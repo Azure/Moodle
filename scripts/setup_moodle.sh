@@ -28,7 +28,7 @@ siteFQDN=$3
 syslogserver=$4
 webServerType=$5
 
-echo $glusterNode    > /tmp/vars.txt
+echo $glusterNode    >> /tmp/vars.txt
 echo $glusterVolume  >> /tmp/vars.txt
 echo $siteFQDN >> /tmp/vars.txt
 echo $syslogserver >> /tmp/vars.txt
@@ -311,7 +311,7 @@ EOF
    sed -i "s/^ExecStart.*/${VARNISHSTART}/" /lib/systemd/system/varnish.service
 
    # Configure varnish VCL for moodle
-   cat <<EOF > /etc/varnish/moodle.vcl
+   cat <<EOF >> /etc/varnish/moodle.vcl
 vcl 4.0;
 
 import std;
