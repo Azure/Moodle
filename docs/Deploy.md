@@ -13,6 +13,19 @@ You will need a local copy of the Moodle ARM templates. These are
 published on GitHub so you should clone them locally (possibly after
 forking them on GitHub).
 
+## Configuration
+
+We will use a number of environment variables to configure our
+deployment. To customize them for your environment copy `env.json`
+into `env.local.json` and edit the contents accordingly. The values
+set within that file are:
+
+``` shell
+echo "Resource Group Name : $MOODLE_RG_NAME"
+echo "Resource Group Location : $MOODLE_RG_LOCATION"
+echo "Deployment Name : $MOODLE_DEPLOYMENT_NAME"
+```
+
 ## Create Resource Group
 
 When you create the Moodle cluster you will create many resources. On

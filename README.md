@@ -22,18 +22,10 @@ This template set deploys the following infrastructure:
 
 ![network_diagram](images/stack_diagram.jpg "Diagram of deployed stack")
 
-## Configuration
+## Quickstart
 
-We will use a number of environment variables to configure our
-deployment. To customize them for your environment copy `env.json`
-into `env.local.json` and edit the contents accordingly. The values
-set within that file are:
-
-``` shell
-echo "Resource Group Name : $MOODLE_RG_NAME"
-echo "Resource Group Location : $MOODLE_RG_LOCATION"
-echo "Deployment Name : $MOODLE_DEPLOYMENT_NAME"
-```
+Why not get started with [deploying a Moodle cluster on
+Azure](docs/Deploy.md) right now.
 
 ## Contributing
 
