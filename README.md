@@ -1,11 +1,14 @@
 # Deploy and Manage a Scalable Moodle Cluster on Azure
 
 This repo contains guides on how to deploy and manage a scalable
-[Moodle](https://moodle.com) cluster on Azure.
+[Moodle](https://moodle.com) cluster on Azure. You can use an [Azure
+free account](https://azure.microsoft.com/en-us/free/) to get started.
 
-This document is designed to be "executed" by Simdem to produce an
-interactive tutorial or a demo environment. However, it can also be
-read as standard documentation.
+Once you have an Azure account you can deploy Moodle via the Azure
+portal using the button below, or you can [deploy Moodle via the
+CLI](docs/Deploy.md).
+
+[![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy.json)  [![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.png)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy.json)
 
 ## What this stack will give you
 
