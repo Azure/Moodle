@@ -140,6 +140,40 @@ http {
 }
 EOF
 
+    cat <<EOF >> /etc/nginx/sites-enabled/${siteFQDN}.conf
+server {
+        listen 443 ssl;
+        root /moodle/html/moodle;
+	index index.php index.html index.htm;
+
+        ssl on;
+        ssl_certificate /moodle/certs/nginx.crt;
+        ssl_certificate_key /moodle/certs/nginx.key;
+
+        # Log to syslog
+        error_log syslog:server=localhost,facility=local1,severity=error,tag=moodle;
+        access_log syslog:server=localhost,facility=local1,severity=notice,tag=moodle moodle_combined;
+
+        # Log XFF IP instead of varnish
+        set_real_ip_from    10.0.0.0/8;
+        set_real_ip_from    127.0.0.1;
+        set_real_ip_from    172.16.0.0/12;
+        set_real_ip_from    192.168.0.0/16;
+        real_ip_header      X-Forwarded-For;
+        real_ip_recursive   on;
+
+        location / {
+          proxy_set_header Host \$host;
+          proxy_set_header HTTP_REFERER \$http_referer;
+          proxy_set_header X-Forwarded-Host \$host;
+          proxy_set_header X-Forwarded-Server \$host;
+          proxy_set_header X-Forwarded-Proto https;
+          proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+          proxy_pass http://localhost:80;
+        }
+}
+EOF
+
   if [ "$webServerType" = "nginx" ]; then
     cat <<EOF >> /etc/nginx/sites-enabled/${siteFQDN}.conf
 server {
@@ -196,44 +230,10 @@ server {
 EOF
   fi
 
-    cat <<EOF > /etc/nginx/sites-enabled/${siteFQDN}.conf
-server {
-        listen 443 ssl;
-        root /moodle/html/moodle;
-	index index.php index.html index.htm;
+  if [ "$webServerType" = "apache" ]; then
+    sed -i "s/Listen 80/Listen 81/" /etc/apache2/ports.conf
 
-        ssl on;
-        ssl_certificate /moodle/certs/nginx.crt;
-        ssl_certificate_key /moodle/certs/nginx.key;
-
-        # Log to syslog
-        error_log syslog:server=localhost,facility=local1,severity=error,tag=moodle;
-        access_log syslog:server=localhost,facility=local1,severity=notice,tag=moodle moodle_combined;
-
-        # Log XFF IP instead of varnish
-        set_real_ip_from    10.0.0.0/8;
-        set_real_ip_from    127.0.0.1;
-        set_real_ip_from    172.16.0.0/12;
-        set_real_ip_from    192.168.0.0/16;
-        real_ip_header      X-Forwarded-For;
-        real_ip_recursive   on;
-
-        location / {
-          proxy_set_header Host \$host;
-          proxy_set_header HTTP_REFERER \$http_referer;
-          proxy_set_header X-Forwarded-Host \$host;
-          proxy_set_header X-Forwarded-Server \$host;
-          proxy_set_header X-Forwarded-Proto https;
-          proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-          proxy_pass http://localhost:80;
-        }
-}
-EOF
-
- if [ "$webServerType" = "apache" ]; then
-   sed -i "s/Listen 80/Listen 81/" /etc/apache2/ports.conf
-
-   cat <<EOF > /etc/apache2/sites-enabled/${siteFQDN}.conf
+    cat <<EOF >> /etc/apache2/sites-enabled/${siteFQDN}.conf
 <VirtualHost *:81>
 	ServerName ${siteFQDN}
 
@@ -246,8 +246,8 @@ EOF
 		Require all granted
 	</Directory>
 
-	ErrorLog "|/usr/bin/logger -t moodle -p local1.error"
-	CustomLog "|/usr/bin/logger -t moodle -p local1.notice" combined
+	ErrorLog \${APACHE_LOG_DIR}/error.log
+	CustomLog \${APACHE_LOG_DIR}/access.log combined combined
 
 </VirtualHost>
 EOF
