@@ -8,6 +8,7 @@
                 "blobStorageAccountType":      { "value": "Standard_LRS"},
                 "controllerVmSku":             { "value": "Standard_DS1_v2" },
                 "dbServerType":                { "value": "postgres" },
+                "webServerType":               { "value": "apache" },
                 "elasticVmSku":                { "value": "Standard_DS2_v2" },
                 "glusterDiskCount":            { "value": 4 },
                 "glusterDiskSize":             { "value": 127 },

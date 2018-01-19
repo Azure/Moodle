@@ -197,7 +197,7 @@
         }
     ],
     "variables": {
-        "cmdExec": "[concat('bash ',parameters('moodleCommon').moodleSetupScriptFilename,' ',parameters('moodleCommon').gfsNameRoot,'0', ' ','data', ' ', parameters('moodleCommon').siteURL, ' ', concat('jumpbox-vm-',parameters('moodleCommon').resourcesPrefix))]",
+        "cmdExec": "[concat('bash ',parameters('moodleCommon').moodleSetupScriptFilename,' ',parameters('moodleCommon').gfsNameRoot,'0', ' ','data', ' ', parameters('moodleCommon').siteURL, ' ', concat('jumpbox-vm-',parameters('moodleCommon').resourcesPrefix), ' ', parameters('moodleCommon').webServerType)]",
         "dstorID": "[resourceId('Microsoft.Storage/storageAccounts',parameters('moodleCommon').vmssdStorageAccounttName)]",
         "extBeID": "[concat(variables('extLbID'),'/backendAddressPools/',parameters('moodleCommon').extBeName)]",
         "extFeID": "[concat(variables('extLbID'),'/frontendIPConfigurations/',parameters('moodleCommon').extFeName)]",
