@@ -32,17 +32,32 @@ Azure](docs/Deploy.md) right now.
 
 ## Contributing
 
-This project welcomes contributions and suggestions. Most
-contributions require you to agree to a Contributor License Agreement
-(CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit
-https://cla.microsoft.com.
+This project welcomes contributions and suggestions. Our goal is to
+work on Azure specific tooling for deploying and managing the open
+source [Moodle](http://moodle.org) learning management system on
+Azure. We do not work on Moodle itself here, instead we work upstream
+as appropriate.
 
-When you submit a pull request, a CLA-bot will automatically determine
-whether you need to provide a CLA and decorate the PR appropriately
-(e.g., label, comment). Simply follow the instructions provided by the
-bot. You will only need to do this once across all repos using our
-CLA.
+The short version of how to contribute to this project is "just do
+it". Where "it" can be defined as any valuable contribution (and to be
+clear, asking questions is a valuable contribution):
+
+  * ask questions
+  * provide feedback
+  * write or update documentation
+  * help new users
+  * recommend the project to others
+  * test the code and report bugs
+  * fix bugs and issue pull requests
+  * give us feedback on required features
+  * write and update the software
+  * create artwork
+  * translate to different languages
+  * anything you can see that needs doing
+
+For a more detailed discussion of how to contribute see our [Contribution Guide](CONTRIBUTE.md).
+
+## Code of Conduct
 
 This project has adopted the [Microsoft Open Source Code of
 Conduct](https://opensource.microsoft.com/codeofconduct/). For more
