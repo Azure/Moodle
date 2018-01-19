@@ -246,8 +246,8 @@ EOF
 		Require all granted
 	</Directory>
 
-	ErrorLog \${APACHE_LOG_DIR}/error.log
-	CustomLog \${APACHE_LOG_DIR}/access.log combined combined
+	ErrorLog "|/usr/bin/logger -t moodle -p local1.error"
+	CustomLog "|/usr/bin/logger -t moodle -p local1.notice" combined
 
 </VirtualHost>
 EOF
