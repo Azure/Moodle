@@ -89,3 +89,108 @@ where to spend their time. For example:
     Community members should seek to solve the problem in different
     ways. Often this will mean contribution to Moodle itself or a
     plugin that is external to this community.
+
+# Community roles
+
+This section outlines roles and responsibilities within the community.
+
+## Users
+
+Users self-identify by using our software and documentation. Their
+responsibilities are to benefit from our work, but we welcome
+contributions from users, such as:
+
+  * Ask questions
+  * Answer questions
+  * Feature requests
+  * Bug reports
+  * Design reviews
+  * Planning reviews
+  * Evangelize the project
+  * and more...
+  
+Some users will become more involved with the project, those users
+become Contributors.
+
+## Contributors
+
+Contributes self-identify by making longer term commitments to our
+project. Their responsibilities are to help the project be succesful
+by ensuring that our work matches the needs of our users.
+Possible contributions can include:
+
+  * Everything a User might contribute
+  * Remove blocks for users
+  * Provide design input
+  * Review pull requests
+  * Implement features
+  * Triage questions, feature requests and bug reports
+  * and more...
+  
+Some contributors will become very engaged and therefore become an
+essential part of the community, these contributors will become
+Maintainers.
+
+## Maintainers
+
+We are fans of efficient processes. Maintainers are people who insert
+themselves into our process to ensure they run well. The goal is to
+empower our contributors who in turn focus on delighting our users.
+Maintainers contributions may include:
+
+  * Everyting Users and Contributors do
+  * Merge pull requests where appropriate
+  * Seek community consensus where conflict occurs
+  * Remove blocks for contributors
+  * and more...
+
+# Pull requests, Review and Merges
+
+We like efficient processes. Anyone is welcome to issue pull requests.
+Everyone is encouraged to review pull requests. Maintainers are
+responsible for merging pull requests but they are not responsible for
+reviews, that is a community wide responsibility.
+
+We operate under two models of review process as appropriate to each
+circumstance:
+
+  * Merge then Review (our preferred model)
+  * Review then Merge
+  
+## Merge Then Review
+
+In the "merge then review" model a maintainer will merge the pull
+request into with minimal review. Community members are still expected
+to review the code, but it is done after the fact.
+
+The goal is to get the code into a shared repository as early as
+possible. This allows people, including advanced users, to start
+testing it. This ensures we have the maximum possible exposure to
+testing in real scenarios early in the process. Encouragin bug reports
+from the whole community ensures we have visibility into breaks as
+early as possible.
+
+This model has its risks, however. If a PR is on the critical path or
+it is controversial in some way it is expected that maintainers will
+ensure it recieves a thorough review before merging (see next section
+on "Review then Merge". This decision is at the discretion of the
+maintainer who first triages the pull request.
+
+Should a mistake be made and a bad merge be performed then it can
+often be easier and faster to fix it under the "Merge then Review"
+model than it is to provide feedback to the original author and await
+a fix from them. Should the mistake have a high impact and/or no easy
+fix is available we simply roll back the merge and provide feedback
+via the review process.
+
+It should be noted that this model means that maintainers have the
+right to simply merge their own code and expect others to review it
+*after*. Maintainers are expected to use their best judgement when
+excercising this priviledge.
+
+## Review Then Merge
+
+Where a change is on the critical path or it is potentiall
+contriversial maintainers should request reviews using the GitHub
+tooling. The last reviewer to sign-off on the pull request will merge
+the pull request.
