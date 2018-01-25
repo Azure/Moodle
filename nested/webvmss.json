@@ -35,36 +35,18 @@
                     "extensionProfile": {
                         "extensions": [
                             {
-                                "name": "LinuxDiagnostic",
-                                "properties": {
-                                    "autoUpgradeMinorVersion": true,
-                                    "protectedSettings": {
-                                        "storageAccountEndPoint": "https://core.windows.net",
-                                        "storageAccountKey": "[listkeys(variables('dstorID'), variables('storageApiVersion')).key1]",
-                                        "storageAccountName": "[parameters('moodleCommon').vmssdStorageAccounttName]"
-                                    },
-                                    "publisher": "Microsoft.OSTCExtensions",
-                                    "settings": {
-                                        "storageAccount": "[parameters('moodleCommon').vmssdStorageAccounttName]",
-                                        "xmlCfg": "[base64(concat(variables('wadCfgxStart'), variables('vmssID'), variables('wadCfgxEnd')))]"
-                                    },
-                                    "type": "LinuxDiagnostic",
-                                    "typeHandlerVersion": "2.3"
-                                }
-                            },
-                            {
                                 "name": "setup_moodle",
                                 "properties": {
                                     "autoUpgradeMinorVersion": true,
-                                    "publisher": "Microsoft.OSTCExtensions",
+                                    "publisher": "Microsoft.Azure.Extensions",
                                     "settings": {
                                         "commandToExecute": "[variables('cmdExec')]",
                                         "fileUris": [
                                             "[variables('scriptUri')]"
                                         ]
                                     },
-                                    "type": "CustomScriptForLinux",
-                                    "typeHandlerVersion": "1.4"
+                                    "type": "CustomScript",
+                                    "typeHandlerVersion": "2.0"
                                 }
                             }
                         ]
@@ -152,7 +134,7 @@
                         "rules": [
                             {
                                 "metricTrigger": {
-                                    "metricName": "\\Processor\\PercentProcessorTime",
+                                    "metricName": "Percentage CPU",
                                     "metricNamespace": "",
                                     "metricResourceUri": "[variables('vmssID')]",
                                     "operator": "GreaterThan",
@@ -171,7 +153,7 @@
                             },
                             {
                                 "metricTrigger": {
-                                    "metricName": "\\Processor\\PercentProcessorTime",
+                                    "metricName": "Percentage CPU",
                                     "metricNamespace": "",
                                     "metricResourceUri": "[variables('vmssID')]",
                                     "operator": "LessThan",
@@ -208,10 +190,6 @@
         "storageApiVersion": "2015-06-15",
         "subnetWebRef": "[concat(resourceId('Microsoft.Network/virtualNetworks',parameters('moodleCommon').vnetName),'/subnets/',parameters('moodleCommon').subnetWeb)]",
         "vmssID": "[resourceId('Microsoft.Compute/virtualMachineScaleSets',parameters('moodleCommon').vmssName)]",
-        "wadCfgxEnd": "[concat('\"><MetricAggregation scheduledTransferPeriod=\"PT1H\"/><MetricAggregation scheduledTransferPeriod=\"PT1M\"/></Metrics></DiagnosticMonitorConfiguration></WadCfg>')]",
-        "wadCfgxStart": "[concat(variables('wadLogs'),variables('wadPerfCounter'),'<Metrics resourceId=\"')]",
-        "wadLogs": "<WadCfg><DiagnosticMonitorConfiguration>",
-        "wadPerfCounter": "<PerformanceCounters scheduledTransferPeriod=\"PT1M\"><PerformanceCounterConfiguration counterSpecifier=\"\\Processor\\PercentProcessorTime\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU percentage guest OS\" locale=\"en-us\"/></PerformanceCounterConfiguration></PerformanceCounters>",
         "webvmss1NIC": "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('moodleCommon').vmssName, '/virtualMachines/0/networkInterfaces/vmssnic')]"
     },
     "outputs": {

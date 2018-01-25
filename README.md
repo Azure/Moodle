@@ -8,12 +8,12 @@ Once you have an Azure account you can deploy Moodle via the Azure
 portal using the button below, or you can [deploy Moodle via the
 CLI](docs/Deploy.md).
 
-[![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy.json)  [![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.png)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy.json)
+[![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fhosungsmsft%2FMoodle%2Fmaster%2Fazuredeploy.json)  [![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.png)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2Fhosungsmsft%2FMoodle%2Fmaster%2Fazuredeploy.json)
 
 ## What this stack will give you
 
 This template set deploys the following infrastructure:
-- Autoscaling web frontend layer (Nginx for https termination, Varnish for caching, Nginx/php-fpm or Apache/php)
+- Autoscaling web frontend layer (Nginx for https termination, Varnish for caching, Apache/php or nginx/php-fpm)
 - Private virtual network for frontend instances
 - Controller instance running cron and handling syslog for the autoscaled site
 - Load balancer to balance across the autoscaled instances
