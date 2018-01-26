@@ -38,10 +38,10 @@
             "type": "string"
         },
         "dbServerType": {
-            "defaultValue": "postgres",
+            "defaultValue": "mysql",
             "allowedValues": [
-                "postgres",
-                "mysql"
+                "mysql",
+                "postgres"
             ],
             "metadata": {
                 "description": "Database type"
