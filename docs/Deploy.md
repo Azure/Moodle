@@ -21,6 +21,10 @@ into `env.local.json` and edit the contents accordingly. The values
 set within that file are:
 
 ``` shell
+TIME=$(date +%s)
+MOODLE_RG_NAME=moodle_$TIME
+MOODLE_RG_LOCATION=southcentralus
+MOODLE_DEPLOYMENT_NAME="MasterDeploy"
 echo "Resource Group Name : $MOODLE_RG_NAME"
 echo "Resource Group Location : $MOODLE_RG_LOCATION"
 echo "Deployment Name : $MOODLE_DEPLOYMENT_NAME"
@@ -68,9 +72,7 @@ proceed with the defaults, but there is one value, the `sshPublicKey`
 that **must** be provided. To automatically add your default SSH key
 (in Bash) use the following command:
 
-```
 FIXME: sed command to add SSH key
-```
 
 ## Deploy cluster
 
@@ -78,7 +80,7 @@ Now that we have a resource group and a configuration file we can
 create the cluster itself. This is done with a single command:
 
 ```
-az group deployment create --name $MOODLE_DEPLOYMENT_NAME --resource-group $MOODLE_RG_NAME --template-file ~/projects/azure-quickstart-templates/moodle-scalable-cluster-ubuntu/azuredeploy.json --parameters azuredeploy.parameters.json
+az group deployment create --name $MOODLE_DEPLOYMENT_NAME --resource-group $MOODLE_RG_NAME --template-file ../azuredeploy.json --parameters azuredeploy.parameters.json
 ```
 
 ## Using the created stack

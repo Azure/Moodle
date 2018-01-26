@@ -6,9 +6,9 @@ management tasks on a scalable Moodle cluster on Azure.
 ## Prerequisites
 
 In order to manage a cluster it is clearly necessary to first [deploy
-a scalable Moodle cluster on Azure](../Deploy/README.md).
+a scalable Moodle cluster on Azure](./Deploy.md).
 
-For convenience and readability this document also assumes that essential [deployment details for your cluster have been assigned to environment variables](../GetInstallData/README.md).
+For convenience and readability this document also assumes that essential [deployment details for your cluster have been assigned to environment variables](./Get-Install-Data.md).
 
 ## Updating Moodle code/settings
 
