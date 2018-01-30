@@ -295,6 +295,18 @@
     },
     "resources": [
         {
+            "name": "pid-738e3eec-68d4-4667-8377-c05c77c21f1b",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": []
+                }
+            }
+        },
+        {
             "apiVersion": "2015-01-01",
             "name": "dbTemplate",
             "properties": {
@@ -410,7 +422,7 @@
                 "Microsoft.Resources/deployments/redisTemplate",
                 "Microsoft.Resources/deployments/blobStorageAccountTemplate"
             ],
-            "name": "pid-738e3eec-68d4-4667-8377-c05c77c21f1b",
+            "name": "controllerTemplate",
             "properties": {
                 "mode": "Incremental",
                 "parameters": {
