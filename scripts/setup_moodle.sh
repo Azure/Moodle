@@ -140,7 +140,8 @@ http {
 }
 EOF
 
-    cat <<EOF >> /etc/nginx/sites-enabled/${siteFQDN}.conf
+  # Configure nginx/https
+  cat <<EOF >> /etc/nginx/sites-enabled/${siteFQDN}.conf
 server {
         listen 443 ssl;
         root /moodle/html/moodle;
@@ -231,7 +232,9 @@ EOF
   fi
 
   if [ "$webServerType" = "apache" ]; then
+    # Configure Apache/php
     sed -i "s/Listen 80/Listen 81/" /etc/apache2/ports.conf
+    a2enmod rewrite && a2enmod remoteip && a2enmod headers
 
     cat <<EOF >> /etc/apache2/sites-enabled/${siteFQDN}.conf
 <VirtualHost *:81>
@@ -246,8 +249,20 @@ EOF
 		Require all granted
 	</Directory>
 
+    # Redirect unencrypted direct connections to HTTPS
+    <IfModule mod_rewrite.c>
+      RewriteEngine on
+      RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
+      RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [L,R=301]
+    </IFModule>
+
+    # Log X-Forwarded-For IP address instead of varnish (127.0.0.1)
+    SetEnvIf X-Forwarded-For "^.*\..*\..*\..*" forwarded
+    LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+    LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" forwarded
 	ErrorLog "|/usr/bin/logger -t moodle -p local1.error"
-	CustomLog "|/usr/bin/logger -t moodle -p local1.notice" combined
+    CustomLog "|/usr/bin/logger -t moodle -p local1.notice" combined env=!forwarded
+    CustomLog "|/usr/bin/logger -t moodle -p local1.notice" forwarded env=forwarded
 
 </VirtualHost>
 EOF

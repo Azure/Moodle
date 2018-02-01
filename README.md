@@ -13,7 +13,7 @@ CLI](docs/Deploy.md).
 ## What this stack will give you
 
 This template set deploys the following infrastructure:
-- Autoscaling web frontend layer (Nginx for https termination, Varnish for caching, Nginx/php-fpm or Apache/php)
+- Autoscaling web frontend layer (Nginx for https termination, Varnish for caching, Apache/php or nginx/php-fpm)
 - Private virtual network for frontend instances
 - Controller instance running cron and handling syslog for the autoscaled site
 - Load balancer to balance across the autoscaled instances
@@ -23,7 +23,7 @@ This template set deploys the following infrastructure:
 - Three Elasticsearch VMs for search indexing in Moodle
 - Dual gluster nodes for high availability access to Moodle files
 
-![network_diagram](images/stack_diagram.jpg "Diagram of deployed stack")
+![network_diagram](images/stack_diagram.png "Diagram of deployed stack")
 
 ## Quickstart
 
