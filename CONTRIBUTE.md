@@ -34,7 +34,27 @@ whether you need to provide a CLA and decorate the PR appropriately
 bot. You will only need to do this once across all repos using our
 CLA.
 
-# Planning
+## Decision Making
+
+This is a community project. Decisions are made through consensus
+building. All voices are equal and we welcome input from everyone.
+
+That said, this is not a democracy. Consensus does not mean everyone
+has to agree. It merely means that nobody is objecting *and* offering
+an alternative.
+
+What this means, in practive, is that she who does the work makes the
+decisions. We'd rather discuss how to improve imperfect code than
+argue over what would make perfect code. So if you have an objection
+to the way we are doing things issue a pull request.
+
+In the unlikely event that we cannot reach consensus through consensus
+then the project maintainers (as identified by their having the admin
+bit on GitHub) will make a judgetment call. But normally their
+role is to guide the community to consensus action, not to make
+decisions on bhalf of the community.
+
+## Planning
 
 This is an open source project. We have a few mantras to ensure
 efficient collaboration, these mostly boil down to ensuring good
@@ -43,7 +63,7 @@ visibility into the communities goals. These include:
   * If it didn't happen in public, it didn't happen
   * Scratch your own itch
   
-## If it didn't happen in public, it didn't happen (aka full transparency)
+### If it didn't happen in public, it didn't happen (aka full transparency)
 
 The goal of this mantra is to ensure maximum visibility into our
 communities work in order to:
@@ -55,7 +75,7 @@ communities work in order to:
   
 Both of these goals lead to the second mantra "Scratch your own itch".
 
-## Scratch your own itch (aka getting what you want)
+### Scratch your own itch (aka getting what you want)
 
 This is an open source project. We welcome feature requests and, as a
 community, we will provide feedback on whether we intend to work on it
@@ -90,11 +110,11 @@ where to spend their time. For example:
     ways. Often this will mean contribution to Moodle itself or a
     plugin that is external to this community.
 
-# Community roles
+## Community roles
 
 This section outlines roles and responsibilities within the community.
 
-## Users
+### Users
 
 Users self-identify by using our software and documentation. Their
 responsibilities are to benefit from our work, but we welcome
@@ -112,7 +132,7 @@ contributions from users, such as:
 Some users will become more involved with the project, those users
 become Contributors.
 
-## Contributors
+### Contributors
 
 Contributes self-identify by making longer term commitments to our
 project. Their responsibilities are to help the project be succesful
@@ -131,7 +151,7 @@ Some contributors will become very engaged and therefore become an
 essential part of the community, these contributors will become
 Maintainers.
 
-## Maintainers
+### Maintainers
 
 We are fans of efficient processes. Maintainers are people who insert
 themselves into our process to ensure they run well. The goal is to
@@ -144,7 +164,7 @@ Maintainers contributions may include:
   * Remove blocks for contributors
   * and more...
 
-# Pull requests, Review and Merges
+## Pull requests, Review and Merges
 
 We like efficient processes. Anyone is welcome to issue pull requests.
 Everyone is encouraged to review pull requests. Maintainers are
@@ -157,7 +177,7 @@ circumstance:
   * Merge then Review (our preferred model)
   * Review then Merge
   
-## Merge Then Review
+### Merge Then Review
 
 In the "merge then review" model a maintainer will merge the pull
 request into with minimal review. Community members are still expected
@@ -188,9 +208,10 @@ right to simply merge their own code and expect others to review it
 *after*. Maintainers are expected to use their best judgement when
 excercising this priviledge.
 
-## Review Then Merge
+### Review Then Merge
 
 Where a change is on the critical path or it is potentiall
 contriversial maintainers should request reviews using the GitHub
 tooling. The last reviewer to sign-off on the pull request will merge
 the pull request.
+
