@@ -295,6 +295,7 @@
     },
     "resources": [
         {
+            "apiVersion":"2017-08-01",
             "name": "pid-738e3eec-68d4-4667-8377-c05c77c21f1b",
             "type": "Microsoft.Resources/deployments",
             "properties": {
