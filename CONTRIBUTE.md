@@ -1,5 +1,15 @@
 # Contributing to Moodle on Azure 
 
+The TL;DR version is:
+
+  * We are a community project
+  * We seek to make decisions through community consensus
+  * We prefer debate through gradual improvement through pull requests to endless discussion about the "perfect" solution
+  * We are a meritocracy, not a democracy
+  * We welcome all your contributions including but not limited to feature requests, bug-reports, documentation and code
+  
+## How the project is managed
+
 This project welcomes contributions and suggestions. Our goal is to
 work on Azure specific tooling for deploying and managing the open
 source [Moodle](http://moodle.org) learning management system on
@@ -53,6 +63,15 @@ then the project maintainers (as identified by their having the admin
 bit on GitHub) will make a judgetment call. But normally their
 role is to guide the community to consensus action, not to make
 decisions on bhalf of the community.
+
+## Minimum Bar for Contributions
+
+As the project matures we will add more thorough testing. It is expected
+that all contributions pass the currently available suite of tests. If
+they do not then they will be rejected.
+
+It is also required that contributions which add features also bring
+at least basic testing of that feature.
 
 ## Planning
 
