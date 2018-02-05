@@ -175,7 +175,7 @@
             ],
             "defaultValue": 50,
             "metadata": {
-                "description": "Postgresql database trasaction units"
+                "description": "MySql/Postgresql database trasaction units"
             },
             "type": "int"
         },
@@ -185,7 +185,7 @@
             ],
             "defaultValue": "SkuFamily",
             "metadata": {
-                "description": "Postgresql sku family"
+                "description": "MySql/Postgresql sku family"
             },
             "type": "string"
         },
@@ -204,16 +204,16 @@
                 "MYSQLS400",
                 "MYSQLS800"
             ],
-            "defaultValue": "PGSQLB50",
+            "defaultValue": "MYSQLB50",
             "metadata": {
-                "description": "Postgresql sku name"
+                "description": "MySql/Postgresql sku name"
             },
             "type": "string"
         },
         "skuSizeMB": {
             "defaultValue": 51200,
             "metadata": {
-                "description": "Postgresql sku size in mb"
+                "description": "MySql/Postgresql sku size in MB. For Basic tier, minimum 50GB, increased by 125GB up to 1TB. For Standard tier, minimum 125GB, increase by 125GB up to 1TB"
             },
             "type": "int"
         },
@@ -224,7 +224,7 @@
             ],
             "defaultValue": "Basic",
             "metadata": {
-                "description": "Postgresql sku tier"
+                "description": "MySql/Postgresql sku tier"
             },
             "type": "string"
         },
@@ -248,7 +248,7 @@
             ],
             "defaultValue": "Disabled",
             "metadata": {
-                "description": "Postgresql SSL connection"
+                "description": "MySql/Postgresql SSL connection"
             },
             "type": "string"
         },
@@ -295,7 +295,7 @@
     },
     "resources": [
         {
-            "apiVersion":"2017-08-01",
+            "apiVersion": "2017-08-01",
             "name": "pid-738e3eec-68d4-4667-8377-c05c77c21f1b",
             "type": "Microsoft.Resources/deployments",
             "properties": {
