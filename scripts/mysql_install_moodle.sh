@@ -625,14 +625,11 @@ EOF
     /usr/bin/unzip -q moodle.zip
     /bin/mv -v moodle-'$moodleVersion' /moodle/html/moodle
 
-    # Commented out as the plugin is not available
     # install Office 365 plugins
-    #if [ "$installOfficePlugins" = "True" ]; then
-    #        curl -k --max-redirs 10 https://github.com/Microsoft/o365-moodle/archive/'$moodleVersion'.zip -L -o o365.zip
-    #        unzip -q o365.zip
-    #        cp -r o365-moodle-'$moodleVersion'/* /moodle/html/moodle
-    #        rm -rf o365-moodle-'$moodleVersion'
-    #fi
+    curl -k --max-redirs 10 https://github.com/Microsoft/o365-moodle/archive/'$moodleVersion'.zip -L -o o365.zip
+    unzip -q o365.zip
+    cp -r o365-moodle-'$moodleVersion'/* /moodle/html/moodle
+    rm -rf o365-moodle-'$moodleVersion'
 
     # Install ElasticSearch plugin
     /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-search_elastic/archive/master.zip -L -o plugin-elastic.zip
