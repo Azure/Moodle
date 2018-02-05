@@ -121,7 +121,7 @@
                     "dataDisks": "[reference(concat(variables('vmName'),'-diskSelection')).outputs.dataDiskArray.value]",
                     "imageReference": "[parameters('moodleCommon').osType]",
                     "osDisk": {
-                        "createOption": "fromImage",
+                        "createOption": "FromImage",
                         "managedDisk": {
                             "storageAccountType": "Premium_LRS"
                         },
@@ -135,6 +135,7 @@
             "type": "Microsoft.Compute/virtualMachines"
         },
         {
+            "condition": "[equals(parameters('moodleCommon').applyScriptsSwitch,1)]",
             "apiVersion": "2015-01-01",
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachines/',variables('vmName'))]"
@@ -154,12 +155,13 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(    parameters('moodleCommon').baseTemplateUrl,'glustervmconfig',parameters('moodleCommon').applyScriptsSwitch,'.json')]"
+                    "uri": "[concat(    parameters('moodleCommon').baseTemplateUrl,'glustervmconfig.json')]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
         },
         {
+            "condition": "[equals(parameters('moodleCommon').azureBackupSwitch,1)]",
             "apiVersion": "2015-01-01",
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachines/',variables('vmName'))]"
@@ -176,7 +178,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(    parameters('moodleCommon').baseTemplateUrl,'recoveryservicesEnlist',parameters('moodleCommon').azureBackupSwitch,'.json')]"
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'recoveryservicesEnlist.json')]"
                 }
             },
             "type": "Microsoft.Resources/deployments"

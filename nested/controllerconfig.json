@@ -28,15 +28,15 @@
             "name": "[concat(parameters('moodleCommon').jboxVmName,'/','install_moodle')]",
             "properties": {
                 "autoUpgradeMinorVersion": true,
-                "publisher": "Microsoft.OSTCExtensions",
+                "publisher": "Microsoft.Azure.Extensions",
                 "settings": {
                     "commandToExecute": "[variables('cmdExec')]",
                     "fileUris": [
                         "[variables('scriptUri')]"
                     ]
                 },
-                "type": "CustomScriptForLinux",
-                "typeHandlerVersion": "1.4"
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0"
             },
             "tags": {
                 "displayName": "install_moodle"
@@ -57,7 +57,7 @@
         "documentation09": "    moodleDbName                - database name for moodle",
         "documentation10": "    moodleDbUser                - database user for moodle",
         "documentation11": "    moodleDbPass                - database password for moodleDbUser",
-        "documentation11": "    moodleAdminPass             - password for moodle admin user",
+        "documentation12": "    moodleAdminPass             - password for moodle admin user",
         "scriptUri": "[concat(parameters('moodleCommon').ScriptLocation,parameters('moodleCommon').moodleInstallScriptFilename)]"
     }
 }

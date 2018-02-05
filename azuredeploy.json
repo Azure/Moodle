@@ -324,6 +324,7 @@
             "type": "Microsoft.Resources/deployments"
         },
         {
+            "condition": "[equals(parameters('azureBackupSwitch'),1)]",
             "apiVersion": "2015-01-01",
             "name": "recoveryTemplate",
             "properties": {
@@ -334,7 +335,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'recoveryservices',variables('moodleCommon').azureBackupSwitch,'.json')]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'recoveryservices.json')]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -582,9 +583,9 @@
             "lbDns": "[concat('lb-',variables('resourceprefix'),'.',resourceGroup().location,'.cloudapp.azure.com')]",
             "lbName": "[concat('lb-',variables('resourceprefix'))]",
             "lbPipName": "[concat('lb-pubip-',variables('resourceprefix'))]",
-            "moodleAdminPass": "[concat(toUpper('xl'), substring(uniqueString(resourceGroup().id, deployment().name), 6, 7),'<,!1*8')]",
+            "moodleAdminPass": "[concat(toUpper('xl'), substring(uniqueString(resourceGroup().id, deployment().name), 6, 7),',1*8')]",
             "moodleDbName": "moodle",
-            "moodleDbPass": "[concat('9(#36^', substring(uniqueString(resourceGroup().id, deployment().name), 5, 8), toUpper('ercq'))]",
+            "moodleDbPass": "[concat('9#36^', substring(uniqueString(resourceGroup().id, deployment().name), 5, 8), toUpper('ercq'))]",
             "moodleDbUser": "moodle",
             "moodleDbUserAzure": "[concat('moodle', '@', parameters('dbServerType'), '-', variables('resourceprefix'))]",
             "moodleInstallScriptFilename": "[concat(parameters('dbServerType'), '_', 'install_moodle.sh')]",

@@ -27,7 +27,7 @@
             "location": "[resourceGroup().location]",
             "name": "[parameters('moodleCommon').vmssName]",
             "properties": {
-                "overprovision": "true",
+                "overprovision": true,
                 "upgradePolicy": {
                     "mode": "Manual"
                 },
@@ -71,7 +71,7 @@
                                             }
                                         }
                                     ],
-                                    "primary": "true"
+                                    "primary": true
                                 }
                             }
                         ]
