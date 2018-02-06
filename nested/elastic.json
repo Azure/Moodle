@@ -84,7 +84,7 @@
             "type": "Microsoft.Compute/virtualMachines"
         },
         {
-            "condition": "[equals(parameters('moodleCommon').applyScriptsSwitch,1)]",
+            "condition": "[parameters('moodleCommon').applyScriptsSwitch]",
             "apiVersion": "2015-01-01",
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachines/', parameters('moodleCommon').elasticVmName1)]"
@@ -105,7 +105,7 @@
             "type": "Microsoft.Resources/deployments"
         },
         {
-            "condition": "[equals(parameters('moodleCommon').azureBackupSwitch,1)]",
+            "condition": "[parameters('moodleCommon').azureBackupSwitch]",
             "apiVersion": "2015-01-01",
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachines/',parameters('moodleCommon').elasticVmName1)]"
@@ -191,7 +191,7 @@
             "type": "Microsoft.Compute/virtualMachines"
         },
         {
-            "condition": "[equals(parameters('moodleCommon').applyScriptsSwitch,1)]",
+            "condition": "[parameters('moodleCommon').applyScriptsSwitch]",
             "apiVersion": "2015-01-01",
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachines/', parameters('moodleCommon').elasticVmName2)]"
@@ -212,7 +212,7 @@
             "type": "Microsoft.Resources/deployments"
         },
         {
-            "condition": "[equals(parameters('moodleCommon').azureBackupSwitch,1)]",
+            "condition": "[parameters('moodleCommon').azureBackupSwitch]",
             "apiVersion": "2015-01-01",
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachines/',parameters('moodleCommon').elasticVmName2)]"
@@ -298,7 +298,7 @@
             "type": "Microsoft.Compute/virtualMachines"
         },
         {
-            "condition": "[equals(parameters('moodleCommon').applyScriptsSwitch,1)]",
+            "condition": "[parameters('moodleCommon').applyScriptsSwitch]",
             "apiVersion": "2015-01-01",
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachines/', parameters('moodleCommon').elasticVmName3)]"
@@ -319,7 +319,7 @@
             "type": "Microsoft.Resources/deployments"
         },
         {
-            "condition": "[equals(parameters('moodleCommon').azureBackupSwitch,1)]",
+            "condition": "[parameters('moodleCommon').azureBackupSwitch]",
             "apiVersion": "2015-01-01",
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachines/',parameters('moodleCommon').elasticVmName3)]"

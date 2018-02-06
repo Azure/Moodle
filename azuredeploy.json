@@ -3,26 +3,32 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "applyScriptsSwitch": {
-            "allowedValues": [
-                0,
-                1
-            ],
-            "defaultValue": 1,
+            "defaultValue": true,
             "metadata": {
                 "description": "Switch to process or bypass all scripts/extensions"
             },
-            "type": "int"
+            "type": "bool"
         },
         "azureBackupSwitch": {
-            "allowedValues": [
-                0,
-                1
-            ],
-            "defaultValue": 0,
+            "defaultValue": false,
             "metadata": {
                 "description": "Switch to configure AzureBackup and enlist VM's"
             },
-            "type": "int"
+            "type": "bool"
+        },
+        "installO365pluginsSwitch": {
+            "defaultValue": false,
+            "metadata": {
+                "description": "Switch to install Moodle Office 365 plugins"
+            },
+            "type": "bool"
+        },
+        "installElasticSearchSwitch": {
+            "defaultValue": false,
+            "metadata": {
+                "description": "Switch to install Moodle ElasticSearch plugins & VMs"
+            },
+            "type": "bool"
         },
         "blobStorageAccountType": {
             "defaultValue": "Standard_LRS",
@@ -324,7 +330,7 @@
             "type": "Microsoft.Resources/deployments"
         },
         {
-            "condition": "[equals(parameters('azureBackupSwitch'),1)]",
+            "condition": "[parameters('azureBackupSwitch')]",
             "apiVersion": "2015-01-01",
             "name": "recoveryTemplate",
             "properties": {
@@ -376,6 +382,7 @@
             "type": "Microsoft.Resources/deployments"
         },
         {
+            "condition": "[parameters('installElasticSearchSwitch')]",
             "apiVersion": "2015-01-01",
             "dependsOn": [
                 "Microsoft.Resources/deployments/networkTemplate",
@@ -576,6 +583,8 @@
             "glusterScriptFilename": "install_gluster.sh",
             "glusterVmCount": 2,
             "glusterVmSku": "[parameters('glusterVmSku')]",
+            "installO365pluginsSwitch": "[parameters('installO365pluginsSwitch')]",
+            "installElasticSearchSwitch": "[parameters('installElasticSearchSwitch')]",
             "jboxNicName": "[concat('jumpbox-vm-nic-',variables('resourceprefix'))]",
             "jboxNsgName": "[concat('jumpbox-nsg-',variables('resourceprefix'))]",
             "jboxPipName": "[concat('jumpbox-pubip-',variables('resourceprefix'))]",
