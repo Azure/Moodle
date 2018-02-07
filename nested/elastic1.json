@@ -98,7 +98,7 @@
 
                 },
                 "templateLink": {
-                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'elasticconfig',parameters('moodleCommon').applyScriptsSwitch,'.json')]"
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'elasticconfig',parameters('moodleCommon')applyScriptsSwitch,'.json')]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -203,7 +203,7 @@
 
                 },
                 "templateLink": {
-                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'elasticconfig',parameters('moodleCommon').applyScriptsSwitch,'.json')]"
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'elasticconfig',parameters('moodleCommon')applyScriptsSwitch,'.json')]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -308,7 +308,7 @@
 
                 },
                 "templateLink": {
-                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'elasticconfig',parameters('moodleCommon').applyScriptsSwitch,'.json')]"
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'elasticconfig',parameters('moodleCommon')applyScriptsSwitch,'.json')]"
                 }
             },
             "type": "Microsoft.Resources/deployments"

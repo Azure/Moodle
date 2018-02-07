@@ -38,7 +38,8 @@
     azuremoodledbuser=$14
     redisDns=$15
     redisAuth=$16
-    elasticVm1IP=$17
+    elasticEnable=$17
+    elasticVm1IP=$18
 
     echo $moodleVersion        >> /tmp/vars.txt
     echo $glusterNode          >> /tmp/vars.txt
@@ -48,7 +49,7 @@
     echo $moodledbname         >> /tmp/vars.txt
     echo $moodledbuser         >> /tmp/vars.txt
     echo $moodledbpass         >> /tmp/vars.txt
-    echo    $adminpass         >> /tmp/vars.txt
+    echo $adminpass            >> /tmp/vars.txt
     echo $pgadminlogin         >> /tmp/vars.txt
     echo $pgadminpass          >> /tmp/vars.txt
     echo $wabsacctname         >> /tmp/vars.txt
@@ -56,6 +57,7 @@
     echo $azuremoodledbuser    >> /tmp/vars.txt
     echo $redisDns             >> /tmp/vars.txt
     echo $redisAuth            >> /tmp/vars.txt
+    echo $elasticEnable        >> /tmp/vars.txt
     echo $elasticVm1IP         >> /tmp/vars.txt
 
     # make sure system does automatic updates and fail2ban
@@ -635,11 +637,13 @@ EOF
     #fi
 
     # Install ElasticSearch plugin
-    /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-search_elastic/archive/master.zip -L -o plugin-elastic.zip
-    /usr/bin/unzip -q plugin-elastic.zip
-    /bin/mkdir -p /moodle/html/moodle/search/engine/elastic
-    /bin/cp -r moodle-search_elastic-master/* /moodle/html/moodle/search/engine/elastic
-    /bin/rm -rf moodle-search_elastic-master
+    if [ "'$elasticEnable'" == "1" ]; then
+	    /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-search_elastic/archive/master.zip -L -o plugin-elastic.zip
+	    /usr/bin/unzip -q plugin-elastic.zip
+	    /bin/mkdir -p /moodle/html/moodle/search/engine/elastic
+	    /bin/cp -r moodle-search_elastic-master/* /moodle/html/moodle/search/engine/elastic
+	    /bin/rm -rf moodle-search_elastic-master
+    fi
 
     # Install ElasticSearch plugin dependency
     /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-local_aws/archive/master.zip -L -o local-aws.zip
@@ -2097,9 +2101,11 @@ EOF
     sed -i "23 a \$CFG->sslproxy  = 'true';" /moodle/html/moodle/config.php
 
     # Set up elasticsearch plugin
-    sed -i "23 a \$CFG->forced_plugin_settings = ['search_elastic' => ['hostname' => 'http://$elasticVm1IP']];" /moodle/html/moodle/config.php
-    sed -i "23 a \$CFG->searchengine = 'elastic';" /moodle/html/moodle/config.php
-    sed -i "23 a \$CFG->enableglobalsearch = 'true';" /moodle/html/moodle/config.php
+    if [ "$elasticEnable" == "1" ]; then
+    	sed -i "23 a \$CFG->forced_plugin_settings = ['search_elastic' => ['hostname' => 'http://$elasticVm1IP']];" /moodle/html/moodle/config.php
+    	sed -i "23 a \$CFG->searchengine = 'elastic';" /moodle/html/moodle/config.php
+    	sed -i "23 a \$CFG->enableglobalsearch = 'true';" /moodle/html/moodle/config.php
+    fi
 
     # Set the ObjectFS alternate filesystem
     sed -i "23 a \$CFG->alternative_file_system_class = '\\\tool_objectfs\\\azure_file_system';" /moodle/html/moodle/config.php
