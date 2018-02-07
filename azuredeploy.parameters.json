@@ -9,6 +9,7 @@
                 "controllerVmSku":             { "value": "Standard_DS1_v2" },
                 "dbServerType":                { "value": "mysql" },
                 "webServerType":               { "value": "apache" },
+                "elasticEnable":               { "value": 1 },
                 "elasticVmSku":                { "value": "Standard_DS2_v2" },
                 "glusterDiskCount":            { "value": 4 },
                 "glusterDiskSize":             { "value": 127 },
