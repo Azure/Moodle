@@ -80,6 +80,17 @@
             },
             "type": "int"
         },
+        "elasticEnable": {
+            "allowedValues": [
+                0,
+                1
+            ],
+            "defaultValue": 1,
+            "metadata": {
+                "description": "Switch to process or bypass all creation for elasticsearch"
+            },
+            "type": "int"
+        },
         "elasticVmSku": {
             "defaultValue": "Standard_DS2_v2",
             "metadata": {
@@ -389,7 +400,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'elastic.json')]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'elastic',variables('moodleCommon').elasticEnable,'.json')]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -543,6 +554,7 @@
             "dbLoginPassword": "[concat(substring(uniqueString(resourceGroup().id, deployment().name), 2, 11), '*7', toUpper('pfiwb'))]",
             "dbServerType": "[parameters('dbServerType')]",
             "dbUsername": "[concat(parameters('dbLogin'), '@', parameters('dbServerType'), '-', variables('resourceprefix'))]",
+            "elasticEnable": "[parameters('elasticEnable')]",
             "elasticVmSku": "[parameters('elasticVmSku')]",
             "elasticAvailabilitySetName": "[concat('elastic-avset-',variables('resourceprefix'))]",
             "elasticClusterName": "[concat('es-cluster-',variables('resourceprefix'))]",
