@@ -4,7 +4,7 @@
         "parameters": {
                 "autoscaleVmCount":            { "value": 10 },
                 "autoscaleVmSku":              { "value": "Standard_DS2_v2" },
-                "azureBackupSwitch":           { "value": 0 },
+                "azureBackupSwitch":           { "value": true },
                 "blobStorageAccountType":      { "value": "Standard_LRS"},
                 "controllerVmSku":             { "value": "Standard_DS1_v2" },
                 "dbServerType":                { "value": "mysql" },
