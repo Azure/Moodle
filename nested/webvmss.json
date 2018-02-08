@@ -40,10 +40,12 @@
                                     "autoUpgradeMinorVersion": true,
                                     "publisher": "Microsoft.Azure.Extensions",
                                     "settings": {
-                                        "commandToExecute": "[variables('cmdExec')]",
                                         "fileUris": [
                                             "[variables('scriptUri')]"
                                         ]
+                                    },
+                                    "protectedSettings":{
+                                        "commandToExecute": "[variables('cmdExec')]"
                                     },
                                     "type": "CustomScript",
                                     "typeHandlerVersion": "2.0"
