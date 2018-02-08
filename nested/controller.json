@@ -144,7 +144,7 @@
                     "dataDisks": [],
                     "imageReference": "[parameters('moodleCommon').osType]",
                     "osDisk": {
-                        "createOption": "fromImage",
+                        "createOption": "FromImage",
                         "managedDisk": {
                             "storageAccountType": "Standard_LRS"
                         },
@@ -158,6 +158,7 @@
             "type": "Microsoft.Compute/virtualMachines"
         },
         {
+            "condition": "[parameters('moodleCommon').applyScriptsSwitch]",
             "apiVersion": "2015-01-01",
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachines/', parameters('moodleCommon').jboxVmName)]"
@@ -178,12 +179,13 @@
 
                 },
                 "templateLink": {
-                    "uri": "[concat(    parameters('moodleCommon').baseTemplateUrl,'controllerconfig',parameters('moodleCommon').applyScriptsSwitch,'.json')]"
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'controllerconfig.json')]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
         },
         {
+            "condition": "[parameters('moodleCommon').azureBackupSwitch]",
             "apiVersion": "2015-01-01",
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachines/',parameters('moodleCommon').jboxVmName)]"
@@ -200,7 +202,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(    parameters('moodleCommon').baseTemplateUrl,'recoveryservicesEnlist',parameters('moodleCommon').azureBackupSwitch,'.json')]"
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'recoveryservicesEnlist.json')]"
                 }
             },
             "type": "Microsoft.Resources/deployments"

@@ -22,24 +22,25 @@
 
 #parameters 
 {
-    moodleVersion=$1
-    glusterNode=$2
-    glusterVolume=$3
-    siteFQDN=$4
-    postgresIP=$5
-    moodledbname=$6
-    moodledbuser=$7
-    moodledbpass=$8
-    adminpass=$9
-    pgadminlogin=$10
-    pgadminpass=$11
-    wabsacctname=$12
-    wabsacctkey=$13
-    azuremoodledbuser=$14
-    redisDns=$15
-    redisAuth=$16
-    elasticEnable=$17
-    elasticVm1IP=$18
+    moodleVersion=${1}
+    glusterNode=${2}
+    glusterVolume=${3}
+    siteFQDN=${4}
+    postgresIP=${5}
+    moodledbname=${6}
+    moodledbuser=${7}
+    moodledbpass=${8}
+    adminpass=${9}
+    pgadminlogin=${10}
+    pgadminpass=${11}
+    wabsacctname=${12}
+    wabsacctkey=${13}
+    azuremoodledbuser=${14}
+    redisDns=${15}
+    redisAuth=${16}
+    elasticVm1IP=${17}
+    installO365pluginsSwitch=${18}
+    installElasticSearchSwitch=${19}
 
     echo $moodleVersion        >> /tmp/vars.txt
     echo $glusterNode          >> /tmp/vars.txt
@@ -57,8 +58,9 @@
     echo $azuremoodledbuser    >> /tmp/vars.txt
     echo $redisDns             >> /tmp/vars.txt
     echo $redisAuth            >> /tmp/vars.txt
-    echo $elasticEnable        >> /tmp/vars.txt
     echo $elasticVm1IP         >> /tmp/vars.txt
+    echo $installO365pluginsSwitch    >> /tmp/vars.txt
+    echo $installElasticSearchSwitch  >> /tmp/vars.txt
 
     # make sure system does automatic updates and fail2ban
     sudo apt-get -y update
@@ -627,29 +629,28 @@ EOF
     /usr/bin/unzip -q moodle.zip
     /bin/mv -v moodle-'$moodleVersion' /moodle/html/moodle
 
-    # Commented out as the plugin is not available
-    # install Office 365 plugins
-    #if [ "$installOfficePlugins" = "True" ]; then
-    #        curl -k --max-redirs 10 https://github.com/Microsoft/o365-moodle/archive/'$moodleVersion'.zip -L -o o365.zip
-    #        unzip -q o365.zip
-    #        cp -r o365-moodle-'$moodleVersion'/* /moodle/html/moodle
-    #        rm -rf o365-moodle-'$moodleVersion'
-    #fi
-
-    # Install ElasticSearch plugin
-    if [ "'$elasticEnable'" == "1" ]; then
-	    /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-search_elastic/archive/master.zip -L -o plugin-elastic.zip
-	    /usr/bin/unzip -q plugin-elastic.zip
-	    /bin/mkdir -p /moodle/html/moodle/search/engine/elastic
-	    /bin/cp -r moodle-search_elastic-master/* /moodle/html/moodle/search/engine/elastic
-	    /bin/rm -rf moodle-search_elastic-master
+    if [ "'$installO365pluginsSwitch'" = "True" ]; then
+        # install Office 365 plugins
+        curl -k --max-redirs 10 https://github.com/Microsoft/o365-moodle/archive/'$moodleVersion'.zip -L -o o365.zip
+        unzip -q o365.zip
+        cp -r o365-moodle-'$moodleVersion'/* /moodle/html/moodle
+        rm -rf o365-moodle-'$moodleVersion'
     fi
 
-    # Install ElasticSearch plugin dependency
-    /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-local_aws/archive/master.zip -L -o local-aws.zip
-    /usr/bin/unzip -q local-aws.zip
-    /bin/mkdir -p /moodle/html/moodle/local/aws
-    /bin/cp -r moodle-local_aws-master/* /moodle/html/moodle/local/aws
+    if [ "'$installElasticSearchSwitch'" = "True" ]; then
+        # Install ElasticSearch plugin
+        /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-search_elastic/archive/master.zip -L -o plugin-elastic.zip
+        /usr/bin/unzip -q plugin-elastic.zip
+        /bin/mkdir -p /moodle/html/moodle/search/engine/elastic
+        /bin/cp -r moodle-search_elastic-master/* /moodle/html/moodle/search/engine/elastic
+        /bin/rm -rf moodle-search_elastic-master
+
+        # Install ElasticSearch plugin dependency
+        /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-local_aws/archive/master.zip -L -o local-aws.zip
+        /usr/bin/unzip -q local-aws.zip
+        /bin/mkdir -p /moodle/html/moodle/local/aws
+        /bin/cp -r moodle-local_aws-master/* /moodle/html/moodle/local/aws
+    fi
 
     # Install the ObjectFS plugin
     /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-tool_objectfs/archive/master.zip -L -o plugin-objectfs.zip
@@ -2100,11 +2101,11 @@ EOF
     # We proxy ssl, so moodle needs to know this
     sed -i "23 a \$CFG->sslproxy  = 'true';" /moodle/html/moodle/config.php
 
-    # Set up elasticsearch plugin
-    if [ "$elasticEnable" == "1" ]; then
-    	sed -i "23 a \$CFG->forced_plugin_settings = ['search_elastic' => ['hostname' => 'http://$elasticVm1IP']];" /moodle/html/moodle/config.php
-    	sed -i "23 a \$CFG->searchengine = 'elastic';" /moodle/html/moodle/config.php
-    	sed -i "23 a \$CFG->enableglobalsearch = 'true';" /moodle/html/moodle/config.php
+    if [ "$installElasticSearchSwitch" = "True" ]; then
+        # Set up elasticsearch plugin
+        sed -i "23 a \$CFG->forced_plugin_settings = ['search_elastic' => ['hostname' => 'http://$elasticVm1IP']];" /moodle/html/moodle/config.php
+        sed -i "23 a \$CFG->searchengine = 'elastic';" /moodle/html/moodle/config.php
+        sed -i "23 a \$CFG->enableglobalsearch = 'true';" /moodle/html/moodle/config.php
     fi
 
     # Set the ObjectFS alternate filesystem

@@ -3,26 +3,32 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "applyScriptsSwitch": {
-            "allowedValues": [
-                0,
-                1
-            ],
-            "defaultValue": 1,
+            "defaultValue": true,
             "metadata": {
                 "description": "Switch to process or bypass all scripts/extensions"
             },
-            "type": "int"
+            "type": "bool"
         },
         "azureBackupSwitch": {
-            "allowedValues": [
-                0,
-                1
-            ],
-            "defaultValue": 0,
+            "defaultValue": false,
             "metadata": {
                 "description": "Switch to configure AzureBackup and enlist VM's"
             },
-            "type": "int"
+            "type": "bool"
+        },
+        "installO365pluginsSwitch": {
+            "defaultValue": false,
+            "metadata": {
+                "description": "Switch to install Moodle Office 365 plugins"
+            },
+            "type": "bool"
+        },
+        "installElasticSearchSwitch": {
+            "defaultValue": false,
+            "metadata": {
+                "description": "Switch to install Moodle ElasticSearch plugins & VMs"
+            },
+            "type": "bool"
         },
         "blobStorageAccountType": {
             "defaultValue": "Standard_LRS",
@@ -77,17 +83,6 @@
             "defaultValue": 10,
             "metadata": {
                 "description": "Maximum number of autoscaled nodes"
-            },
-            "type": "int"
-        },
-        "elasticEnable": {
-            "allowedValues": [
-                0,
-                1
-            ],
-            "defaultValue": 1,
-            "metadata": {
-                "description": "Switch to process or bypass all creation for elasticsearch"
             },
             "type": "int"
         },
@@ -186,7 +181,7 @@
             ],
             "defaultValue": 50,
             "metadata": {
-                "description": "Postgresql database trasaction units"
+                "description": "MySql/Postgresql database trasaction units"
             },
             "type": "int"
         },
@@ -196,7 +191,7 @@
             ],
             "defaultValue": "SkuFamily",
             "metadata": {
-                "description": "Postgresql sku family"
+                "description": "MySql/Postgresql sku family"
             },
             "type": "string"
         },
@@ -215,16 +210,16 @@
                 "MYSQLS400",
                 "MYSQLS800"
             ],
-            "defaultValue": "PGSQLB50",
+            "defaultValue": "MYSQLB50",
             "metadata": {
-                "description": "Postgresql sku name"
+                "description": "MySql/Postgresql sku name"
             },
             "type": "string"
         },
         "skuSizeMB": {
             "defaultValue": 51200,
             "metadata": {
-                "description": "Postgresql sku size in mb"
+                "description": "MySql/Postgresql sku size in MB. For Basic tier, minimum 50GB, increased by 125GB up to 1TB. For Standard tier, minimum 125GB, increase by 125GB up to 1TB"
             },
             "type": "int"
         },
@@ -235,7 +230,7 @@
             ],
             "defaultValue": "Basic",
             "metadata": {
-                "description": "Postgresql sku tier"
+                "description": "MySql/Postgresql sku tier"
             },
             "type": "string"
         },
@@ -259,7 +254,7 @@
             ],
             "defaultValue": "Disabled",
             "metadata": {
-                "description": "Postgresql SSL connection"
+                "description": "MySql/Postgresql SSL connection"
             },
             "type": "string"
         },
@@ -306,7 +301,7 @@
     },
     "resources": [
         {
-            "apiVersion":"2017-08-01",
+            "apiVersion": "2017-08-01",
             "name": "pid-738e3eec-68d4-4667-8377-c05c77c21f1b",
             "type": "Microsoft.Resources/deployments",
             "properties": {
@@ -335,6 +330,7 @@
             "type": "Microsoft.Resources/deployments"
         },
         {
+            "condition": "[parameters('azureBackupSwitch')]",
             "apiVersion": "2015-01-01",
             "name": "recoveryTemplate",
             "properties": {
@@ -345,7 +341,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'recoveryservices',variables('moodleCommon').azureBackupSwitch,'.json')]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'recoveryservices.json')]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -386,6 +382,7 @@
             "type": "Microsoft.Resources/deployments"
         },
         {
+            "condition": "[parameters('installElasticSearchSwitch')]",
             "apiVersion": "2015-01-01",
             "dependsOn": [
                 "Microsoft.Resources/deployments/networkTemplate",
@@ -400,7 +397,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'elastic',variables('moodleCommon').elasticEnable,'.json')]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'elastic.json')]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -554,7 +551,6 @@
             "dbLoginPassword": "[concat(substring(uniqueString(resourceGroup().id, deployment().name), 2, 11), '*7', toUpper('pfiwb'))]",
             "dbServerType": "[parameters('dbServerType')]",
             "dbUsername": "[concat(parameters('dbLogin'), '@', parameters('dbServerType'), '-', variables('resourceprefix'))]",
-            "elasticEnable": "[parameters('elasticEnable')]",
             "elasticVmSku": "[parameters('elasticVmSku')]",
             "elasticAvailabilitySetName": "[concat('elastic-avset-',variables('resourceprefix'))]",
             "elasticClusterName": "[concat('es-cluster-',variables('resourceprefix'))]",
@@ -587,6 +583,8 @@
             "glusterScriptFilename": "install_gluster.sh",
             "glusterVmCount": 2,
             "glusterVmSku": "[parameters('glusterVmSku')]",
+            "installO365pluginsSwitch": "[parameters('installO365pluginsSwitch')]",
+            "installElasticSearchSwitch": "[parameters('installElasticSearchSwitch')]",
             "jboxNicName": "[concat('jumpbox-vm-nic-',variables('resourceprefix'))]",
             "jboxNsgName": "[concat('jumpbox-nsg-',variables('resourceprefix'))]",
             "jboxPipName": "[concat('jumpbox-pubip-',variables('resourceprefix'))]",
@@ -594,9 +592,9 @@
             "lbDns": "[concat('lb-',variables('resourceprefix'),'.',resourceGroup().location,'.cloudapp.azure.com')]",
             "lbName": "[concat('lb-',variables('resourceprefix'))]",
             "lbPipName": "[concat('lb-pubip-',variables('resourceprefix'))]",
-            "moodleAdminPass": "[concat(toUpper('xl'), substring(uniqueString(resourceGroup().id, deployment().name), 6, 7),'<,!1*8')]",
+            "moodleAdminPass": "[concat(toUpper('xl'), substring(uniqueString(resourceGroup().id, deployment().name), 6, 7),',1*8')]",
             "moodleDbName": "moodle",
-            "moodleDbPass": "[concat('9(#36^', substring(uniqueString(resourceGroup().id, deployment().name), 5, 8), toUpper('ercq'))]",
+            "moodleDbPass": "[concat('9#36^', substring(uniqueString(resourceGroup().id, deployment().name), 5, 8), toUpper('ercq'))]",
             "moodleDbUser": "moodle",
             "moodleDbUserAzure": "[concat('moodle', '@', parameters('dbServerType'), '-', variables('resourceprefix'))]",
             "moodleInstallScriptFilename": "[concat(parameters('dbServerType'), '_', 'install_moodle.sh')]",

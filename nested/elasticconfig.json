@@ -16,15 +16,15 @@
             "name": "[concat(parameters('moodleCommon').elasticVmName1,'/','install_elastic')]",
             "properties": {
                 "autoUpgradeMinorVersion": true,
-                "publisher": "Microsoft.OSTCExtensions",
+                "publisher": "Microsoft.Azure.Extensions",
                 "settings": {
                     "commandToExecute": "[variables('cmdExec')]",
                     "fileUris": [
                         "[variables('scriptUri')]"
                     ]
                 },
-                "type": "CustomScriptForLinux",
-                "typeHandlerVersion": "1.4"
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0"
             },
             "tags": {
                 "displayName": "install_elastic"
@@ -37,15 +37,15 @@
             "name": "[concat(parameters('moodleCommon').elasticVmName2,'/','install_elastic')]",
             "properties": {
                 "autoUpgradeMinorVersion": true,
-                "publisher": "Microsoft.OSTCExtensions",
+                "publisher": "Microsoft.Azure.Extensions",
                 "settings": {
                     "commandToExecute": "[variables('cmdExec')]",
                     "fileUris": [
                         "[variables('scriptUri')]"
                     ]
                 },
-                "type": "CustomScriptForLinux",
-                "typeHandlerVersion": "1.4"
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0"
             },
             "tags": {
                 "displayName": "install_elastic"
@@ -58,15 +58,15 @@
             "name": "[concat(parameters('moodleCommon').elasticVmName3,'/','install_elastic')]",
             "properties": {
                 "autoUpgradeMinorVersion": true,
-                "publisher": "Microsoft.OSTCExtensions",
+                "publisher": "Microsoft.Azure.Extensions",
                 "settings": {
                     "commandToExecute": "[variables('cmdExec')]",
                     "fileUris": [
                         "[variables('scriptUri')]"
                     ]
                 },
-                "type": "CustomScriptForLinux",
-                "typeHandlerVersion": "1.4"
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0"
             },
             "tags": {
                 "displayName": "install_elastic"
