@@ -45,7 +45,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(    parameters('moodleCommon').baseTemplateUrl,'glustervm.json')]"
+                    "uri": "[concat(    parameters('moodleCommon').baseTemplateUrl,'glustervm.json',parameters('moodleCommon').artifactsSasToken)]"
                 }
             },
             "type": "Microsoft.Resources/deployments"

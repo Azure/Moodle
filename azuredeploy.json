@@ -2,6 +2,20 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "_artifactsLocation": {
+            "type": "string",
+            "metadata": {
+                "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
+            },
+            "defaultValue": "https://raw.githubusercontent.com/Azure/Moodle/master/"
+        },
+        "_artifactsLocationSasToken": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+            },
+            "defaultValue": ""
+        },
         "applyScriptsSwitch": {
             "defaultValue": true,
             "metadata": {
@@ -324,7 +338,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl, parameters('dbServerType'), '.json')]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl, parameters('dbServerType'), '.json', parameters('_artifactsLocationSasToken'))]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -341,7 +355,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'recoveryservices.json')]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'recoveryservices.json',parameters('_artifactsLocationSasToken'))]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -360,7 +374,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'redis.json')]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'redis.json',parameters('_artifactsLocationSasToken'))]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -376,7 +390,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'network.json')]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'network.json',parameters('_artifactsLocationSasToken'))]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -397,7 +411,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'elastic.json')]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'elastic.json',parameters('_artifactsLocationSasToken'))]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -417,7 +431,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'gluster.json')]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'gluster.json',parameters('_artifactsLocationSasToken'))]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -446,7 +460,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'controller.json')]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'controller.json',parameters('_artifactsLocationSasToken'))]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -467,7 +481,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'webvmss.json')]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'webvmss.json',parameters('_artifactsLocationSasToken'))]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -483,7 +497,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'blobStorageAccount.json')]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'blobStorageAccount.json',parameters('_artifactsLocationSasToken'))]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -536,8 +550,9 @@
         "documentation10": "    controller          - creates a jumpbox and deploys code",
         "documentation11": "GlusterFS Sizing guidance",
         "moodleCommon": {
-            "baseTemplateUrl": "https://raw.githubusercontent.com/Azure/Moodle/master/nested/",
-            "scriptLocation": "https://raw.githubusercontent.com/Azure/Moodle/master/scripts/",
+            "baseTemplateUrl": "[concat(parameters('_artifactsLocation'), 'nested/')]",
+            "scriptLocation": "[concat(parameters('_artifactsLocation'), 'scripts/')]",
+            "artifactsSasToken": "[parameters('_artifactsLocationSasToken')]",
 
             "applyScriptsSwitch": "[parameters('applyScriptsSwitch')]",
             "autoscaleVmCount": "[parameters('autoscaleVmCount')]",

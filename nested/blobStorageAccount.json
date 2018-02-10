@@ -46,7 +46,7 @@
         "documentation1": "This sub-template creates a blob storage account.  It expects certain values in the 'common' datastructure.",
         "documentation2": " blobStorageAccountName - name of storage account",
         "documentation3": " blobStorageAccountType - type of storage account",
-        "scriptUri": "[concat(parameters('moodleCommon').ScriptLocation,parameters('moodleCommon').moodleInstallScriptFilename)]",
+        "scriptUri": "[concat(parameters('moodleCommon').scriptLocation,parameters('moodleCommon').moodleInstallScriptFilename,parameters('moodleCommon').artifactsSasToken)]",
         "blobStorageAccountId": "[concat(resourceGroup().id,'/providers/Microsoft.Storage/storageAccounts/', parameters('moodleCommon').blobStorageAccountName)]"
     },
     "outputs": {

@@ -99,7 +99,7 @@
 
                 },
                 "templateLink": {
-                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'elasticconfig.json')]"
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'elasticconfig.json',parameters('moodleCommon').artifactsSasToken)]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -122,7 +122,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'recoveryservicesEnlist.json')]"
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'recoveryservicesEnlist.json',parameters('moodleCommon').artifactsSasToken)]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -206,7 +206,7 @@
 
                 },
                 "templateLink": {
-                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'elasticconfig.json')]"
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'elasticconfig.json',parameters('moodleCommon').artifactsSasToken)]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -229,7 +229,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'recoveryservicesEnlist.json')]"
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'recoveryservicesEnlist.json',parameters('moodleCommon').artifactsSasToken)]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -313,7 +313,7 @@
 
                 },
                 "templateLink": {
-                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'elasticconfig.json')]"
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'elasticconfig.json',parameters('moodleCommon').artifactsSasToken)]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -336,7 +336,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'recoveryservicesEnlist.json')]"
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'recoveryservicesEnlist.json',parameters('moodleCommon').artifactsSasToken)]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
