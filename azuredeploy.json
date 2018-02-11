@@ -612,8 +612,7 @@
             "moodleDbPass": "[concat('9#36^', substring(uniqueString(resourceGroup().id, deployment().name), 5, 8), toUpper('ercq'))]",
             "moodleDbUser": "moodle",
             "moodleDbUserAzure": "[concat('moodle', '@', parameters('dbServerType'), '-', variables('resourceprefix'))]",
-            "moodleInstallScriptFilename": "[concat(parameters('dbServerType'), '_', 'install_moodle.sh')]",
-            "moodleSetupScriptFilename": "setup_moodle.sh",
+            "moodleInstallScriptFilename": "install_moodle.sh",
             "moodleVersion": "[parameters('moodleVersion')]",
             "mysqlVersion": "[parameters('mysqlVersion')]",
             "osType": {
@@ -656,6 +655,7 @@
             "vmssdStorageAccounttName": "[concat('vmss',uniqueString(resourceGroup().id))]",
             "vnetName": "[concat('vnet-',variables('resourceprefix'))]",
             "vpnType": "[parameters('vpnType')]",
+            "webServerSetupScriptFilename": "setup_webserver.sh",
             "webServerType": "[parameters('webServerType')]"
         },
         "octets": "[split(parameters('vNetAddressSpace'), '.')]",
