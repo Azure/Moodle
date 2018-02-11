@@ -851,7 +851,6 @@ pm.start_servers = 20
 pm.min_spare_servers = 22 
 pm.max_spare_servers = 30 
 EOF
-   
 
    # Remove the default site. Moodle is the only site we want
    rm -f /etc/nginx/sites-enabled/default
@@ -2087,7 +2086,6 @@ EOF
   ),
 );
 EOF
-
     # redis configuration in /moodle/html/moodle/config.php
     sed -i "23 a \$CFG->session_redis_lock_expire = 7200;" /moodle/html/moodle/config.php
     sed -i "23 a \$CFG->session_redis_acquire_lock_timeout = 120;" /moodle/html/moodle/config.php
@@ -2121,7 +2119,6 @@ EOF
    cat <<EOF > /etc/cron.d/sql-backup
 22 02 * * * root /usr/bin/pg_dump -Fc -h $postgresIP -U ${azuremoodledbuser} ${moodledbname} > /moodle/db-backup.sql
 EOF
-
 
    # Turning off services we don't need the jumpbox running
    service nginx stop

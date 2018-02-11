@@ -668,7 +668,7 @@ EOF
     ' > /tmp/setup-moodle.sh 
 
     chmod 755 /tmp/setup-moodle.sh
-    sudo -u www-data /tmp/setup-moodle.sh  >> /tmp/setupmoodle.log
+    sudo -u www-data /tmp/setup-moodle.sh >> /tmp/setupmoodle.log
 
     # create cron entry
     # It is scheduled for once per day. It can be changed as needed.

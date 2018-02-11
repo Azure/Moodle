@@ -26,13 +26,13 @@
     glusterNode=${2}
     glusterVolume=${3}
     siteFQDN=${4}
-    mysqlIP=${5}
+    dbIP=${5}
     moodledbname=${6}
     moodledbuser=${7}
     moodledbpass=${8}
     adminpass=${9}
-    mysqladminlogin=${10}
-    mysqladminpass=${11}
+    dbadminlogin=${10}
+    dbadminpass=${11}
     wabsacctname=${12}
     wabsacctkey=${13}
     azuremoodledbuser=${14}
@@ -41,18 +41,19 @@
     elasticVm1IP=${17}
     installO365pluginsSwitch=${18}
     installElasticSearchSwitch=${19}
+    dbServerType=${20}
 
     echo $moodleVersion        >> /tmp/vars.txt
     echo $glusterNode          >> /tmp/vars.txt
     echo $glusterVolume        >> /tmp/vars.txt
     echo $siteFQDN             >> /tmp/vars.txt
-    echo $mysqlIP              >> /tmp/vars.txt
+    echo $dbIP                 >> /tmp/vars.txt
     echo $moodledbname         >> /tmp/vars.txt
     echo $moodledbuser         >> /tmp/vars.txt
     echo $moodledbpass         >> /tmp/vars.txt
     echo $adminpass            >> /tmp/vars.txt
-    echo $mysqladminlogin      >> /tmp/vars.txt
-    echo $mysqladminpass       >> /tmp/vars.txt
+    echo $dbadminlogin         >> /tmp/vars.txt
+    echo $dbadminpass          >> /tmp/vars.txt
     echo $wabsacctname         >> /tmp/vars.txt
     echo $wabsacctkey          >> /tmp/vars.txt
     echo $azuremoodledbuser    >> /tmp/vars.txt
@@ -61,6 +62,20 @@
     echo $elasticVm1IP         >> /tmp/vars.txt
     echo $installO365pluginsSwitch    >> /tmp/vars.txt
     echo $installElasticSearchSwitch  >> /tmp/vars.txt
+    echo $dbServerType                >> /tmp/vars.txt
+
+    if [ "$dbServerType" = "mysql" ]; then
+      mysqlIP=$dbIP
+      mysqladminlogin=$dbadminlogin
+      mysqladminpass=$dbadminpass
+    elif [ "$dbServerType" = "postgres" ]; then
+      postgresIP=$dbIP
+      pgadminlogin=$dbadminlogin
+      pgadminpass=$dbadminpass
+    else
+      echo "Invalid dbServerType ($dbServerType) given. Only 'mysql' or 'postgres' is allowed. Exiting"
+      exit 1
+    fi
 
     # make sure system does automatic updates and fail2ban
     sudo apt-get -y update
@@ -561,7 +576,12 @@ EOF
     # configure gluster repository & install gluster client
     sudo add-apt-repository ppa:gluster/glusterfs-3.8 -y                     >> /tmp/apt1.log
     sudo apt-get -y update                                                   >> /tmp/apt2.log
-    sudo apt-get -y --force-yes install rsyslog glusterfs-client mysql-client git    >> /tmp/apt3.log
+    sudo apt-get -y --force-yes install rsyslog glusterfs-client git         >> /tmp/apt3.log
+    if [ $dbServerType = "mysql" ]; then
+        sudo apt-get -y --force-yes install mysql-client >> /tmp/apt3.log
+    else
+        sudo apt-get -y --force-yes install postgresql-client >> /tmp/apt3.log
+    fi
 
     # install azure cli & setup container
     echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ wheezy main" | \
@@ -611,8 +631,12 @@ EOF
     # Moodle requirements
     sudo apt-get -y update > /dev/null
     sudo apt-get install -y --force-yes graphviz aspell php-common php-soap php-json php-redis > /tmp/apt6.log
-    sudo apt-get install -y --force-yes php-bcmath php-gd php-mysql php-xmlrpc php-intl php-xml php-bz2 >> /tmp/apt6.log
-
+    sudo apt-get install -y --force-yes php-bcmath php-gd php-xmlrpc php-intl php-xml php-bz2 >> /tmp/apt6.log
+    if [ $dbServerType = "mysql" ]; then
+        sudo apt-get install -y --force-yes php-mysql
+    else
+        sudo apt-get install -y --force-yes php-pgsql
+    fi
 
     # Set up initial moodle dirs
     mkdir -p /moodle/html
@@ -668,7 +692,7 @@ EOF
     ' > /tmp/setup-moodle.sh 
 
     chmod 755 /tmp/setup-moodle.sh
-    sudo -u www-data /tmp/setup-moodle.sh  >> /tmp/setupmoodle.log
+    sudo -u www-data /tmp/setup-moodle.sh >> /tmp/setupmoodle.log
 
     # create cron entry
     # It is scheduled for once per day. It can be changed as needed.
@@ -1110,11 +1134,21 @@ EOF
     systemctl daemon-reload
     service varnish restart
 
-    mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e "CREATE DATABASE ${moodledbname} CHARACTER SET utf8;"
-    mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e "GRANT ALL ON ${moodledbname}.* TO ${moodledbuser} IDENTIFIED BY '${moodledbpass}';"
+    if [ $dbServerType = "mysql" ]; then
+        mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e "CREATE DATABASE ${moodledbname} CHARACTER SET utf8;"
+        mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e "GRANT ALL ON ${moodledbname}.* TO ${moodledbuser} IDENTIFIED BY '${moodledbpass}';"
 
-    echo "mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e \"CREATE DATABASE ${moodledbname};\"" >> /tmp/debug
-    echo "mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e \"GRANT ALL ON ${moodledbname}.* TO ${moodledbuser} IDENTIFIED BY '${moodledbpass}';\"" >> /tmp/debug
+        echo "mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e \"CREATE DATABASE ${moodledbname};\"" >> /tmp/debug
+        echo "mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e \"GRANT ALL ON ${moodledbname}.* TO ${moodledbuser} IDENTIFIED BY '${moodledbpass}';\"" >> /tmp/debug
+    else
+        # Create postgres db
+        echo "${postgresIP}:5432:postgres:${pgadminlogin}:${pgadminpass}" > /root/.pgpass
+        chmod 600 /root/.pgpass
+        psql -h $postgresIP -U $pgadminlogin -c "CREATE DATABASE ${moodledbname};" postgres
+        psql -h $postgresIP -U $pgadminlogin -c "CREATE USER ${moodledbuser} WITH PASSWORD '${moodledbpass}';" postgres
+        psql -h $postgresIP -U $pgadminlogin -c "GRANT ALL ON DATABASE ${moodledbname} TO ${moodledbuser};" postgres
+        rm -f /root/.pgpass
+    fi
 
     # Master config for syslog
     mkdir /var/log/sitelogs
@@ -1131,14 +1165,28 @@ EOF
     service rsyslog restart
 
     # Fire off moodle setup
-    echo -e "cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot=https://"$siteFQDN" --dataroot=/moodle/moodledata --dbhost="$mysqlIP" --dbname="$moodledbname" --dbuser="$azuremoodledbuser" --dbpass="$moodledbpass" --dbtype=mysqli --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass="$adminpass" --adminemail=admin@"$siteFQDN" --non-interactive --agree-license --allow-unstable || true "
-    cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot=https://$siteFQDN   --dataroot=/moodle/moodledata --dbhost=$mysqlIP   --dbname=$moodledbname   --dbuser=$azuremoodledbuser   --dbpass=$moodledbpass   --dbtype=mysqli --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass=$adminpass   --adminemail=admin@$siteFQDN   --non-interactive --agree-license --allow-unstable || true
+    if [ $dbServerType = "mysql" ]; then
+        echo -e "cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot=https://"$siteFQDN" --dataroot=/moodle/moodledata --dbhost="$mysqlIP" --dbname="$moodledbname" --dbuser="$azuremoodledbuser" --dbpass="$moodledbpass" --dbtype=mysqli --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass="$adminpass" --adminemail=admin@"$siteFQDN" --non-interactive --agree-license --allow-unstable || true "
+        cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot=https://$siteFQDN   --dataroot=/moodle/moodledata --dbhost=$mysqlIP   --dbname=$moodledbname   --dbuser=$azuremoodledbuser   --dbpass=$moodledbpass   --dbtype=mysqli --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass=$adminpass   --adminemail=admin@$siteFQDN   --non-interactive --agree-license --allow-unstable || true
 
-    mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'enabletasks', 1);" 
-    mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'filesystem', '\\\tool_objectfs\\\azure_file_system');"
-    mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_accountname', '${wabsacctname}');"
-    mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_container', 'objectfs');"
-    mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_sastoken', '${sas}');"
+        mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'enabletasks', 1);" 
+        mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'filesystem', '\\\tool_objectfs\\\azure_file_system');"
+        mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_accountname', '${wabsacctname}');"
+        mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_container', 'objectfs');"
+        mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_sastoken', '${sas}');"
+    else
+        echo -e "cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot=https://"$siteFQDN" --dataroot=/moodle/moodledata --dbhost="$postgresIP" --dbname="$moodledbname" --dbuser="$azuremoodledbuser" --dbpass="$moodledbpass" --dbtype=pgsql --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass="$adminpass" --adminemail=admin@"$siteFQDN" --non-interactive --agree-license --allow-unstable || true "
+        cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot=https://$siteFQDN   --dataroot=/moodle/moodledata --dbhost=$postgresIP   --dbname=$moodledbname   --dbuser=$azuremoodledbuser   --dbpass=$moodledbpass   --dbtype=pgsql --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass=$adminpass   --adminemail=admin@$siteFQDN   --non-interactive --agree-license --allow-unstable || true
+
+        # Add the ObjectFS configuration to Moodle.
+        echo "${postgresIP}:5432:${moodledbname}:${azuremoodledbuser}:${moodledbpass}" > /root/.pgpass
+        chmod 600 /root/.pgpass
+        psql -h $postgresIP -U $azuremoodledbuser -c "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'enabletasks', 1);" $moodledbname
+        psql -h $postgresIP -U $azuremoodledbuser -c "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'filesystem', '\tool_objectfs\azure_file_system');" $moodledbname
+        psql -h $postgresIP -U $azuremoodledbuser -c "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_accountname', '$wabsacctname');" $moodledbname
+        psql -h $postgresIP -U $azuremoodledbuser -c "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_container', 'objectfs');" $moodledbname
+        psql -h $postgresIP -U $azuremoodledbuser -c "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_sastoken', '$sas');" $moodledbname
+    fi
 
     echo -e "\n\rDone! Installation completed!\n\r"
 
@@ -2104,10 +2152,24 @@ EOF
     # Set the ObjectFS alternate filesystem
     sed -i "23 a \$CFG->alternative_file_system_class = '\\\tool_objectfs\\\azure_file_system';" /moodle/html/moodle/config.php
 
+   if [ "$dbServerType" = "postgres" ]; then
+     # Get a new version of Postgres to match Azure version
+     add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main"
+     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+     apt-get update
+     apt-get install postgresql-client-9.6
+   fi
+
    # Set up cronned sql dump
-   cat <<EOF > /etc/cron.d/sql-backup
-   22 02 * * * root /usr/bin/mysqldump -h $mysqlIP -u ${azuremoodledbuser} -p'${moodledbpass}' --databases ${moodledbname} | gzip > /moodle/db-backup.sql.gz
+   if [ "$dbServerType" = "mysql" ]; then
+      cat <<EOF > /etc/cron.d/sql-backup
+22 02 * * * root /usr/bin/mysqldump -h $mysqlIP -u ${azuremoodledbuser} -p'${moodledbpass}' --databases ${moodledbname} | gzip > /moodle/db-backup.sql.gz
 EOF
+   else
+      cat <<EOF > /etc/cron.d/sql-backup
+22 02 * * * root /usr/bin/pg_dump -Fc -h $postgresIP -U ${azuremoodledbuser} ${moodledbname} > /moodle/db-backup.sql
+EOF
+   fi
 
    # Turning off services we don't need the jumpbox running
    service nginx stop
