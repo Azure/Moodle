@@ -27,12 +27,21 @@ glusterVolume=$2
 siteFQDN=$3
 syslogserver=$4
 webServerType=$5
+fileServerType=$6
+storageAccountName=$7
+storageAccountKey=$8
 
 echo $glusterNode    >> /tmp/vars.txt
 echo $glusterVolume  >> /tmp/vars.txt
 echo $siteFQDN >> /tmp/vars.txt
 echo $syslogserver >> /tmp/vars.txt
 echo $webServerType >> /tmp/vars.txt
+echo $fileServerType >> /tmp/vars.txt
+echo $storageAccountName >> /tmp/vars.txt
+echo $storageAccountKey >> /tmp/vars.txt
+
+. ./common_functions.sh
+check_fileServerType_param $fileServerType
 
 {
   # make sure the system does automatic update
@@ -42,10 +51,16 @@ echo $webServerType >> /tmp/vars.txt
   # install pre-requisites
   sudo apt-get -y install python-software-properties unzip rsyslog
 
-  #configure gluster repository & install gluster client
-  sudo add-apt-repository ppa:gluster/glusterfs-3.8 -y
-  sudo apt-get -y update
-  sudo apt-get -y install glusterfs-client postgresql-client mysql-client git
+  sudo apt-get -y install postgresql-client mysql-client git
+
+  if [ $fileServerType = "gluster" ]; then
+    #configure gluster repository & install gluster client
+    sudo add-apt-repository ppa:gluster/glusterfs-3.8 -y
+    sudo apt-get -y update
+    sudo apt-get -y install glusterfs-client
+  else # "azurefilese"
+    sudo apt-get -y install cifs-utils
+  fi
 
   # install the base stack
   sudo apt-get -y install nginx varnish php php-cli php-curl php-zip
@@ -61,14 +76,18 @@ echo $webServerType >> /tmp/vars.txt
   # Moodle requirements
   sudo apt-get install -y graphviz aspell php-soap php-json php-redis php-bcmath php-gd php-pgsql php-mysql php-xmlrpc php-intl php-xml php-bz2
 
-  # Mount gluster fs for /moodle
-  sudo mkdir -p /moodle
-  sudo chown www-data /moodle
-  sudo chmod 770 /moodle
-  sudo echo -e 'mount -t glusterfs '$glusterNode':/'$glusterVolume' /moodle'
-  sudo mount -t glusterfs $glusterNode:/$glusterVolume /moodle
-  sudo echo -e $glusterNode':/'$glusterVolume'   /moodle         glusterfs       defaults,_netdev,log-level=WARNING,log-file=/var/log/gluster.log 0 0' >> /etc/fstab
-  sudo mount -a
+  if [ $fileServerType = "gluster" ]; then
+    # Mount gluster fs for /moodle
+    sudo mkdir -p /moodle
+    sudo chown www-data /moodle
+    sudo chmod 770 /moodle
+    sudo echo -e 'mount -t glusterfs '$glusterNode':/'$glusterVolume' /moodle'
+    sudo mount -t glusterfs $glusterNode:/$glusterVolume /moodle
+    sudo echo -e $glusterNode':/'$glusterVolume'   /moodle         glusterfs       defaults,_netdev,log-level=WARNING,log-file=/var/log/gluster.log 0 0' >> /etc/fstab
+    sudo mount -a
+  else # "azurefiles"
+    setup_and_mount_azure_files_moodle_share $storageAccountName $storageAccountKey
+  fi
 
   # Configure syslog to forward
   cat <<EOF >> /etc/rsyslog.conf

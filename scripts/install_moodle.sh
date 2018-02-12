@@ -42,6 +42,7 @@
     installO365pluginsSwitch=${18}
     installElasticSearchSwitch=${19}
     dbServerType=${20}
+    fileServerType=${21}
 
     echo $moodleVersion        >> /tmp/vars.txt
     echo $glusterNode          >> /tmp/vars.txt
@@ -63,6 +64,10 @@
     echo $installO365pluginsSwitch    >> /tmp/vars.txt
     echo $installElasticSearchSwitch  >> /tmp/vars.txt
     echo $dbServerType                >> /tmp/vars.txt
+    echo $fileServerType              >> /tmp/vars.txt
+
+    . ./common_functions.sh
+    check_fileServerType_param $fileServerType
 
     if [ "$dbServerType" = "mysql" ]; then
       mysqlIP=$dbIP
@@ -568,15 +573,25 @@ findtime = 86400   ; 1 day
 maxretry = 5
 EOF
 
-    # create gluster mount point
+    # create gluster or Azure Files mount point
     mkdir -p /moodle
 
     export DEBIAN_FRONTEND=noninteractive
 
-    # configure gluster repository & install gluster client
-    sudo add-apt-repository ppa:gluster/glusterfs-3.8 -y                     >> /tmp/apt1.log
+    if [ $fileServerType = "gluster" ]; then
+        # configure gluster repository & install gluster client
+        sudo add-apt-repository ppa:gluster/glusterfs-3.8 -y                 >> /tmp/apt1.log
+    fi
+
     sudo apt-get -y update                                                   >> /tmp/apt2.log
-    sudo apt-get -y --force-yes install rsyslog glusterfs-client git         >> /tmp/apt3.log
+    sudo apt-get -y --force-yes install rsyslog git                          >> /tmp/apt3.log
+
+    if [ $fileServerType = "gluster" ]; then
+        sudo apt-get -y --force-yes install glusterfs-client                 >> /tmp/apt3.log
+    else # "azurefiles"
+        sudo apt-get -y --force-yes install cifs-utils                       >> /tmp/apt3.log
+    fi
+
     if [ $dbServerType = "mysql" ]; then
         sudo apt-get -y --force-yes install mysql-client >> /tmp/apt3.log
     else
@@ -615,11 +630,15 @@ EOF
         --policy readwrite \
         --output tsv)
 
-    # mount gluster files system
-    echo -e '\n\rInstalling GlusterFS on '$glusterNode':/'$glusterVolume '/moodle\n\r' 
-    sudo mount -t glusterfs $glusterNode:/$glusterVolume /moodle
+    if [ $fileServerType = "azurefiles" ]; then
+        create_azure_files_moodle_share $wabsacctname $wabsacctkey /tmp/wabs.log
+    fi
 
-    
+    if [ $fileServerType = "gluster" ]; then
+        # mount gluster files system
+        echo -e '\n\rInstalling GlusterFS on '$glusterNode':/'$glusterVolume '/moodle\n\r' 
+        sudo mount -t glusterfs $glusterNode:/$glusterVolume /moodle
+    fi
     
     # install pre-requisites
     sudo apt-get install -y --fix-missing python-software-properties unzip
@@ -627,6 +646,12 @@ EOF
     # install the entire stack
     sudo apt-get -y  --force-yes install nginx php-fpm varnish >> /tmp/apt5a.log
     sudo apt-get -y  --force-yes install php php-cli php-curl php-zip >> /tmp/apt5b.log
+
+    if [ $fileServerType = "azurefiles" ]; then
+        # Set up and mount Azure Files share. Must be done after nginx is installed because of www-data user/group
+        echo -e '\n\rSetting up and mounting Azure Files share on //'$wabsacctname'.file.core.windows.net/moodle on /moodle\n\r'
+        setup_and_mount_azure_files_moodle_share $wabsacctname $wabsacctkey
+    fi
 
     # Moodle requirements
     sudo apt-get -y update > /dev/null

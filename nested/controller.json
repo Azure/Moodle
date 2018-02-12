@@ -8,7 +8,7 @@
             },
             "type": "object"
         },
-        "blobStorageAccountKey": {
+        "storageAccountKey": {
             "metadata": {
                 "description": "Key used to create a storage container"
             },
@@ -170,8 +170,8 @@
                     "moodleCommon": {
                         "value": "[parameters('moodleCommon')]"
                     },
-                    "blobStorageAccountKey": {
-                        "value": "[parameters('blobStorageAccountKey')]"
+                    "storageAccountKey": {
+                        "value": "[parameters('storageAccountKey')]"
                     },
                     "redisPrimaryKey": {
                         "value": "[parameters('redisPrimaryKey')]"

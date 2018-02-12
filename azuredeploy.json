@@ -44,16 +44,15 @@
             },
             "type": "bool"
         },
-        "blobStorageAccountType": {
+        "storageAccountType": {
             "defaultValue": "Standard_LRS",
             "allowedValues": [
                 "Standard_LRS",
                 "Standard_GRS",
-                "Standard_ZRS",
-                "Premium_LRS"
+                "Standard_ZRS"
             ],
             "metadata": {
-                "description": "Blob Storage Account type"
+                "description": "Storage Account type"
             },
             "type": "string"
         },
@@ -65,6 +64,17 @@
             ],
             "metadata": {
                 "description": "Database type"
+            },
+            "type": "string"
+        },
+        "fileServerType": {
+            "defaultValue": "gluster",
+            "allowedValues": [
+                "azurefiles",
+                "gluster"
+            ],
+            "metadata": {
+                "description": "File server type: GlusterFS, Azure Files (CIFS)"
             },
             "type": "string"
         },
@@ -417,6 +427,7 @@
             "type": "Microsoft.Resources/deployments"
         },
         {
+            "condition": "[equals(parameters('fileServerType'),'gluster')]",
             "apiVersion": "2015-01-01",
             "dependsOn": [
                 "Microsoft.Resources/deployments/networkTemplate",
@@ -443,7 +454,7 @@
                 "Microsoft.Resources/deployments/glusterTemplate",
                 "Microsoft.Resources/deployments/recoveryTemplate",
                 "Microsoft.Resources/deployments/redisTemplate",
-                "Microsoft.Resources/deployments/blobStorageAccountTemplate"
+                "Microsoft.Resources/deployments/storageAccountTemplate"
             ],
             "name": "controllerTemplate",
             "properties": {
@@ -452,8 +463,8 @@
                     "moodleCommon": {
                         "value": "[variables('moodleCommon')]"
                     },
-                    "blobStorageAccountKey": {
-                        "value": "[reference('blobStorageAccountTemplate').outputs.blobStorageAccountKey.value]"
+                    "storageAccountKey": {
+                        "value": "[reference('storageAccountTemplate').outputs.storageAccountKey.value]"
                     },
                     "redisPrimaryKey": {
                         "value": "[reference('redisTemplate').outputs.redisPrimaryKey.value]"
@@ -478,6 +489,9 @@
                 "parameters": {
                     "moodleCommon": {
                         "value": "[variables('moodleCommon')]"
+                    },
+                    "storageAccountKey": {
+                        "value": "[reference('storageAccountTemplate').outputs.storageAccountKey.value]"
                     }
                 },
                 "templateLink": {
@@ -488,7 +502,7 @@
         },
         {
             "apiVersion": "2015-01-01",
-            "name": "blobStorageAccountTemplate",
+            "name": "storageAccountTemplate",
             "properties": {
                 "mode": "Incremental",
                 "parameters": {
@@ -497,7 +511,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'blobStorageAccount.json',parameters('_artifactsLocationSasToken'))]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'storageAccount.json',parameters('_artifactsLocationSasToken'))]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -558,8 +572,7 @@
             "autoscaleVmCount": "[parameters('autoscaleVmCount')]",
             "autoscaleVmSku": "[parameters('autoscaleVmSku')]",
             "azureBackupSwitch": "[parameters( 'azureBackupSwitch')]",
-            "blobStorageAccountName": "[tolower(concat('abs',variables('resourceprefix')))]",
-            "blobStorageAccountType": "[parameters('blobStorageAccountType')]",
+            "commonFunctionsScriptUri": "[concat(parameters('_artifactsLocation'),'scripts/common_functions.sh',parameters('_artifactsLocationSasToken'))]",
             "computeApi": "2016-04-30-preview",
             "controllerVmSku": "[parameters('controllerVmSku')]",
             "dbLogin": "[parameters('dbLogin')]",
@@ -584,6 +597,7 @@
             "extFeName": "[concat('lb-frontend-',variables('resourceprefix'))]",
             "extNatPool": "[concat('lb-natpool-',variables('resourceprefix'))]",
             "extProbe": "[concat('lb-probe-',variables('resourceprefix'))]",
+            "fileServerType": "[parameters('fileServerType')]",
             "firewallRuleName": "[parameters('firewallRuleName')]",
             "gatewayName": "[concat('vnet-gateway-',variables('resourceprefix'))]",
             "gatewayPublicIPName": "[concat('vnet-gw-ip-',variables('resourceprefix'))]",
@@ -637,6 +651,8 @@
             "sshPublicKey": "[parameters('sshPublicKey')]",
             "sshUsername": "[parameters('sshUsername')]",
             "sslEnforcement": "[parameters('sslEnforcement')]",
+            "storageAccountName": "[tolower(concat('abs',variables('resourceprefix')))]",
+            "storageAccountType": "[parameters('storageAccountType')]",
             "subnetElastic": "[concat('elastic-subnet-',variables('resourceprefix'))]",
             "subnetElasticPrefix": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),4)))]",
             "subnetElasticRange": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),4)), '.0/24')]",
