@@ -188,7 +188,7 @@
         "extLbID": "[resourceId('Microsoft.Network/loadBalancers',parameters('moodleCommon').lbName)]",
         "extProbeID": "[concat(variables('extLbID'),'/probes/',parameters('moodleCommon').extProbe  )]",
         "pipID": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('moodleCommon').lbPipName)]",
-        "scriptUri": "[concat(parameters('moodleCommon').ScriptLocation,parameters('moodleCommon').moodleSetupScriptFilename)]",
+        "scriptUri": "[concat(parameters('moodleCommon').scriptLocation,parameters('moodleCommon').moodleSetupScriptFilename,parameters('moodleCommon').artifactsSasToken)]",
         "storageApiVersion": "2015-06-15",
         "subnetWebRef": "[concat(resourceId('Microsoft.Network/virtualNetworks',parameters('moodleCommon').vnetName),'/subnets/',parameters('moodleCommon').subnetWeb)]",
         "vmssID": "[resourceId('Microsoft.Compute/virtualMachineScaleSets',parameters('moodleCommon').vmssName)]",
