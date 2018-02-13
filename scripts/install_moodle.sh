@@ -630,10 +630,6 @@ EOF
         --policy readwrite \
         --output tsv)
 
-    if [ $fileServerType = "azurefiles" ]; then
-        create_azure_files_moodle_share $wabsacctname $wabsacctkey /tmp/wabs.log
-    fi
-
     if [ $fileServerType = "gluster" ]; then
         # mount gluster files system
         echo -e '\n\rInstalling GlusterFS on '$glusterNode':/'$glusterVolume '/moodle\n\r' 
@@ -646,12 +642,6 @@ EOF
     # install the entire stack
     sudo apt-get -y  --force-yes install nginx php-fpm varnish >> /tmp/apt5a.log
     sudo apt-get -y  --force-yes install php php-cli php-curl php-zip >> /tmp/apt5b.log
-
-    if [ $fileServerType = "azurefiles" ]; then
-        # Set up and mount Azure Files share. Must be done after nginx is installed because of www-data user/group
-        echo -e '\n\rSetting up and mounting Azure Files share on //'$wabsacctname'.file.core.windows.net/moodle on /moodle\n\r'
-        setup_and_mount_azure_files_moodle_share $wabsacctname $wabsacctkey
-    fi
 
     # Moodle requirements
     sudo apt-get -y update > /dev/null
@@ -2203,9 +2193,27 @@ EOF
    service varnishncsa stop
    service varnishlog stop
 
-   # make sure Moodle can read its code directory but not write
-   sudo chown -R root.root /moodle/html/moodle
-   sudo find /moodle/html/moodle -type f -exec chmod 644 '{}' \;
-   sudo find /moodle/html/moodle -type d -exec chmod 755 '{}' \;
+   if [ $fileServerType = "gluster" ]; then
+      # make sure Moodle can read its code directory but not write
+      sudo chown -R root.root /moodle/html/moodle
+      sudo find /moodle/html/moodle -type f -exec chmod 644 '{}' \;
+      sudo find /moodle/html/moodle -type d -exec chmod 755 '{}' \;
+   fi
+
+   if [ $fileServerType = "azurefiles" ]; then
+      # Delayed copy of moodle installation to the Azure Files share
+
+      # First rename moodle directory to something else
+      mv /moodle /moodle_old_delete_me
+      # Then create the moodle share
+      echo -e '\n\rCreating an Azure Files share for moodle'
+      create_azure_files_moodle_share $wabsacctname $wabsacctkey /tmp/wabs.log
+      # Set up and mount Azure Files share. Must be done after nginx is installed because of www-data user/group
+      echo -e '\n\rSetting up and mounting Azure Files share on //'$wabsacctname'.file.core.windows.net/moodle on /moodle\n\r'
+      setup_and_mount_azure_files_moodle_share $wabsacctname $wabsacctkey
+      # Move the local installation over to the Azure Files
+      echo -e '\n\rMoving locally installed moodle over to Azure Files'
+      mv -v /moodle_old_delete_me/* /moodle
+   fi
 
 }  > /tmp/install.log
