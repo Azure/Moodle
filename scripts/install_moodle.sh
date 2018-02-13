@@ -2213,7 +2213,8 @@ EOF
       setup_and_mount_azure_files_moodle_share $wabsacctname $wabsacctkey
       # Move the local installation over to the Azure Files
       echo -e '\n\rMoving locally installed moodle over to Azure Files'
-      mv -v /moodle_old_delete_me/* /moodle
+      cp -a /moodle_old_delete_me/* /moodle
+      rm -rf /moodle_old_delete_me || true
    fi
 
 }  > /tmp/install.log
