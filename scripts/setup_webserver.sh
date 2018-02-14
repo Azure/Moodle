@@ -40,7 +40,7 @@ echo $fileServerType >> /tmp/vars.txt
 echo $storageAccountName >> /tmp/vars.txt
 echo $storageAccountKey >> /tmp/vars.txt
 
-. ./common_functions.sh
+. ./helper_functions.sh
 check_fileServerType_param $fileServerType
 
 {
