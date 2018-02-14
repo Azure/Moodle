@@ -190,6 +190,11 @@ server {
           proxy_set_header X-Forwarded-Proto https;
           proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
           proxy_pass http://localhost:80;
+
+          proxy_connect_timeout       3600;
+          proxy_send_timeout          3600;
+          proxy_read_timeout          3600;
+          send_timeout                3600;
         }
 }
 EOF
