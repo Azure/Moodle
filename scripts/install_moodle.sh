@@ -2214,7 +2214,7 @@ EOF
       # Move the local installation over to the Azure Files
       echo -e '\n\rMoving locally installed moodle over to Azure Files'
       cp -a /moodle_old_delete_me/* /moodle
-      rm -rf /moodle_old_delete_me || true
+      # rm -rf /moodle_old_delete_me || true # Keep the files just in case
    fi
 
 }  > /tmp/install.log
