@@ -37,7 +37,7 @@ EOF
     
     grep "^//$storageAccountName.file.core.windows.net/moodle\s\s*/moodle\s\s*cifs" /etc/fstab
     if [ $? != "0" ]; then
-        echo "//$storageAccountName.file.core.windows.net/moodle   /moodle cifs    credentials=/etc/moodle_azure_files.credential,uid=www-data,gid=www-data,nofail,vers=3.0,dir_mode=0755,file_mode=0644,serverino,mfsymlinks" >> /etc/fstab
+        echo "//$storageAccountName.file.core.windows.net/moodle   /moodle cifs    credentials=/etc/moodle_azure_files.credential,uid=www-data,gid=www-data,nofail,vers=3.0,dir_mode=0770,file_mode=0660,serverino,mfsymlinks" >> /etc/fstab
     fi
     mkdir -p /moodle
     mount /moodle
