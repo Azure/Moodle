@@ -275,10 +275,6 @@
         "controllerIP": {
             "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', parameters('moodleCommon').jboxPipName), '2015-06-15').ipAddress]",
             "type": "string"
-        },
-        "controllerPrivateIP": {
-            "value": "[reference(variables('nicRef'), '2017-03-01').ipConfigurations[0].properties.privateIPAddress]",
-            "type": "string"
         }
     }
 }

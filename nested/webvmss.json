@@ -13,12 +13,6 @@
                 "description": "Key used to create the Azure Files share in case azurefiles is specified as fileServerType"
             },
             "type": "string"
-        },
-        "controllerPrivateIP": {
-            "metadata": {
-                "description": "Private IP address of the controller (jumpbox) VM, in case NFS mount is needed"
-            },
-            "type": "string"
         }
     },
     "resources": [
@@ -194,7 +188,7 @@
         }
     ],
     "variables": {
-        "cmdExec": "[concat('bash ',parameters('moodleCommon').webServerSetupScriptFilename,' ',parameters('moodleCommon').gfsNameRoot,'0', ' ','data', ' ', parameters('moodleCommon').siteURL, ' ', concat('jumpbox-vm-',parameters('moodleCommon').resourcesPrefix), ' ', parameters('moodleCommon').webServerType, ' ', parameters('moodleCommon').fileServerType, ' ', parameters('moodleCommon').storageAccountName, ' ', parameters('storageAccountKey'), ' ', parameters('controllerPrivateIP'))]",
+        "cmdExec": "[concat('bash ',parameters('moodleCommon').webServerSetupScriptFilename,' ',parameters('moodleCommon').gfsNameRoot,'0', ' ','data', ' ', parameters('moodleCommon').siteURL, ' ', concat('jumpbox-vm-',parameters('moodleCommon').resourcesPrefix), ' ', parameters('moodleCommon').webServerType, ' ', parameters('moodleCommon').fileServerType, ' ', parameters('moodleCommon').storageAccountName, ' ', parameters('storageAccountKey'), ' ', parameters('moodleCommon').jboxVmName)]",
         "dstorID": "[resourceId('Microsoft.Storage/storageAccounts',parameters('moodleCommon').vmssdStorageAccounttName)]",
         "extBeID": "[concat(variables('extLbID'),'/backendAddressPools/',parameters('moodleCommon').extBeName)]",
         "extFeID": "[concat(variables('extLbID'),'/frontendIPConfigurations/',parameters('moodleCommon').extFeName)]",

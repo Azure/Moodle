@@ -495,9 +495,6 @@
                     },
                     "storageAccountKey": {
                         "value": "[reference('storageAccountTemplate').outputs.storageAccountKey.value]"
-                    },
-                    "controllerPrivateIP": {
-                        "value": "[reference('controllerTemplate').outputs.controllerPrivateIP.value]"
                     }
                 },
                 "templateLink": {
