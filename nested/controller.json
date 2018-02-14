@@ -108,9 +108,53 @@
             "type": "Microsoft.Network/networkInterfaces"
         },
         {
+            "condition": "[equals(parameters('moodleCommon').fileServerType,'nfs')]",
+            "apiVersion": "[parameters('moodleCommon').computeApi]",
+            "copy": {
+                "count": "[parameters('moodleCommon').fileServerDiskCount]",
+                "name": "[variables('diskLoop')]"
+            },
+            "location": "[resourceGroup().location]",
+            "name": "[concat(variables('vmName'),'-datadisk',copyIndex(1))]",
+            "properties": {
+                "accountType": "Premium_LRS",
+                "creationData": {
+                    "createOption": "Empty"
+                },
+                "diskSizeGB": "[parameters('moodleCommon').fileServerDiskSize]"
+            },
+            "tags": {
+                "displayName": "Gluster VM Data Disk"
+            },
+            "type": "Microsoft.Compute/disks"
+        },
+        {
+            "apiVersion": "2015-01-01",
+            "dependsOn": [
+                "[variables('diskLoop')]"
+            ],
+            "name": "[concat(variables('vmName'),'-diskSelection')]",
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {
+                    "vmDiskCount": {
+                        "value": "[parameters('moodleCommon').fileServerDiskCount]"
+                    },
+                    "vmName": {
+                        "value": "[variables('vmName')]"
+                    }
+                },
+                "templateLink": {
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'diskSelection.json',parameters('moodleCommon').artifactsSasToken)]"
+                }
+            },
+            "type": "Microsoft.Resources/deployments"
+        },
+        {
             "apiVersion": "[parameters('moodleCommon').computeApi]",
             "dependsOn": [
-                "[concat('Microsoft.Network/networkInterfaces/', parameters('moodleCommon').jboxNicName)]"
+                "[concat('Microsoft.Network/networkInterfaces/', parameters('moodleCommon').jboxNicName)]",
+                "[concat('Microsoft.Resources/deployments/',concat(variables('vmName'),'-diskSelection'))]"
             ],
             "location": "[resourceGroup().location]",
             "name": "[parameters('moodleCommon').jboxVmName]",
@@ -141,7 +185,7 @@
                     }
                 },
                 "storageProfile": {
-                    "dataDisks": [],
+                    "dataDisks": "[if(equals(parameters('moodleCommon').fileServerType,'nfs'), reference(concat(variables('vmName'),'-diskSelection')).outputs.dataDiskArray.value, reference(concat(variables('vmName'),'-diskSelection')).outputs.emptyDataDiskArray.value)]",
                     "imageReference": "[parameters('moodleCommon').osType]",
                     "osDisk": {
                         "createOption": "FromImage",
@@ -220,6 +264,8 @@
         "documentation09": "This sub-template calls other sub-templates",
         "documentation10": "    controllerconfig       - conditionally applies post-deployment script on the VM",
         "documentation18": "    recoveryservicesEnlist - conditionally enlists the VM into the backup regimen",
+        "vmName": "[parameters('moodleCommon').jboxVmName]",
+        "diskLoop": "[concat(variables('vmName'),'-disk')]",
         "nicRef": "[resourceId('Microsoft.Network/networkInterfaces', parameters('moodleCommon').jboxNicName)]",
         "nsgRef": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('moodleCommon').jboxNsgName)]",
         "pipRef": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('moodleCommon').jboxPipName)]",

@@ -71,10 +71,11 @@
             "defaultValue": "gluster",
             "allowedValues": [
                 "azurefiles",
-                "gluster"
+                "gluster",
+                "nfs"
             ],
             "metadata": {
-                "description": "File server type: GlusterFS, Azure Files (CIFS)"
+                "description": "File server type: GlusterFS, Azure Files (CIFS)--very slow, NFS--not highly available"
             },
             "type": "string"
         },
@@ -152,17 +153,19 @@
             },
             "type": "string"
         },
-        "glusterDiskSize": {
+        "fileServerDiskSize": {
             "defaultValue": 127,
             "metadata": {
-                "description": "Size per disk for gluster nodes"
+                "description": "Size per disk for gluster nodes or nfs server"
             },
             "type": "int"
         },
-        "glusterDiskCount": {
+        "fileServerDiskCount": {
             "defaultValue": 4,
+            "minValue": 2,
+            "maxValue": 8,
             "metadata": {
-                "description": "Number of disks in raid0 per gluster node"
+                "description": "Number of disks in raid0 per gluster node or nfs server"
             },
             "type": "int"
         },
@@ -572,7 +575,7 @@
             "autoscaleVmCount": "[parameters('autoscaleVmCount')]",
             "autoscaleVmSku": "[parameters('autoscaleVmSku')]",
             "azureBackupSwitch": "[parameters( 'azureBackupSwitch')]",
-            "commonFunctionsScriptUri": "[concat(parameters('_artifactsLocation'),'scripts/common_functions.sh',parameters('_artifactsLocationSasToken'))]",
+            "commonFunctionsScriptUri": "[concat(parameters('_artifactsLocation'),'scripts/helper_functions.sh',parameters('_artifactsLocationSasToken'))]",
             "computeApi": "2016-04-30-preview",
             "controllerVmSku": "[parameters('controllerVmSku')]",
             "dbLogin": "[parameters('dbLogin')]",
@@ -597,6 +600,8 @@
             "extFeName": "[concat('lb-frontend-',variables('resourceprefix'))]",
             "extNatPool": "[concat('lb-natpool-',variables('resourceprefix'))]",
             "extProbe": "[concat('lb-probe-',variables('resourceprefix'))]",
+            "fileServerDiskCount": "[parameters('fileServerDiskCount')]",
+            "fileServerDiskSize": "[parameters('fileServerDiskSize')]",
             "fileServerType": "[parameters('fileServerType')]",
             "firewallRuleName": "[parameters('firewallRuleName')]",
             "gatewayName": "[concat('vnet-gateway-',variables('resourceprefix'))]",
@@ -607,8 +612,6 @@
             "gatewayType": "[parameters('gatewayType')]",
             "gfsNameRoot": "[concat('gluster-vm-',variables('resourceprefix'))]",
             "gfxAvailabilitySetName": "[concat('gluster-avset-',variables('resourceprefix'))]",
-            "glusterDiskCount": "[parameters('glusterDiskCount')]",
-            "glusterDiskSize": "[parameters('glusterDiskSize')]",
             "glusterScriptFilename": "install_gluster.sh",
             "glusterVmCount": 2,
             "glusterVmSku": "[parameters('glusterVmSku')]",
