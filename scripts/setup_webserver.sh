@@ -30,6 +30,7 @@ webServerType=$5
 fileServerType=$6
 storageAccountName=$7
 storageAccountKey=$8
+nfsVmName=$9
 
 echo $glusterNode    >> /tmp/vars.txt
 echo $glusterVolume  >> /tmp/vars.txt
@@ -39,6 +40,7 @@ echo $webServerType >> /tmp/vars.txt
 echo $fileServerType >> /tmp/vars.txt
 echo $storageAccountName >> /tmp/vars.txt
 echo $storageAccountKey >> /tmp/vars.txt
+echo $nfsVmName >> /tmp/vars.txt
 
 . ./helper_functions.sh
 check_fileServerType_param $fileServerType
@@ -58,7 +60,7 @@ check_fileServerType_param $fileServerType
     sudo add-apt-repository ppa:gluster/glusterfs-3.8 -y
     sudo apt-get -y update
     sudo apt-get -y install glusterfs-client
-  else # "azurefilese"
+  else # "azurefiles"
     sudo apt-get -y install cifs-utils
   fi
 
@@ -85,6 +87,8 @@ check_fileServerType_param $fileServerType
     sudo mount -t glusterfs $glusterNode:/$glusterVolume /moodle
     sudo echo -e $glusterNode':/'$glusterVolume'   /moodle         glusterfs       defaults,_netdev,log-level=WARNING,log-file=/var/log/gluster.log 0 0' >> /etc/fstab
     sudo mount -a
+  elif [ $fileServerType = "nfs" ]; then
+    configure_nfs_client_and_mount $nfsVmName /moodle /moodle
   else # "azurefiles"
     setup_and_mount_azure_files_moodle_share $storageAccountName $storageAccountKey
   fi

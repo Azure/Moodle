@@ -573,7 +573,7 @@ findtime = 86400   ; 1 day
 maxretry = 5
 EOF
 
-    # create gluster or Azure Files mount point
+    # create gluster, nfs or Azure Files mount point
     mkdir -p /moodle
 
     export DEBIAN_FRONTEND=noninteractive
@@ -581,6 +581,10 @@ EOF
     if [ $fileServerType = "gluster" ]; then
         # configure gluster repository & install gluster client
         sudo add-apt-repository ppa:gluster/glusterfs-3.8 -y                 >> /tmp/apt1.log
+    elif [ $fileServerType = "nfs" ]; then
+        # configure NFS server and export
+        create_filesystem_with_raid /moodle /dev/md1 /dev/md1p1
+        configure_nfs_server_and_export /moodle
     fi
 
     sudo apt-get -y update                                                   >> /tmp/apt2.log
@@ -1256,7 +1260,7 @@ EOF
    service varnishncsa stop
    service varnishlog stop
 
-   if [ $fileServerType = "gluster" ]; then
+   if [ $fileServerType = "gluster" -o $fileServerType = "nfs" ]; then
       # make sure Moodle can read its code directory but not write
       sudo chown -R root.root /moodle/html/moodle
       sudo find /moodle/html/moodle -type f -exec chmod 644 '{}' \;
