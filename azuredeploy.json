@@ -30,6 +30,13 @@
             },
             "type": "bool"
         },
+        "vnetGwDeploySwitch": {
+            "defaultValue": false,
+            "metadata": {
+                "description": "Switch to deploy a virtual network gateway or not"
+            },
+            "type": "bool"
+        },
         "installO365pluginsSwitch": {
             "defaultValue": false,
             "metadata": {
@@ -671,6 +678,7 @@
             "vaultName": "[concat('vault-',variables('resourceprefix'))]",
             "vmssName": "[concat('vmss-',variables('resourceprefix'))]",
             "vmssdStorageAccounttName": "[concat('vmss',uniqueString(resourceGroup().id))]",
+            "vnetGwDeploySwitch": "[parameters('vnetGwDeploySwitch')]",
             "vnetName": "[concat('vnet-',variables('resourceprefix'))]",
             "vpnType": "[parameters('vpnType')]",
             "webServerSetupScriptFilename": "setup_webserver.sh",

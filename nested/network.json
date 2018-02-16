@@ -56,6 +56,7 @@
             "type": "Microsoft.Network/virtualNetworks"
         },
         {
+            "condition": "[parameters('moodleCommon').vnetGwDeploySwitch]",
             "apiVersion": "2015-06-15",
             "location": "[resourceGroup().location]",
             "name": "[parameters('moodleCommon').gatewayPublicIPName]",
@@ -68,6 +69,7 @@
             "type": "Microsoft.Network/publicIPAddresses"
         },
         {
+            "condition": "[parameters('moodleCommon').vnetGwDeploySwitch]",
             "apiVersion": "2015-06-15",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks', parameters('moodleCommon').vnetName)]"
@@ -79,6 +81,7 @@
             "type": "Microsoft.Network/virtualNetworks/subnets"
         },
         {
+            "condition": "[parameters('moodleCommon').vnetGwDeploySwitch]",
             "apiVersion": "2015-06-15",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses', parameters('moodleCommon').gatewayPublicIPName)]",
@@ -168,7 +171,7 @@
                             "probe": {
                                 "id": "[variables('extProbeID')]"
                             },
-                            "protocol": "tcp"
+                            "protocol": "Tcp"
                         }
                     },
                     {
@@ -187,7 +190,7 @@
                             "probe": {
                                 "id": "[variables('extProbeID')]"
                             },
-                            "protocol": "tcp"
+                            "protocol": "Tcp"
                         }
                     }
                 ],
@@ -195,10 +198,10 @@
                     {
                         "name": "[parameters('moodleCommon').extProbe  ]",
                         "properties": {
-                            "intervalInSeconds": "5",
-                            "numberOfProbes": "3",
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 3,
                             "port": 80,
-                            "protocol": "tcp"
+                            "protocol": "Tcp"
                         }
                     }
                 ]
