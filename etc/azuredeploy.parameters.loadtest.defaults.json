@@ -1,0 +1,13 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "autoscaleVmSku":              { "value": "__WEB_VM_SKU__" },
+        "dbServerType":                { "value": "__DB_SERVER_TYPE__" },
+        "webServerType":               { "value": "__WEB_SERVER_TYPE__" },
+        "fileServerType":              { "value": "__FILE_SERVER_TYPE__" },
+        "fileServerDiskCount":         { "value": 2 },
+        "fileServerDiskSize":          { "value": 128 },
+        "sshPublicKey":                { "value": "__SSH_PUB_KEY__" }
+    }
+}
