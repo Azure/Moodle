@@ -71,12 +71,22 @@ function install_moosh
     ln -s $PWD/moosh.php ~/bin/moosh
 }
 
-function install_moosh_on_remote_host
+function delete_course
 {
-    local ssh_dest=${1}   # E.g., azureadmin@10.2.3.4
-    local port=${2:-22}       # E.g., 2222
+    local course_id=${1}
 
-    local cmd="ssh -p $port $ssh_dest 'wget https://raw.githubusercontent.com/Azure/Moodle/hs-loadtest/etc/loadtest.sh; source loadtest.sh; install_moosh'"
+    sudo -u www-data ~/bin/moosh --moodle-path=/moodle/html/moodle course-delete $course_id
+}
+
+LOADTEST_BASE_URI=https://raw.githubusercontent.com/Azure/Moodle/hs-loadtest/loadtest
+
+function run_loadtest_func_cmd_on_remote_host
+{
+    local func_cmd=${1}   # E.g., install_moosh or 'delete_course 2'
+    local ssh_dest=${2}   # E.g., azureadmin@10.2.3.4
+    local port=${3:-22}   # E.g., 2222
+
+    local cmd="ssh -p $port $ssh_dest 'wget $LOADTEST_BASE_URI/loadtest.sh -O loadtest.sh; source loadtest.sh; $func_cmd'"
     show_command_to_run $cmd
     eval $cmd
 }
