@@ -71,14 +71,59 @@ function install_moosh
     ln -s $PWD/moosh.php ~/bin/moosh
 }
 
+MOODLE_PATH=/moodle/html/moodle
+
 function delete_course
 {
     local course_id=${1}
 
-    sudo -u www-data ~/bin/moosh --moodle-path=/moodle/html/moodle course-delete $course_id
+    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-delete $course_id
+}
+
+function create_course
+{
+    local course_id=${1}
+
+    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-create --idnumber=$course_id empty@test.course
+}
+
+function restore_course_from_url
+{
+    local url=${1}
+
+    wget $url -O backup_to_restore.mbz
+    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-restore backup_to_restore.mbz 1
+}
+
+function create_1000_test_users_and_enroll_them_in_course
+{
+    local course_id=${1}
+    local password=${2}
+
+    # TODO ugly...
+    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{1..200}
+    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{201..400}
+    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{401..600}
+    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{601..800}
+    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{801..1000}
+
+    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{1..200}
+    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{201..400}
+    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{401..600}
+    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{601..800}
+    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{801..1000}
 }
 
 LOADTEST_BASE_URI=https://raw.githubusercontent.com/Azure/Moodle/hs-loadtest/loadtest
+
+function setup_azure_moodle_loadtest_env
+{
+    install_moosh
+    restore_course_from_url $LOADTEST_BASE_URI/moodle-on-azure-test-course-1.mbz
+    local course_id=2  # TODO Fix this hard-coded course id #. Should be retrieved from the previous restore_course_from_url output
+    local password='testUserP@$$w0rd'   # TODO hard-coded
+    create_1000_test_users_and_enroll_them_in_course $course_id $password
+}
 
 function run_loadtest_func_cmd_on_remote_host
 {
