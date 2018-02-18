@@ -32,28 +32,67 @@ function show_command_to_run
     echo "Running command: $*"
 }
 
-# TODO hard-coded Azure location. Parametrize this later.
+function check_db_sku_params
+{
+    local dtu=${1}
+    local size=${2}
+
+    if [ "$dtu" != 100 -a "$dtu" != 200 -a "$dtu" != 400 -a "$dtu" != 800 ]; then
+        echo "Invalid DTU ($dtu). Only allowed are 100, 200, 400, 800."
+        return 1
+    fi
+    if [ "$size" != 125 ] && [ "$size" != 250 ] && [ "$size" != 375 ] && [ "$size" != 500 ] && [ "$size" != 625 ] && [ "$size" != 750 ] && [ "$size" != 875 ] && [ "$size" 1000 ]; then
+        echo "Invalid DB size ($size). Only allowed are 125, 250, 375, ... 875, 1000."
+        return 1
+    fi
+}
+
+function get_db_sku_name
+{
+    local db_server_type=${1}
+    local db_dtu=${2}
+
+    if [ "$db_server_type" = mysql ]; then
+        echo "MYSQLS${db_dtu}"
+    elif [ "$db_server_type" = postgres ]; then
+        echo "PGSQLS${db_dtu}"
+    else
+        echo "Invalid DB type ($db_server_type). Only mysql or postgres are allowed"
+        return 1
+    fi
+}
+
+# TODO hard-coded Azure location in global variable. Parametrize this later.
 LOCATION=southcentralus
 
-function deploy_moodle_with_some_parameters_nowait
+function deploy_moodle_with_some_parameters
 {
     check_if_logged_on_azure || return 1
 
     local resource_group=${1}   # Azure resource group where templates will be deployed
-    local template_uri=${2}     # Github URL of the top template to deploy
+    local template_url=${2}     # Github URL of the top template to deploy
     local parameters_template_file=${3} # Local parameter template file
-    local web_vm_sku=${4}       # E.g., Standard_DS2_v2
-    local db_server_type=${5}   # E.g., mysql or postgres
-    local web_server_type=${6}  # E.g., apache or nginx
-    local file_server_type=${7} # E.g., nfs or gluster
-    local ssh_pub_key=${8}      # Your ssh authorized_keys content
+    local web_server_type=${4}  # E.g., apache or nginx
+    local web_vm_sku=${5}       # E.g., Standard_DS2_v2
+    local db_server_type=${6}   # E.g., mysql or postgres
+    local db_dtu=${7}           # 100, 200, 400, 800 only
+    local db_size=${8}          # 125, 250, 375, 500, 625, 750, 875. 1000 only
+    local file_server_type=${9} # E.g., nfs or gluster
+    local file_server_disk_count=${10}  # 2, 3, 4
+    local file_server_disk_size=${11}   # in GB
+    local ssh_pub_key=${12}     # Your ssh authorized_keys content
+    local no_wait_flag=${13}    # Must be "--no-wait" to be passed to az
+
+    check_db_sku_params $db_dtu $db_size || return 1
+    local db_sku_name=$(get_db_sku_name $db_server_type $db_dtu) || return 1
+    local db_size_mb=$(($db_size * 1024))
 
     local cmd="az group create --resource-group $resource_group --location $LOCATION"
     show_command_to_run $cmd
     eval $cmd || return 1
 
     local deployment_name="${resource_group}-deployment"
-    local cmd="az group deployment create --resource-group $resource_group --name $deployment_name --no-wait --template-uri $template_uri --parameters @$parameters_template_file autoscaleVmSku=$web_vm_sku dbServerType=$db_server_type webServerType=$web_server_type fileServerType=$file_server_type sshPublicKey='$ssh_pub_key'"
+    local cmd="az group deployment create --resource-group $resource_group --name $deployment_name $no_wait_flag --template-uri $template_url --parameters @$parameters_template_file webServerType=$web_server_type autoscaleVmSku=$web_vm_sku dbServerType=$db_server_type skuCapacityDTU=$db_dtu skuName=$db_sku_name skuSizeMB=$db_size_mb fileServerType=$file_server_type fileServerDiskCount=$file_server_disk_count fileServerDiskSize=$file_server_disk_size sshPublicKey='$ssh_pub_key'"
     show_command_to_run $cmd
     eval $cmd
 }
@@ -183,7 +222,62 @@ function run_simple_test_1_on_resource_group
     echo $output | jq . > ${prefix}.deployment.json
 
     export JVM_ARGS="-Xms1024m -Xmx4096m"
-    local cmd="jmeter -n -t simple-test-1.jmx -l ${prefix}.jmeter.results.txt -j ${prefix}.jmeter.log -o ${prefix}.jmeter.report -Jhost=${moodle_host} -Jdb_host=${db_host} -Jdb_user=${moodle_db_user} '-Jdb_pass=${moodle_db_pass}' '-Jmoodle_user_pass=${moodle_user_pass}' -Jthreads=${test_threads_count} -Jrampup=${test_rampup_time_sec} -Jruntime=${test_run_time_sec}"
+    local cmd="jmeter -n -t simple-test-1.jmx -l ${prefix}.jmeter.results.txt -j ${prefix}.jmeter.log -e -o ${prefix}.jmeter.report -Jhost=${moodle_host} -Jdb_host=${db_host} -Jdb_user=${moodle_db_user} '-Jdb_pass=${moodle_db_pass}' '-Jmoodle_user_pass=${moodle_user_pass}' -Jthreads=${test_threads_count} -Jrampup=${test_rampup_time_sec} -Jruntime=${test_run_time_sec}"
     show_command_to_run $cmd
     eval $cmd
+}
+
+function deallocate_services_in_resource_group
+{
+    local rg=${1}
+
+    # Deallocate VMSS's
+    local scalesets=$(az vmss list -g $rg --query [].name -o tsv)
+    for scaleset in $scalesets; do
+        local cmd="az vmss deallocate -g $rg --name $scaleset"
+        show_command_to_run $cmd
+        eval $cmd
+    done
+
+    # Deallocate VMs
+    local cmd="az vm deallocate --ids $(az vm list -g $rg --query [].id -o tsv)"
+    show_command_to_run $cmd
+    eval $cmd
+
+    # Stopping DBs and redis cache is currently not possible on Azure.
+}
+
+function deploy_run_test1_teardown
+{
+    local resource_group=${1}
+    local location=${2}
+    local template_url=${3}
+    local parameters_template_file=${4}
+    local web_server_type=${5}
+    local web_vm_sku=${6}
+    local db_server_type=${7}
+    local db_dtu=${8}
+    local db_size=${9}
+    local file_server_type=${10}
+    local file_server_disk_count=${11}
+    local file_server_disk_size=${12}
+    local ssh_pub_key=${13}
+    local test_threads_count=${14}
+    local test_rampup_time_sec=${15}
+    local test_run_time_sec=${16}
+    local delete_resource_group_flag=${17}  # Any non-empty string is considered true
+
+    LOCATION=$location
+    deploy_moodle_with_some_parameters $resource_group $template_url $parameters_template_file $web_server_type $web_vm_sku $db_server_type $db_dtu $db_size $file_server_type $file_server_disk_count $file_server_disk_size "$ssh_pub_key" || return 1
+    run_simple_test_1_on_resource_group $resource_group $test_threads_count $test_rampup_time_sec $test_run_time_sec 1 || return 1
+    if [ -n "$delete_resource_group_flag" ]; then
+        az group delete -g $resource_group -y
+    else
+        deallocate_services_in_resource_group $resource_group
+    fi
+}
+
+function run_all1
+{
+    deploy_run_test1_teardown ltest4 southcentralus https://raw.githubusercontent.com/Azure/Moodle/hs-loadtest/azuredeploy.json azuredeploy.parameters.loadtest.defaults.json apache Standard_DS2_v2 mysql 200 125 nfs 2 128 "$(cat ~/.ssh/authorized_keys)" 800 2400 12800
 }
