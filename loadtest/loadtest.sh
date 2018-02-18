@@ -123,6 +123,12 @@ function create_1000_test_users_and_enroll_them_in_course
     sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{801..1000}
 }
 
+function hide_course_overview_block_for_jmeter_test
+{
+    # "myoverview" is the registered name of the "Course overview" block
+    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH block-manage hide myoverview
+}
+
 # TODO hard-coded values...
 LOADTEST_BASE_URI=https://raw.githubusercontent.com/Azure/Moodle/hs-loadtest/loadtest
 MOODLE_TEST_USER_PASSWORD='testUserP@$$w0rd'
@@ -135,6 +141,7 @@ function setup_test_course_and_users
     local course_id=2  # TODO Fix this hard-coded course id #. Should be retrieved from the previous restore_course_from_url output
     local password=$MOODLE_TEST_USER_PASSWORD   # TODO parameterize
     create_1000_test_users_and_enroll_them_in_course $course_id $password
+    hide_course_overview_block_for_jmeter_test
 }
 
 function run_cmd_on_remote_host
@@ -173,10 +180,10 @@ function run_simple_test_1_on_resource_group
     mkdir -p test_outputs
 
     local prefix="test_outputs/simple_test_1_$(date +%Y%m%d%H%M%S)"
-    echo $output | jq . > ${prefix}.params.json
+    echo $output | jq . > ${prefix}.deployment.json
 
     export JVM_ARGS="-Xms1024m -Xmx4096m"
-    local cmd="jmeter -n -t simple-test-1.jmx -l ${prefix}.jmeter.results.txt -j ${prefix}.jmeter.log -o ${prefix}.jmeter.report -Jhost=${moodle_host} -Jdb_host=${db_host} -Jdb_user=${moodle_db_user} -Jdb_pass=${moodle_db_pass} -Jmoodle_user_pass=${moodle_user_pass} -Jthreads=${test_threads_count} -Jrampup=${test_rampup_time_sec} -Jruntime=${test_run_time_sec}"
+    local cmd="jmeter -n -t simple-test-1.jmx -l ${prefix}.jmeter.results.txt -j ${prefix}.jmeter.log -o ${prefix}.jmeter.report -Jhost=${moodle_host} -Jdb_host=${db_host} -Jdb_user=${moodle_db_user} '-Jdb_pass=${moodle_db_pass}' '-Jmoodle_user_pass=${moodle_user_pass}' -Jthreads=${test_threads_count} -Jrampup=${test_rampup_time_sec} -Jruntime=${test_run_time_sec}"
     show_command_to_run $cmd
     eval $cmd
 }

@@ -16,9 +16,8 @@
         <collectionProp name="Arguments.arguments">
           <elementProp name="login_host" elementType="Argument">
             <stringProp name="Argument.name">login_host</stringProp>
-            <stringProp name="Argument.value">lb-cosbae.southcentralus.cloudapp.azure.com</stringProp>
+            <stringProp name="Argument.value">${__P(host, lb-cosbae.southcentralus.cloudapp.azure.com)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
-            <stringProp name="Argument.desc">Not required</stringProp>
           </elementProp>
           <elementProp name="host" elementType="Argument">
             <stringProp name="Argument.name">host</stringProp>
@@ -106,7 +105,7 @@
           </elementProp>
           <elementProp name="db_user" elementType="Argument">
             <stringProp name="Argument.name">db_user</stringProp>
-            <stringProp name="Argument.value">${_P(db_user,moodle@mysql-cosbae)}</stringProp>
+            <stringProp name="Argument.value">${__P(db_user,moodle@mysql-cosbae)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="db_name" elementType="Argument">
@@ -116,12 +115,12 @@
           </elementProp>
           <elementProp name="db_pass" elementType="Argument">
             <stringProp name="Argument.name">db_pass</stringProp>
-            <stringProp name="Argument.value">${_P(db_pass,)}</stringProp>
+            <stringProp name="Argument.value">${__P(db_pass,)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="moodle_user_pass" elementType="Argument">
             <stringProp name="Argument.name">moodle_user_pass</stringProp>
-            <stringProp name="Argument.value">${_P(moodle_user_pass,testUserP@$$w0rd)}</stringProp>
+            <stringProp name="Argument.value">${__P(moodle_user_pass,testUserP@$$w0rd)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
