@@ -555,6 +555,14 @@
         "type": "string",
         "value": "[variables('moodleCommon').moodleAdminPass]"
       },
+      "moodleDbUsername": {
+        "type": "string",
+        "value": "[variables('moodleCommon').moodleDbUserAzure]"
+      },
+      "moodleDbPassword": {
+        "type": "string",
+        "value": "[variables('moodleCommon').moodleDbPass]"
+      },
       "loadBalancerDNS": {
         "type": "string",
         "value": "[variables('moodleCommon').lbDns]"
