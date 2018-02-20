@@ -1,5 +1,25 @@
 #!/bin/bash
 
+# This is not tested myself. Just documenting what's needed.
+function install_java_and_jmeter
+{
+    sudo apt update
+    sudo apt install -y openjdk-8-jdk
+
+    wget -O apache-jmeter-4.0.tgz http://www-us.apache.org/dist//jmeter/binaries/apache-jmeter-4.0.tgz
+    tar xfz apache-jmeter-4.0.tgz
+    mkdir -p ~/bin/jmeter
+    ln -s apache-jmeter-4.0/bin/jmeter ~/bin/jmeter
+
+    wget -O mysql-connector-java-5.1.45.tar.gz https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.45.tar.gz
+    tar xfz mysql-connector-java-5.1.45.tar.gz
+    mv mysql-connector-java-5.1.45/mysql-connector-java-5.1.45-bin.jar apache-jmeter-4.0/lib
+    rm -rf mysql-connector-java-5.1.45*
+
+    wget -O postgres-42.2.1.jar https://jdbc.postgresql.org/download/postgresql-42.2.1.jar
+    mv postgres-42.2.1.jar apache-jmeter-4.0/lib
+}
+
 function install_az_cli
 {
     local az_repo=$(lsb_release -cs)
@@ -7,15 +27,6 @@ function install_az_cli
     sudo apt-key adv --keyserver packages.microsoft.com --recv-keys 52E16F86FEE04B979B07E28DB02C46DF417A0893
     sudo apt-get install -y apt-transport-https
     sudo apt-get update && sudo apt-get install -y azure-cli
-}
-
-function install_package_if_not_installed
-{
-    local pkg=${1}
-    dpkg -s $pkg > /dev/null 2>&1
-    if [ $? != "0" ]; then
-        sudo apt install -y $pkg
-    fi
 }
 
 function check_if_logged_on_azure
@@ -143,7 +154,7 @@ function restore_course_from_url
     sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-restore backup_to_restore.mbz 1
 }
 
-function create_1000_test_users_and_enroll_them_in_course
+function create_2000_test_users_and_enroll_them_in_course
 {
     local course_id=${1}
     local password=${2}
@@ -154,12 +165,22 @@ function create_1000_test_users_and_enroll_them_in_course
     sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{401..600}
     sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{601..800}
     sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{801..1000}
+    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{1001..1200}
+    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{1201..1400}
+    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{1401..1600}
+    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{1601..1800}
+    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{1801..2000}
 
     sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{1..200}
     sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{201..400}
     sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{401..600}
     sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{601..800}
     sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{801..1000}
+    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{1001..1200}
+    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{1201..1400}
+    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{1401..1600}
+    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{1601..1800}
+    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{1801..2000}
 }
 
 function hide_course_overview_block_for_jmeter_test
@@ -179,7 +200,7 @@ function setup_test_course_and_users
     restore_course_from_url $LOADTEST_BASE_URI/moodle-on-azure-test-course-1.mbz
     local course_id=2  # TODO Fix this hard-coded course id #. Should be retrieved from the previous restore_course_from_url output
     local password=$MOODLE_TEST_USER_PASSWORD   # TODO parameterize
-    create_1000_test_users_and_enroll_them_in_course $course_id $password
+    create_2000_test_users_and_enroll_them_in_course $course_id $password
     hide_course_overview_block_for_jmeter_test
 }
 
@@ -202,7 +223,7 @@ function run_simple_test_1_on_resource_group
     local test_run_time_sec=${4}    # E.g., 3600 for 1 hour
     local setup_test_course_users_flag=${5} # Run setup_test_course_and_users on moodle_host if nonzero
 
-    install_package_if_not_installed jq
+    sudo apt update; sudo apt install -y jq
     local deployment="${resource_group}-deployment"
     local output=$(az group deployment show -g $resource_group -n $deployment)
     local moodle_host=$(echo $output | jq -r .properties.outputs.siteURL.value)
@@ -277,7 +298,18 @@ function deploy_run_test1_teardown
     fi
 }
 
-function run_all1
+function check_ssh_agent_and_added_key
 {
-    deploy_run_test1_teardown ltest4 southcentralus https://raw.githubusercontent.com/Azure/Moodle/hs-loadtest/azuredeploy.json azuredeploy.parameters.loadtest.defaults.json apache Standard_DS2_v2 mysql 200 125 nfs 2 128 "$(cat ~/.ssh/authorized_keys)" 800 2400 12800
+    ssh-add -l
+    if [ $? != "0" ]; then
+        echo "No ssh key added to ssh-agent or no ssh-agent is running. Make sure to run ssh-agent (eval `ssh-agent`) and add the correct ssh key (usually just ssh-add will do), so that remote commands execution through ssh doesn't prompt for interactive password."
+        return 1
+    fi
+}
+
+function run_load_test_example
+{
+    check_ssh_agent_and_added_key || return 1
+
+    deploy_run_test1_teardown ltest6 southcentralus https://raw.githubusercontent.com/Azure/Moodle/hs-loadtest/azuredeploy.json azuredeploy.parameters.loadtest.defaults.json apache Standard_DS2_v2 mysql 200 125 nfs 2 128 "$(cat ~/.ssh/authorized_keys)" 1600 4800 18000
 }
