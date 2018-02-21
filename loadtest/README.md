@@ -61,13 +61,13 @@ also has hard-coded database type (JDBC connection string) that won't work
 for Postgres SQL server, so making it work would be also greatly appreciated.
 Also, if you run this load test with any parameters, it'd be great to share
 the numeric results so that we can have more performance data on various
-configurations. A link to an Excel spreadsheet will be added here to share
-such load testing results.
+configurations. Here is [a link to an Excel spreadsheet](https://1drv.ms/x/s!Aj6KpM6lFGAjgd4D6IV8_6M42q9omA)
+where anyone can share their load testing results.
 
 ## Acknowledgement
 
 The original test course and the test plan were generously provided by
 [Catalyst](https://github.com/catalyst) as part of this template modernization
-project. jMeter is a great load testing tool, but also thanks to moosh,
+project. jMeter is a great load testing tool, and also thanks to moosh,
 the whole process could be automated without too much difficulty, which was
 really nice.
