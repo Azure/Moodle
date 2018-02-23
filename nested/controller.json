@@ -36,7 +36,7 @@
             "tags": {
                 "displayName": "jboxpip"
             }
-            },
+        },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2017-10-01",
