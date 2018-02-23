@@ -6,6 +6,11 @@ are available in the portal, but in this document we will retrieve
 them using the AZ command line tools and through the AZ CLI tool. This
 document describes the available parameters and how to retrieve them.
 
+## Prerequisites
+
+In order to configure our deployment and tools we'll set up some
+[environment variables](./Environment-Variables.md) to ensure consistency.
+
 ## Output Paramater Overview
 
 The available output parameters are:
