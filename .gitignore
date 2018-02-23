@@ -102,3 +102,7 @@ ENV/
 
 # test outputs
 loadtest/test_outputs/
+
+# Emacs
+*#*#
+

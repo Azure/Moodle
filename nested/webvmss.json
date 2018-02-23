@@ -10,7 +10,7 @@
         },
         "storageAccountKey": {
             "metadata": {
-                "description": "Key used to create the Azure Files share in case azurefiles is specified as fileServerType"
+                "description": "Storage account key that may be needed in the VM setup scripts"
             },
             "type": "string"
         }
