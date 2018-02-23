@@ -212,7 +212,7 @@
                 400,
                 800
             ],
-            "defaultValue": 50,
+            "defaultValue": 100,
             "metadata": {
                 "description": "MySql/Postgresql database trasaction units"
             },
@@ -243,14 +243,14 @@
                 "MYSQLS400",
                 "MYSQLS800"
             ],
-            "defaultValue": "MYSQLB50",
+            "defaultValue": "MYSQLS100",
             "metadata": {
                 "description": "MySql/Postgresql sku name"
             },
             "type": "string"
         },
         "skuSizeMB": {
-            "defaultValue": 51200,
+            "defaultValue": 128000,
             "metadata": {
                 "description": "MySql/Postgresql sku size in MB. For Basic tier, minimum 50GB, increased by 125GB up to 1TB. For Standard tier, minimum 125GB, increase by 125GB up to 1TB"
             },
@@ -261,7 +261,7 @@
                 "Basic",
                 "Standard"
             ],
-            "defaultValue": "Basic",
+            "defaultValue": "Standard",
             "metadata": {
                 "description": "MySql/Postgresql sku tier"
             },
