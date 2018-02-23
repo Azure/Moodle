@@ -5,6 +5,9 @@ management tasks on a scalable Moodle cluster on Azure.
 
 ## Prerequisites
 
+In order to configure our deployment and tools we'll set up some
+[environment variables](./Environment-Variables.md) to ensure consistency.
+
 In order to manage a cluster it is clearly necessary to first [deploy
 a scalable Moodle cluster on Azure](./Deploy.md).
 

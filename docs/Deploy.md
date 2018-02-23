@@ -9,26 +9,9 @@ install.
 
 ## Prerequisites
 
-You will need a local copy of the Moodle ARM templates. These are
-published on GitHub so you should clone them locally (possibly after
-forking them on GitHub).
+To make things consitent across different sessions managing Moodle we
+should [configure the environment](./Preparation.md).
 
-## Configuration
-
-We will use a number of environment variables to configure our
-deployment. To customize them for your environment copy `env.json`
-into `env.local.json` and edit the contents accordingly. The values
-set within that file are:
-
-``` shell
-TIME=$(date +%s)
-MOODLE_RG_NAME=moodle_$TIME
-MOODLE_RG_LOCATION=southcentralus
-MOODLE_DEPLOYMENT_NAME="MasterDeploy"
-echo "Resource Group Name : $MOODLE_RG_NAME"
-echo "Resource Group Location : $MOODLE_RG_LOCATION"
-echo "Deployment Name : $MOODLE_DEPLOYMENT_NAME"
-```
 
 ## Create Resource Group
 
@@ -56,7 +39,7 @@ Results:
 }
 ```
 
-## Create Azure Deployment Paramaters
+## Create Azure Deployment Parameters
 
 Your deployment will be configured using an
 `azuredeploy.parameters.json` file. It is possible to provide these
@@ -72,7 +55,11 @@ proceed with the defaults, but there is one value, the `sshPublicKey`
 that **must** be provided. To automatically add your default SSH key
 (in Bash) use the following command:
 
-FIXME: sed command to add SSH key
+``` bash
+ssh_pub_key=`cat $MOODLE_SSH_KEY_FILENAME.pub`
+echo $ssh_pub_key
+sed "s|GEN-SSH-PUB-KEY|$ssh_pub_key|g" $MOODLE_AZURE_WORKSPACE/arm_template/azuredeploy.parameters.json > $MOODLE_AZURE_WORKSPACE/$MOODLE_RG_NAME/azuredeploy.parameters.json
+```
 
 ## Deploy cluster
 
@@ -80,7 +67,7 @@ Now that we have a resource group and a configuration file we can
 create the cluster itself. This is done with a single command:
 
 ```
-az group deployment create --name $MOODLE_DEPLOYMENT_NAME --resource-group $MOODLE_RG_NAME --template-file ../azuredeploy.json --parameters azuredeploy.parameters.json
+az group deployment create --name $MOODLE_DEPLOYMENT_NAME --resource-group $MOODLE_RG_NAME --template-file $MOODLE_AZURE_WORKSPACE/arm_template/azuredeploy.json --parameters $MOODLE_AZURE_WORKSPACE/$MOODLE_RG_NAME/azuredeploy.parameters.json
 ```
 
 ## Using the created stack
