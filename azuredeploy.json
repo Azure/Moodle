@@ -2,6 +2,20 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "_artifactsLocation": {
+            "type": "string",
+            "metadata": {
+                "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
+            },
+            "defaultValue": "https://raw.githubusercontent.com/Azure/Moodle/hs-loadtest/"
+        },
+        "_artifactsLocationSasToken": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+            },
+            "defaultValue": ""
+        },
         "applyScriptsSwitch": {
             "defaultValue": true,
             "metadata": {
@@ -13,6 +27,13 @@
             "defaultValue": false,
             "metadata": {
                 "description": "Switch to configure AzureBackup and enlist VM's"
+            },
+            "type": "bool"
+        },
+        "vnetGwDeploySwitch": {
+            "defaultValue": false,
+            "metadata": {
+                "description": "Switch to deploy a virtual network gateway or not"
             },
             "type": "bool"
         },
@@ -30,16 +51,15 @@
             },
             "type": "bool"
         },
-        "blobStorageAccountType": {
+        "storageAccountType": {
             "defaultValue": "Standard_LRS",
             "allowedValues": [
                 "Standard_LRS",
                 "Standard_GRS",
-                "Standard_ZRS",
-                "Premium_LRS"
+                "Standard_ZRS"
             ],
             "metadata": {
-                "description": "Blob Storage Account type"
+                "description": "Storage Account type"
             },
             "type": "string"
         },
@@ -51,6 +71,17 @@
             ],
             "metadata": {
                 "description": "Database type"
+            },
+            "type": "string"
+        },
+        "fileServerType": {
+            "defaultValue": "gluster",
+            "allowedValues": [
+                "gluster",
+                "nfs"
+            ],
+            "metadata": {
+                "description": "File server type: GlusterFS, Azure Files (CIFS)--disabled due to too slow perf, NFS--not highly available"
             },
             "type": "string"
         },
@@ -128,17 +159,19 @@
             },
             "type": "string"
         },
-        "glusterDiskSize": {
+        "fileServerDiskSize": {
             "defaultValue": 127,
             "metadata": {
-                "description": "Size per disk for gluster nodes"
+                "description": "Size per disk for gluster nodes or nfs server"
             },
             "type": "int"
         },
-        "glusterDiskCount": {
+        "fileServerDiskCount": {
             "defaultValue": 4,
+            "minValue": 2,
+            "maxValue": 8,
             "metadata": {
-                "description": "Number of disks in raid0 per gluster node"
+                "description": "Number of disks in raid0 per gluster node or nfs server"
             },
             "type": "int"
         },
@@ -324,7 +357,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl, parameters('dbServerType'), '.json')]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl, parameters('dbServerType'), '.json', parameters('_artifactsLocationSasToken'))]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -341,7 +374,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'recoveryservices.json')]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'recoveryservices.json',parameters('_artifactsLocationSasToken'))]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -360,7 +393,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'redis.json')]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'redis.json',parameters('_artifactsLocationSasToken'))]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -376,7 +409,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'network.json')]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'network.json',parameters('_artifactsLocationSasToken'))]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -397,12 +430,13 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'elastic.json')]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'elastic.json',parameters('_artifactsLocationSasToken'))]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
         },
         {
+            "condition": "[equals(parameters('fileServerType'),'gluster')]",
             "apiVersion": "2015-01-01",
             "dependsOn": [
                 "Microsoft.Resources/deployments/networkTemplate",
@@ -417,7 +451,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'gluster.json')]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'gluster.json',parameters('_artifactsLocationSasToken'))]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -429,7 +463,7 @@
                 "Microsoft.Resources/deployments/glusterTemplate",
                 "Microsoft.Resources/deployments/recoveryTemplate",
                 "Microsoft.Resources/deployments/redisTemplate",
-                "Microsoft.Resources/deployments/blobStorageAccountTemplate"
+                "Microsoft.Resources/deployments/storageAccountTemplate"
             ],
             "name": "controllerTemplate",
             "properties": {
@@ -438,15 +472,15 @@
                     "moodleCommon": {
                         "value": "[variables('moodleCommon')]"
                     },
-                    "blobStorageAccountKey": {
-                        "value": "[reference('blobStorageAccountTemplate').outputs.blobStorageAccountKey.value]"
+                    "storageAccountKey": {
+                        "value": "[reference('storageAccountTemplate').outputs.storageAccountKey.value]"
                     },
                     "redisPrimaryKey": {
                         "value": "[reference('redisTemplate').outputs.redisPrimaryKey.value]"
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'controller.json')]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'controller.json',parameters('_artifactsLocationSasToken'))]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -464,17 +498,20 @@
                 "parameters": {
                     "moodleCommon": {
                         "value": "[variables('moodleCommon')]"
+                    },
+                    "storageAccountKey": {
+                        "value": "[reference('storageAccountTemplate').outputs.storageAccountKey.value]"
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'webvmss.json')]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'webvmss.json',parameters('_artifactsLocationSasToken'))]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
         },
         {
             "apiVersion": "2015-01-01",
-            "name": "blobStorageAccountTemplate",
+            "name": "storageAccountTemplate",
             "properties": {
                 "mode": "Incremental",
                 "parameters": {
@@ -483,7 +520,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'blobStorageAccount.json')]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'storageAccount.json',parameters('_artifactsLocationSasToken'))]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -518,6 +555,14 @@
         "type": "string",
         "value": "[variables('moodleCommon').moodleAdminPass]"
       },
+      "moodleDbUsername": {
+        "type": "string",
+        "value": "[variables('moodleCommon').moodleDbUserAzure]"
+      },
+      "moodleDbPassword": {
+        "type": "string",
+        "value": "[variables('moodleCommon').moodleDbPass]"
+      },
       "loadBalancerDNS": {
         "type": "string",
         "value": "[variables('moodleCommon').lbDns]"
@@ -536,15 +581,15 @@
         "documentation10": "    controller          - creates a jumpbox and deploys code",
         "documentation11": "GlusterFS Sizing guidance",
         "moodleCommon": {
-            "baseTemplateUrl": "https://raw.githubusercontent.com/Azure/Moodle/master/nested/",
-            "scriptLocation": "https://raw.githubusercontent.com/Azure/Moodle/master/scripts/",
+            "baseTemplateUrl": "[concat(parameters('_artifactsLocation'), 'nested/')]",
+            "scriptLocation": "[concat(parameters('_artifactsLocation'), 'scripts/')]",
+            "artifactsSasToken": "[parameters('_artifactsLocationSasToken')]",
 
             "applyScriptsSwitch": "[parameters('applyScriptsSwitch')]",
             "autoscaleVmCount": "[parameters('autoscaleVmCount')]",
             "autoscaleVmSku": "[parameters('autoscaleVmSku')]",
             "azureBackupSwitch": "[parameters( 'azureBackupSwitch')]",
-            "blobStorageAccountName": "[tolower(concat('abs',variables('resourceprefix')))]",
-            "blobStorageAccountType": "[parameters('blobStorageAccountType')]",
+            "commonFunctionsScriptUri": "[concat(parameters('_artifactsLocation'),'scripts/helper_functions.sh',parameters('_artifactsLocationSasToken'))]",
             "computeApi": "2016-04-30-preview",
             "controllerVmSku": "[parameters('controllerVmSku')]",
             "dbLogin": "[parameters('dbLogin')]",
@@ -569,6 +614,9 @@
             "extFeName": "[concat('lb-frontend-',variables('resourceprefix'))]",
             "extNatPool": "[concat('lb-natpool-',variables('resourceprefix'))]",
             "extProbe": "[concat('lb-probe-',variables('resourceprefix'))]",
+            "fileServerDiskCount": "[parameters('fileServerDiskCount')]",
+            "fileServerDiskSize": "[parameters('fileServerDiskSize')]",
+            "fileServerType": "[parameters('fileServerType')]",
             "firewallRuleName": "[parameters('firewallRuleName')]",
             "gatewayName": "[concat('vnet-gateway-',variables('resourceprefix'))]",
             "gatewayPublicIPName": "[concat('vnet-gw-ip-',variables('resourceprefix'))]",
@@ -578,8 +626,6 @@
             "gatewayType": "[parameters('gatewayType')]",
             "gfsNameRoot": "[concat('gluster-vm-',variables('resourceprefix'))]",
             "gfxAvailabilitySetName": "[concat('gluster-avset-',variables('resourceprefix'))]",
-            "glusterDiskCount": "[parameters('glusterDiskCount')]",
-            "glusterDiskSize": "[parameters('glusterDiskSize')]",
             "glusterScriptFilename": "install_gluster.sh",
             "glusterVmCount": 2,
             "glusterVmSku": "[parameters('glusterVmSku')]",
@@ -597,8 +643,7 @@
             "moodleDbPass": "[concat('9#36^', substring(uniqueString(resourceGroup().id, deployment().name), 5, 8), toUpper('ercq'))]",
             "moodleDbUser": "moodle",
             "moodleDbUserAzure": "[concat('moodle', '@', parameters('dbServerType'), '-', variables('resourceprefix'))]",
-            "moodleInstallScriptFilename": "[concat(parameters('dbServerType'), '_', 'install_moodle.sh')]",
-            "moodleSetupScriptFilename": "setup_moodle.sh",
+            "moodleInstallScriptFilename": "install_moodle.sh",
             "moodleVersion": "[parameters('moodleVersion')]",
             "mysqlVersion": "[parameters('mysqlVersion')]",
             "osType": {
@@ -623,6 +668,8 @@
             "sshPublicKey": "[parameters('sshPublicKey')]",
             "sshUsername": "[parameters('sshUsername')]",
             "sslEnforcement": "[parameters('sslEnforcement')]",
+            "storageAccountName": "[tolower(concat('abs',variables('resourceprefix')))]",
+            "storageAccountType": "[parameters('storageAccountType')]",
             "subnetElastic": "[concat('elastic-subnet-',variables('resourceprefix'))]",
             "subnetElasticPrefix": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),4)))]",
             "subnetElasticRange": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),4)), '.0/24')]",
@@ -639,8 +686,10 @@
             "vaultName": "[concat('vault-',variables('resourceprefix'))]",
             "vmssName": "[concat('vmss-',variables('resourceprefix'))]",
             "vmssdStorageAccounttName": "[concat('vmss',uniqueString(resourceGroup().id))]",
+            "vnetGwDeploySwitch": "[parameters('vnetGwDeploySwitch')]",
             "vnetName": "[concat('vnet-',variables('resourceprefix'))]",
             "vpnType": "[parameters('vpnType')]",
+            "webServerSetupScriptFilename": "setup_webserver.sh",
             "webServerType": "[parameters('webServerType')]"
         },
         "octets": "[split(parameters('vNetAddressSpace'), '.')]",

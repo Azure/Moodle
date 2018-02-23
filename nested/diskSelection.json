@@ -5,6 +5,10 @@
         "dataDiskArray": {
             "type": "array",
             "value": "[take(variables('diskArray'),parameters('vmDiskCount'))]"
+        },
+        "emptyDataDiskArray": {
+            "type": "array",
+            "value": []
         }
     },
     "parameters": {

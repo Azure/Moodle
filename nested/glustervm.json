@@ -41,7 +41,7 @@
         {
             "apiVersion": "[parameters('moodleCommon').computeApi]",
             "copy": {
-                "count": "[parameters('moodleCommon').glusterDiskCount]",
+                "count": "[parameters('moodleCommon').fileServerDiskCount]",
                 "name": "[variables('diskLoop')]"
             },
             "location": "[resourceGroup().location]",
@@ -51,7 +51,7 @@
                 "creationData": {
                     "createOption": "Empty"
                 },
-                "diskSizeGB": "[parameters('moodleCommon').glusterDiskSize]"
+                "diskSizeGB": "[parameters('moodleCommon').fileServerDiskSize]"
             },
             "tags": {
                 "displayName": "Gluster VM Data Disk"
@@ -68,14 +68,14 @@
                 "mode": "Incremental",
                 "parameters": {
                     "vmDiskCount": {
-                        "value": "[parameters('moodleCommon').glusterDiskCount]"
+                        "value": "[parameters('moodleCommon').fileServerDiskCount]"
                     },
                     "vmName": {
                         "value": "[variables('vmName')]"
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'diskSelection.json')]"
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'diskSelection.json',parameters('moodleCommon').artifactsSasToken)]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -155,7 +155,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(    parameters('moodleCommon').baseTemplateUrl,'glustervmconfig.json')]"
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'glustervmconfig.json',parameters('moodleCommon').artifactsSasToken)]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -178,7 +178,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'recoveryservicesEnlist.json')]"
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'recoveryservicesEnlist.json',parameters('moodleCommon').artifactsSasToken)]"
                 }
             },
             "type": "Microsoft.Resources/deployments"
@@ -202,8 +202,8 @@
         "documentation16": " diskSelection           - returns an arry of disk names - for flexible sizing",
         "documentation17": " glustervmconfig         - conditionally applies post-deployment script on the VM",
         "documentation18": " recoveryservicesEnlist  - conditionally enlists the VM into the backup regimen",
-        "documentation19": " glusterDiskCount        - Number of disks to raid0 for the gluster mount",
-        "documentation20": " glusterDiskSize         - Size per disk for gluster",
+        "documentation19": " fileServerDiskCount        - Number of disks to raid0 for the gluster mount",
+        "documentation20": " fileServerDiskSize         - Size per disk for gluster",
         "nicName": "[concat(variables('vmName'),'-nic')]",
         "nicRef": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]",
         "subnetSanRef": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('moodleCommon').vnetName), '/subnets/',parameters('moodleCommon').subnetSan)]",

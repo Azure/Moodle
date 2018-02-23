@@ -99,3 +99,10 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# test outputs
+loadtest/test_outputs/
+
+# Emacs
+*#*#
+
