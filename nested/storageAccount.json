@@ -11,6 +11,7 @@
     },
     "resources": [
         {
+            "type": "Microsoft.Storage/storageAccounts",
             "kind": "Storage",
             "location": "[resourceGroup().location]",
             "name": "[parameters('moodleCommon').storageAccountName]",
@@ -37,20 +38,19 @@
                     "virtualNetworkRules": []
                 },
                 "supportsHttpsTrafficOnly": true
-            },
-            "type": "Microsoft.Storage/storageAccounts"
+            }
         }
     ],
     "variables": {
         "documentation1": "This sub-template creates a storage account.  It expects certain values in the 'common' datastructure.",
         "documentation2": " storageAccountName - name of storage account",
         "documentation3": " storageAccountType - type of storage account",
-        "storageAccountId": "[concat(resourceGroup().id,'/providers/Microsoft.Storage/storageAccounts/', parameters('moodleCommon').storageAccountName)]"
+        "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('moodleCommon').storageAccountName)]"
     },
     "outputs": {
         "storageAccountKey": {
             "value": "[listKeys(variables('storageAccountId'), '2017-06-01').keys[0].value]",
-            "type": "string"
+            "type": "securestring"
         }
     }
 }

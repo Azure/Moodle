@@ -11,7 +11,8 @@
     },
     "resources": [
         {
-            "apiVersion": "[parameters('moodleCommon').computeApi]",
+            "type": "Microsoft.Compute/availabilitySets",
+            "apiVersion": "2017-03-30",
             "location": "[resourceGroup().location]",
             "name": "[parameters('moodleCommon').gfxAvailabilitySetName]",
             "properties": {
@@ -21,11 +22,11 @@
             },
             "tags": {
                 "displayName": "Gluster Availability Set"
-            },
-            "type": "Microsoft.Compute/availabilitySets"
+            }
         },
         {
-            "apiVersion": "2015-01-01",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
             "copy": {
                 "count": "[parameters('moodleCommon').glusterVmCount]",
                 "name": "vmloop"
@@ -45,10 +46,9 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(    parameters('moodleCommon').baseTemplateUrl,'glustervm.json',parameters('moodleCommon').artifactsSasToken)]"
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'glustervm.json',parameters('moodleCommon').artifactsSasToken)]"
                 }
-            },
-            "type": "Microsoft.Resources/deployments"
+            }
         }
     ],
     "variables": {

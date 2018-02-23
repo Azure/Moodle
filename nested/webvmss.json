@@ -17,16 +17,17 @@
     },
     "resources": [
         {
-            "apiVersion": "[variables('storageApiVersion')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2017-06-01",
             "location": "[resourceGroup().location]",
             "name": "[parameters('moodleCommon').vmssdStorageAccounttName]",
             "properties": {
                 "accountType": "Standard_LRS"
-            },
-            "type": "Microsoft.Storage/storageAccounts"
+            }
         },
         {
-            "apiVersion": "2016-04-30-preview",
+            "type": "Microsoft.Compute/virtualMachineScaleSets",
+            "apiVersion": "2017-03-30",
             "dependsOn": [
                 "[concat('Microsoft.Storage/storageAccounts/', parameters('moodleCommon').vmssdStorageAccounttName)]"
             ],
@@ -119,10 +120,10 @@
             },
             "tags": {
                 "displayName": "webfarm"
-            },
-            "type": "Microsoft.Compute/virtualMachineScaleSets"
+            }
         },
         {
+            "type": "Microsoft.Insights/autoscaleSettings",
             "apiVersion": "2015-04-01",
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('moodleCommon').vmssName)]"
@@ -183,8 +184,7 @@
                     }
                 ],
                 "targetResourceUri": "[variables('vmssID')]"
-            },
-            "type": "Microsoft.Insights/autoscaleSettings"
+            }
         }
     ],
     "variables": {
@@ -196,7 +196,6 @@
         "extProbeID": "[concat(variables('extLbID'),'/probes/',parameters('moodleCommon').extProbe  )]",
         "pipID": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('moodleCommon').lbPipName)]",
         "scriptUri": "[concat(parameters('moodleCommon').scriptLocation,parameters('moodleCommon').webServerSetupScriptFilename,parameters('moodleCommon').artifactsSasToken)]",
-        "storageApiVersion": "2015-06-15",
         "subnetWebRef": "[concat(resourceId('Microsoft.Network/virtualNetworks',parameters('moodleCommon').vnetName),'/subnets/',parameters('moodleCommon').subnetWeb)]",
         "vmssID": "[resourceId('Microsoft.Compute/virtualMachineScaleSets',parameters('moodleCommon').vmssName)]",
         "webvmss1NIC": "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('moodleCommon').vmssName, '/virtualMachines/0/networkInterfaces/vmssnic')]"

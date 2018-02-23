@@ -11,6 +11,7 @@
     },
     "resources": [
         {
+            "type": "Microsoft.Cache/Redis",
             "apiVersion": "2016-04-01",
             "location": "[resourceGroup().location]",
             "name": "[parameters('moodleCommon').redisCacheName]",
@@ -22,8 +23,7 @@
                     "name": "Premium"
                 },
                 "subnetId": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('moodleCommon').vnetName), '/subnets/', parameters('moodleCommon').subnetRedis)]"
-            },
-            "type": "Microsoft.Cache/Redis"
+            }
         }
     ],
     "variables": {
@@ -34,7 +34,7 @@
     "outputs": {
         "redisPrimaryKey": {
             "value": "[listKeys(variables('redisResourceId'), '2016-04-01').primaryKey]",
-            "type": "string"
+            "type": "securestring"
         }
     }
 }
