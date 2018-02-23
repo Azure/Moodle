@@ -86,7 +86,7 @@ function get_db_sku_name
 }
 
 # TODO hard-coded Azure location in global variable. Parametrize this later.
-LOCATION=southcentralus
+MOODLE_RG_LOCATION=southcentralus
 
 function deploy_moodle_with_some_parameters
 {
@@ -110,7 +110,7 @@ function deploy_moodle_with_some_parameters
     local db_sku_name=$(get_db_sku_name $db_server_type $db_dtu) || return 1
     local db_size_mb=$(($db_size * 1024))
 
-    local cmd="az group create --resource-group $resource_group --location $LOCATION"
+    local cmd="az group create --resource-group $resource_group --location $MOODLE_RG_LOCATION"
     show_command_to_run $cmd
     eval $cmd || return 1
 
@@ -300,7 +300,7 @@ function deploy_run_test1_teardown
     local test_run_time_sec=${16}
     local delete_resource_group_flag=${17}  # Any non-empty string is considered true
 
-    LOCATION=$location
+    MOODLE_RG_LOCATION=$location
     deploy_moodle_with_some_parameters $resource_group $template_url $parameters_template_file $web_server_type $web_vm_sku $db_server_type $db_dtu $db_size $file_server_type $file_server_disk_count $file_server_disk_size "$ssh_pub_key" || return 1
     run_simple_test_1_on_resource_group $resource_group $test_threads_count $test_rampup_time_sec $test_run_time_sec 1 || return 1
     if [ -n "$delete_resource_group_flag" ]; then
