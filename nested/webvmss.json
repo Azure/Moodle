@@ -7,6 +7,12 @@
                 "description": "Common Moodle values"
             },
             "type": "object"
+        },
+        "storageAccountKey": {
+            "metadata": {
+                "description": "Storage account key that may be needed in the VM setup scripts"
+            },
+            "type": "string"
         }
     },
     "resources": [
@@ -41,7 +47,8 @@
                                     "publisher": "Microsoft.Azure.Extensions",
                                     "settings": {
                                         "fileUris": [
-                                            "[variables('scriptUri')]"
+                                            "[variables('scriptUri')]",
+                                            "[parameters('moodleCommon').commonFunctionsScriptUri]"
                                         ]
                                     },
                                     "protectedSettings":{
@@ -181,7 +188,7 @@
         }
     ],
     "variables": {
-        "cmdExec": "[concat('bash ',parameters('moodleCommon').webServerSetupScriptFilename,' ',parameters('moodleCommon').gfsNameRoot,'0', ' ','data', ' ', parameters('moodleCommon').siteURL, ' ', concat('jumpbox-vm-',parameters('moodleCommon').resourcesPrefix), ' ', parameters('moodleCommon').webServerType)]",
+        "cmdExec": "[concat('bash ',parameters('moodleCommon').webServerSetupScriptFilename,' ',parameters('moodleCommon').gfsNameRoot,'0', ' ','data', ' ', parameters('moodleCommon').siteURL, ' ', concat('jumpbox-vm-',parameters('moodleCommon').resourcesPrefix), ' ', parameters('moodleCommon').webServerType, ' ', parameters('moodleCommon').fileServerType, ' ', parameters('moodleCommon').storageAccountName, ' ', parameters('storageAccountKey'), ' ', parameters('moodleCommon').jboxVmName)]",
         "dstorID": "[resourceId('Microsoft.Storage/storageAccounts',parameters('moodleCommon').vmssdStorageAccounttName)]",
         "extBeID": "[concat(variables('extLbID'),'/backendAddressPools/',parameters('moodleCommon').extBeName)]",
         "extFeID": "[concat(variables('extLbID'),'/frontendIPConfigurations/',parameters('moodleCommon').extFeName)]",
