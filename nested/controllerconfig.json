@@ -10,7 +10,7 @@
         },
         "storageAccountKey": {
             "metadata": {
-                "description": "Key used to create a storage container and Azure Files share if azurefiles is specified as fileServerType"
+                "description": "Key used to create a storage container"
             },
             "type": "string"
         },
