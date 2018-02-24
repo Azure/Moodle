@@ -7,18 +7,6 @@
                 "description": "Common Moodle values"
             },
             "type": "object"
-        },
-        "storageAccountKey": {
-            "metadata": {
-                "description": "Key used to create a storage container"
-            },
-            "type": "securestring"
-        },
-        "redisPrimaryKey": {
-            "metadata": {
-                "description": "Key used for Redis authentication"
-            },
-            "type": "securestring"
         }
     },
     "resources": [
@@ -85,12 +73,12 @@
             "location": "[resourceGroup().location]",
             "name": "[parameters('moodleCommon').jboxNicName]",
             "properties": {
+                "networkSecurityGroup": {
+                    "id": "[variables('nsgRef')]"
+                },
                 "ipConfigurations": [
                     {
                         "name": "ipcfgjbox",
-                        "networkSecurityGroup": {
-                            "id": "[variables('nsgRef')]"
-                        },
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
@@ -150,18 +138,7 @@
                         },
                         "name": "[parameters('moodleCommon').jboxVmName]"
                     },
-                    "copy": [
-                        {
-                            "name": "[variables('diskLoop')]",
-                            "count": "[if(equals(parameters('moodleCommon').fileServerType,'nfs'), parameters('moodleCommon').fileServerDiskCount, 0)]",
-                            "input": {
-                                "accountType": "Premium_LRS",
-                                "diskSizeGB": "[parameters('moodleCommon').fileServerDiskSize]",
-                                "lun": "[copyIndex(variables('diskLoop'))]",
-                                "createOption": "Empty"
-                            }
-                        }
-                    ]
+                    "dataDisks": "[take(variables('nfsDiskArray'),if(equals(parameters('moodleCommon').fileServerType,'nfs'), parameters('moodleCommon').fileServerDiskCount, 0))]"
                 }
             },
             "tags": {
@@ -181,14 +158,7 @@
                 "parameters": {
                     "moodleCommon": {
                         "value": "[parameters('moodleCommon')]"
-                    },
-                    "storageAccountKey": {
-                        "value": "[parameters('storageAccountKey')]"
-                    },
-                    "redisPrimaryKey": {
-                        "value": "[parameters('redisPrimaryKey')]"
                     }
-
                 },
                 "templateLink": {
                     "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'controllerconfig.json',parameters('moodleCommon').artifactsSasToken)]"
@@ -224,23 +194,34 @@
         "documentation02": "It expects certain values in the 'common' datastructure.",
         "documentation03": "    vnetName     - name of virtual network",
         "documentation04": "    subnetWeb    - name of subnet for controller (and vm scale set)",
-        "documentation05": "    computeApi   - the 'managed' resources need to all use this value",
         "documentation06": "    jboxPipName  - name of Public IP address for the jumpbox (note that none of the other VM's get a PIP - just the jumpbox",
         "documentation07": "    jboxNicName  - name of the network interface (all VM's must hae a nic) to crate, tied to the public IP address",
         "documentation08": "    jboxNsgName  - name of the network security group, regulating access to/from the jumpbox",
         "documentation09": "This sub-template calls other sub-templates",
         "documentation10": "    controllerconfig       - conditionally applies post-deployment script on the VM",
         "documentation18": "    recoveryservicesEnlist - conditionally enlists the VM into the backup regimen",
-        "vmName": "[parameters('moodleCommon').jboxVmName]",
-        "diskLoop": "[concat(variables('vmName'),'-disk')]",
         "nicRef": "[resourceId('Microsoft.Network/networkInterfaces', parameters('moodleCommon').jboxNicName)]",
         "nsgRef": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('moodleCommon').jboxNsgName)]",
         "pipRef": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('moodleCommon').jboxPipName)]",
-        "subnetWebRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('moodleCommon').vnetName, parameters('moodleCommon').subnetWeb)]"
+        "subnetWebRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('moodleCommon').vnetName, parameters('moodleCommon').subnetWeb)]",
+        "copy": [
+            {
+                "name": "nfsDiskArray",
+                "count": 8,
+                "input": {
+                    "managedDisk": {
+                        "storageAccountType": "Premium_LRS"
+                    },
+                    "diskSizeGB": "[parameters('moodleCommon').fileServerDiskSize]",
+                    "lun": "[copyIndex('nfsDiskArray')]",
+                    "createOption": "Empty"
+                }
+            }
+        ]
     },
     "outputs": {
         "controllerIP": {
-            "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', parameters('moodleCommon').jboxPipName), '2015-06-15').ipAddress]",
+            "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', parameters('moodleCommon').jboxPipName), '2017-10-01').ipAddress]",
             "type": "string"
         }
     }

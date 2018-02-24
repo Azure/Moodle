@@ -472,12 +472,6 @@
                 "parameters": {
                     "moodleCommon": {
                         "value": "[variables('moodleCommon')]"
-                    },
-                    "storageAccountKey": {
-                        "value": "[reference('storageAccountTemplate').outputs.storageAccountKey.value]"
-                    },
-                    "redisPrimaryKey": {
-                        "value": "[reference('redisTemplate').outputs.redisPrimaryKey.value]"
                     }
                 },
                 "templateLink": {
@@ -499,9 +493,6 @@
                 "parameters": {
                     "moodleCommon": {
                         "value": "[variables('moodleCommon')]"
-                    },
-                    "storageAccountKey": {
-                        "value": "[reference('storageAccountTemplate').outputs.storageAccountKey.value]"
                     }
                 },
                 "templateLink": {
