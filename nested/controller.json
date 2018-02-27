@@ -161,7 +161,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'controllerconfig.json',parameters('moodleCommon').artifactsSasToken)]"
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl, 'controllerconfig', if(parameters('moodleCommon').redisDeploySwitch,'','-noredis'), '.json', parameters('moodleCommon').artifactsSasToken)]"
                 }
             }
         },

@@ -30,6 +30,13 @@
             },
             "type": "bool"
         },
+        "redisDeploySwitch": {
+            "defaultValue": true,
+            "metadata": {
+                "description": "Switch to deploy a redis cache or not"
+            },
+            "type": "bool"
+        },
         "vnetGwDeploySwitch": {
             "defaultValue": false,
             "metadata": {
@@ -380,6 +387,7 @@
             }
         },
         {
+            "condition": "[parameters('redisDeploySwitch')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
             "name": "redisTemplate",
@@ -463,6 +471,8 @@
                 "Microsoft.Resources/deployments/elasticTemplate",
                 "Microsoft.Resources/deployments/glusterTemplate",
                 "Microsoft.Resources/deployments/recoveryTemplate",
+                "Microsoft.Resources/deployments/networkTemplate",
+                "Microsoft.Resources/deployments/dbTemplate",
                 "Microsoft.Resources/deployments/redisTemplate",
                 "Microsoft.Resources/deployments/storageAccountTemplate"
             ],
@@ -484,6 +494,7 @@
             "apiVersion": "2017-05-10",
             "dependsOn": [
                 "Microsoft.Resources/deployments/controllerTemplate",
+                "Microsoft.Resources/deployments/networkTemplate",
                 "Microsoft.Resources/deployments/redisTemplate",
                 "Microsoft.Resources/deployments/dbTemplate"
             ],
@@ -645,6 +656,7 @@
             "policyName": "[concat('policy-',variables('resourceprefix'))]",
             "postgresVersion": "[parameters('postgresVersion')]",
             "redisCacheName": "[concat('redis-',variables('resourceprefix'))]",
+            "redisDeploySwitch": "[parameters('redisDeploySwitch')]",
             "redisDns": "[concat('redis-',variables('resourceprefix'),'.redis.cache.windows.net')]",
             "resourcesPrefix": "[variables('resourceprefix')]",
             "serverName": "[concat(parameters('dbServerType'), '-',variables('resourceprefix'))]",
