@@ -1,55 +1,72 @@
 # Load-Testing Deployed Moodle Cluster
 
-This directory currently contains utility scripts, a Moodle test course,
-and a jMeter test plan that can be used to load-test a Moodle cluster
-that's deployed on Azure using the templates in this repo.
+This directory currently contains utility scripts, a Moodle test
+course, and an Apache jMeter test plan that can be used to load-test a
+Moodle cluster on Azure using the Azure Resource Manager templates in
+this repository.
 
-## Setting up the test host
+## Prerequisites
 
-To run load tests using the resources in this directory, you'll want to spin up
-an Ubuntu 16.04 Linux VM on your Azure subscription and an Azure location where
-you'll be deploying your Moodle cluster (so that test traffic can be from the
-same Azure region to avoid egress charges). Once your Ubuntu 16.04 Linux VM is
-ready, you need to install Java and [jMeter](https://jmeter.apache.org/).
-You also need the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) 
-installed on your Ubuntu 16.04 Linux VM (let's call it the jMeter host) for 
-necessary Azure operations (deployment, metadata retrieval).
-These dependencies can be installed using the included utility scripts as follows:
-```
-$ cd [local_repo]/loadtest
-$ . loadtest.sh
-$ install_java_and_jmeter
-$ install_az_cli
-```
-Steps above need to be performed only once.
+To run load tests using the resources in this directory, you'll want
+to spin up an Ubuntu VM (let's call it the [Load Test VM](./Deploy_Load_Test_VM.md)) in your Azure subscription. This VM
+will generate the traffic, running it in Azure will minimize network
+charges.
 
 ## Deploying Moodle using templates and running load test
 
-Once dependencies are installed, you can initiate the whole process of a load 
-testing process using included utility scripts,
-starting from a whole Moodle cluter template deployment, setting up the test course
-and enrolling students on the Moodle host, and running the synthetic test workload
-using jMeter. See the included example `run_load_test_example` that's as follows:
-```
-function run_load_test_example
-{
-    check_ssh_agent_and_added_key || return 1
+Once dependencies are installed, you can initiate the load testing
+process by using included utility scripts. These scripts will:
 
-    deploy_run_test1_teardown ltest6 southcentralus https://raw.githubusercontent.com/Azure/Moodle/hs-loadtest/azuredeploy.json azuredeploy.parameters.loadtest.defaults.json apache Standard_DS2_v2 mysql 200 125 nfs 2 128 "$(cat ~/.ssh/authorized_keys)" 1600 4800 18000
+  * deploy a Moodle cluster
+  * set up the test course in Moodle
+  * enrol students for the course
+  * run a synthetic test workload using jMeter 
+  * teardown the test cluster
+  
+Use the function `deploy_run_test1_teardown` to perform all these
+steps. This function takes 17 parameters in the following order:
+
+See the included example `run_load_test_example` in
+`loadtest/loadtest.sh`. At the time of writing this example is
+configured as follows:
+
+``` bash
+deploy_run_test1_teardown \
+    ltest6 \
+    southcentralus \
+    https://raw.githubusercontent.com/Azure/Moodle/hs-loadtest/azuredeploy.json \
+    azuredeploy.parameters.loadtest.defaults.json \
+    apache \
+    Standard_DS2_v2 \
+    mysql \
+    200 \
+    125 \
+    nfs \
+    2 \
+    128 \ 
+    "$(cat ~/.ssh/authorized_keys)" \
+    1600 \
+    4800 \
+    18000 
 }
 ```
-Running the script function above will deploy the templates with Apache web server,
-Standard_DS2_v2 Azure VM SKU, mysql database (with 200 DTU and 125GB DB size),
-NFS file share (with 2 disks and 128GB disk size each), using your SSH pub key in
-your home directory (make sure to copy the corresponding SSH private key as 
-`~/.ssh/id_rsa` and have it added to ssh-agent using `eval $(ssh-agent)` and 
-`ssh-add`). Once the template deployment is successfully completed, the script
-will configure the deployed Moodle server with a test course and test students
-(installing/running [moosh](https://moosh-online.com/) on the Moodle host over ssh),
-and finally run the synthetic workload with designated number of concurrent threads 
-(1600 above) and the time duration of the simulation run (18000 seconds=5 hours, and 
-4800 seconds rampup time---make sure to give a sufficient rampup time for the number 
-of concurrent threads).
+
+Running this example will deploy a cluster with the following configuration:
+
+  * Apache web server
+  * Standard_DS2_v2 Azure VM SKU
+  * mysql database (with 200 DTU and 125GB DB size)
+  * NFS file share (with 2 disks and 128GB disk size each)
+  * uses your SSH pub key in `~/.ssh/id_rsa`
+
+[NOTE ON SSH KEYS] Ensure your `~/.ssh/id_rsa` has been  added to ssh-agent using `eval $(ssh-agent)` and `ssh-add`). 
+
+Once the Moodle cluster is deployed and configured with course and
+student data (using [moosh](https://moosh-online.com/) it will run the
+synthetic workload with designated number of concurrent threads (in
+the example we use 1600 thread) for the designated duration and rampup
+time (18000 seconds = 5 hours duration, 4800 seconds rampup time in
+the example).
 
 ## Please contribute!
 
@@ -68,6 +85,6 @@ where anyone can share their load testing results.
 
 The original test course and the test plan were generously provided by
 [Catalyst](https://github.com/catalyst) as part of this template modernization
-project. jMeter is a great load testing tool, and also thanks to moosh,
+project. jMeter is a great load testing tool, and also thanks to [moosh](http://moosh-online.com/),
 the whole process could be automated without too much difficulty, which was
 really nice.
