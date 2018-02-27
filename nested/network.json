@@ -11,7 +11,8 @@
     },
     "resources": [
         {
-            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2017-10-01",
             "location": "[resourceGroup().location]",
             "name": "[parameters('moodleCommon').vnetName]",
             "properties": {
@@ -52,12 +53,12 @@
                         }
                     }
                 ]
-            },
-            "type": "Microsoft.Network/virtualNetworks"
+            }
         },
         {
             "condition": "[parameters('moodleCommon').vnetGwDeploySwitch]",
-            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2017-10-01",
             "location": "[resourceGroup().location]",
             "name": "[parameters('moodleCommon').gatewayPublicIPName]",
             "properties": {
@@ -65,24 +66,24 @@
             },
             "tags": {
                 "displayName": "Virtual network gateway Public IP"
-            },
-            "type": "Microsoft.Network/publicIPAddresses"
+            }
         },
         {
             "condition": "[parameters('moodleCommon').vnetGwDeploySwitch]",
-            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2017-10-01",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks', parameters('moodleCommon').vnetName)]"
             ],
             "name": "[concat(parameters('moodleCommon').vnetName, '/', parameters('moodleCommon').gatewaySubnet)]",
             "properties": {
                 "addressPrefix": "[parameters('moodleCommon').gatewaySubnetRange]"
-            },
-            "type": "Microsoft.Network/virtualNetworks/subnets"
+            }
         },
         {
             "condition": "[parameters('moodleCommon').vnetGwDeploySwitch]",
-            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/virtualNetworkGateways",
+            "apiVersion": "2017-10-01",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses', parameters('moodleCommon').gatewayPublicIPName)]",
                 "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('moodleCommon').vnetName, parameters('moodleCommon').gatewaySubnet)]"
@@ -113,11 +114,11 @@
                     "capacity": 2
                 },
                 "vpnType": "[parameters('moodleCommon').vpnType]"
-            },
-            "type": "Microsoft.Network/virtualNetworkGateways"
+            }
         },
         {
-            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2017-10-01",
             "location": "[resourceGroup().location]",
             "name": "[parameters('moodleCommon').lbPipName]",
             "properties": {
@@ -128,11 +129,11 @@
             },
             "tags": {
                 "displayName": "Load Balancer Public IP"
-            },
-            "type": "Microsoft.Network/publicIPAddresses"
+            }
         },
         {
-            "apiVersion": "2016-03-30",
+            "type": "Microsoft.Network/loadBalancers",
+            "apiVersion": "2017-10-01",
             "dependsOn": [
                 "[concat('Microsoft.Network/publicIPAddresses/',parameters('moodleCommon').lbPipName)]"
             ],
@@ -205,8 +206,7 @@
                         }
                     }
                 ]
-            },
-            "type": "Microsoft.Network/loadBalancers"
+            }
         }
     ],
     "variables": {
