@@ -27,7 +27,7 @@ function install_java_and_jmeter
     mv cmdrunner-2.0.jar apache-jmeter-4.0/lib
     java -cp apache-jmeter-4.0/lib/ext/jmeter-plugins-manager-0.19.jar org.jmeterplugins.repository.PluginManagerCMDInstaller
     # TODO Hard-coded .jmx file here. Do this for each individual .jmx file
-    wget -O simple-test-1.jmx https://raw.githubusercontent.com/Azure/Moodle/hs-loadtest/loadtest/simple-test-1.jmx
+    wget -O simple-test-1.jmx https://raw.githubusercontent.com/Azure/Moodle/master/loadtest/simple-test-1.jmx
     apache-jmeter-4.0/bin/PluginsManagerCMD.sh install-for-jmx simple-test-1.jmx
     rm simple-test-1.jmx
 }
@@ -202,7 +202,7 @@ function hide_course_overview_block_for_jmeter_test
 }
 
 # TODO hard-coded values...
-LOADTEST_BASE_URI=https://raw.githubusercontent.com/Azure/Moodle/hs-loadtest/loadtest
+LOADTEST_BASE_URI=https://raw.githubusercontent.com/Azure/Moodle/master/loadtest
 MOODLE_TEST_USER_PASSWORD='testUserP@$$w0rd'
 
 function setup_test_course_and_users
@@ -323,5 +323,5 @@ function run_load_test_example
 {
     check_ssh_agent_and_added_key || return 1
 
-    deploy_run_test1_teardown ltest6 southcentralus https://raw.githubusercontent.com/Azure/Moodle/hs-loadtest/azuredeploy.json azuredeploy.parameters.loadtest.defaults.json apache Standard_DS2_v2 mysql 200 125 nfs 2 128 "$(cat ~/.ssh/authorized_keys)" 1600 4800 18000
+    deploy_run_test1_teardown ltest6 southcentralus https://raw.githubusercontent.com/Azure/Moodle/master/azuredeploy.json azuredeploy.parameters.loadtest.defaults.json apache Standard_DS2_v2 mysql 200 125 nfs 2 128 "$(cat ~/.ssh/authorized_keys)" 1600 4800 18000
 }

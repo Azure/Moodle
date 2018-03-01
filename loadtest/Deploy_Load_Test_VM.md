@@ -79,7 +79,7 @@ At the time of writing the load test code has not been merged into
 Master, so we need to switch to the right branch.
 
 ```
-ssh -o StrictHostKeyChecking=no $ipAddress "cd Moodle; git checkout hs-loadtest"
+ssh -o StrictHostKeyChecking=no $ipAddress "cd Moodle; git checkout master"
 ```
 
 Now we can install the load testing scripts and its dependencies:

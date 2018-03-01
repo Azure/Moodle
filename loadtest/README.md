@@ -34,7 +34,7 @@ configured as follows:
 deploy_run_test1_teardown \
     ltest6 \
     southcentralus \
-    https://raw.githubusercontent.com/Azure/Moodle/hs-loadtest/azuredeploy.json \
+    https://raw.githubusercontent.com/Azure/Moodle/master/azuredeploy.json \
     azuredeploy.parameters.loadtest.defaults.json \
     apache \
     Standard_DS2_v2 \
