@@ -1,0 +1,40 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageAccountNamePrefix": {
+            "type": "string",
+            "defaultValue": "moodleapp"
+        },
+        "storageAccountType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS"
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]"
+        }
+    },
+    "variables": {
+        "storageAccountName": "[concat(parameters('storageAccountNamePrefix'), uniqueString('storage'))]"
+    },
+    "resources": [
+                {
+                    "type": "Microsoft.Storage/storageAccounts",
+                    "name": "[variables('storageAccountName')]",
+                    "apiVersion": "2016-01-01",
+                    "location": "[parameters('location')]",
+                    "sku": {
+                        "name": "[parameters('storageAccountType')]"
+                    },
+                    "kind": "Storage",
+                    "properties": {}
+                }
+    ],
+    "outputs": {
+        "storageEndpoint": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName')), '2016-01-01').primaryEndpoints.blob]"
+        }
+    }
+}
