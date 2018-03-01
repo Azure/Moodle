@@ -37,6 +37,13 @@ Applications](https://docs.microsoft.com/en-us/azure/managed-applications/overvi
 or keep reading here to see how to quickly get started providing your
 own Moodle based services as Managed Applications.
 
+## Prerequisites
+
+In the following sections we demonstrate how to use the Azure CLI to
+work with a Moodle based Managed Application. For convenience these
+commands use a variety of [environment variables](Environment.md) that
+should be configured first.
+
 ## Defining the Resources (mainTemplate.json)
 
 The `mainTemplate.json` file defines the Azure resources that are
@@ -78,14 +85,6 @@ needs of each role in your organization.
 Azure has full documentation on [creating a group in Azure Active
 Directory](https://docs.microsoft.com/en-us/azure/active-directory/active-directory-groups-create-azure-portal). The commands below will create a single 'owner' role for
 use in the examples below.
-
-For convenieve we'll setup some environment variables to make these
-command snippets reusable.
-
-``` bash
-MOODLE_MANAGED_APP_OWNER_GROUP_NAME=MoodleOwner
-MOODLE_MANAGED_APP_OWNER_NICKNAME=MoodleOwner
-```
 
 Create the group:
 
@@ -137,35 +136,28 @@ MOODLE_MANAGED_APP_ROLE_ID=$(az role definition list --name Owner --query [].nam
 
 The Azure documentation has more information on how to work with [Azure Active Directory](https://docs.microsoft.com/en-us/azure/active-directory/manage-access-to-azure-resources).
 
-## Create a Resource Group for the Manged Application
+## Create a Resource Group for the Managed Application Service Catalog Entry
 
 ``` bash
-MOODLE_MANAGED_APP_LOCATION=southcentralus
-MOODLE_MANAGED_APP_RG_NAME=MoodleManagedAppRG
-```
-
-``` bash
-az group create --name $MOODLE_MANAGED_APP_RG_NAME --location $MOODLE_MANAGED_APP_LOCATION
+az group create --name $MOODLE_SERVICE_CATALOG_RG_NAME --location $MOODLE_SERVICE_CATALOG_LOCATION
 ```
 
 ## Deploy to your Service Catalog using Azure CLI
 
 You can deploy a Managed Application into your Service Catalog using
 the Azure CLI. For convenience we'll set a few environment variables
-to make it easier to work with the application.
+to make it easier to work with the application.We'll need to construct
+the authorization configuration from the app and role IDs retrieved
+earlier.
 
 ``` bash
-MOODLE_MANAGED_APP_NAME=MoodleManagedApp
-MOODLE_MANAGED_APP_LOCK_LEVEL=ReadOnly
-MOODLE_MANAGED_APP_DISPLAY_NAME=Moodle
-MOODLE_MANAGED_APP_DESCRIPTION="Moodle on Azure as a Managed Application"
 MOODLE_MANAGED_APP_AUTHORIZATIONS=$MOODLE_MANAGED_APP_AD_ID:$MOODLE_MANAGED_APP_ROLE_ID
 ```
 
 The following command will add your managed application to the Service Catalog.
 
 ``` bash
-az managedapp definition create --name $MOODLE_MANAGED_APP_NAME --location $MOODLE_MANAGED_APP_LOCATION --resource-group $MOODLE_MANAGED_APP_RG_NAME --lock-level $MOODLE_MANAGED_APP_LOCK_LEVEL --display-name $MOODLE_MANAGED_APP_DISPLAY_NAME --description "$MOODLE_MANAGED_APP_DESCRIPTION" --authorizations=$MOODLE_MANAGED_APP_AUTHORIZATIONS --main-template=@mainTemplate.json --create-ui-definition=@createUIDefinition.json
+az managedapp definition create --name $MOODLE_MANAGED_APP_NAME --location $MOODLE_SERVICE_CATALOG_LOCATION --resource-group $MOODLE_SERVICE_CATALOG_RG_NAME --lock-level $MOODLE_MANAGED_APP_LOCK_LEVEL --display-name $MOODLE_MANAGED_APP_DISPLAY_NAME --description "$MOODLE_MANAGED_APP_DESCRIPTION" --authorizations="$MOODLE_MANAGED_APP_AUTHORIZATIONS" --main-template=@mainTemplate.json --create-ui-definition=@createUIDefinition.json
 ```
 
 Results:
@@ -227,35 +219,19 @@ Once the Moodle on Azure Managed Application is published to your
 service catalog you can now depoloy it from within the portal or using
 the CLI. In the following commands we'll see how to do this in the CLI.
 
+### Setup a Resource Group for the Application
+
 First we need to get the id of the application. This was returned in
 the output of the command to create the service catalog entry.
 However, we'll use the CLI to retireve it and record it into a
 variable:
 
 ``` bash
-MOODLE_MANAGED_APP_ID=$(az managedapp definition show --name $MOODLE_MANAGED_APP_NAME --resource-group $MOODLE_MANAGED_APP_RG_NAME --query id --output tsv)
+MOODLE_MANAGED_APP_ID=$(az managedapp definition show --name $MOODLE_MANAGED_APP_NAME --resource-group $MOODLE_SERVICE_CATALOG_RG_NAME --query id --output tsv)
 ```
 
-Create an id for the resource group that will be managed by the
-managed application provider. This is the resource group that
-infrastructure will be deployed into. The end user does not,
-generally, manage this group.
-
-``` bash
-SUBSCRIPTION_ID=$(az account show --query id --output tsv)
-MOODLE_MANAGED_RG_ID=$/subscriptions/$SUBSCRIPTION_ID/resourceGroups/MoodleInfrastrcuture
-```
-
-Create a resource group for the application deployment. This is the
-resource group into which the application is deployed. The end user,
-generally, does have access to this resource group.
-
-``` bash
-MOODLE_DEPLOYMENT_RG_NAME=MoodleManagedAppRG
-MOODLE_DEPLOYMENT_LOCATION=southcentralus
-```
-
-Create the application resource group.
+Create the application resource group, this is the group in which the
+cusrtomer will see the managed application..
 
 ``` bash
 az group create --name $MOODLE_DEPLOYMENT_RG_NAME --location=$MOODLE_DEPLOYMENT_LOCATION
@@ -276,14 +252,40 @@ Results:
 }
 ```
 
-Deploy the applications:
+### Customer Deployment
 
-``` bash
-MOODLE_DEPLOYMENT_NAME=MoodleManagedApp
-```
+When a customer wants to deploy an application they can do so using
+either the Portal or the CLI. In this section we'll look at how this
+is done in the CLI.
+
+#### Providing Parameters
+
+If we were using the portal our `CreateUIDefinition.json` file would
+be used to create a user interface to define the parameters needed in
+`mainTemplate.json`. When using the CLI we need to provide parameter
+values for any parameters that don't have a default. To make it easier
+to manage we'll put these parameter values into environment variables.
+
+For convenience our `mainTemplate.json` file has defaults for all
+values. This means that there is no need to provide parameters in the
+commandline, though you can override the defaults if you want to by
+adding the `--parameters` attribute. This attribute can take either 
+a JSON string or a filename (preceded with an '@', e.g. '--parameters @parameters.json`) containing a JSON
+definition for the paramters, e.g.
+
+
+    {
+        "parameterName": "value",
+        "ANOtherParameter"" "another value"
+    }
+
+
+### Deploying the application
 
 Deploy the managed application and corresponding infrastrcuture.
 
 ``` bash
-az managedapp create --name ravtestappliance401 --location "westcentralus" --kind "Servicecatalog" --resource-group "ravApplianceCustRG401" --managedapp-definition-id "/subscriptions/{guid}/resourceGroups/ravApplianceDefRG401/providers/Microsoft.Solutions/applianceDefinitions/ravtestAppDef401" --managed-rg-id "/subscriptions/{guid}/resourceGroups/ravApplianceCustManagedRG401" --parameters "{\"storageAccountName\": {\"value\": \"ravappliancedemostore1\"}}"
+az managedapp create --name $MOODLE_DEPLOYMENT_NAME --location $MOODLE_DEPLOYMENT_LOCATION --kind ServiceCatalog --resource-group $MOODLE_DEPLOYMENT_RG_NAME --managedapp-definition-id $MOODLE_MANAGED_APP_ID --managed-rg-id $MOODLE_MANAGED_RG_ID
 ```
+
+
