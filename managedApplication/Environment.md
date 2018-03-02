@@ -1,6 +1,13 @@
 # Setup Environment
 
-For convenience most of the configuration values we need to create and manage our Moodle Managed Application we'll create a numer of Environment Variables.
+For convenience most of the configuration values we need to create and
+manage our Moodle Managed Application we'll create a numer of
+Environment Variables. In order to store any generated files and
+configurations we will also create a workspace.
+
+NOTE: If you are running these scripts through SimDem you can
+customize these values by copying and editing `env.json` into
+`env.local.json`.
 
 ## Setup for Publishing the Moodle Managed Application
 
@@ -15,7 +22,7 @@ MOODLE_MANAGED_APP_DISPLAY_NAME=Moodle
 MOODLE_MANAGED_APP_DESCRIPTION="Moodle on Azure as a Managed Application"
 ```
 
-## Setup for COnsuming the Moodle Managed Application
+## Setup for Consuming the Moodle Managed Application
 
 Create an id for the resource group that will be managed by the
 managed application provider. This is the resource group that
@@ -37,3 +44,22 @@ MOODLE_DEPLOYMENT_LOCATION=southcentralus
 MOODLE_DEPLOYMENT_NAME=MoodleManagedApp
 ```
 
+## Workspace
+
+We need a workspace for storing configuration files and other
+per-deployment artifacts:
+
+``` shell
+MOODLE_MANAGED_APP_WORKSPACE=~/.moodle
+mkdir -p $MOODLE_MANAGED_APP_WORKSPACE/$MOODLE_DEPLOYMENT_NAME
+```
+
+## SSH Key
+
+We use SSH for secure communication with our hosts. The following line
+will check there is a valid SSH key available and, if not, create one.
+
+```
+MOODLE_SSH_KEY_FILENAME=~/.ssh/moodle_managedapp_id_rsa
+if [ ! -f "$MOODLE_SSH_KEY_FILENAME" ]; then ssh-keygen -t rsa -N "" -f $MOODLE_SSH_KEY_FILENAME; fi
+```
