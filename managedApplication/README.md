@@ -52,9 +52,8 @@ majority of the work here for you (see `azuredeploy.json` in the root
 of this repository). The `mainTemplate.json` file is where you
 customize the configuration and, optionally, add additional resources.
 
-An initial `mainTemplate.json` file is provided in
-`managedApplication/maintemplte.json`. This file is sufficient to get
-you started building your own Moodle based Managed Applications.
+For the purposes of our demo we will use the ARM template from the
+root of our project as the main tamplate.
 
 This file is a regular [Azure Resource Manager template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-overview).
 
@@ -86,45 +85,23 @@ Azure has full documentation on [creating a group in Azure Active
 Directory](https://docs.microsoft.com/en-us/azure/active-directory/active-directory-groups-create-azure-portal). The commands below will create a single 'owner' role for
 use in the examples below.
 
-Create the group:
+If the Group already exists we don't want to create a new one, so we
+will try to get the Group ID first:
 
 ``` bash
-az ad group create --display-name $MOODLE_MANAGED_APP_OWNER_GROUP_NAME --mail-nickname=$MOODLE_MANAGED_APP_OWNER_NICKNAME
+MOODLE_MANAGED_APP_AD_ID=$(az ad group list --filter="displayName eq '$MOODLE_MANAGED_APP_OWNER_GROUP_NAME'" --query [0].objectId --output tsv)
 ```
 
-Results:
-
-``` json
-{
-  "additionalProperties": {
-    "deletionTimestamp": null,
-    "description": null,
-    "dirSyncEnabled": null,
-    "lastDirSyncTime": null,
-    "mailEnabled": false,
-    "mailNickname": "MoodleOwner",
-    "odata.metadata": "https://graph.windows.net/72f988bf-86f1-41af-91ab-2d7cd011db47/$metadata#directoryObjects/Microsoft.DirectoryServices.Group/@Element",
-    "odata.type": "Microsoft.DirectoryServices.Group",
-    "onPremisesDomainName": null,
-    "onPremisesNetBiosName": null,
-    "onPremisesSamAccountName": null,
-    "onPremisesSecurityIdentifier": null,
-    "provisioningErrors": [],
-    "proxyAddresses": []
-  },
-  "displayName": "MoodleOwner",
-  "mail": null,
-  "objectId": "dd46cacd-eab1-43b0-a4ba-425d8b8d82fa",
-  "objectType": "Group",
-  "securityEnabled": true
-}
-```
-
-You'll need the object ID from this output. For convenience we'll
-create an environment variable set to the object ID value.
+At this point MOODLE_MANAGED_APP_AD_ID will either be empty or it will have the ID of an existing group. If it is empty we need to create the group and grab its ID:
 
 ``` bash
-MOODLE_MANAGED_APP_AD_ID=$(az ad group list --filter="displayName eq '$MOODLE_MANAGED_APP_OWNER_GROUP_NAME'" --query [*].objectId --output tsv)
+if [ -z "$MOODLE_MANAGED_APP_AD_ID" ]; then az ad group create --display-name $MOODLE_MANAGED_APP_OWNER_GROUP_NAME --mail-nickname=$MOODLE_MANAGED_APP_OWNER_NICKNAME; fi
+```
+
+Lets ensure that we have the object ID even if we created a new one.
+
+``` bash
+MOODLE_MANAGED_APP_AD_ID=$(az ad group list --filter="displayName eq '$MOODLE_MANAGED_APP_OWNER_GROUP_NAME'" --query [0].objectId --output tsv)
 ```
 
 You will also need the Role ID for your chosen role, here we will use
@@ -157,7 +134,7 @@ MOODLE_MANAGED_APP_AUTHORIZATIONS=$MOODLE_MANAGED_APP_AD_ID:$MOODLE_MANAGED_APP_
 The following command will add your managed application to the Service Catalog.
 
 ``` bash
-az managedapp definition create --name $MOODLE_MANAGED_APP_NAME --location $MOODLE_SERVICE_CATALOG_LOCATION --resource-group $MOODLE_SERVICE_CATALOG_RG_NAME --lock-level $MOODLE_MANAGED_APP_LOCK_LEVEL --display-name $MOODLE_MANAGED_APP_DISPLAY_NAME --description "$MOODLE_MANAGED_APP_DESCRIPTION" --authorizations="$MOODLE_MANAGED_APP_AUTHORIZATIONS" --main-template=@mainTemplate.json --create-ui-definition=@createUIDefinition.json
+az managedapp definition create --name $MOODLE_MANAGED_APP_NAME --location $MOODLE_SERVICE_CATALOG_LOCATION --resource-group $MOODLE_SERVICE_CATALOG_RG_NAME --lock-level $MOODLE_MANAGED_APP_LOCK_LEVEL --display-name $MOODLE_MANAGED_APP_DISPLAY_NAME --description "$MOODLE_MANAGED_APP_DESCRIPTION" --authorizations="$MOODLE_MANAGED_APP_AUTHORIZATIONS" --main-template=@../azuredeploy.json --create-ui-definition=@createUIDefinition.json
 ```
 
 Results:
@@ -276,16 +253,35 @@ definition for the paramters, e.g.
 
     {
         "parameterName": "value",
-        "ANOtherParameter"" "another value"
+        "AnOtherParameter"" "another value"
     }
 
+The Moodle template provides sensible defaults for almost every
+parameter, the one exception to this is the SSH Public Key, used to
+provide secure access to the VMs. For this example we will use the
+defaults for all parameters, but we still need to create a parameters
+file. A template file is provided here (see
+`parameters-template.json`). The following command will replace the
+placeholder in the parameters template file with an SSH key used for
+testing puporses (this is created as part of the envrionment setup in
+the prerequisites):
+
+``` bash
+ssh_pub_key=`cat $MOODLE_SSH_KEY_FILENAME.pub`
+echo $ssh_pub_key
+sed "s|GEN-SSH-PUB-KEY|$ssh_pub_key|g" parameters-template.json > $MOODLE_MANAGED_APP_WORKSPACE/$MOODLE_DEPLOYMENT_NAME/parameters.json
+```
+
+If you want to have more control over the deployment configuration
+simply add parameters to the template file and use that to create
+parameter files for specific deployments..
 
 ### Deploying the application
 
 Deploy the managed application and corresponding infrastrcuture.
 
 ``` bash
-az managedapp create --name $MOODLE_DEPLOYMENT_NAME --location $MOODLE_DEPLOYMENT_LOCATION --kind ServiceCatalog --resource-group $MOODLE_DEPLOYMENT_RG_NAME --managedapp-definition-id $MOODLE_MANAGED_APP_ID --managed-rg-id $MOODLE_MANAGED_RG_ID
+az managedapp create --name $MOODLE_DEPLOYMENT_NAME --location $MOODLE_DEPLOYMENT_LOCATION --kind ServiceCatalog --resource-group $MOODLE_DEPLOYMENT_RG_NAME --managedapp-definition-id $MOODLE_MANAGED_APP_ID --managed-rg-id $MOODLE_MANAGED_RG_ID --parameters @$MOODLE_MANAGED_APP_WORKSPACE/$MOODLE_DEPLOYMENT_NAME/parameters.json
 ```
 
 
