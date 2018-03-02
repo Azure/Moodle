@@ -69,13 +69,66 @@ the example we use 1600 thread) for the designated duration and rampup
 time (18000 seconds = 5 hours duration, 4800 seconds rampup time in
 the example).
 
+## Test plans
+
+We'd like to offer test plans that are as realistic as possible, so that potential
+Moodle users on Azure can have better confidence with their Moodle deployment on Azure.
+We are just starting out in that direction and here are descriptions of currently
+available test plans.
+
+### [simple-test-1.jmx](./simple-test-1.jmx)
+
+This test plan is a simple scenario that performs the following operations repeatedly:
+
+* Login to the Moodle site
+* View the test course
+* View any resource if any
+* View a forum in the test course
+* View any forum discussion
+* Post a new discussion topic
+* Take a quiz and submit
+
+The scripts in [loadtest.sh](./loadtest.sh) are tailored for this test plan.
+
+### [simple-test-2.jmx](./simple-test-2.jmx)
+
+Currently [loadtest.sh](./loadtest.sh) doesn't have any tailored scripts for this
+test plan. Therefore, this test plan will need to be executed by issuing the
+actual jmeter command with properly modified parameters manually, or it'd be
+greatly appreciated if someone can contribute better support for this test plan
+in [loadtest.hs](./loadtest.sh).
+
+The purpose of this test plan is to try stressing the moodledata directory
+in a shared file system (either a gluster volume or an NFS share, depending
+on the choice). Initially attaching a random file in a forum discussion post
+was tried, but for some reason (probably due to my lack of understanding
+in PHP/web interaction), files were not attached. I instead tried to upload
+random files to each test Moodle users's Private Files area, and it did work.
+This test plan basically performs the following operations repeatedly:
+
+* Login to the Moodle site
+* Open the Moodle user's Private Files repository
+* Upload a random file (of a random size within a hard-coded range)
+* Save the change
+
+This way, we were able to populate the shared moodledata directory with
+random files in Moodle users' Private Files repositories. The mechanism
+to generate random files is not so efficient, so that's currently what
+slows down the upload speed, and any improvement in that BeanShell preprocessor
+code would be great. Note that the uploaded files have to be different.
+Moodle seems so good at deduplicating that a single file uploaded multiple
+times by different users won't increase the file system usage beyond its
+single copy.
+
+It'd be also great if we add a download operation step in the test plan,
+and it's left as a future work item.
+
 ## Please contribute
 
-It'd be great if we have other test plans (like uploading files populating the
-`moodledata` directory intensely), and make other parameters configurable (for
+It'd be great if we have more test plans, and make other parameters configurable (for
 example, make the auto-scaling thresholds configurable, which actually requires
-some changes in the templates as well). The currently available test plan
-also has hard-coded database type (JDBC connection string) that won't work
+some changes in the templates as well). The currently available test plans
+also have hard-coded database type (JDBC connection string) that won't work
 for Postgres SQL server, so making it work would be also greatly appreciated.
 Also, if you run this load test with any parameters, it'd be great to share
 the numeric results so that we can have more performance data on various
