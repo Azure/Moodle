@@ -52,8 +52,10 @@ defaults create a scalable cluster that is suitable for low volume
 testing. If you are building out a production service you should
 review the section below on sizing considerations. For now we will
 proceed with the defaults, but there is one value, the `sshPublicKey`
-that **must** be provided. To automatically add your default SSH key
-(in Bash) use the following command:
+that **must** be provided. The following command will replace the
+placeholder in the parameters template file with an SSH key used for
+testing puporses (this is created as part of the envrionment setup in
+the prerequisites):
 
 ``` bash
 ssh_pub_key=`cat $MOODLE_SSH_KEY_FILENAME.pub`
