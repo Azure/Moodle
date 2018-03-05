@@ -70,8 +70,8 @@
     echo $dbServerType                >> /tmp/vars.txt
     echo $fileServerType              >> /tmp/vars.txt
     echo $serviceObjective	>> /tmp/vars.txt
-    echo $serviceTier=${23}	>> /tmp/vars.txt
-    echo $serviceSize=${24}	>> /tmp/vars.txt
+    echo $serviceTier	>> /tmp/vars.txt
+    echo $serviceSize	>> /tmp/vars.txt
 
     . ./helper_functions.sh
     check_fileServerType_param $fileServerType
@@ -667,7 +667,7 @@ EOF
         sudo apt-get install -y --force-yes php-mysql
     elif [ $dbServerType = "mssql" ]; then
         # Download and build php/mssql driver
-		  /usr/bin/curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -  
+        /usr/bin/curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -  
         /usr/bin/curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
         sudo apt-get update
         sudo ACCEPT_EULA=Y apt-get install msodbcsql mssql-tools unixodbc-dev -y
