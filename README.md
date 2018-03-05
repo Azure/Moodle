@@ -17,7 +17,7 @@ This template set deploys the following infrastructure:
 - Private virtual network for frontend instances
 - Controller instance running cron and handling syslog for the autoscaled site
 - Load balancer to balance across the autoscaled instances
-- Postgres or MySQL database
+- MS SQL, Postgres or MySQL database
 - Azure Redis instance for Moodle caching
 - ObjectFS in Azure blobs (Moodle sitedata)
 - Three Elasticsearch VMs for search indexing in Moodle
