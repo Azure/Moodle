@@ -752,7 +752,7 @@
             "webServerSetupScriptFilename": "setup_webserver.sh",
             "webServerType": "[parameters('webServerType')]",
             "serviceObjective": "[parameters('serviceObjective')]",
-            "msSizeMB": "[parameters('msSizeMB')]"
+            "msSizeMB": "[parameters('msSizeMB')]",
             "webServerType": "[parameters('webServerType')]"
         },
         "octets": "[split(parameters('vNetAddressSpace'), '.')]",
