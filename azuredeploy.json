@@ -43,6 +43,7 @@
                 "description": "Switch to deploy a virtual network gateway or not"
             },
             "type": "bool"
+<<<<<<< HEAD
         },
         "installO365pluginsSwitch": {
             "defaultValue": false,
@@ -58,6 +59,23 @@
             },
             "type": "bool"
         },
+=======
+        },
+        "installO365pluginsSwitch": {
+            "defaultValue": false,
+            "metadata": {
+                "description": "Switch to install Moodle Office 365 plugins"
+            },
+            "type": "bool"
+        },
+        "installElasticSearchSwitch": {
+            "defaultValue": false,
+            "metadata": {
+                "description": "Switch to install Moodle ElasticSearch plugins & VMs"
+            },
+            "type": "bool"
+        },
+>>>>>>> main/master
         "storageAccountType": {
             "defaultValue": "Standard_LRS",
             "allowedValues": [
@@ -750,9 +768,13 @@
             "vnetName": "[concat('vnet-',variables('resourceprefix'))]",
             "vpnType": "[parameters('vpnType')]",
             "webServerSetupScriptFilename": "setup_webserver.sh",
+<<<<<<< HEAD
             "webServerType": "[parameters('webServerType')]",
             "serviceObjective": "[parameters('serviceObjective')]",
             "msSizeMB": "[parameters('msSizeMB')]"
+=======
+            "webServerType": "[parameters('webServerType')]"
+>>>>>>> main/master
         },
         "octets": "[split(parameters('vNetAddressSpace'), '.')]",
         "resourceprefix": "[substring(uniqueString(resourceGroup().id, deployment().name), 3, 6)]"
