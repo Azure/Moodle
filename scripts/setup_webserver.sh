@@ -65,7 +65,7 @@ check_fileServerType_param $fileServerType
   fi
 
   # install the base stack
-  sudo apt-get -y install nginx varnish php php-cli php-curl php-zip php-pear
+  sudo apt-get -y install nginx varnish php php-cli php-curl php-zip php-pear php-mbstring php-dev mcrypt
 
   if [ "$webServerType" = "apache" ]; then
     # install apache pacakges
