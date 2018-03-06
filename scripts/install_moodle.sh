@@ -666,27 +666,7 @@ EOF
     if [ $dbServerType = "mysql" ]; then
         sudo apt-get install -y --force-yes php-mysql
     elif [ $dbServerType = "mssql" ]; then
-        # Download and build php/mssql driver
-        /usr/bin/curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -  
-        /usr/bin/curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
-        sudo apt-get update
-        sudo ACCEPT_EULA=Y apt-get install msodbcsql mssql-tools unixodbc-dev -y
-        echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
-        echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
-        source ~/.bashrc   
-             
-       #Build mssql driver
-       /usr/bin/pear config-set php_ini `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"` system
-       /usr/bin/pecl install sqlsrv
-       /usr/bin/pecl install pdo_sqlsrv
-       PHPVER=`/usr/bin/php -r "echo PHP_VERSION;" | /usr/bin/cut -c 1,2,3`
-       echo "extension=sqlsrv.so" >> /etc/php/$PHPVER/fpm/php.ini
-       echo "extension=pdo_sqlsrv.so" >> /etc/php/$PHPVER/fpm/php.ini
-       echo "extension=sqlsrv.so" >> /etc/php/$PHPVER/apache2/php.ini
-       echo "extension=pdo_sqlsrv.so" >> /etc/php/$PHPVER/apache2/php.ini
-       echo "extension=sqlsrv.so" >> /etc/php/$PHPVER/cli/php.ini
-       echo "extension=pdo_sqlsrv.so" >> /etc/php/$PHPVER/cli/php.ini
-        
+        install_php_sql_driver 
     else
         sudo apt-get install -y --force-yes php-pgsql
     fi
@@ -1195,10 +1175,6 @@ EOF
         /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d ${moodledbname} -Q "CREATE USER ${moodledbuser} FROM LOGIN ${moodledbuser}"
         /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d ${moodledbname} -Q "exec sp_addrolemember 'db_owner','${moodledbuser}'" 
         
-        echo "/opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -Q \"CREATE DATABASE ${moodledbname} ( MAXSIZE = $serviceSize, EDITION = '$serviceTier', SERVICE_OBJECTIVE = '$serviceObjective' )\"" > /tmp/debug
-        echo "/opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -Q \"CREATE LOGIN ${moodledbuser} with password = '${moodledbpass}'\"" >> /tmp/debug 
-        echo "/opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d ${moodledbname} -Q \"CREATE USER ${moodledbuser} FROM LOGIN ${moodledbuser}\"" >> /tmp/debug
-        echo "/opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d ${moodledbname} -Q \"exec sp_addrolemember 'db_owner','${moodledbuser}'\"" >> /tmp/debug 
     else
         # Create postgres db
         echo "${postgresIP}:5432:postgres:${pgadminlogin}:${pgadminpass}" > /root/.pgpass
@@ -1234,7 +1210,6 @@ EOF
         mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_container', 'objectfs');"
         mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_sastoken', '${sas}');"
     elif [ $dbServerType = "mssql" ]; then
-        echo -e "cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot=https://"$siteFQDN" --dataroot=/moodle/moodledata --dbhost="$mssqlIP" --dbname="$moodledbname" --dbuser="$azuremoodledbuser" --dbpass="$moodledbpass" --dbtype=sqlsrv --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass="$adminpass" --adminemail=admin@"$siteFQDN" --non-interactive --agree-license --allow-unstable || true "
         cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot=https://$siteFQDN   --dataroot=/moodle/moodledata --dbhost=$mssqlIP   --dbname=$moodledbname   --dbuser=$azuremoodledbuser   --dbpass=$moodledbpass   --dbtype=sqlsrv --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass=$adminpass   --adminemail=admin@$siteFQDN   --non-interactive --agree-license --allow-unstable || true
 
        /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d ${moodledbname} -Q "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'enabletasks', 1)" 

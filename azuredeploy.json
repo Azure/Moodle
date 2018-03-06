@@ -7,7 +7,7 @@
             "metadata": {
                 "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
             },
-            "defaultValue": "https://raw.githubusercontent.com/CatalystAUInf/Moodle/master/"
+            "defaultValue": "https://raw.githubusercontent.com/Azure/Moodle/master/"
         },
         "_artifactsLocationSasToken": {
             "type": "securestring",
@@ -235,7 +235,7 @@
                 "S4",
                 "S5",
                 "S6",
-		"S7",
+                "S7",
                 "S9" 
             ],
             "defaultValue": "S1",
@@ -245,7 +245,7 @@
             "type": "string"
         },
         
-         "msSizeMB": {
+         "msDbSize": {
             "allowedValues": [
                 "100MB",
                 "250MB",
@@ -266,7 +266,7 @@
                 "750GB",
                 "1024GB"
             ],
-            "defaultValue": "250MB",
+            "defaultValue": "250GB",
             "metadata": {
                 "description": "MS SQL database size" 
             },
@@ -597,7 +597,7 @@
       },
       "databaseDNS": {
         "type": "string",
-          "value": "[variables('moodleCommon').dbDNS]"
+        "value": "[variables('moodleCommon').dbDNS]"
       },
       "databaseAdminUsername": {
         "type": "string",
@@ -753,7 +753,7 @@
             "webServerSetupScriptFilename": "setup_webserver.sh",
             "webServerType": "[parameters('webServerType')]",
             "serviceObjective": "[parameters('serviceObjective')]",
-            "msSizeMB": "[parameters('msSizeMB')]",
+            "msDbSize": "[parameters('msDbSize')]",
             "webServerType": "[parameters('webServerType')]"
         },
         "octets": "[split(parameters('vNetAddressSpace'), '.')]",
