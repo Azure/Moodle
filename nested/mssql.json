@@ -11,13 +11,14 @@
     },
     "resources": [
         {
-            "apiVersion": "2014-04-01",
+            "apiVersion": "2015-05-01-preview",
             "kind": "",
             "location": "[resourceGroup().location]",
             "name": "[parameters('moodleCommon').serverName]",
             "properties": {
                 "administratorLogin": "[parameters('moodleCommon').dbLogin]",
                 "administratorLoginPassword": "[parameters('moodleCommon').dbLoginPassword]",
+		"sslEnforcement": "[parameters('moodleCommon').sslEnforcement]",
                 "storageMB": "[parameters('moodleCommon').skuSizeMB]",
                 "version": "[parameters('moodleCommon').mssqlVersion]"
             },
@@ -33,7 +34,7 @@
                         "startIpAddress": "0.0.0.0",
                         "endIpAddress": "255.255.255.255"
                     },
-                    "type": "firewallRules"
+                    "type": "firewallrules"
                 }
             ],
             "sku": {
