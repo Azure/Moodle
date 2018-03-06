@@ -93,6 +93,10 @@ check_fileServerType_param $fileServerType
   PHPVER=`/usr/bin/php -r "echo PHP_VERSION;" | /usr/bin/cut -c 1,2,3`
   echo "extension=sqlsrv.so" >> /etc/php/$PHPVER/fpm/php.ini
   echo "extension=pdo_sqlsrv.so" >> /etc/php/$PHPVER/fpm/php.ini  
+  echo "extension=sqlsrv.so" >> /etc/php/$PHPVER/apache2/php.ini
+  echo "extension=pdo_sqlsrv.so" >> /etc/php/$PHPVER/apache2/php.ini  
+  echo "extension=sqlsrv.so" >> /etc/php/$PHPVER/cli/php.ini
+  echo "extension=pdo_sqlsrv.so" >> /etc/php/$PHPVER/cli/php.ini  
 
   if [ $fileServerType = "gluster" ]; then
     # Mount gluster fs for /moodle
