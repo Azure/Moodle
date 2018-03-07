@@ -37,14 +37,6 @@
                     "type": "firewallrules"
                 }
             ],
-            "sku": {
-                "capacity": "[parameters('moodleCommon').skuCapacityDTU]",
-                "family": "[parameters('moodleCommon').skuFamily]",
-                "name": "[parameters('moodleCommon').skuName]",
-                "size": "[parameters('moodleCommon').skuSizeMB]",
-                "tier": "[parameters('moodleCommon').skuTier]"
-            },
-            "type": "Microsoft.Sql/servers"
         }
     ],
     "variables": {
