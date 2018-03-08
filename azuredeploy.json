@@ -73,8 +73,9 @@
         "dbServerType": {
             "defaultValue": "mysql",
             "allowedValues": [
+                "postgres",
                 "mysql",
-                "postgres"
+                "mssql"
             ],
             "metadata": {
                 "description": "Database type"
@@ -225,6 +226,53 @@
             },
             "type": "int"
         },
+
+        "serviceObjective": {
+            "allowedValues": [
+                "S1",
+                "S2",
+                "S3",
+                "S4",
+                "S5",
+                "S6",
+                "S7",
+                "S9" 
+            ],
+            "defaultValue": "S1",
+            "metadata": {
+                "description": "MS SQL  database trasaction units"
+            },
+            "type": "string"
+        },
+        
+         "msDbSize": {
+            "allowedValues": [
+                "100MB",
+                "250MB",
+                "500MB",
+                "1GB",
+                "2GB",
+                "5GB",
+                "10GB",
+                "20GB",
+                "30GB",
+                "40GB",
+                "50GB",
+                "100GB",
+                "250GB",
+                "300GB",
+                "400GB",
+                "500GB",
+                "750GB",
+                "1024GB"
+            ],
+            "defaultValue": "250GB",
+            "metadata": {
+                "description": "MS SQL database size" 
+            },
+            "type": "string"
+        },
+
         "skuFamily": {
             "allowedValues": [
                 "SkuFamily"
@@ -317,6 +365,16 @@
             "defaultValue": "5.7",
             "metadata": {
                 "description": "Mysql version"
+            },
+            "type": "string"
+        },
+         "mssqlVersion": {
+            "allowedValues": [
+                "12.0"
+            ],
+            "defaultValue": "12.0",
+            "metadata": {
+                "description": "Mssql version"
             },
             "type": "string"
         },
@@ -539,7 +597,7 @@
       },
       "databaseDNS": {
         "type": "string",
-        "value": "[concat(variables('moodleCommon').dbServerType, '-', variables('moodleCommon').resourcesPrefix, '.', variables('moodleCommon').dbServerType, '.database.azure.com')]"
+        "value": "[variables('moodleCommon').dbDNS]"
       },
       "databaseAdminUsername": {
         "type": "string",
@@ -598,6 +656,7 @@
             "dbServerType": "[parameters('dbServerType')]",
             "dbUsername": "[concat(parameters('dbLogin'), '@', parameters('dbServerType'), '-', variables('resourceprefix'))]",
             "elasticVmSku": "[parameters('elasticVmSku')]",
+            "dbDNS": "[if(equals(parameters('dbServerType'),'mssql'),concat(parameters('dbServerType'), '-',variables('resourcePrefix'), '.database.windows.net'), concat(parameters('dbServerType'), '-', variables('resourcePrefix'), '.', parameters('dbServerType'), '.database.azure.com'))]",
             "elasticAvailabilitySetName": "[concat('elastic-avset-',variables('resourceprefix'))]",
             "elasticClusterName": "[concat('es-cluster-',variables('resourceprefix'))]",
             "elasticNicName1": "[concat('elastic-vm-nic-01-',variables('resourceprefix'))]",
@@ -655,6 +714,7 @@
             },
             "policyName": "[concat('policy-',variables('resourceprefix'))]",
             "postgresVersion": "[parameters('postgresVersion')]",
+		    "mssqlVersion": "[parameters('mssqlVersion')]",
             "redisCacheName": "[concat('redis-',variables('resourceprefix'))]",
             "redisDeploySwitch": "[parameters('redisDeploySwitch')]",
             "redisDns": "[concat('redis-',variables('resourceprefix'),'.redis.cache.windows.net')]",
@@ -691,6 +751,9 @@
             "vnetName": "[concat('vnet-',variables('resourceprefix'))]",
             "vpnType": "[parameters('vpnType')]",
             "webServerSetupScriptFilename": "setup_webserver.sh",
+            "webServerType": "[parameters('webServerType')]",
+            "serviceObjective": "[parameters('serviceObjective')]",
+            "msDbSize": "[parameters('msDbSize')]",
             "webServerType": "[parameters('webServerType')]"
         },
         "octets": "[split(parameters('vNetAddressSpace'), '.')]",
