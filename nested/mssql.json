@@ -11,7 +11,7 @@
     },
     "resources": [
         {
-            "type": "Microsoft.Sql/servers"
+            "type": "Microsoft.Sql/servers",
             "apiVersion": "2015-05-01-preview",
             "kind": "",
             "location": "[resourceGroup().location]",
