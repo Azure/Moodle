@@ -30,6 +30,20 @@
             },
             "type": "bool"
         },
+        "redisDeploySwitch": {
+            "defaultValue": true,
+            "metadata": {
+                "description": "Switch to deploy a redis cache or not"
+            },
+            "type": "bool"
+        },
+        "vnetGwDeploySwitch": {
+            "defaultValue": false,
+            "metadata": {
+                "description": "Switch to deploy a virtual network gateway or not"
+            },
+            "type": "bool"
+        },
         "installO365pluginsSwitch": {
             "defaultValue": false,
             "metadata": {
@@ -59,8 +73,9 @@
         "dbServerType": {
             "defaultValue": "mysql",
             "allowedValues": [
+                "postgres",
                 "mysql",
-                "postgres"
+                "mssql"
             ],
             "metadata": {
                 "description": "Database type"
@@ -205,12 +220,59 @@
                 400,
                 800
             ],
-            "defaultValue": 50,
+            "defaultValue": 100,
             "metadata": {
                 "description": "MySql/Postgresql database trasaction units"
             },
             "type": "int"
         },
+
+        "serviceObjective": {
+            "allowedValues": [
+                "S1",
+                "S2",
+                "S3",
+                "S4",
+                "S5",
+                "S6",
+                "S7",
+                "S9" 
+            ],
+            "defaultValue": "S1",
+            "metadata": {
+                "description": "MS SQL  database trasaction units"
+            },
+            "type": "string"
+        },
+        
+         "msDbSize": {
+            "allowedValues": [
+                "100MB",
+                "250MB",
+                "500MB",
+                "1GB",
+                "2GB",
+                "5GB",
+                "10GB",
+                "20GB",
+                "30GB",
+                "40GB",
+                "50GB",
+                "100GB",
+                "250GB",
+                "300GB",
+                "400GB",
+                "500GB",
+                "750GB",
+                "1024GB"
+            ],
+            "defaultValue": "250GB",
+            "metadata": {
+                "description": "MS SQL database size" 
+            },
+            "type": "string"
+        },
+
         "skuFamily": {
             "allowedValues": [
                 "SkuFamily"
@@ -236,14 +298,14 @@
                 "MYSQLS400",
                 "MYSQLS800"
             ],
-            "defaultValue": "MYSQLB50",
+            "defaultValue": "MYSQLS100",
             "metadata": {
                 "description": "MySql/Postgresql sku name"
             },
             "type": "string"
         },
         "skuSizeMB": {
-            "defaultValue": 51200,
+            "defaultValue": 128000,
             "metadata": {
                 "description": "MySql/Postgresql sku size in MB. For Basic tier, minimum 50GB, increased by 125GB up to 1TB. For Standard tier, minimum 125GB, increase by 125GB up to 1TB"
             },
@@ -254,7 +316,7 @@
                 "Basic",
                 "Standard"
             ],
-            "defaultValue": "Basic",
+            "defaultValue": "Standard",
             "metadata": {
                 "description": "MySql/Postgresql sku tier"
             },
@@ -306,6 +368,16 @@
             },
             "type": "string"
         },
+         "mssqlVersion": {
+            "allowedValues": [
+                "12.0"
+            ],
+            "defaultValue": "12.0",
+            "metadata": {
+                "description": "Mssql version"
+            },
+            "type": "string"
+        },
         "vNetAddressSpace": {
             "defaultValue": "172.31.0.0",
             "metadata": {
@@ -327,9 +399,9 @@
     },
     "resources": [
         {
-            "apiVersion": "2017-08-01",
-            "name": "pid-738e3eec-68d4-4667-8377-c05c77c21f1b",
             "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "name": "pid-738e3eec-68d4-4667-8377-c05c77c21f1b",
             "properties": {
                 "mode": "Incremental",
                 "template": {
@@ -340,7 +412,8 @@
             }
         },
         {
-            "apiVersion": "2015-01-01",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
             "name": "dbTemplate",
             "properties": {
                 "mode": "Incremental",
@@ -352,12 +425,12 @@
                 "templateLink": {
                     "uri": "[concat(variables('moodleCommon').baseTemplateUrl, parameters('dbServerType'), '.json', parameters('_artifactsLocationSasToken'))]"
                 }
-            },
-            "type": "Microsoft.Resources/deployments"
+            }
         },
         {
             "condition": "[parameters('azureBackupSwitch')]",
-            "apiVersion": "2015-01-01",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
             "name": "recoveryTemplate",
             "properties": {
                 "mode": "Incremental",
@@ -369,11 +442,12 @@
                 "templateLink": {
                     "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'recoveryservices.json',parameters('_artifactsLocationSasToken'))]"
                 }
-            },
-            "type": "Microsoft.Resources/deployments"
+            }
         },
         {
-            "apiVersion": "2015-01-01",
+            "condition": "[parameters('redisDeploySwitch')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
             "name": "redisTemplate",
             "dependsOn": [
                 "Microsoft.Resources/deployments/networkTemplate"
@@ -388,11 +462,11 @@
                 "templateLink": {
                     "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'redis.json',parameters('_artifactsLocationSasToken'))]"
                 }
-            },
-            "type": "Microsoft.Resources/deployments"
+            }
         },
         {
-            "apiVersion": "2015-01-01",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
             "name": "networkTemplate",
             "properties": {
                 "mode": "Incremental",
@@ -404,12 +478,12 @@
                 "templateLink": {
                     "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'network.json',parameters('_artifactsLocationSasToken'))]"
                 }
-            },
-            "type": "Microsoft.Resources/deployments"
+            }
         },
         {
             "condition": "[parameters('installElasticSearchSwitch')]",
-            "apiVersion": "2015-01-01",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
             "dependsOn": [
                 "Microsoft.Resources/deployments/networkTemplate",
                 "Microsoft.Resources/deployments/recoveryTemplate"
@@ -425,12 +499,12 @@
                 "templateLink": {
                     "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'elastic.json',parameters('_artifactsLocationSasToken'))]"
                 }
-            },
-            "type": "Microsoft.Resources/deployments"
+            }
         },
         {
             "condition": "[equals(parameters('fileServerType'),'gluster')]",
-            "apiVersion": "2015-01-01",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
             "dependsOn": [
                 "Microsoft.Resources/deployments/networkTemplate",
                 "Microsoft.Resources/deployments/recoveryTemplate"
@@ -446,15 +520,17 @@
                 "templateLink": {
                     "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'gluster.json',parameters('_artifactsLocationSasToken'))]"
                 }
-            },
-            "type": "Microsoft.Resources/deployments"
+            }
         },
         {
-            "apiVersion": "2015-01-01",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
             "dependsOn": [
                 "Microsoft.Resources/deployments/elasticTemplate",
                 "Microsoft.Resources/deployments/glusterTemplate",
                 "Microsoft.Resources/deployments/recoveryTemplate",
+                "Microsoft.Resources/deployments/networkTemplate",
+                "Microsoft.Resources/deployments/dbTemplate",
                 "Microsoft.Resources/deployments/redisTemplate",
                 "Microsoft.Resources/deployments/storageAccountTemplate"
             ],
@@ -464,24 +540,19 @@
                 "parameters": {
                     "moodleCommon": {
                         "value": "[variables('moodleCommon')]"
-                    },
-                    "storageAccountKey": {
-                        "value": "[reference('storageAccountTemplate').outputs.storageAccountKey.value]"
-                    },
-                    "redisPrimaryKey": {
-                        "value": "[reference('redisTemplate').outputs.redisPrimaryKey.value]"
                     }
                 },
                 "templateLink": {
                     "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'controller.json',parameters('_artifactsLocationSasToken'))]"
                 }
-            },
-            "type": "Microsoft.Resources/deployments"
+            }
         },
         {
-            "apiVersion": "2015-01-01",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
             "dependsOn": [
                 "Microsoft.Resources/deployments/controllerTemplate",
+                "Microsoft.Resources/deployments/networkTemplate",
                 "Microsoft.Resources/deployments/redisTemplate",
                 "Microsoft.Resources/deployments/dbTemplate"
             ],
@@ -491,19 +562,16 @@
                 "parameters": {
                     "moodleCommon": {
                         "value": "[variables('moodleCommon')]"
-                    },
-                    "storageAccountKey": {
-                        "value": "[reference('storageAccountTemplate').outputs.storageAccountKey.value]"
                     }
                 },
                 "templateLink": {
                     "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'webvmss.json',parameters('_artifactsLocationSasToken'))]"
                 }
-            },
-            "type": "Microsoft.Resources/deployments"
+            }
         },
         {
-            "apiVersion": "2015-01-01",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
             "name": "storageAccountTemplate",
             "properties": {
                 "mode": "Incremental",
@@ -515,8 +583,7 @@
                 "templateLink": {
                     "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'storageAccount.json',parameters('_artifactsLocationSasToken'))]"
                 }
-            },
-            "type": "Microsoft.Resources/deployments"
+            }
         }
     ],
     "outputs": {
@@ -530,7 +597,7 @@
       },
       "databaseDNS": {
         "type": "string",
-        "value": "[concat(variables('moodleCommon').dbServerType, '-', variables('moodleCommon').resourcesPrefix, '.', variables('moodleCommon').dbServerType, '.database.azure.com')]"
+        "value": "[variables('moodleCommon').dbDNS]"
       },
       "databaseAdminUsername": {
         "type": "string",
@@ -547,6 +614,14 @@
       "moodleAdminPassword": {
         "type": "string",
         "value": "[variables('moodleCommon').moodleAdminPass]"
+      },
+      "moodleDbUsername": {
+        "type": "string",
+        "value": "[variables('moodleCommon').moodleDbUserAzure]"
+      },
+      "moodleDbPassword": {
+        "type": "string",
+        "value": "[variables('moodleCommon').moodleDbPass]"
       },
       "loadBalancerDNS": {
         "type": "string",
@@ -575,13 +650,13 @@
             "autoscaleVmSku": "[parameters('autoscaleVmSku')]",
             "azureBackupSwitch": "[parameters( 'azureBackupSwitch')]",
             "commonFunctionsScriptUri": "[concat(parameters('_artifactsLocation'),'scripts/helper_functions.sh',parameters('_artifactsLocationSasToken'))]",
-            "computeApi": "2016-04-30-preview",
             "controllerVmSku": "[parameters('controllerVmSku')]",
             "dbLogin": "[parameters('dbLogin')]",
             "dbLoginPassword": "[concat(substring(uniqueString(resourceGroup().id, deployment().name), 2, 11), '*7', toUpper('pfiwb'))]",
             "dbServerType": "[parameters('dbServerType')]",
             "dbUsername": "[concat(parameters('dbLogin'), '@', parameters('dbServerType'), '-', variables('resourceprefix'))]",
             "elasticVmSku": "[parameters('elasticVmSku')]",
+            "dbDNS": "[if(equals(parameters('dbServerType'),'mssql'),concat(parameters('dbServerType'), '-',variables('resourcePrefix'), '.database.windows.net'), concat(parameters('dbServerType'), '-', variables('resourcePrefix'), '.', parameters('dbServerType'), '.database.azure.com'))]",
             "elasticAvailabilitySetName": "[concat('elastic-avset-',variables('resourceprefix'))]",
             "elasticClusterName": "[concat('es-cluster-',variables('resourceprefix'))]",
             "elasticNicName1": "[concat('elastic-vm-nic-01-',variables('resourceprefix'))]",
@@ -606,8 +681,8 @@
             "gatewayName": "[concat('vnet-gateway-',variables('resourceprefix'))]",
             "gatewayPublicIPName": "[concat('vnet-gw-ip-',variables('resourceprefix'))]",
             "gatewaySubnet": "[parameters('gatewaySubnet')]",
-            "gatewaySubnetPrefix": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),2)))]",
-            "gatewaySubnetRange": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),2)), '.0/24')]",
+            "gatewaySubnetPrefix": "[concat(variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),2)))]",
+            "gatewaySubnetRange": "[concat(variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),2)), '.0/24')]",
             "gatewayType": "[parameters('gatewayType')]",
             "gfsNameRoot": "[concat('gluster-vm-',variables('resourceprefix'))]",
             "gfxAvailabilitySetName": "[concat('gluster-avset-',variables('resourceprefix'))]",
@@ -630,6 +705,8 @@
             "moodleDbUserAzure": "[concat('moodle', '@', parameters('dbServerType'), '-', variables('resourceprefix'))]",
             "moodleInstallScriptFilename": "install_moodle.sh",
             "moodleVersion": "[parameters('moodleVersion')]",
+            "msDbSize": "[parameters('msDbSize')]",
+            "mssqlVersion": "[parameters('mssqlVersion')]",
             "mysqlVersion": "[parameters('mysqlVersion')]",
             "osType": {
                 "offer": "UbuntuServer",
@@ -640,8 +717,10 @@
             "policyName": "[concat('policy-',variables('resourceprefix'))]",
             "postgresVersion": "[parameters('postgresVersion')]",
             "redisCacheName": "[concat('redis-',variables('resourceprefix'))]",
+            "redisDeploySwitch": "[parameters('redisDeploySwitch')]",
             "redisDns": "[concat('redis-',variables('resourceprefix'),'.redis.cache.windows.net')]",
             "resourcesPrefix": "[variables('resourceprefix')]",
+            "serviceObjective": "[parameters('serviceObjective')]",
             "serverName": "[concat(parameters('dbServerType'), '-',variables('resourceprefix'))]",
             "siteURL": "[if(or(empty(parameters('siteURL')), equals(parameters('siteURL'), 'www.example.org')), concat('lb-',variables('resourceprefix'),'.',resourceGroup().location,'.cloudapp.azure.com'), parameters('siteURL'))]",
             "skuCapacityDTU": "[parameters('skuCapacityDTU')]",
@@ -649,7 +728,6 @@
             "skuName": "[parameters('skuName')]",
             "skuSizeMB": "[parameters('skuSizeMB')]",
             "skuTier": "[parameters('skuTier')]",
-            "sshPassword": "[concat(toUpper('ds'), substring(uniqueString(resourceGroup().id, deployment().name), 4, 9), '2@%5')]",
             "sshPublicKey": "[parameters('sshPublicKey')]",
             "sshUsername": "[parameters('sshUsername')]",
             "sslEnforcement": "[parameters('sslEnforcement')]",
@@ -671,6 +749,7 @@
             "vaultName": "[concat('vault-',variables('resourceprefix'))]",
             "vmssName": "[concat('vmss-',variables('resourceprefix'))]",
             "vmssdStorageAccounttName": "[concat('vmss',uniqueString(resourceGroup().id))]",
+            "vnetGwDeploySwitch": "[parameters('vnetGwDeploySwitch')]",
             "vnetName": "[concat('vnet-',variables('resourceprefix'))]",
             "vpnType": "[parameters('vpnType')]",
             "webServerSetupScriptFilename": "setup_webserver.sh",

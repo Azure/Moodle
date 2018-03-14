@@ -7,26 +7,22 @@
                 "description": "Common Moodle values"
             },
             "type": "object"
-        },
-        "storageAccountKey": {
-            "metadata": {
-                "description": "Storage account key that may be needed in the VM setup scripts"
-            },
-            "type": "string"
         }
     },
     "resources": [
         {
-            "apiVersion": "[variables('storageApiVersion')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2017-06-01",
             "location": "[resourceGroup().location]",
             "name": "[parameters('moodleCommon').vmssdStorageAccounttName]",
-            "properties": {
-                "accountType": "Standard_LRS"
-            },
-            "type": "Microsoft.Storage/storageAccounts"
+            "kind": "Storage",
+            "sku": {
+                "name": "Standard_LRS"
+            }
         },
         {
-            "apiVersion": "2016-04-30-preview",
+            "type": "Microsoft.Compute/virtualMachineScaleSets",
+            "apiVersion": "2017-03-30",
             "dependsOn": [
                 "[concat('Microsoft.Storage/storageAccounts/', parameters('moodleCommon').vmssdStorageAccounttName)]"
             ],
@@ -52,7 +48,7 @@
                                         ]
                                     },
                                     "protectedSettings":{
-                                        "commandToExecute": "[variables('cmdExec')]"
+                                        "commandToExecute": "[concat('bash ',parameters('moodleCommon').webServerSetupScriptFilename,' ',parameters('moodleCommon').gfsNameRoot,'0', ' ','data', ' ', parameters('moodleCommon').siteURL, ' ', concat('jumpbox-vm-',parameters('moodleCommon').resourcesPrefix), ' ', parameters('moodleCommon').webServerType, ' ', parameters('moodleCommon').fileServerType, ' ', parameters('moodleCommon').storageAccountName, ' ', listKeys(variables('storageAccountId'), '2017-06-01').keys[0].value, ' ', parameters('moodleCommon').jboxVmName)]"
                                     },
                                     "type": "CustomScript",
                                     "typeHandlerVersion": "2.0"
@@ -119,10 +115,10 @@
             },
             "tags": {
                 "displayName": "webfarm"
-            },
-            "type": "Microsoft.Compute/virtualMachineScaleSets"
+            }
         },
         {
+            "type": "Microsoft.Insights/autoscaleSettings",
             "apiVersion": "2015-04-01",
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('moodleCommon').vmssName)]"
@@ -183,12 +179,10 @@
                     }
                 ],
                 "targetResourceUri": "[variables('vmssID')]"
-            },
-            "type": "Microsoft.Insights/autoscaleSettings"
+            }
         }
     ],
     "variables": {
-        "cmdExec": "[concat('bash ',parameters('moodleCommon').webServerSetupScriptFilename,' ',parameters('moodleCommon').gfsNameRoot,'0', ' ','data', ' ', parameters('moodleCommon').siteURL, ' ', concat('jumpbox-vm-',parameters('moodleCommon').resourcesPrefix), ' ', parameters('moodleCommon').webServerType, ' ', parameters('moodleCommon').fileServerType, ' ', parameters('moodleCommon').storageAccountName, ' ', parameters('storageAccountKey'), ' ', parameters('moodleCommon').jboxVmName)]",
         "dstorID": "[resourceId('Microsoft.Storage/storageAccounts',parameters('moodleCommon').vmssdStorageAccounttName)]",
         "extBeID": "[concat(variables('extLbID'),'/backendAddressPools/',parameters('moodleCommon').extBeName)]",
         "extFeID": "[concat(variables('extLbID'),'/frontendIPConfigurations/',parameters('moodleCommon').extFeName)]",
@@ -196,8 +190,8 @@
         "extProbeID": "[concat(variables('extLbID'),'/probes/',parameters('moodleCommon').extProbe  )]",
         "pipID": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('moodleCommon').lbPipName)]",
         "scriptUri": "[concat(parameters('moodleCommon').scriptLocation,parameters('moodleCommon').webServerSetupScriptFilename,parameters('moodleCommon').artifactsSasToken)]",
-        "storageApiVersion": "2015-06-15",
         "subnetWebRef": "[concat(resourceId('Microsoft.Network/virtualNetworks',parameters('moodleCommon').vnetName),'/subnets/',parameters('moodleCommon').subnetWeb)]",
+        "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('moodleCommon').storageAccountName)]",
         "vmssID": "[resourceId('Microsoft.Compute/virtualMachineScaleSets',parameters('moodleCommon').vmssName)]",
         "webvmss1NIC": "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('moodleCommon').vmssName, '/virtualMachines/0/networkInterfaces/vmssnic')]"
     },
