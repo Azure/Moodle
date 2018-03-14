@@ -20,9 +20,9 @@
                         "name": "sshPublicKey",
                         "type": "Microsoft.Common.TextBox",
                         "label": "SSH Public Key",
-                        "tooltip": "Public SSH Key to use for access",
-                        "contraints": {
-                            "required": "true"
+                        "toolTip": "Public SSH Key to use for access",
+                        "constraints": {
+                            "required": true
                         }
                     }
                 ]
