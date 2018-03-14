@@ -70,16 +70,14 @@ adding the `--parameters` attribute. This attribute can take either
 a JSON string or a filename (preceded with an '@', e.g. '--parameters @parameters.json`) containing a JSON
 definition for the paramters, e.g.
 
-``` json
-{
-    "parameterName": {
-        "value": "some value"
-    },
-    "anotherParameterName": {
-        "value": "another value"
+    {
+        "parameterName": {
+            "value": "some value"
+        },
+        "anotherParameterName": {
+            "value": "another value"
+        }
     }
-}
-```
 
 The Moodle template provides sensible defaults for almost every
 parameter, the one exception to this is the SSH Public Key, used to
