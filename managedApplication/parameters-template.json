@@ -1,5 +1,8 @@
 {
-    "sshPublicKey": {
-        "value": "GEN-SSH-PUB-KEY"
-    }
+    "sshPublicKey":         { "value": "GEN-SSH-PUB-KEY" },
+    "redisDeploySwitch":    { "value": false },
+    "dbServerType":         { "value": "mssql" },
+    "fileServerType":       { "value": "nfs" },
+    "autoscaleVmSku":       { "value": "Standard_DS1_v2" },
+    "fileServerDiskCount":  { "value": 2 }
 }
