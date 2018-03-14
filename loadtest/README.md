@@ -17,14 +17,14 @@ charges.
 Once dependencies are installed, you can initiate the load testing
 process by using included utility scripts. These scripts will:
 
-  * deploy a Moodle cluster
-  * set up the test course in Moodle
-  * enrol students for the course
-  * run a synthetic test workload using jMeter 
-  * teardown the test cluster
-  
+* deploy a Moodle cluster
+* set up the test course in Moodle
+* enrol students for the course
+* run a synthetic test workload using jMeter
+* teardown the test cluster
+
 Use the function `deploy_run_test1_teardown` to perform all these
-steps. This function takes 17 parameters in the following order:
+steps. This function takes 18 parameters in the following order:
 
 See the included example `run_load_test_example` in
 `loadtest/loadtest.sh`. At the time of writing this example is
@@ -43,23 +43,24 @@ deploy_run_test1_teardown \
     125 \
     nfs \
     2 \
-    128 \ 
+    128 \
+    false \
     "$(cat ~/.ssh/authorized_keys)" \
     1600 \
     4800 \
-    18000 
+    18000
 }
 ```
 
 Running this example will deploy a cluster with the following configuration:
 
-  * Apache web server
-  * Standard_DS2_v2 Azure VM SKU
-  * mysql database (with 200 DTU and 125GB DB size)
-  * NFS file share (with 2 disks and 128GB disk size each)
-  * uses your SSH pub key in `~/.ssh/id_rsa`
+* Apache web server
+* Standard_DS2_v2 Azure VM SKU
+* mysql database (with 200 DTU and 125GB DB size)
+* NFS file share (with 2 disks and 128GB disk size each)
+* uses your SSH pub key in `~/.ssh/id_rsa`
 
-[NOTE ON SSH KEYS] Ensure your `~/.ssh/id_rsa` has been  added to ssh-agent using `eval $(ssh-agent)` and `ssh-add`). 
+[NOTE ON SSH KEYS] Ensure your `~/.ssh/id_rsa` has been  added to ssh-agent using `eval $(ssh-agent)` and `ssh-add`).
 
 Once the Moodle cluster is deployed and configured with course and
 student data (using [moosh](https://moosh-online.com/) it will run the
@@ -68,7 +69,7 @@ the example we use 1600 thread) for the designated duration and rampup
 time (18000 seconds = 5 hours duration, 4800 seconds rampup time in
 the example).
 
-## Please contribute!
+## Please contribute
 
 It'd be great if we have other test plans (like uploading files populating the
 `moodledata` directory intensely), and make other parameters configurable (for

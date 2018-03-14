@@ -103,8 +103,9 @@ function deploy_moodle_with_some_parameters
     local file_server_type=${9} # E.g., nfs or gluster
     local file_server_disk_count=${10}  # 2, 3, 4
     local file_server_disk_size=${11}   # in GB
-    local ssh_pub_key=${12}     # Your ssh authorized_keys content
-    local no_wait_flag=${13}    # Must be "--no-wait" to be passed to az
+    local redis_cache=${12}     # Redis cache choice. Currently 'true' or 'false' only.
+    local ssh_pub_key=${13}     # Your ssh authorized_keys content
+    local no_wait_flag=${14}    # Must be "--no-wait" to be passed to az
 
     check_db_sku_params $db_dtu $db_size || return 1
     local db_sku_name=$(get_db_sku_name $db_server_type $db_dtu) || return 1
@@ -115,7 +116,7 @@ function deploy_moodle_with_some_parameters
     eval $cmd || return 1
 
     local deployment_name="${resource_group}-deployment"
-    local cmd="az group deployment create --resource-group $resource_group --name $deployment_name $no_wait_flag --template-uri $template_url --parameters @$parameters_template_file webServerType=$web_server_type autoscaleVmSku=$web_vm_sku dbServerType=$db_server_type skuCapacityDTU=$db_dtu skuName=$db_sku_name skuSizeMB=$db_size_mb fileServerType=$file_server_type fileServerDiskCount=$file_server_disk_count fileServerDiskSize=$file_server_disk_size sshPublicKey='$ssh_pub_key'"
+    local cmd="az group deployment create --resource-group $resource_group --name $deployment_name $no_wait_flag --template-uri $template_url --parameters @$parameters_template_file webServerType=$web_server_type autoscaleVmSku=$web_vm_sku dbServerType=$db_server_type skuCapacityDTU=$db_dtu skuName=$db_sku_name skuSizeMB=$db_size_mb fileServerType=$file_server_type fileServerDiskCount=$file_server_disk_count fileServerDiskSize=$file_server_disk_size redisDeploySwitch=$redis_cache sshPublicKey='$ssh_pub_key'"
     show_command_to_run $cmd
     eval $cmd
 }
@@ -294,14 +295,15 @@ function deploy_run_test1_teardown
     local file_server_type=${10}
     local file_server_disk_count=${11}
     local file_server_disk_size=${12}
-    local ssh_pub_key=${13}
-    local test_threads_count=${14}
-    local test_rampup_time_sec=${15}
-    local test_run_time_sec=${16}
-    local delete_resource_group_flag=${17}  # Any non-empty string is considered true
+    local redis_cache=${13}
+    local ssh_pub_key=${14}
+    local test_threads_count=${15}
+    local test_rampup_time_sec=${16}
+    local test_run_time_sec=${17}
+    local delete_resource_group_flag=${18}  # Any non-empty string is considered true
 
     MOODLE_RG_LOCATION=$location
-    deploy_moodle_with_some_parameters $resource_group $template_url $parameters_template_file $web_server_type $web_vm_sku $db_server_type $db_dtu $db_size $file_server_type $file_server_disk_count $file_server_disk_size "$ssh_pub_key" || return 1
+    deploy_moodle_with_some_parameters $resource_group $template_url $parameters_template_file $web_server_type $web_vm_sku $db_server_type $db_dtu $db_size $file_server_type $file_server_disk_count $file_server_disk_size $redis_cache "$ssh_pub_key" || return 1
     run_simple_test_1_on_resource_group $resource_group $test_threads_count $test_rampup_time_sec $test_run_time_sec 1 || return 1
     if [ -n "$delete_resource_group_flag" ]; then
         az group delete -g $resource_group -y
@@ -323,5 +325,5 @@ function run_load_test_example
 {
     check_ssh_agent_and_added_key || return 1
 
-    deploy_run_test1_teardown ltest6 southcentralus https://raw.githubusercontent.com/Azure/Moodle/master/azuredeploy.json azuredeploy.parameters.loadtest.defaults.json apache Standard_DS2_v2 mysql 200 125 nfs 2 128 "$(cat ~/.ssh/authorized_keys)" 1600 4800 18000
+    deploy_run_test1_teardown ltest6 southcentralus https://raw.githubusercontent.com/Azure/Moodle/master/azuredeploy.json azuredeploy.parameters.loadtest.defaults.json apache Standard_DS2_v2 mysql 200 125 nfs 2 128 false "$(cat ~/.ssh/authorized_keys)" 1600 4800 18000
 }
