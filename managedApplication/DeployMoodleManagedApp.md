@@ -1,6 +1,6 @@
-# Deploy a Moodle Based Managed Application into a Customers Subscription
+# Deploy a Moodle Based Managed Application into a Customer's Subscription
 
-In this tutorial we'll dmeonstrate how your customers will deploy an
+In this tutorial we'll demonstrate how your customers will deploy an
 instance of your Moodle Based Managed Application in their
 subscription.
 
@@ -20,7 +20,7 @@ the CLI. In the following commands we'll see how to do this in the CLI.
 
 First we need to get the id of the application. This was returned in
 the output of the command to create the service catalog entry.
-However, we'll use the CLI to retireve it and record it into a
+However, we'll use the CLI to retrieve it and record it into a
 variable:
 
 ``` bash
@@ -28,7 +28,7 @@ MOODLE_MANAGED_APP_ID=$(az managedapp definition show --name $MOODLE_MANAGED_APP
 ```
 
 Create the application resource group, this is the group in which the
-cusrtomer will see the managed application..
+customer will see the managed application.
 
 ``` bash
 az group create --name $MOODLE_DEPLOYMENT_RG_NAME --location=$MOODLE_DEPLOYMENT_LOCATION
@@ -66,15 +66,20 @@ to manage we'll put these parameter values into environment variables.
 For convenience our `mainTemplate.json` file has defaults for all
 values. This means that there is no need to provide parameters in the
 commandline, though you can override the defaults if you want to by
-adding the `--parameters` attribute. This attribute can take either 
+adding the `--parameters` attribute. This attribute can take either
 a JSON string or a filename (preceded with an '@', e.g. '--parameters @parameters.json`) containing a JSON
 definition for the paramters, e.g.
 
-
-    {
-        "parameterName": "value",
-        "AnOtherParameter"" "another value"
+``` json
+{
+    "parameterName": {
+        "value": "some value"
+    },
+    "anotherParameterName": {
+        "value": "another value"
     }
+}
+```
 
 The Moodle template provides sensible defaults for almost every
 parameter, the one exception to this is the SSH Public Key, used to
@@ -94,13 +99,12 @@ sed "s|GEN-SSH-PUB-KEY|$ssh_pub_key|g" parameters-template.json > $MOODLE_MANAGE
 
 If you want to have more control over the deployment configuration
 simply add parameters to the template file and use that to create
-parameter files for specific deployments..
+parameter files for specific deployments.
 
 ### Deploying the application
 
-Deploy the managed application and corresponding infrastrcuture.
+Deploy the managed application and corresponding infrastructure.
 
 ``` bash
 az managedapp create --name $MOODLE_DEPLOYMENT_NAME --location $MOODLE_DEPLOYMENT_LOCATION --kind ServiceCatalog --resource-group $MOODLE_DEPLOYMENT_RG_NAME --managedapp-definition-id $MOODLE_MANAGED_APP_ID --managed-rg-id $MOODLE_MANAGED_RG_ID --parameters @$MOODLE_MANAGED_APP_WORKSPACE/$MOODLE_DEPLOYMENT_NAME/parameters.json
 ```
-

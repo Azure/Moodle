@@ -67,14 +67,14 @@ At this point MOODLE_MANAGED_APP_AD_ID will either be empty or it will have the 
 if [ -z "$MOODLE_MANAGED_APP_AD_ID" ]; then az ad group create --display-name $MOODLE_MANAGED_APP_OWNER_GROUP_NAME --mail-nickname=$MOODLE_MANAGED_APP_OWNER_NICKNAME; fi
 ```
 
-Lets ensure that we have the object ID even if we created a new one.
+Let's ensure that we have the object ID even if we created a new one.
 
 ``` bash
 MOODLE_MANAGED_APP_AD_ID=$(az ad group list --filter="displayName eq '$MOODLE_MANAGED_APP_OWNER_GROUP_NAME'" --query [0].objectId --output tsv)
 ```
 
 You will also need the Role ID for your chosen role, here we will use
-the built in 'Owner' role:
+the built-in 'Owner' role:
 
 ``` bash
 MOODLE_MANAGED_APP_ROLE_ID=$(az role definition list --name Owner --query [].name --output tsv)
@@ -88,11 +88,11 @@ The Azure documentation has more information on how to work with [Azure Active D
 az group create --name $MOODLE_SERVICE_CATALOG_RG_NAME --location $MOODLE_SERVICE_CATALOG_LOCATION
 ```
 
-## Deploy to your Service Catalog using Azure CLI
+## Publish to your Service Catalog using Azure CLI
 
-You can deploy a Managed Application into your Service Catalog using
+You can publish a Managed Application definition into your Service Catalog using
 the Azure CLI. For convenience we'll set a few environment variables
-to make it easier to work with the application.We'll need to construct
+to make it easier to work with the application. We'll need to construct
 the authorization configuration from the app and role IDs retrieved
 earlier.
 
@@ -100,7 +100,7 @@ earlier.
 MOODLE_MANAGED_APP_AUTHORIZATIONS=$MOODLE_MANAGED_APP_AD_ID:$MOODLE_MANAGED_APP_ROLE_ID
 ```
 
-The following command will add your managed application to the Service Catalog.
+The following command will add your managed application definition to the Service Catalog.
 
 ``` bash
 az managedapp definition create --name $MOODLE_MANAGED_APP_NAME --location $MOODLE_SERVICE_CATALOG_LOCATION --resource-group $MOODLE_SERVICE_CATALOG_RG_NAME --lock-level $MOODLE_MANAGED_APP_LOCK_LEVEL --display-name $MOODLE_MANAGED_APP_DISPLAY_NAME --description "$MOODLE_MANAGED_APP_DESCRIPTION" --authorizations="$MOODLE_MANAGED_APP_AUTHORIZATIONS" --main-template=@../azuredeploy.json --create-ui-definition=@createUIDefinition.json
@@ -108,7 +108,7 @@ az managedapp definition create --name $MOODLE_MANAGED_APP_NAME --location $MOOD
 
 Results:
 
-```
+``` json
 {
   "artifacts": [
     {
@@ -140,7 +140,7 @@ Results:
   "managedBy": null,
   "name": "MoodleManagedApp",
   "packageFileUri": null,
-  "resourceGroup": "MoodleManagedAppRG",
+  "resourceGroup": "MoodleManagedAppServiceCatalogRG",
   "sku": null,
   "tags": null,
   "type": "Microsoft.Solutions/applicationDefinitions"
@@ -150,7 +150,7 @@ Results:
 ### [OPTIONAL] Package the files
 
 The `mainTemplate.json` and `createUIDefinition.json` files can be
-packaged together in a zip file. Both files should br at the root level
+packaged together in a zip file. Both files should be at the root level
 of the zip. Once created the package needs to be uploaded to a location accessible
 to Azure. We've published the samples to GitHub so you can experiment
 with minimal effort.
