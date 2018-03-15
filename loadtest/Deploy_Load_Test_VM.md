@@ -66,28 +66,31 @@ echo $ipAddress
 We can now connect to the VM using ssh, and run commands. The first thing we want to do is pull down the Moodle on Azure repo. Since this document is used to automatically run tests all our commands need to be non-interactive. We will therefore skip the host key validation step. Note that you should never do this in a production environment (remove `-o StrictHostKeyChecking=no`):
 
 ``` bash
-ssh -o StrictHostKeyChecking=no $ipAddress git clone git://github.com/Azure/Moodle.git
+ssh -o StrictHostKeyChecking=no $ipAddress "rm -Rf Moodle; git clone git://github.com/Azure/Moodle.git"
 ```
 
-Results:
-
-```
-Cloning into 'Moodle'...
-```
-
-At the time of writing the load test code has not been merged into
-Master, so we need to switch to the right branch.
-
-```
-ssh -o StrictHostKeyChecking=no $ipAddress "cd Moodle; git checkout master"
-```
-
-Now we can install the load testing scripts and its dependencies:
+Now we can install the load testing scripts, we will have these loaded
+via the `.profile` so that they are always availble.
 
 ``` bash
-ssh -o StrictHostKeyChecking=no $ipAddress "cd Moodle/loadtest; . loadtest.sh; . loadtest.sh; install_java_and_jmeter; install_az_cli"
+ssh #ipAddress echo ". ~/Moodle/loadtest/loadtest.sh" >> ~/.profile
 ```
 
+This script provides some helper functions for installing dependencies
+on the VM.
+
+``` bash
+ssh $ipAddress install_java_and_jmeter; install_az_cli
+```
+
+We need to login to Azure using the CLI. The command below is
+convenient but is not secure since it stores your password in clear
+text in an environment variable. However, it is convenient for test
+purposes.
+
+``` bash
+ssh $ipAddress "az login --username $AZURE_LOGIN --password $AZURE_PASSWORD; az account set --subscription $AZURE_SUBSCRIPTION_ID"
+```
 
 ## Validation
 
@@ -108,65 +111,14 @@ OpenJDK 64-Bit Server VM (build 25.151-b12, mixed mode)
 We will also need to confirm the Azure CLI is present:
 
 ``` bash
-ssh -o StrictHostKeyChecking=no $ipAddress "az --version"
+ssh -o StrictHostKeyChecking=no $ipAddress "if hash az 2>/dev/null; then echo "Azure CLI Installed"; else echo "Missing dependency: Azure CLI"; fi"
 ```
 
 Results:
 
 ```
-azure-cli (2.0.27)
-
-acr (2.0.21)
-acs (2.0.26)
-advisor (0.1.2)
-appservice (0.1.26)
-backup (1.0.6)
-batch (3.1.10)
-batchai (0.1.5)
-billing (0.1.7)
-cdn (0.0.13)
-cloud (2.0.12)
-cognitiveservices (0.1.10)
-command-modules-nspkg (2.0.1)
-configure (2.0.14)
-consumption (0.2.1)
-container (0.1.18)
-core (2.0.27)
-cosmosdb (0.1.19)
-dla (0.0.18)
-dls (0.0.19)
-eventgrid (0.1.10)
-extension (0.0.9)
-feedback (2.1.0)
-find (0.2.8)
-interactive (0.3.16)
-iot (0.1.17)
-keyvault (2.0.18)
-lab (0.0.17)
-monitor (0.1.2)
-network (2.0.23)
-nspkg (3.0.1)
-profile (2.0.19)
-rdbms (0.0.12)
-redis (0.2.11)
-reservations (0.1.1)
-resource (2.0.23)
-role (2.0.19)
-servicefabric (0.0.10)
-sql (2.0.21)
-storage (2.0.25)
-vm (2.0.26)
-
-Python location '/home/rgardler/lib/azure-cli/bin/python'
-Extensions directory '/home/rgardler/.azure/cliextensions'
-
-Python (Linux) 2.7.12 (default, Dec  4 2017, 14:50:18)
-[GCC 5.4.0 20160609]
-
-Legal docs and information: aka.ms/AzureCliLegal
+Azure CLI Installed
 ```
-
-
 
 
 
