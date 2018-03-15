@@ -8,7 +8,23 @@ Once you have an Azure account you can deploy Moodle via the Azure
 portal using the button below, or you can [deploy Moodle via the
 CLI](docs/Deploy.md).
 
-[![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy.json)  [![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.png)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy.json)
+## Minimal deployment
+
+Try the following button if you'd like to deploy our templates with minimal resources.
+All configurations are fixed and you just need to pass your ssh public key to the template
+for logging in to the deployed VMs. This deployment will use NFS, Microsoft SQL, and
+smaller autoscale web frontend VM sku (1 core) that'll give faster deployment time (less than
+30 minutes) and requires only 3 VM cores currently that'll fit even in a free trial Azure subscription.
+
+[![Deploy to Azure Minimally](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy-minimal.json)  [![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.png)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy.json)
+
+## Scalable and fully configurable deployment
+
+The following button will allow you to specify various configurations for your Moodle cluster
+deployment. The number of configuration options might be overwhelming, and we'll add more
+detailed sizing guidelines in the future.
+
+[![Deploy to Azure Fully Configurable](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy.json)  [![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.png)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy.json)
 
 ## What this stack will give you
 
