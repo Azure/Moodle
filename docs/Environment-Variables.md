@@ -14,7 +14,6 @@ create a new value using a timestamp:
 
 ``` shell
 if [ -z "$MOODLE_RG_NAME" ]; then MOODLE_RG_NAME=moodle_$(date +%Y-%m-%d-%H); fi
-echo "Resource Group Name : $MOODLE_RG_NAME"
 ```
 
 Other configurable values for our Azure deployment include the
@@ -41,3 +40,72 @@ per-deployment artifacts:
 MOODLE_AZURE_WORKSPACE=~/.moodle
 ```
 
+## Validation
+
+After working through this file there should be a number of
+environment variables defined that will be used to provide a common
+setup for all our Moodle on Azure work.
+
+The resource group name defines the name of the group into which all
+resources will be, or are, deployed. 
+
+```bash
+echo "Resource Group for deployment: $MOODLE_RG_NAME"
+```
+
+Results:
+
+```
+Resource Group for deployment: southcentralus
+```
+
+The resource group location is:
+
+```bash
+echo "Deployment location: $MOODLE_RG_LOCATION"
+```
+
+Results:
+
+```
+Deployment location: southcentralus
+```
+
+When deploying a Moodle cluster the deployment will be given a name so
+that it can be identified later should it be neceessary to debug.
+
+
+```bash
+echo "Deployment name: $MOODLE_DEPLOYMENT_NAME"
+```
+
+Results:
+
+```
+Deployment name: MasterDeploy
+```
+
+The SSH key to use can be found in a file, if necessary this will be
+created as part of these scripts.
+
+``` shell
+echo "SSH key filename: $MOODLE_SSH_KEY_FILENAME"
+```
+
+Results:
+
+```
+SSH key filename: ~/.ssh/moodle_id_rsa
+```
+
+Configuration files will be written to / read from a customer directory:
+
+``` shell
+echo "Workspace directory: $MOODLE_AZURE_WORKSPACE"
+```
+
+Results:
+
+```
+Workspace directory: ~/.moodle
+```
