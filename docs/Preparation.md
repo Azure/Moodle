@@ -54,3 +54,29 @@ checkout the template into our workspace.
 ```
 git clone git@github.com:Azure/Moodle.git $MOODLE_AZURE_WORKSPACE/arm_template
 ```
+
+# Validation
+
+After completing these steps we should have, amonst other things, a
+complete checkout of the Moodle templates from GitHub:
+
+``` bash
+ls $MOODLE_AZURE_WORKSPACE/arm_template
+```
+
+Results:
+
+``` expected_similarity=0.4
+azuredeploy.json  azuredeploy.parameters.json  CONTRIBUTE.md  docs  env.json  etc  images  LICENSE  LICENSE-DOCS  metadata.json  nested
+README.md
+```
+
+We should also have a number of applications installed, such as the Azure CLI:
+
+``` bash
+if hash az 2>/dev/null; then echo "Azure CLI Installed"; else echo "Missing dependency: Azure CLI"; fi
+```
+
+```
+AzureCLI Installed
+```
