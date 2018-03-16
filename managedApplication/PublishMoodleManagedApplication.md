@@ -114,24 +114,24 @@ Results:
     {
         "name": "ApplicationResourceTemplate",
         "type": "Template",
-        "uri": "https://prdsapplianceprodsn01.blob.core.windows.net/applicationdefinitions/84205_325E7C3499FB4190AA871DF746C67705_6E0E9CA0060F5CEE88CC3E16F940540CBAA53157/applicationResourceTemplate.json?sv=2014-02-14&sr=b&sig=bKFLpLurcUVEspaICr158432gE6OSNCWPapzUUMcN3w%3D&se=2118-02-28T20:22:50Z&sp=r"
+        "uri": "https://prdsapplianceprodsn01.blob.core.windows.net/applicationdefinitions/84205_325E7C3499FB4190AA871DF746C67705_8D748DA35A5166F6BF319C41398E89D9953014D8/applicationResourceTemplate.json?sv=2014-02-14&sr=b&sig=PyYyl6dzf0vVyrde2yJZ73h6h9fqbXHwMJuXf0lGFr8%3D&se=2118-03-15T21:33:33Z&sp=r"
     },
     {
         "name": "CreateUiDefinition",
         "type": "Custom",
-        "uri": "https://management.azure.com/subscriptions/325e7c34-99fb-4190-aa87-1df746c67705/resourceGroups/MoodleManagedAppRG/providers/Microsoft.Solutions/applicationDefinitions/MoodleManagedApp/applicationArtifacts/CreateUiDefinition?api-version=2017-09-01"
+        "uri": "https://management.azure.com/subscriptions/325e7c34-99fb-4190-aa87-1df746c67705/resourceGroups/MoodleManagedAppServiceCatalogRG/providers/Microsoft.Solutions/applicationDefinitions/MoodleManagedApp/applicationArtifacts/CreateUiDefinition?api-version=2017-09-01"
     }
   ],
   "authorizations": [
     {
-        "principalId": "dd46cacd-eab1-43b0-a4ba-425d8b8d82fa",
-        "roleDefinitionId": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635"
+      "principalId": "fdc3f6fb-cc24-4182-9943-b63e0ed67285",
+      "roleDefinitionId": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635"
     }
   ],
   "createUiDefinition": null,
   "description": "Moodle on Azure as a Managed Application",
   "displayName": "Moodle",
-  "id": "/subscriptions/325e7c34-99fb-4190-aa87-1df746c67705/resourceGroups/MoodleManagedAppRG/providers/Microsoft.Solutions/applicationDefinitions/MoodleManagedApp",
+  "id": "/subscriptions/325e7c34-99fb-4190-aa87-1df746c67705/resourceGroups/MoodleManagedAppServiceCatalogRG/providers/Microsoft.Solutions/applicationDefinitions/MoodleManagedApp",
   "identity": null,
   "isEnabled": "True",
   "location": "southcentralus",
