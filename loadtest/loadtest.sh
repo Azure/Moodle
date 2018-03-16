@@ -28,9 +28,9 @@ function install_java_and_jmeter
     mv cmdrunner-2.0.jar apache-jmeter-4.0/lib
     java -cp apache-jmeter-4.0/lib/ext/jmeter-plugins-manager-0.19.jar org.jmeterplugins.repository.PluginManagerCMDInstaller
     # TODO Hard-coded .jmx file here. Do this for each individual .jmx file
-    wget -O simple-test-1.jmx https://raw.githubusercontent.com/Azure/Moodle/master/loadtest/simple-test-1.jmx
-    apache-jmeter-4.0/bin/PluginsManagerCMD.sh install-for-jmx simple-test-1.jmx
-    rm simple-test-1.jmx
+    wget -O tmp-for-plugin-install.jmx https://raw.githubusercontent.com/Azure/Moodle/master/loadtest/simple-test-1.jmx
+    apache-jmeter-4.0/bin/PluginsManagerCMD.sh install-for-jmx tmp-for-plugin-install.jmx
+    rm tmp-for-plugin-install.jmx
 }
 
 function install_az_cli
