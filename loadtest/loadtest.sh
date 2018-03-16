@@ -6,9 +6,10 @@ function install_java_and_jmeter
     sudo apt update
     sudo apt install -y openjdk-8-jdk
 
-    wget -O apache-jmeter-4.0.tgz http://www-us.apache.org/dist//jmeter/binaries/apache-jmeter-4.0.tgz
-    tar xfz apache-jmeter-4.0.tgz
-    ln -s ${PWD}/apache-jmeter-4.0/bin/jmeter ~/bin/jmeter
+    wget -O apache-jmeter-4.0.tgz http://www-us.apache.org/dist/jmeter/binaries/apache-jmeter-4.0.tgz
+    tar xfz apache-jmeter-4.0.tgz -C ~
+    mkdir -p ~/bin
+    ln -s ~/apache-jmeter-4.0/bin/jmeter ~/bin/jmeter
     rm apache-jmeter-4.0.tgz
 
     wget -O mysql-connector-java-5.1.45.tar.gz https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.45.tar.gz
