@@ -11,7 +11,7 @@ We need to ensure the [variables](Environment.md) are set up correctly.
 ## Azure Active Directory
 
 ``` bash
-MOODLE_MANAGED_APP_AD_ID=$(az ad group list --filter="displayName eq '$MOODLE_MANAGED_APP_OWNER_GROUP_NAME'" --query [*].objectId --output tsv)
+MOODLE_MANAGED_APP_AD_ID=$(az ad group list --filter="displayName eq '$MOODLE_MANAGED_APP_OWNER_GROUP_NAME'" --query [0].objectId --output tsv)
 az ad group delete --group $MOODLE_MANAGED_APP_AD_ID
 ```
 
