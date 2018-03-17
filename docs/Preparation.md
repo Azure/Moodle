@@ -37,15 +37,6 @@ will check there is a valid SSH key available and, if not, create one.
 ```
 if [ ! -f "$MOODLE_SSH_KEY_FILENAME" ]; then ssh-keygen -t rsa -N "" -f $MOODLE_SSH_KEY_FILENAME; fi
 ```
-
-## Create Workspace
-
-Ensure the workspace for this particular deployment exists:
-
-```
-mkdir -p $MOODLE_AZURE_WORKSPACE/$MOODLE_RG_NAME
-```
-
 ## Checkout the Moodle ARM Template
 
 The Moodle Azure Resource Manager template is hosted on GitHub. We'll
