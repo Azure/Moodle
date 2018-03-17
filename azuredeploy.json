@@ -2,13 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "applyScriptsSwitch": {
-            "defaultValue": true,
-            "metadata": {
-                "description": "Switch to process or bypass all scripts/extensions"
-            },
-            "type": "bool"
-        },
         "azureBackupSwitch": {
             "defaultValue": false,
             "metadata": {
@@ -395,6 +388,13 @@
                 "description": "The sasToken required to access _artifactsLocation. Under normal circumstances this will not need to be changed."
             },
             "defaultValue": ""
+        },
+        "_applyScriptsSwitch": {
+            "defaultValue": true,
+            "metadata": {
+                "description": "Switch to process or bypass all scripts/extensions. This is normally only used during testing, it prevents theinstallation and configuration of software on the resources, this results in a much faster deployment of allowing for easier validation of the infrastructure configuration."
+            },
+            "type": "bool"
         }
     },
     "resources": [
@@ -645,7 +645,7 @@
             "scriptLocation": "[concat(parameters('_artifactsLocation'), 'scripts/')]",
             "artifactsSasToken": "[parameters('_artifactsLocationSasToken')]",
 
-            "applyScriptsSwitch": "[parameters('applyScriptsSwitch')]",
+            "applyScriptsSwitch": "[parameters('_applyScriptsSwitch')]",
             "autoscaleVmCount": "[parameters('autoscaleVmCount')]",
             "autoscaleVmSku": "[parameters('autoscaleVmSku')]",
             "azureBackupSwitch": "[parameters( 'azureBackupSwitch')]",
