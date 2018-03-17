@@ -18,7 +18,7 @@ sudp apt install jq
 ```
 
 ``` bash
-jq -r '.parameters | to_entries[] | .key + "\n\t" + .value.metadata.description + "\n\tType: " + .value.type + "\n\tPossible Values: " + (.value.allowedValues | @text) + "\n\tDefault: " + (.value.defaultValue | @text) + "\n\n"' azuredeploy.json
+For more information ajq -r '.parameters | to_entries[] | "### " + .key + "\n\n" + .value.metadata.description + "\n\nType: " + .value.type + "\n\nPossible Values: " + (.value.allowedValues | @text) + "\n\nDefault: " + (.value.defaultValue | @text) + "\n\n"' azuredeploy.json
 ```
 
 ## Available Parameters
@@ -28,7 +28,9 @@ jq -r '.parameters | to_entries[] | .key + "\n\t" + .value.metadata.description 
 The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated.
 
 Type: string
+
 Possible Values: null
+
 Default: https://raw.githubusercontent.com/Azure/Moodle/master/
 
 
@@ -37,7 +39,9 @@ Default: https://raw.githubusercontent.com/Azure/Moodle/master/
 The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated.
 
 Type: securestring
+
 Possible Values: null
+
 Default:
 
 
@@ -46,7 +50,9 @@ Default:
 Switch to process or bypass all scripts/extensions
 
 Type: bool
+
 Possible Values: null
+
 Default: true
 
 
@@ -55,7 +61,9 @@ Default: true
 Switch to configure AzureBackup and enlist VM's
 
 Type: bool
+
 Possible Values: null
+
 Default: false
 
 
@@ -64,7 +72,9 @@ Default: false
 Switch to deploy a redis cache or not
 
 Type: bool
+
 Possible Values: null
+
 Default: true
 
 
@@ -73,7 +83,9 @@ Default: true
 Switch to deploy a virtual network gateway or not
 
 Type: bool
+
 Possible Values: null
+
 Default: false
 
 
@@ -82,7 +94,9 @@ Default: false
 Switch to install Moodle Office 365 plugins
 
 Type: bool
+
 Possible Values: null
+
 Default: false
 
 
@@ -91,7 +105,9 @@ Default: false
 Switch to install Moodle ElasticSearch plugins & VMs
 
 Type: bool
+
 Possible Values: null
+
 Default: false
 
 
@@ -100,7 +116,9 @@ Default: false
 Storage Account type
 
 Type: string
+
 Possible Values: ["Standard_LRS","Standard_GRS","Standard_ZRS"]
+
 Default: Standard_LRS
 
 
@@ -109,7 +127,9 @@ Default: Standard_LRS
 Database type
 
 Type: string
+
 Possible Values: ["postgres","mysql","mssql"]
+
 Default: mysql
 
 
@@ -118,7 +138,9 @@ Default: mysql
 File server type: GlusterFS, Azure Files (CIFS)--disabled due to too slow perf, NFS--not highly available
 
 Type: string
+
 Possible Values: ["gluster","nfs"]
+
 Default: gluster
 
 
@@ -127,7 +149,9 @@ Default: gluster
 Web server type
 
 Type: string
+
 Possible Values: ["apache","nginx"]
+
 Default: apache
 
 
@@ -136,7 +160,9 @@ Default: apache
 VM size for the controller node
 
 Type: string
+
 Possible Values: null
+
 Default: Standard_DS1_v2
 
 
@@ -145,7 +171,9 @@ Default: Standard_DS1_v2
 VM size for autoscaled nodes
 
 Type: string
+
 Possible Values: null
+
 Default: Standard_DS2_v2
 
 
@@ -154,7 +182,9 @@ Default: Standard_DS2_v2
 Maximum number of autoscaled nodes
 
 Type: int
+
 Possible Values: null
+
 Default: 10
 
 
@@ -163,7 +193,9 @@ Default: 10
 VM size for the elastic search nodes
 
 Type: string
+
 Possible Values: null
+
 Default: Standard_DS2_v2
 
 
@@ -172,7 +204,9 @@ Default: Standard_DS2_v2
 Database firewall rule name
 
 Type: string
+
 Possible Values: null
+
 Default: open-to-the-world
 
 
@@ -181,7 +215,9 @@ Default: open-to-the-world
 name for Virtual network gateway subnet
 
 Type: string
+
 Possible Values: ["GatewaySubnet"]
+
 Default: GatewaySubnet
 
 
@@ -190,7 +226,9 @@ Default: GatewaySubnet
 Virtual network gateway type
 
 Type: string
+
 Possible Values: ["Vpn","ER"]
+
 Default: Vpn
 
 
@@ -199,7 +237,9 @@ Default: Vpn
 VM size for the gluster nodes
 
 Type: string
+
 Possible Values: null
+
 Default: Standard_DS2_v2
 
 
@@ -208,7 +248,9 @@ Default: Standard_DS2_v2
 Size per disk for gluster nodes or nfs server
 
 Type: int
+
 Possible Values: null
+
 Default: 127
 
 
@@ -217,7 +259,9 @@ Default: 127
 Number of disks in raid0 per gluster node or nfs server
 
 Type: int
+
 Possible Values: null
+
 Default: 4
 
 
@@ -226,7 +270,9 @@ Default: 4
 The Moodle version you want to install.
 
 Type: string
+
 Possible Values: ["MOODLE_34_STABLE","MOODLE_33_STABLE","MOODLE_32_STABLE","MOODLE_31_STABLE","MOODLE_30_STABLE","MOODLE_29_STABLE"]
+
 Default: MOODLE_34_STABLE
 
 
@@ -235,7 +281,9 @@ Default: MOODLE_34_STABLE
 Database admin username
 
 Type: string
+
 Possible Values: null
+
 Default: dbadmin
 
 
@@ -244,7 +292,9 @@ Default: dbadmin
 URL for Moodle site
 
 Type: string
+
 Possible Values: null
+
 Default: www.example.org
 
 
@@ -253,7 +303,9 @@ Default: www.example.org
 MySql/Postgresql database trasaction units
 
 Type: int
+
 Possible Values: [50,100,200,400,800]
+
 Default: 100
 
 
@@ -262,7 +314,9 @@ Default: 100
 MS SQL  database trasaction units
 
 Type: string
+
 Possible Values: ["S1","S2","S3","S4","S5","S6","S7","S9"]
+
 Default: S1
 
 
@@ -271,7 +325,9 @@ Default: S1
 MS SQL database size
 
 Type: string
+
 Possible Values: ["100MB","250MB","500MB","1GB","2GB","5GB","10GB","20GB","30GB","40GB","50GB","100GB","250GB","300GB","400GB","500GB","750GB","1024GB"]
+
 Default: 250GB
 
 
@@ -280,7 +336,9 @@ Default: 250GB
 MySql/Postgresql sku family
 
 Type: string
+
 Possible Values: ["SkuFamily"]
+
 Default: SkuFamily
 
 
@@ -289,7 +347,9 @@ Default: SkuFamily
 MySql/Postgresql sku name
 
 Type: string
+
 Possible Values: ["PGSQLB50","PGSQLB100","PGSQLS100","PGSQLS200","PGSQLS400","PGSQLS800","MYSQLB50","MYSQLB100","MYSQLS100","MYSQLS200","MYSQLS400","MYSQLS800"]
+
 Default: MYSQLS100
 
 
@@ -298,7 +358,9 @@ Default: MYSQLS100
 MySql/Postgresql sku size in MB. For Basic tier, minimum 50GB, increased by 125GB up to 1TB. For Standard tier, minimum 125GB, increase by 125GB up to 1TB
 
 Type: int
+
 Possible Values: null
+
 Default: 128000
 
 
@@ -307,7 +369,9 @@ Default: 128000
 MySql/Postgresql sku tier
 
 Type: string
+
 Possible Values: ["Basic","Standard"]
+
 Default: Standard
 
 
@@ -316,7 +380,9 @@ Default: Standard
 ssh public key
 
 Type: string
+
 Possible Values: null
+
 Default: null
 
 
@@ -325,7 +391,9 @@ Default: null
 ssh user name
 
 Type: string
+
 Possible Values: null
+
 Default: azureadmin
 
 
@@ -334,7 +402,9 @@ Default: azureadmin
 MySql/Postgresql SSL connection
 
 Type: string
+
 Possible Values: ["Disabled","Enabled"]
+
 Default: Disabled
 
 
@@ -343,7 +413,9 @@ Default: Disabled
 Postgresql version
 
 Type: string
+
 Possible Values: ["9.5","9.6"]
+
 Default: 9.6
 
 
@@ -352,7 +424,9 @@ Default: 9.6
 Mysql version
 
 Type: string
+
 Possible Values: ["5.6","5.7"]
+
 Default: 5.7
 
 
@@ -361,7 +435,9 @@ Default: 5.7
 Mssql version
 
 Type: string
+
 Possible Values: ["12.0"]
+
 Default: 12.0
 
 
@@ -370,7 +446,9 @@ Default: 12.0
 Address range for the Moodle virtual network - presumed /16 - further subneting during vnet creation
 
 Type: string
+
 Possible Values: null
+
 Default: 172.31.0.0
 
 
@@ -379,8 +457,8 @@ Default: 172.31.0.0
 Virtual network gateway vpn type
 
 Type: string
+
 Possible Values: ["RouteBased","PolicyBased"]
+
 Default: RouteBased
-
-
 
