@@ -2,38 +2,44 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "sshPublicKey": {
+            "metadata": {
+                "description": "SSH public key used to secure access to the cluster. This can be used to login to the servers for debugging and maintenance."
+            },
+            "type": "string"
+        },
+        "sshUsername": {
+            "defaultValue": "azureadmin",
+            "metadata": {
+                "description": "SSH username used to secure access to the cluster. This can be used to login to the servers for debugging and maintenance."
+            },
+            "type": "string"
+        },
         "azureBackupSwitch": {
             "defaultValue": false,
             "metadata": {
-                "description": "Switch to configure AzureBackup and enlist VM's"
+                "description": "Switch to configure AzureBackup and enlist VM's. Setting this to true will ensure your cluster is backed up but will incur a cost. See https://azure.microsoft.com/services/backup/ for more details."
             },
             "type": "bool"
         },
         "redisDeploySwitch": {
             "defaultValue": true,
             "metadata": {
-                "description": "Switch to deploy a redis cache or not"
+                "description": "Switch to deploy a Redis cache or not. Setting this to true can significantly improve performance of your cluster, but will incur a cost. It is not required for low traffic Moodle sites. See https://azure.microsoft.com/services/cache/ for more details."
             },
             "type": "bool"
         },
         "vnetGwDeploySwitch": {
             "defaultValue": false,
             "metadata": {
-                "description": "Switch to deploy a virtual network gateway or not"
+                "description": "Switch to deploy a Virtual Network Gateway or not. If you require VPN access to your cluster or communication with another Azure Virtual Network, you should set this to true. If you set this to true then you should review the `gateway*` parameters below to configure your gateway. VNet Gateways incur an additional cost. See https://docs.microsoft.com/azure/vpn-gateway/ for more information."
             },
             "type": "bool"
         },
         "installO365pluginsSwitch": {
             "defaultValue": false,
             "metadata": {
-                "description": "Switch to install Moodle Office 365 plugins"
-            },
-            "type": "bool"
-        },
-        "installElasticSearchSwitch": {
-            "defaultValue": false,
-            "metadata": {
-                "description": "Switch to install Moodle ElasticSearch plugins & VMs"
+                "description": "Switch to install Moodle Office 365 plugins. These plugins provide a range of features for O365 user, including advanced single-sign-on functionality using configurable OpenID identity providers, including Azure Acitve Directory. These plugins are open source and do not incur any additional costs.. Connect See https://moodle.org/plugins/browse.php?list=set&id=72 for more information."
             },
             "type": "bool"
         },
@@ -41,23 +47,23 @@
             "defaultValue": "Standard_LRS",
             "allowedValues": [
                 "Standard_LRS",
-                "Standard_GRS",
-                "Standard_ZRS"
+                "Standard_ZRS",
+                "Standard_GRS"
             ],
             "metadata": {
-                "description": "Storage Account type"
+                "description": "Define the storage account type to be used. Three options exist, Locally Redundant Storage (LRS) is designed to provide 11 9's durability of objects over a given year, LRS data is replicated within a single data center. Zone Redundant Storage (ZRS) is designed to provide 12 9's durability, ZRS data is replicated across availability zones and should be used where downtime is not acceptable since it can continue to operate even when a single zone is unrecoverable. Geographically Redundant Storage (GRS) is designed to give 16 9's durability in a given year. GRS data is replicated across two regions at least 100 miles apart. In the event of a failure in one region Azure will fail-over to the second region. The higher the durability offered the higher the cost of your storage account. For more information see https://docs.microsoft.com/azure/storage/common/storage-introduction#pricing."
             },
             "type": "string"
         },
         "dbServerType": {
             "defaultValue": "mysql",
             "allowedValues": [
-                "postgres",
                 "mysql",
-                "mssql"
+                "mssql",
+                "postgres"
             ],
             "metadata": {
-                "description": "Database type"
+                "description": "Select your preferred database type. Three databases, each offered as a service, are supported: MySQL, Postgres and MS SQL. The most commonly chosen option is MySQL. Each database has additional configuration options below. For more information about Azure Database for MySQL see https://azure.microsoft.com/services/mysql/, for Microsoft SQL see https://azure.microsoft.com/services/sql-database/ and for Postgres see https://azure.microsoft.com/services/postgresql/."
             },
             "type": "string"
         },
@@ -68,7 +74,7 @@
                 "nfs"
             ],
             "metadata": {
-                "description": "File server type: GlusterFS, Azure Files (CIFS)--disabled due to too slow perf, NFS--not highly available"
+                "description": "Moodle files (the PHP source and Moodle Data) are stored on a fileserver. Gluster provides a replicated solution that is designed to provide higher avialbility, but incurs additional cost (it uses at least 2 additional VMs). Alternatively you can opt to use an NFS server which does not require an additional VM and is therefore cheaper, however, since it presents a single point of failure it may not be the preferred option. To further configure your fileserver see the `gluster*` and `fileserver` parameters below."
             },
             "type": "string"
         },
@@ -79,42 +85,52 @@
                 "nginx"
             ],
             "metadata": {
-                "description": "Web server type"
+                "description": "The PHP Moodle application can be served by wither Apache or NGinx. There is no difference in cost between the two. Apache is the more popular choice, but some people prefer NGinx. If Apache is used NGinx is still used for HTTPS termination."
             },
             "type": "string"
         },
         "controllerVmSku": {
             "defaultValue": "Standard_DS1_v2",
             "metadata": {
-                "description": "VM size for the controller node"
+                "description": "The controller VM serves a number of purposes. It is used during deployment to bootstrap the cluster while at runtime it runs the Moodle Cron jobs, manages log information and acts as an SHH jumpbox should the cluster need to be debugged. If you select the NFS fileserver option it also acts as the fileserver. The size of this VM should reflect the expected demand on the machine. It can be resized later. For more information on VM sizes and prices see https://azure.microsoft.com/en-us/services/virtual-machines/."
             },
             "type": "string"
         },
         "autoscaleVmSku": {
             "defaultValue": "Standard_DS2_v2",
             "metadata": {
-                "description": "VM size for autoscaled nodes"
+                "description": "The autoscale VMs provide a scalable Moodle web tier. These machines should be sized to accomodate expected load. Related parameters (below) allow the configuration of the autoscale parameters. For more information on VM sizes and prices see https://azure.microsoft.com/en-us/services/virtual-machines/."
             },
             "type": "string"
         },
         "autoscaleVmCount": {
             "defaultValue": 10,
             "metadata": {
-                "description": "Maximum number of autoscaled nodes"
+                "description": "This sets a maximum limit to the number of autoscale VMs in the Web Tier. This should be setat a level high enough to ensure the web tier can scale to handle peak load, but low enough to prevent uncontrolled scaling in the event of DDOS or similar attacks."
             },
             "type": "int"
+        },
+        "installElasticSearchSwitch": {
+            "defaultValue": false,
+            "metadata": {
+                "description": "Switch to install Moodle ElasticSearch plugins to allow Elastic Search to be used as an engine for Moodle's Global Search. Setting this switch to true will create an additional 3 VMs (of configurable size) and thus will incur additional charges. See https://moodle.org/plugins/search_elastic for more information."
+            },
+            "type": "bool"
         },
         "elasticVmSku": {
             "defaultValue": "Standard_DS2_v2",
             "metadata": {
-                "description": "VM size for the elastic search nodes"
+                "description": "VM size for the elastic search nodes. This parameter is only used if `installElasticSearchSwitch` is set to true, in which case it defines the size of the three VMs used to provide Moodle Global Search using Elastic Search. For more information on VM sizes and prices see https://azure.microsoft.com/en-us/services/virtual-machines/."
             },
             "type": "string"
         },
+
+
+        
         "firewallRuleName": {
             "defaultValue": "open-to-the-world",
             "metadata": {
-                "description": "Database firewall rule name"
+                "description": "Database firewall rule name as it will appear in your Azure subscription. Under normal circumstances this need not be changed."
             },
             "type": "string"
         },
@@ -124,7 +140,7 @@
             ],
             "defaultValue": "GatewaySubnet",
             "metadata": {
-                "description": "name for Virtual network gateway subnet"
+                "description": "Name for Virtual Network Gateway Subnet as it will appear in the Azure subscription. This is not used unless `vnetGwDeploySwitch` is set to true. Under normal circumstances this will not need to be changed."
             },
             "type": "string"
         },
@@ -135,30 +151,30 @@
             ],
             "defaultValue": "Vpn",
             "metadata": {
-                "description": "Virtual network gateway type"
+                "description": "If `vnetGwDeploySwitch is set to true this parameter will set the Virtual Network Gateway Type, it will be either Virtual Private Network (Vpn) or Express Route (ER). For more information see https://docs.microsoft.com/azure/vpn-gateway/."
             },
             "type": "string"
         },
         "glusterVmSku": {
             "defaultValue": "Standard_DS2_v2",
             "metadata": {
-                "description": "VM size for the gluster nodes"
+                "description": "VM size for the Gluster nodes. This parameter is only used if ``fileServerType` is set to 'gluster'. You should select a size that is appropriate for your expected load. For more information on VM sizes and prices see https://azure.microsoft.com/en-us/services/virtual-machines/."
             },
             "type": "string"
-        },
-        "fileServerDiskSize": {
-            "defaultValue": 127,
-            "metadata": {
-                "description": "Size per disk for gluster nodes or nfs server"
-            },
-            "type": "int"
         },
         "fileServerDiskCount": {
             "defaultValue": 4,
             "minValue": 2,
             "maxValue": 8,
             "metadata": {
-                "description": "Number of disks in raid0 per gluster node or nfs server"
+                "description": "Number of disks in raid0 per Gluster node or NFS server. The size of the disks is configurable via the `fileServerDiskSize` parameter. You should opt for an appropriate balance between number of disks, size of disks and price."
+            },
+            "type": "int"
+        },        
+        "fileServerDiskSize": {
+            "defaultValue": 127,
+            "metadata": {
+                "description": "Size per disk for Gluster nodes or NFS server. The size of the disks is configurable via the `fileServerDiskSize` parameter. You should opt for an appropriate balance between number of disks, size of disks and price."
             },
             "type": "int"
         },
@@ -180,14 +196,14 @@
         "dbLogin": {
             "defaultValue": "dbadmin",
             "metadata": {
-                "description": "Database admin username"
+                "description": "Database admin username. The password will be generated during install and will be available in the outputs of the deployment. See https://github.com/Azure/Moodle/blob/master/docs/Get-Install-Data.md for instructions for retrieving such information after deployment."
             },
             "type": "string"
         },
         "siteURL": {
             "defaultValue": "www.example.org",
             "metadata": {
-                "description": "URL for Moodle site"
+                "description": "The URL for Moodle site. Moodle will be configured to use this URL if the value is changes. If the value is null or left as the default 'www.example.org' moodle will be configured to use the URL of the application cluster load balancer. This will be avialble as an output of the deployment. See https://github.com/Azure/Moodle/blob/master/docs/Get-Install-Data.md for retrieving such information after deployment."
             },
             "type": "string"
         },
@@ -201,64 +217,17 @@
             ],
             "defaultValue": 100,
             "metadata": {
-                "description": "MySql/Postgresql database trasaction units"
+                "description": "Required Database Trasaction Units for MySQL or Postgres databases. This parameter is only used if `dbServerType` is set to 'mysql' or 'postgres'. DTU is a measure of the guaranteed level of resources for your database. It is a blended measure of CPU, memory, I/O (data and transaction log I/O). If your workload exceeds theselected amount of DTUs your throughput is throttled. It is important to selected a DTU level that can manage your workload without throttling but be aware that higher levels of DTUs will incur higher charges for your database. For more information on DTUs see https://docs.microsoft.com/azure/sql-database/sql-database-what-is-a-dtu."
             },
             "type": "int"
         },
-
-        "serviceObjective": {
-            "allowedValues": [
-                "S1",
-                "S2",
-                "S3",
-                "S4",
-                "S5",
-                "S6",
-                "S7",
-                "S9" 
-            ],
-            "defaultValue": "S1",
-            "metadata": {
-                "description": "MS SQL  database trasaction units"
-            },
-            "type": "string"
-        },
-        
-         "msDbSize": {
-            "allowedValues": [
-                "100MB",
-                "250MB",
-                "500MB",
-                "1GB",
-                "2GB",
-                "5GB",
-                "10GB",
-                "20GB",
-                "30GB",
-                "40GB",
-                "50GB",
-                "100GB",
-                "250GB",
-                "300GB",
-                "400GB",
-                "500GB",
-                "750GB",
-                "1024GB"
-            ],
-            "defaultValue": "250GB",
-            "metadata": {
-                "description": "MS SQL database size" 
-            },
-            "type": "string"
-        },
-
         "skuFamily": {
             "allowedValues": [
                 "SkuFamily"
             ],
             "defaultValue": "SkuFamily",
             "metadata": {
-                "description": "MySql/Postgresql sku family"
+                "description": "MySql/Postgresql sku family. NOTE: this is likely an unused parameter that will be removed, see https://github.com/Azure/Moodle/issues/54."
             },
             "type": "string"
         },
@@ -279,14 +248,14 @@
             ],
             "defaultValue": "MYSQLS100",
             "metadata": {
-                "description": "MySql/Postgresql sku name"
+                "description": "MySql/Postgresql SKU name. This defines the number of cores and the type of database created. For more information see https://docs.microsoft.com/azure/mysql/concepts-pricing-tiers."
             },
             "type": "string"
         },
         "skuSizeMB": {
             "defaultValue": 128000,
             "metadata": {
-                "description": "MySql/Postgresql sku size in MB. For Basic tier, minimum 50GB, increased by 125GB up to 1TB. For Standard tier, minimum 125GB, increase by 125GB up to 1TB"
+                "description": "MySql/Postgresql SKU size in MB. For Basic tier, minimum 50GB, increased by 125GB up to 1TB. For Standard tier, minimum 125GB, increase by 125GB up to 1TB. For more information see https://docs.microsoft.com/azure/mysql/concepts-pricing-tiers."
             },
             "type": "int"
         },
@@ -297,20 +266,7 @@
             ],
             "defaultValue": "Standard",
             "metadata": {
-                "description": "MySql/Postgresql sku tier"
-            },
-            "type": "string"
-        },
-        "sshPublicKey": {
-            "metadata": {
-                "description": "ssh public key"
-            },
-            "type": "string"
-        },
-        "sshUsername": {
-            "defaultValue": "azureadmin",
-            "metadata": {
-                "description": "ssh user name"
+                "description": "MySql/Postgres SKU tier. For more information see https://docs.microsoft.com/azure/mysql/concepts-pricing-tiers"
             },
             "type": "string"
         },
@@ -321,7 +277,7 @@
             ],
             "defaultValue": "Disabled",
             "metadata": {
-                "description": "MySql/Postgresql SSL connection"
+                "description": "Enable or Disable MySql/Postgresql SSL connection."
             },
             "type": "string"
         },
@@ -347,6 +303,50 @@
             },
             "type": "string"
         },
+        "serviceObjective": {
+            "allowedValues": [
+                "S1",
+                "S2",
+                "S3",
+                "S4",
+                "S5",
+                "S6",
+                "S7",
+                "S9" 
+            ],
+            "defaultValue": "S1",
+            "metadata": {
+                "description": "Required Database Trasaction Units for MS SQL databases. This parameter is only used if `dbServerType` is set to 'mssql'. DTU is a measure of the guaranteed level of resources for your database. It is a blended measure of CPU, memory, I/O (data and transaction log I/O). If your workload exceeds theselected amount of DTUs your throughput is throttled. It is important to selected a DTU level that can manage your workload without throttling but be aware that higher levels of DTUs will incur higher charges for your database. For more information on DTUs see https://docs.microsoft.com/azure/sql-database/sql-database-what-is-a-dtu."
+            },
+            "type": "string"
+        },
+        "msDbSize": {
+            "allowedValues": [
+                "100MB",
+                "250MB",
+                "500MB",
+                "1GB",
+                "2GB",
+                "5GB",
+                "10GB",
+                "20GB",
+                "30GB",
+                "40GB",
+                "50GB",
+                "100GB",
+                "250GB",
+                "300GB",
+                "400GB",
+                "500GB",
+                "750GB",
+                "1024GB"
+            ],
+            "defaultValue": "250GB",
+            "metadata": {
+                "description": "Required Database size for MS SQL databases. This parameter is only used if `dbServerType` is set to 'mssql'."
+            },
+            "type": "string"
+        },
          "mssqlVersion": {
             "allowedValues": [
                 "12.0"
@@ -360,7 +360,7 @@
         "vNetAddressSpace": {
             "defaultValue": "172.31.0.0",
             "metadata": {
-                "description": "Address range for the Moodle virtual network - presumed /16 - further subneting during vnet creation"
+                "description": "Address range for the Moodle virtual network - presumed /16."
             },
             "type": "string"
         },
