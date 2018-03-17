@@ -63,6 +63,8 @@ echo $ssh_pub_key
 sed "s|GEN-SSH-PUB-KEY|$ssh_pub_key|g" $MOODLE_AZURE_WORKSPACE/arm_template/azuredeploy.parameters.json > $MOODLE_AZURE_WORKSPACE/$MOODLE_RG_NAME/azuredeploy.parameters.json
 ```
 
+For more information see the [parameters documentation](Parameters.md).
+
 ## Deploy cluster
 
 Now that we have a resource group and a configuration file we can
