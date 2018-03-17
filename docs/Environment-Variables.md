@@ -40,6 +40,14 @@ per-deployment artifacts:
 MOODLE_AZURE_WORKSPACE=~/.moodle
 ```
 
+## Create Workspace
+
+Ensure the workspace for this particular deployment exists:
+
+```
+mkdir -p $MOODLE_AZURE_WORKSPACE/$MOODLE_RG_NAME
+```
+
 ## Validation
 
 After working through this file there should be a number of
@@ -108,4 +116,17 @@ Results:
 
 ```
 Workspace directory: ~/.moodle
+```
+
+Ensure the workspace directory exists:
+
+
+``` bash
+if [ ! -f "$MOODLE_AZURE_WORKSPACE/$MOODLE_RG_NAME" ]; then echo "Worspace exists"; fi
+```
+
+Results:
+
+```
+Workspace exists
 ```
