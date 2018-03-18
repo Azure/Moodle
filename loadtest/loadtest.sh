@@ -137,7 +137,7 @@ function install_moosh
     # 'composer install' keeps failing, so try apt...
     sudo apt-add-repository 'deb http://ppa.launchpad.net/zabuch/ppa/ubuntu trusty main'
     sudo apt-get update || true
-    sudo apt-get install -y moosh
+    sudo apt-get install -y --allow-unauthenticated moosh
 
     # sudo apt update || return 1
     # sudo apt install -y composer || return 1
