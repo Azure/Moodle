@@ -134,14 +134,19 @@ function delete_resource_group
 
 function install_moosh
 {
-    sudo apt update || return 1
-    sudo apt install -y composer || return 1
-    cd ~
-    git clone git://github.com/tmuras/moosh.git || return 1
-    cd moosh
-    composer install || sleep 30 && composer install || sleep 30 && composer install || return 1
-    mkdir -p ~/bin
-    ln -s $PWD/moosh.php ~/bin/moosh
+    # 'composer install' keeps failing, so try apt...
+    sudo apt-add-repository 'deb http://ppa.launchpad.net/zabuch/ppa/ubuntu trusty main'
+    sudo apt-get update || true
+    sudo apt-get install -y moosh
+
+    # sudo apt update || return 1
+    # sudo apt install -y composer || return 1
+    # cd ~
+    # git clone git://github.com/tmuras/moosh.git || return 1
+    # cd moosh
+    # composer install || sleep 30 && composer install || sleep 30 && composer install || return 1
+    # mkdir -p ~/bin
+    # ln -s $PWD/moosh.php ~/bin/moosh
 }
 
 MOODLE_PATH=/moodle/html/moodle
@@ -150,14 +155,14 @@ function delete_course
 {
     local course_id=${1}
 
-    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-delete $course_id
+    sudo -u www-data moosh --moodle-path=$MOODLE_PATH course-delete $course_id
 }
 
 function create_course
 {
     local course_id=${1}
 
-    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-create --idnumber=$course_id empty@test.course
+    sudo -u www-data moosh --moodle-path=$MOODLE_PATH course-create --idnumber=$course_id empty@test.course
 }
 
 function restore_course_from_url
@@ -165,7 +170,7 @@ function restore_course_from_url
     local url=${1}
 
     wget $url -O backup_to_restore.mbz
-    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-restore backup_to_restore.mbz 1
+    sudo -u www-data moosh --moodle-path=$MOODLE_PATH course-restore backup_to_restore.mbz 1
 }
 
 function create_2000_test_users_and_enroll_them_in_course
@@ -174,33 +179,33 @@ function create_2000_test_users_and_enroll_them_in_course
     local password=${2}
 
     # TODO ugly...
-    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{1..200}
-    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{201..400}
-    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{401..600}
-    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{601..800}
-    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{801..1000}
-    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{1001..1200}
-    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{1201..1400}
-    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{1401..1600}
-    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{1601..1800}
-    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{1801..2000}
+    sudo -u www-data moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{1..200}
+    sudo -u www-data moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{201..400}
+    sudo -u www-data moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{401..600}
+    sudo -u www-data moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{601..800}
+    sudo -u www-data moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{801..1000}
+    sudo -u www-data moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{1001..1200}
+    sudo -u www-data moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{1201..1400}
+    sudo -u www-data moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{1401..1600}
+    sudo -u www-data moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{1601..1800}
+    sudo -u www-data moosh --moodle-path=$MOODLE_PATH user-create -p $password m_azuretestuser_{1801..2000}
 
-    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{1..200}
-    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{201..400}
-    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{401..600}
-    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{601..800}
-    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{801..1000}
-    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{1001..1200}
-    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{1201..1400}
-    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{1401..1600}
-    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{1601..1800}
-    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{1801..2000}
+    sudo -u www-data moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{1..200}
+    sudo -u www-data moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{201..400}
+    sudo -u www-data moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{401..600}
+    sudo -u www-data moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{601..800}
+    sudo -u www-data moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{801..1000}
+    sudo -u www-data moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{1001..1200}
+    sudo -u www-data moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{1201..1400}
+    sudo -u www-data moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{1401..1600}
+    sudo -u www-data moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{1601..1800}
+    sudo -u www-data moosh --moodle-path=$MOODLE_PATH course-enrol $course_id m_azuretestuser_{1801..2000}
 }
 
 function hide_course_overview_block_for_jmeter_test
 {
     # "myoverview" is the registered name of the "Course overview" block
-    sudo -u www-data ~/bin/moosh --moodle-path=$MOODLE_PATH block-manage hide myoverview
+    sudo -u www-data moosh --moodle-path=$MOODLE_PATH block-manage hide myoverview
 }
 
 # TODO hard-coded values...
