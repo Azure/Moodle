@@ -139,7 +139,7 @@ function install_moosh
     cd ~
     git clone git://github.com/tmuras/moosh.git || return 1
     cd moosh
-    composer install || return 1
+    composer install || sleep 30 && composer install || sleep 30 && composer install || return 1
     mkdir -p ~/bin
     ln -s $PWD/moosh.php ~/bin/moosh
 }
