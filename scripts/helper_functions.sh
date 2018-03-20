@@ -195,7 +195,7 @@ function configure_nfs_server_and_export {
 }
 
 function configure_nfs_client_and_mount {
-    local NFS_SERVER=${1}     # E.g., jumpbox-vm-ab12cd
+    local NFS_SERVER=${1}     # E.g., controller-vm-ab12cd
     local NFS_DIR=${2}        # E.g., /moodle
     local MOUNTPOINT=${3}     # E.g., /moodle
 
