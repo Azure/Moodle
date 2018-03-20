@@ -199,17 +199,6 @@ Possible Values: null
 Default: Standard_DS2_v2
 
 
-### firewallRuleName
-
-Database firewall rule name
-
-Type: string
-
-Possible Values: null
-
-Default: open-to-the-world
-
-
 ### gatewaySubnet
 
 name for Virtual network gateway subnet

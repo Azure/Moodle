@@ -7,24 +7,15 @@
                 "description": "Common Moodle values"
             },
             "type": "object"
+        },
+        "ctlrPubIpId": {
+            "metadata": {
+                "description": "Resource ID of the controller VM public IP address"
+            },
+            "type": "string"
         }
     },
     "resources": [
-        {
-            "type": "Microsoft.Network/publicIPAddresses",
-            "apiVersion": "2017-10-01",
-            "location": "[resourceGroup().location]",
-            "name": "[parameters('moodleCommon').ctlrPipName]",
-            "properties": {
-                "dnsSettings": {
-                    "domainNameLabel": "[parameters('moodleCommon').ctlrPipName]"
-                },
-                "publicIPAllocationMethod": "Static"
-            },
-            "tags": {
-                "displayName": "ctlrpip"
-            }
-        },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2017-10-01",
@@ -68,7 +59,7 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2017-10-01",
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/', parameters('moodleCommon').ctlrPipName)]"
+                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('moodleCommon').ctlrNsgName)]"
             ],
             "location": "[resourceGroup().location]",
             "name": "[parameters('moodleCommon').ctlrNicName]",
@@ -82,7 +73,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
-                                "id": "[variables('pipRef')]"
+                                "id": "[parameters('ctlrPubIpId')]"
                             },
                             "subnet": {
                                 "id": "[variables('subnetWebRef')]"
@@ -202,7 +193,6 @@
         "documentation18": "    recoveryservicesEnlist - conditionally enlists the VM into the backup regimen",
         "nicRef": "[resourceId('Microsoft.Network/networkInterfaces', parameters('moodleCommon').ctlrNicName)]",
         "nsgRef": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('moodleCommon').ctlrNsgName)]",
-        "pipRef": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('moodleCommon').ctlrPipName)]",
         "subnetWebRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('moodleCommon').vnetName, parameters('moodleCommon').subnetWeb)]",
         "copy": [
             {
