@@ -109,7 +109,7 @@
                 }
             },
             "sku": {
-                "capacity": 2,
+                "capacity": 1,
                 "name": "[parameters('moodleCommon').autoscaleVmSku]",
                 "tier": "Standard"
             },
@@ -131,9 +131,9 @@
                 "profiles": [
                     {
                         "capacity": {
-                            "default": "2",
+                            "default": "1",
                             "maximum": "[parameters('moodleCommon').autoscaleVmCount]",
-                            "minimum": "2"
+                            "minimum": "1"
                         },
                         "name": "Profile1",
                         "rules": [
