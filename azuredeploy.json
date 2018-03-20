@@ -83,13 +83,13 @@
             "type": "string"
         },
         "fileServerType": {
-            "defaultValue": "gluster",
+            "defaultValue": "nfs",
             "allowedValues": [
                 "gluster",
                 "nfs"
             ],
             "metadata": {
-                "description": "File server type: GlusterFS, Azure Files (CIFS)--disabled due to too slow perf, NFS--not highly available"
+                "description": "File server type: GlusterFS, Azure Files (CIFS)--disabled due to too slow perf, NFS--not yet highly available"
             },
             "type": "string"
         },
