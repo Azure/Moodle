@@ -18,7 +18,7 @@ sudp apt install jq
 ```
 
 ``` bash
-For more information ajq -r '.parameters | to_entries[] | "### " + .key + "\n\n" + .value.metadata.description + "\n\nType: " + .value.type + "\n\nPossible Values: " + (.value.allowedValues | @text) + "\n\nDefault: " + (.value.defaultValue | @text) + "\n\n"' azuredeploy.json
+jq -r '.parameters | to_entries[] | "### " + .key + "\n\n" + .value.metadata.description + "\n\nType: " + .value.type + "\n\nPossible Values: " + (.value.allowedValues | @text) + "\n\nDefault: " + (.value.defaultValue | @text) + "\n\n"' azuredeploy.json
 ```
 
 ## Available Parameters
@@ -329,17 +329,6 @@ Type: string
 Possible Values: ["100MB","250MB","500MB","1GB","2GB","5GB","10GB","20GB","30GB","40GB","50GB","100GB","250GB","300GB","400GB","500GB","750GB","1024GB"]
 
 Default: 250GB
-
-
-### skuFamily
-
-MySql/Postgresql sku family
-
-Type: string
-
-Possible Values: ["SkuFamily"]
-
-Default: SkuFamily
 
 
 ### skuName

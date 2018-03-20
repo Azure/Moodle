@@ -40,7 +40,6 @@
             ],
             "sku": {
                 "capacity": "[parameters('moodleCommon').skuCapacityDTU]",
-                "family": "[parameters('moodleCommon').skuFamily]",
                 "name": "[parameters('moodleCommon').skuName]",
                 "size": "[parameters('moodleCommon').skuSizeMB]",
                 "tier": "[parameters('moodleCommon').skuTier]"
@@ -55,7 +54,6 @@
         "documentation3": " administratorLoginPassword  - mysql admin password",
         "documentation4": " location                    - Mysql server location",
         "documentation5": " skuCapacityDTU              - Mysql database trasaction units",
-        "documentation6": " skuFamily                   - Mysql sku family",
         "documentation7": " skuName                     - Mysql sku name",
         "documentation8": " skuSizeMB                   - Mysql sku size in mb",
         "documentation9": " skuTier                     - Mysql sku tier"

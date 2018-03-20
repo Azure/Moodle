@@ -244,8 +244,7 @@
             },
             "type": "string"
         },
-        
-         "msDbSize": {
+        "msDbSize": {
             "allowedValues": [
                 "100MB",
                 "250MB",
@@ -269,17 +268,6 @@
             "defaultValue": "250GB",
             "metadata": {
                 "description": "MS SQL database size" 
-            },
-            "type": "string"
-        },
-
-        "skuFamily": {
-            "allowedValues": [
-                "SkuFamily"
-            ],
-            "defaultValue": "SkuFamily",
-            "metadata": {
-                "description": "MySql/Postgresql sku family"
             },
             "type": "string"
         },
@@ -368,7 +356,7 @@
             },
             "type": "string"
         },
-         "mssqlVersion": {
+        "mssqlVersion": {
             "allowedValues": [
                 "12.0"
             ],
@@ -724,7 +712,6 @@
             "serverName": "[concat(parameters('dbServerType'), '-',variables('resourceprefix'))]",
             "siteURL": "[if(or(empty(parameters('siteURL')), equals(parameters('siteURL'), 'www.example.org')), concat('lb-',variables('resourceprefix'),'.',resourceGroup().location,'.cloudapp.azure.com'), parameters('siteURL'))]",
             "skuCapacityDTU": "[parameters('skuCapacityDTU')]",
-            "skuFamily": "[parameters('skuFamily')]",
             "skuName": "[parameters('skuName')]",
             "skuSizeMB": "[parameters('skuSizeMB')]",
             "skuTier": "[parameters('skuTier')]",
