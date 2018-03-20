@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jmeterTestPlan version="1.2" properties="3.2" jmeter="3.3 r1808647">
+<jmeterTestPlan version="1.2" properties="4.0" jmeter="4.0 r1823414">
   <hashTree>
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Moodle Load Test Plan" enabled="true">
       <boolProp name="TestPlan.functional_mode">false</boolProp>
@@ -22,11 +22,6 @@
           <elementProp name="host" elementType="Argument">
             <stringProp name="Argument.name">host</stringProp>
             <stringProp name="Argument.value">${__P(host, lb-cosbae.southcentralus.cloudapp.azure.com)}</stringProp>
-            <stringProp name="Argument.metadata">=</stringProp>
-          </elementProp>
-          <elementProp name="db_host" elementType="Argument">
-            <stringProp name="Argument.name">db_host</stringProp>
-            <stringProp name="Argument.value">${__P(db_host,mysql-cosbae.mysql.database.azure.com)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="threads" elementType="Argument">
@@ -103,21 +98,6 @@
             <stringProp name="Argument.value">443</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
-          <elementProp name="db_user" elementType="Argument">
-            <stringProp name="Argument.name">db_user</stringProp>
-            <stringProp name="Argument.value">${__P(db_user,moodle@mysql-cosbae)}</stringProp>
-            <stringProp name="Argument.metadata">=</stringProp>
-          </elementProp>
-          <elementProp name="db_name" elementType="Argument">
-            <stringProp name="Argument.name">db_name</stringProp>
-            <stringProp name="Argument.value">moodle</stringProp>
-            <stringProp name="Argument.metadata">=</stringProp>
-          </elementProp>
-          <elementProp name="db_pass" elementType="Argument">
-            <stringProp name="Argument.name">db_pass</stringProp>
-            <stringProp name="Argument.value">${__P(db_pass,)}</stringProp>
-            <stringProp name="Argument.metadata">=</stringProp>
-          </elementProp>
           <elementProp name="moodle_user_pass" elementType="Argument">
             <stringProp name="Argument.name">moodle_user_pass</stringProp>
             <stringProp name="Argument.value">${__P(moodle_user_pass,testUserP@$$w0rd)}</stringProp>
@@ -125,22 +105,6 @@
           </elementProp>
         </collectionProp>
       </Arguments>
-      <hashTree/>
-      <JDBCDataSource guiclass="TestBeanGUI" testclass="JDBCDataSource" testname="Setup DB" enabled="true">
-        <boolProp name="autocommit">true</boolProp>
-        <stringProp name="checkQuery">Select 1</stringProp>
-        <stringProp name="connectionAge">700000</stringProp>
-        <stringProp name="dataSource">lms_admin_db_conn</stringProp>
-        <stringProp name="dbUrl">jdbc:mysql://${db_host}/${db_name}?autoReconnect=true&amp;useSSL=false</stringProp>
-        <stringProp name="driver">com.mysql.jdbc.Driver</stringProp>
-        <boolProp name="keepAlive">true</boolProp>
-        <stringProp name="password">${db_pass}</stringProp>
-        <stringProp name="poolMax">5</stringProp>
-        <stringProp name="timeout">500000</stringProp>
-        <stringProp name="trimInterval">600000</stringProp>
-        <stringProp name="username">${db_user}</stringProp>
-        <stringProp name="transactionIsolation">DEFAULT</stringProp>
-      </JDBCDataSource>
       <hashTree/>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Load Test Moodle" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">startnextloop</stringProp>
@@ -163,125 +127,6 @@
           <stringProp name="CookieManager.policy">default</stringProp>
         </CookieManager>
         <hashTree/>
-        <OnceOnlyController guiclass="OnceOnlyControllerGui" testclass="OnceOnlyController" testname="Once Only Controller" enabled="true"/>
-        <hashTree>
-          <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Load users" enabled="true">
-            <stringProp name="dataSource">lms_admin_db_conn</stringProp>
-            <stringProp name="query">select username from mdl_user where id &gt; 2 limit 1000;
- </stringProp>
-            <stringProp name="queryArguments"></stringProp>
-            <stringProp name="queryArgumentsTypes"></stringProp>
-            <stringProp name="queryType">Prepared Select Statement</stringProp>
-            <stringProp name="variableNames">username</stringProp>
-            <stringProp name="resultVariable"></stringProp>
-            <stringProp name="queryTimeout"></stringProp>
-            <stringProp name="resultSetHandler">Store as String</stringProp>
-          </JDBCSampler>
-          <hashTree>
-            <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report" enabled="false">
-              <boolProp name="ResultCollector.error_logging">false</boolProp>
-              <objProp>
-                <name>saveConfig</name>
-                <value class="SampleSaveConfiguration">
-                  <time>true</time>
-                  <latency>true</latency>
-                  <timestamp>true</timestamp>
-                  <success>true</success>
-                  <label>true</label>
-                  <code>true</code>
-                  <message>true</message>
-                  <threadName>true</threadName>
-                  <dataType>true</dataType>
-                  <encoding>false</encoding>
-                  <assertions>true</assertions>
-                  <subresults>true</subresults>
-                  <responseData>false</responseData>
-                  <samplerData>false</samplerData>
-                  <xml>true</xml>
-                  <fieldNames>false</fieldNames>
-                  <responseHeaders>false</responseHeaders>
-                  <requestHeaders>false</requestHeaders>
-                  <responseDataOnError>false</responseDataOnError>
-                  <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
-                  <assertionsResultsToSave>0</assertionsResultsToSave>
-                  <bytes>true</bytes>
-                  <threadCounts>true</threadCounts>
-                </value>
-              </objProp>
-              <stringProp name="filename"></stringProp>
-            </ResultCollector>
-            <hashTree/>
-            <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="false">
-              <boolProp name="ResultCollector.error_logging">false</boolProp>
-              <objProp>
-                <name>saveConfig</name>
-                <value class="SampleSaveConfiguration">
-                  <time>true</time>
-                  <latency>true</latency>
-                  <timestamp>true</timestamp>
-                  <success>true</success>
-                  <label>true</label>
-                  <code>true</code>
-                  <message>true</message>
-                  <threadName>true</threadName>
-                  <dataType>true</dataType>
-                  <encoding>false</encoding>
-                  <assertions>true</assertions>
-                  <subresults>true</subresults>
-                  <responseData>false</responseData>
-                  <samplerData>false</samplerData>
-                  <xml>true</xml>
-                  <fieldNames>false</fieldNames>
-                  <responseHeaders>false</responseHeaders>
-                  <requestHeaders>false</requestHeaders>
-                  <responseDataOnError>false</responseDataOnError>
-                  <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
-                  <assertionsResultsToSave>0</assertionsResultsToSave>
-                  <bytes>true</bytes>
-                  <threadCounts>true</threadCounts>
-                </value>
-              </objProp>
-              <stringProp name="filename"></stringProp>
-            </ResultCollector>
-            <hashTree/>
-          </hashTree>
-          <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="false">
-            <boolProp name="ResultCollector.error_logging">false</boolProp>
-            <objProp>
-              <name>saveConfig</name>
-              <value class="SampleSaveConfiguration">
-                <time>true</time>
-                <latency>true</latency>
-                <timestamp>true</timestamp>
-                <success>true</success>
-                <label>true</label>
-                <code>true</code>
-                <message>true</message>
-                <threadName>true</threadName>
-                <dataType>true</dataType>
-                <encoding>false</encoding>
-                <assertions>true</assertions>
-                <subresults>true</subresults>
-                <responseData>false</responseData>
-                <samplerData>false</samplerData>
-                <xml>false</xml>
-                <fieldNames>true</fieldNames>
-                <responseHeaders>false</responseHeaders>
-                <requestHeaders>false</requestHeaders>
-                <responseDataOnError>false</responseDataOnError>
-                <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
-                <assertionsResultsToSave>0</assertionsResultsToSave>
-                <bytes>true</bytes>
-                <sentBytes>true</sentBytes>
-                <threadCounts>true</threadCounts>
-                <idleTime>true</idleTime>
-                <connectTime>true</connectTime>
-              </value>
-            </objProp>
-            <stringProp name="filename"></stringProp>
-          </ResultCollector>
-          <hashTree/>
-        </hashTree>
         <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Moodle Tests" enabled="true"/>
         <hashTree>
           <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
@@ -319,15 +164,15 @@
                 <stringProp name="-2078389680">xx_outputFromSplit</stringProp>
               </collectionProp>
               <collectionProp name="UserParameters.thread_values">
-                <collectionProp name="823025461">
+                <collectionProp name="1681097958">
                   <stringProp name=""></stringProp>
                   <stringProp name=""></stringProp>
-                  <stringProp name="-1480544405">${__Random(1,${username_#},ReuseRandomNumber)}</stringProp>
-                  <stringProp name="-1663390002">${__V(username_${RandomNumber})}</stringProp>
+                  <stringProp name="-2046088625">${__Random(1,2000,ReuseRandomNumber)}</stringProp>
+                  <stringProp name="379755733">m_azuretestuser_${RandomNumber}</stringProp>
                   <stringProp name="1345253498">${RandomNumber}</stringProp>
                   <stringProp name="-352988409">${sesskey}</stringProp>
-                  <stringProp name="-201175847">C:\Documents and Settings\anon\Desktop\Load testing\</stringProp>
-                  <stringProp name="-365828264">120MB-file.zip</stringProp>
+                  <stringProp name="0"></stringProp>
+                  <stringProp name="0"></stringProp>
                   <stringProp name="0"></stringProp>
                   <stringProp name="257720200">${__V(course_list_${RandomNumber})}</stringProp>
                   <stringProp name="-306911129">${__split(${courseList}, course_id,|)}</stringProp>
@@ -418,6 +263,7 @@
                 <intProp name="Assertion.test_type">2</intProp>
                 <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
                 <boolProp name="Assertion.assume_success">false</boolProp>
+                <stringProp name="Assertion.custom_message"></stringProp>
               </ResponseAssertion>
               <hashTree/>
               <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="Get sesskey" enabled="true">
@@ -681,6 +527,7 @@
                     <intProp name="Assertion.test_type">2</intProp>
                     <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
                     <boolProp name="Assertion.assume_success">false</boolProp>
+                    <stringProp name="Assertion.custom_message"></stringProp>
                   </ResponseAssertion>
                   <hashTree/>
                   <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="RegExp Extractor - Get coursetopics_html" enabled="true">
@@ -769,6 +616,7 @@
                     <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
                     <boolProp name="Assertion.assume_success">false</boolProp>
                     <intProp name="Assertion.test_type">2</intProp>
+                    <stringProp name="Assertion.custom_message"></stringProp>
                   </ResponseAssertion>
                   <hashTree/>
                   <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="RegExp Extractor - Get forum discussion headings (if any!)" enabled="true">
@@ -933,6 +781,7 @@
                         <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
                         <boolProp name="Assertion.assume_success">false</boolProp>
                         <intProp name="Assertion.test_type">2</intProp>
+                        <stringProp name="Assertion.custom_message"></stringProp>
                       </ResponseAssertion>
                       <hashTree/>
                       <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="RegExp Extractor - Get Forum id" enabled="false">
@@ -1005,6 +854,7 @@
                         <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
                         <boolProp name="Assertion.assume_success">false</boolProp>
                         <intProp name="Assertion.test_type">2</intProp>
+                        <stringProp name="Assertion.custom_message"></stringProp>
                       </ResponseAssertion>
                       <hashTree/>
                       <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="RegExp Extractor - Get Forum id" enabled="false">
@@ -1083,6 +933,7 @@
                       <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
                       <boolProp name="Assertion.assume_success">false</boolProp>
                       <intProp name="Assertion.test_type">2</intProp>
+                      <stringProp name="Assertion.custom_message"></stringProp>
                     </ResponseAssertion>
                     <hashTree/>
                     <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath - Get discussion id" enabled="false">
@@ -1456,6 +1307,7 @@
                       <intProp name="Assertion.test_type">2</intProp>
                       <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
                       <boolProp name="Assertion.assume_success">false</boolProp>
+                      <stringProp name="Assertion.custom_message"></stringProp>
                     </ResponseAssertion>
                     <hashTree/>
                     <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Constant Timer" enabled="true">
@@ -1499,6 +1351,7 @@
                       <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
                       <boolProp name="Assertion.assume_success">false</boolProp>
                       <intProp name="Assertion.test_type">2</intProp>
+                      <stringProp name="Assertion.custom_message"></stringProp>
                     </ResponseAssertion>
                     <hashTree/>
                     <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="XPath - Get the newly-created discussion id" enabled="false">
@@ -1649,6 +1502,7 @@
                     <intProp name="Assertion.test_type">2</intProp>
                     <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
                     <boolProp name="Assertion.assume_success">false</boolProp>
+                    <stringProp name="Assertion.custom_message"></stringProp>
                   </ResponseAssertion>
                   <hashTree/>
                   <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="RegExp Extractor - Get forum discussion headings (if any!)" enabled="false">
@@ -1754,6 +1608,7 @@
                     <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
                     <boolProp name="Assertion.assume_success">false</boolProp>
                     <intProp name="Assertion.test_type">2</intProp>
+                    <stringProp name="Assertion.custom_message"></stringProp>
                   </ResponseAssertion>
                   <hashTree/>
                   <XPathExtractor guiclass="XPathExtractorGui" testclass="XPathExtractor" testname="Get quiz id" enabled="false">
@@ -1824,6 +1679,7 @@
                     <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
                     <boolProp name="Assertion.assume_success">false</boolProp>
                     <intProp name="Assertion.test_type">2</intProp>
+                    <stringProp name="Assertion.custom_message"></stringProp>
                   </ResponseAssertion>
                   <hashTree/>
                   <GaussianRandomTimer guiclass="GaussianRandomTimerGui" testclass="GaussianRandomTimer" testname="Gaussian Random Timer" enabled="true">
@@ -2042,6 +1898,7 @@
                     <intProp name="Assertion.test_type">2</intProp>
                     <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
                     <boolProp name="Assertion.assume_success">false</boolProp>
+                    <stringProp name="Assertion.custom_message"></stringProp>
                   </ResponseAssertion>
                   <hashTree/>
                   <GaussianRandomTimer guiclass="GaussianRandomTimerGui" testclass="GaussianRandomTimer" testname="Gaussian Random Timer" enabled="true">
@@ -2153,6 +2010,7 @@
                     <intProp name="Assertion.test_type">2</intProp>
                     <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
                     <boolProp name="Assertion.assume_success">false</boolProp>
+                    <stringProp name="Assertion.custom_message"></stringProp>
                   </ResponseAssertion>
                   <hashTree/>
                   <GaussianRandomTimer guiclass="GaussianRandomTimerGui" testclass="GaussianRandomTimer" testname="Gaussian Random Timer" enabled="true">
@@ -2236,6 +2094,7 @@
                     <intProp name="Assertion.test_type">2</intProp>
                     <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
                     <boolProp name="Assertion.assume_success">false</boolProp>
+                    <stringProp name="Assertion.custom_message"></stringProp>
                   </ResponseAssertion>
                   <hashTree/>
                   <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assertion - Response Contains Highest grade" enabled="false">
@@ -2245,6 +2104,7 @@
                     <intProp name="Assertion.test_type">2</intProp>
                     <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
                     <boolProp name="Assertion.assume_success">false</boolProp>
+                    <stringProp name="Assertion.custom_message"></stringProp>
                   </ResponseAssertion>
                   <hashTree/>
                   <GaussianRandomTimer guiclass="GaussianRandomTimerGui" testclass="GaussianRandomTimer" testname="Gaussian Random Timer" enabled="true">
@@ -2544,9 +2404,5 @@
         </hashTree>
       </hashTree>
     </hashTree>
-    <WorkBench guiclass="WorkBenchGui" testclass="WorkBench" testname="WorkBench" enabled="true">
-      <boolProp name="WorkBench.save">true</boolProp>
-    </WorkBench>
-    <hashTree/>
   </hashTree>
 </jmeterTestPlan>
