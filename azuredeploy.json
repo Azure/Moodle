@@ -83,13 +83,13 @@
             "type": "string"
         },
         "fileServerType": {
-            "defaultValue": "gluster",
+            "defaultValue": "nfs",
             "allowedValues": [
                 "gluster",
                 "nfs"
             ],
             "metadata": {
-                "description": "File server type: GlusterFS, Azure Files (CIFS)--disabled due to too slow perf, NFS--not highly available"
+                "description": "File server type: GlusterFS, Azure Files (CIFS)--disabled due to too slow perf, NFS--not yet highly available"
             },
             "type": "string"
         },
@@ -129,13 +129,6 @@
             "defaultValue": "Standard_DS2_v2",
             "metadata": {
                 "description": "VM size for the elastic search nodes"
-            },
-            "type": "string"
-        },
-        "firewallRuleName": {
-            "defaultValue": "open-to-the-world",
-            "metadata": {
-                "description": "Database firewall rule name"
             },
             "type": "string"
         },
@@ -244,8 +237,7 @@
             },
             "type": "string"
         },
-        
-         "msDbSize": {
+        "msDbSize": {
             "allowedValues": [
                 "100MB",
                 "250MB",
@@ -269,17 +261,6 @@
             "defaultValue": "250GB",
             "metadata": {
                 "description": "MS SQL database size" 
-            },
-            "type": "string"
-        },
-
-        "skuFamily": {
-            "allowedValues": [
-                "SkuFamily"
-            ],
-            "defaultValue": "SkuFamily",
-            "metadata": {
-                "description": "MySql/Postgresql sku family"
             },
             "type": "string"
         },
@@ -368,7 +349,7 @@
             },
             "type": "string"
         },
-         "mssqlVersion": {
+        "mssqlVersion": {
             "allowedValues": [
                 "12.0"
             ],
@@ -414,12 +395,21 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/networkTemplate"
+            ],
             "name": "dbTemplate",
             "properties": {
                 "mode": "Incremental",
                 "parameters": {
                     "moodleCommon": {
                         "value": "[variables('moodleCommon')]"
+                    },
+                    "lbPubIp": {
+                        "value": "[reference('networkTemplate').outputs.lbPubIp.value]"
+                    },
+                    "ctlrPubIp": {
+                        "value": "[reference('networkTemplate').outputs.ctlrPubIp.value]"
                     }
                 },
                 "templateLink": {
@@ -540,6 +530,9 @@
                 "parameters": {
                     "moodleCommon": {
                         "value": "[variables('moodleCommon')]"
+                    },
+                    "ctlrPubIpId": {
+                        "value": "[reference('networkTemplate').outputs.ctlrPubIpId.value]"
                     }
                 },
                 "templateLink": {
@@ -638,7 +631,7 @@
         "documentation07": "    elastic             - creates a elastic search cluster on a vm farm",
         "documentation08": "    gluster             - creates a gluster file system on a vm farm",
         "documentation09": "    webvmss             - creates a vm scale set",
-        "documentation10": "    controller          - creates a jumpbox and deploys code",
+        "documentation10": "    controller          - creates a controller VM and deploys code",
         "documentation11": "GlusterFS Sizing guidance",
         "moodleCommon": {
             "baseTemplateUrl": "[concat(parameters('_artifactsLocation'), 'nested/')]",
@@ -677,7 +670,6 @@
             "fileServerDiskCount": "[parameters('fileServerDiskCount')]",
             "fileServerDiskSize": "[parameters('fileServerDiskSize')]",
             "fileServerType": "[parameters('fileServerType')]",
-            "firewallRuleName": "[parameters('firewallRuleName')]",
             "gatewayName": "[concat('vnet-gateway-',variables('resourceprefix'))]",
             "gatewayPublicIPName": "[concat('vnet-gw-ip-',variables('resourceprefix'))]",
             "gatewaySubnet": "[parameters('gatewaySubnet')]",
@@ -691,10 +683,10 @@
             "glusterVmSku": "[parameters('glusterVmSku')]",
             "installO365pluginsSwitch": "[parameters('installO365pluginsSwitch')]",
             "installElasticSearchSwitch": "[parameters('installElasticSearchSwitch')]",
-            "jboxNicName": "[concat('jumpbox-vm-nic-',variables('resourceprefix'))]",
-            "jboxNsgName": "[concat('jumpbox-nsg-',variables('resourceprefix'))]",
-            "jboxPipName": "[concat('jumpbox-pubip-',variables('resourceprefix'))]",
-            "jboxVmName": "[concat('jumpbox-vm-',variables('resourceprefix'))]",
+            "ctlrNicName": "[concat('controller-vm-nic-',variables('resourceprefix'))]",
+            "ctlrNsgName": "[concat('controller-nsg-',variables('resourceprefix'))]",
+            "ctlrPipName": "[concat('controller-pubip-',variables('resourceprefix'))]",
+            "ctlrVmName": "[concat('controller-vm-',variables('resourceprefix'))]",
             "lbDns": "[concat('lb-',variables('resourceprefix'),'.',resourceGroup().location,'.cloudapp.azure.com')]",
             "lbName": "[concat('lb-',variables('resourceprefix'))]",
             "lbPipName": "[concat('lb-pubip-',variables('resourceprefix'))]",
@@ -724,7 +716,6 @@
             "serverName": "[concat(parameters('dbServerType'), '-',variables('resourceprefix'))]",
             "siteURL": "[if(or(empty(parameters('siteURL')), equals(parameters('siteURL'), 'www.example.org')), concat('lb-',variables('resourceprefix'),'.',resourceGroup().location,'.cloudapp.azure.com'), parameters('siteURL'))]",
             "skuCapacityDTU": "[parameters('skuCapacityDTU')]",
-            "skuFamily": "[parameters('skuFamily')]",
             "skuName": "[parameters('skuName')]",
             "skuSizeMB": "[parameters('skuSizeMB')]",
             "skuTier": "[parameters('skuTier')]",

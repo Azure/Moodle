@@ -7,6 +7,18 @@
                 "description": "Common Moodle values"
             },
             "type": "object"
+        },
+        "lbPubIp": {
+            "metadata": {
+                "description": "Public IP address of the deployed load balancer"
+            },
+            "type": "string"
+        },
+        "ctlrPubIp": {
+            "metadata": {
+                "description": "Public IP address of the deployed controller VM"
+            },
+            "type": "string"
         }
     },
     "resources": [
@@ -29,14 +41,27 @@
                         "[concat('Microsoft.Sql/servers/', parameters('moodleCommon').serverName)]"
                     ],
                     "location": "[resourceGroup().location]",
-                    "name": "[parameters('moodleCommon').firewallRuleName]",
+                    "name": "mssql-firewall-allow-lb",
                     "properties": {
-                        "startIpAddress": "0.0.0.0",
-                        "endIpAddress": "255.255.255.255"
+                        "startIpAddress": "[parameters('lbPubIp')]",
+                        "endIpAddress": "[parameters('lbPubIp')]"
                     },
-                    "type": "firewallrules"
+                    "type": "firewallRules"
+                },
+                {
+                    "apiVersion": "2014-04-01",
+                    "dependsOn": [
+                        "[concat('Microsoft.Sql/servers/', parameters('moodleCommon').serverName)]"
+                    ],
+                    "location": "[resourceGroup().location]",
+                    "name": "mssql-firewall-allow-ctlr",
+                    "properties": {
+                        "startIpAddress": "[parameters('ctlrPubIp')]",
+                        "endIpAddress": "[parameters('ctlrPubIp')]"
+                    },
+                    "type": "firewallRules"
                 }
-            ],
+            ]
         }
     ],
     "variables": {
@@ -47,7 +72,6 @@
         "documentation3": " administratorLoginPassword  - Mssql admin password",
         "documentation4": " location                    - Mssql server location",
         "documentation5": " skuCapacityDTU              - Mssql database trasaction units",
-        "documentation6": " skuFamily                   - Mssql sku family",
         "documentation7": " skuName                     - Mssql sku name",
         "documentation8": " skuSizeMB                   - Mssql sku size in mb",
         "documentation9": " skuTier                     - Mssql sku tier"
