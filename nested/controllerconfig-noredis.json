@@ -14,7 +14,7 @@
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2017-03-30",
             "location": "[resourceGroup().location]",
-            "name": "[concat(parameters('moodleCommon').jboxVmName,'/','install_moodle_without_redis')]",
+            "name": "[concat(parameters('moodleCommon').ctlrVmName,'/','install_moodle_without_redis')]",
             "properties": {
                 "autoUpgradeMinorVersion": true,
                 "publisher": "Microsoft.Azure.Extensions",
@@ -42,7 +42,7 @@
         "documentation04": "    moodleInstallScriptFilename - name of script file",
         "documentation05": "    siteURL                     - URL of the website",
         "documentation06": "    gfsNameRoot                 - nameroot of gluster farm - note that the code applies a 0 to get to the first node",
-        "documentation07": "    jboxVmName                  - name of the controller/jumpb ox VM",
+        "documentation07": "    ctlrVmName                  - name of the controller/jumpb ox VM",
         "documentation08": "    dbServerType                - postgres or mysql",
         "documentation09": "    moodleDbName                - database name for moodle",
         "documentation10": "    moodleDbUser                - database user for moodle",

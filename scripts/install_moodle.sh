@@ -1284,7 +1284,7 @@ EOF
 EOF
    fi
 
-   # Turning off services we don't need the jumpbox running
+   # Turning off services we don't need the controller running
    service nginx stop
    service php7.0-fpm stop
    service varnish stop
