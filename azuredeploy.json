@@ -58,6 +58,13 @@
             },
             "type": "bool"
         },
+        "htmlLocalCopySwitch": {
+            "defaultValue": false,
+            "metadata": {
+                "description": "Switch to create a local copy of /moodle/html or not"
+            },
+            "type": "bool"
+        },
         "storageAccountType": {
             "defaultValue": "Standard_LRS",
             "allowedValues": [
@@ -683,6 +690,7 @@
             "glusterScriptFilename": "install_gluster.sh",
             "glusterVmCount": 2,
             "glusterVmSku": "[parameters('glusterVmSku')]",
+            "htmlLocalCopySwitch": "[parameters('htmlLocalCopySwitch')]",
             "installO365pluginsSwitch": "[parameters('installO365pluginsSwitch')]",
             "installElasticSearchSwitch": "[parameters('installElasticSearchSwitch')]",
             "ctlrNicName": "[concat('controller-vm-nic-',variables('resourceprefix'))]",

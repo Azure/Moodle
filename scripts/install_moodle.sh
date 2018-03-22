@@ -1315,4 +1315,7 @@ EOF
       # rm -rf /moodle_old_delete_me || true # Keep the files just in case
    fi
 
+   create_last_modified_time_update_script
+   run_once_last_modified_time_update_script
+   
 }  > /tmp/install.log

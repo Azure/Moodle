@@ -211,6 +211,81 @@ function configure_nfs_client_and_mount {
     mount ${MOUNTPOINT}
 }
 
+SERVER_TIMESTAMP_FULLPATH="/moodle/html/moodle/.last_modified_time.moodle_on_azure"
+LOCAL_TIMESTAMP_FULLPATH="/var/www/html/moodle/.last_modified_time.moodle_on_azure"
+
+# Create a script to sync /moodle/html/moodle (gluster/NFS) and /var/www/html/moodle (local) and set up a minutely cron job
+# Should be called by root and only on a VMSS web frontend VM
+function setup_html_local_copy_cron_job {
+  if [ "$(whoami)" != "root" ]; then
+    echo "${0}: Must be run as root!"
+    return 1
+  fi
+
+  local SYNC_SCRIPT_FULLPATH="/usr/local/bin/sync_moodle_html_local_copy_if_modified.sh"
+  mkdir -p $(dirname ${SYNC_SCRIPT_FULLPATH})
+
+  local SYNC_LOG_FULLPATH="/var/log/moodle-html-sync.log"
+
+  cat <<EOF > ${SYNC_SCRIPT_FULLPATH}
+#!/bin/bash
+
+sleep \$((\$RANDOM%30))
+
+if [ -f "$SERVER_TIMESTAMP_FULLPATH" ]; then
+  SERVER_TIMESTAMP=\$(cat $SERVER_TIMESTAMP_FULLPATH)
+  if [ -f "$LOCAL_TIMESTAMP_FULLPATH" ]; then
+    LOCAL_TIMESTAMP=\$(cat $LOCAL_TIMESTAMP_FULLPATH)
+  else
+    logger -p local2.notice -t moodle "Local timestamp file ($LOCAL_TIMESTAMP_FULLPATH) does not exist. Probably first time syncing? Continuing to sync."
+    mkdir -p /var/www/html
+  fi
+  if [ "\$SERVER_TIMESTAMP" != "\$LOCAL_TIMESTAMP" ]; then
+    logger -p local2.notice -t moodle "Server time stamp (\$SERVER_TIMESTAMP) is different from local time stamp (\$LOCAL_TIMESTAMP). Start syncing..."
+    if [[ \$(find $SYNC_LOG_FULLPATH -type f -size +20M 2> /dev/null) ]]; then
+      truncate -s 0 $SYNC_LOG_FULLPATH
+    fi
+    echo \$(date +%Y%m%d%H%M%S) >> $SYNC_LOG_FULLPATH
+    rsync -av --delete /moodle/html/moodle /var/www/html >> $SYNC_LOG_FULLPATH
+  fi
+else
+  logger -p local2.notice -t moodle "Remote timestamp file ($SERVER_TIMESTAMP_FULLPATH) does not exist. Is /moodle mounted? Exiting with error."
+  exit 1
+fi
+EOF
+  chmod 500 ${SYNC_SCRIPT_FULLPATH}
+
+  local CRON_DESC_FULLPATH="/etc/cron.d/sync-moodle-html-local-copy"
+  cat <<EOF > ${CRON_DESC_FULLPATH}
+* * * * * root ${SYNC_SCRIPT_FULLPATH}
+EOF
+  chmod 644 ${CRON_DESC_FULLPATH}
+}
+
+LAST_MODIFIED_TIME_UPDATE_SCRIPT_FULLPATH="/usr/local/bin/update_last_modified_time_update.moodle_on_azure.sh"
+
+# Create a script to modify the last modified timestamp file (/moodle/html/moodle/last_modified_time.moodle_on_azure)
+# Should be called by root and only on the controller VM.
+# The moodle admin should run the generated script everytime the /moodle/html/moodle directory content is updated (e.g., moodle upgrade, config change or plugin install/upgrade)
+function create_last_modified_time_update_script {
+  if [ "$(whoami)" != "root" ]; then
+    echo "${0}: Must be run as root!"
+    return 1
+  fi
+
+  mkdir -p $(dirname $LAST_MODIFIED_TIME_UPDATE_SCRIPT_FULLPATH)
+  cat <<EOF > $LAST_MODIFIED_TIME_UPDATE_SCRIPT_FULLPATH
+#!/bin/bash
+echo \$(date +%Y%m%d%H%M%S) > $SERVER_TIMESTAMP_FULLPATH
+EOF
+
+  chmod +x $LAST_MODIFIED_TIME_UPDATE_SCRIPT_FULLPATH
+}
+
+function run_once_last_modified_time_update_script {
+  $LAST_MODIFIED_TIME_UPDATE_SCRIPT_FULLPATH
+}
+
 # Long Redis cache Moodle config file generation code moved here
 function create_redis_configuration_in_moodledata_muc_config_php
 {
