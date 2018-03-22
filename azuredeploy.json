@@ -89,7 +89,7 @@
                 "nfs"
             ],
             "metadata": {
-                "description": "File server type: GlusterFS, Azure Files (CIFS)--disabled due to too slow perf, NFS--not yet highly available"
+                "description": "File server type: GlusterFS, NFS--not yet highly available"
             },
             "type": "string"
         },
