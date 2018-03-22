@@ -435,7 +435,6 @@
             }
         },
         {
-            "condition": "[parameters('redisDeploySwitch')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
             "name": "redisTemplate",
@@ -450,7 +449,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'redis.json',parameters('_artifactsLocationSasToken'))]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'redis', if(parameters('redisDeploySwitch'), '', '-none'), '.json',parameters('_artifactsLocationSasToken'))]"
                 }
             }
         },
@@ -535,7 +534,7 @@
                         "value": "[reference('networkTemplate').outputs.ctlrPubIpId.value]"
                     },
                     "redisKey": {
-                        "value": "[if(parameters('redisDeploySwitch'), reference('redisTemplate', '2017-05-10').outputs.redisKey.value, 'None')]"
+                        "value": "[reference('redisTemplate').outputs.redisKey.value]"
                     }
                 },
                 "templateLink": {

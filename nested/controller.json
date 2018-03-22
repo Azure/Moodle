@@ -18,7 +18,7 @@
             "metadata": {
                 "description": "Redis cache key from the redis deployment ('None' if redis is not selected). This just gets passed through to the controllerconfig.json."
             },
-            "type": "securestring"
+            "type": "string"
         }
     },
     "resources": [

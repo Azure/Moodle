@@ -12,7 +12,7 @@
             "metadata": {
                 "description": "Redis cache key from the redis deployment ('None' if redis is not selected)"
             },
-            "type": "securestring"
+            "type": "string"
         }
     },
     "resources": [
