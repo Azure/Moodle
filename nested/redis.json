@@ -28,6 +28,13 @@
     ],
     "variables": {
         "documentation1": "This sub-template creates a redis cache.  It expects certain values in the 'common' datastructure.",
-        "documentation2": " redisCacheName - name of cache"
+        "documentation2": " redisCacheName - name of cache",
+        "redisResourceId": "[resourceId('Microsoft.Cache/Redis', parameters('moodleCommon').redisCacheName)]"
+    },
+    "outputs": {
+        "redisKey": {
+            "value": "[listKeys(variables('redisResourceId'), '2016-04-01').primaryKey]",
+            "type": "securestring"
+        }
     }
 }

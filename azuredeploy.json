@@ -533,6 +533,9 @@
                     },
                     "ctlrPubIpId": {
                         "value": "[reference('networkTemplate').outputs.ctlrPubIpId.value]"
+                    },
+                    "redisKey": {
+                        "value": "[if(parameters('redisDeploySwitch'), reference('redisTemplate', '2017-05-10').outputs.redisKey.value, 'None')]"
                     }
                 },
                 "templateLink": {

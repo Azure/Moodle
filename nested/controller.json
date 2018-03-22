@@ -13,6 +13,12 @@
                 "description": "Resource ID of the controller VM public IP address"
             },
             "type": "string"
+        },
+        "redisKey": {
+            "metadata": {
+                "description": "Redis cache key from the redis deployment ('None' if redis is not selected). This just gets passed through to the controllerconfig.json."
+            },
+            "type": "securestring"
         }
     },
     "resources": [
@@ -149,10 +155,13 @@
                 "parameters": {
                     "moodleCommon": {
                         "value": "[parameters('moodleCommon')]"
+                    },
+                    "redisKey": {
+                        "value": "[parameters('redisKey')]"
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl, 'controllerconfig', if(parameters('moodleCommon').redisDeploySwitch,'','-noredis'), '.json', parameters('moodleCommon').artifactsSasToken)]"
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl, 'controllerconfig.json', parameters('moodleCommon').artifactsSasToken)]"
                 }
             }
         },

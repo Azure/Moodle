@@ -7,6 +7,12 @@
                 "description": "Common Moodle values"
             },
             "type": "object"
+        },
+        "redisKey": {
+            "metadata": {
+                "description": "Redis cache key from the redis deployment ('None' if redis is not selected)"
+            },
+            "type": "securestring"
         }
     },
     "resources": [
@@ -14,7 +20,7 @@
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2017-03-30",
             "location": "[resourceGroup().location]",
-            "name": "[concat(parameters('moodleCommon').ctlrVmName,'/','install_moodle_with_redis')]",
+            "name": "[concat(parameters('moodleCommon').ctlrVmName,'/','install_moodle')]",
             "properties": {
                 "autoUpgradeMinorVersion": true,
                 "publisher": "Microsoft.Azure.Extensions",
@@ -25,13 +31,13 @@
                     ]
                 },
                 "protectedSettings":{
-                    "commandToExecute": "[concat('bash ', parameters('moodleCommon').moodleInstallScriptFilename, ' ', parameters('moodleCommon').moodleVersion, ' ', concat(parameters('moodleCommon').gfsNameRoot, '0'), ' ', 'data', ' ', parameters('moodleCommon').siteURL, ' ', parameters('moodleCommon').dbDNS, ' ', parameters('moodleCommon').moodleDbName, ' ', parameters('moodleCommon').moodleDbUser, ' ', parameters('moodleCommon').moodleDbPass, ' ', parameters('moodleCommon').moodleAdminPass, ' ', concat(parameters('moodleCommon').dbLogin, '@', parameters('moodleCommon').dbServerType, '-', parameters('moodleCommon').resourcesPrefix), ' ', parameters('moodleCommon').dbLoginPassword, ' ', parameters('moodleCommon').storageAccountName, ' ', listKeys(variables('storageAccountId'), '2017-06-01').keys[0].value, ' ', parameters('moodleCommon').moodleDbUserAzure, ' ', parameters('moodleCommon').redisDns, ' ', listKeys(variables('redisResourceId'), '2016-04-01').primaryKey, ' ', parameters('moodleCommon').elasticVm1IP, ' ', parameters('moodleCommon').installO365pluginsSwitch, ' ', parameters('moodleCommon').installElasticSearchSwitch, ' ', parameters('moodleCommon').dbServerType, ' ', parameters('moodleCommon').fileServerType , ' ', parameters('moodleCommon').serviceObjective, ' ',  parameters('moodleCommon').skuTier, ' ',  parameters('moodleCommon').msDbSize )]"
+                    "commandToExecute": "[concat('bash ', parameters('moodleCommon').moodleInstallScriptFilename, ' ', parameters('moodleCommon').moodleVersion, ' ', concat(parameters('moodleCommon').gfsNameRoot, '0'), ' ', 'data', ' ', parameters('moodleCommon').siteURL, ' ', parameters('moodleCommon').dbDNS, ' ', parameters('moodleCommon').moodleDbName, ' ', parameters('moodleCommon').moodleDbUser, ' ', parameters('moodleCommon').moodleDbPass, ' ', parameters('moodleCommon').moodleAdminPass, ' ', concat(parameters('moodleCommon').dbLogin, '@', parameters('moodleCommon').dbServerType, '-', parameters('moodleCommon').resourcesPrefix), ' ', parameters('moodleCommon').dbLoginPassword, ' ', parameters('moodleCommon').storageAccountName, ' ', listKeys(variables('storageAccountId'), '2017-06-01').keys[0].value, ' ', parameters('moodleCommon').moodleDbUserAzure, ' ', parameters('moodleCommon').redisDns, ' ', parameters('redisKey'), ' ', parameters('moodleCommon').elasticVm1IP, ' ', parameters('moodleCommon').installO365pluginsSwitch, ' ', parameters('moodleCommon').installElasticSearchSwitch, ' ', parameters('moodleCommon').dbServerType, ' ', parameters('moodleCommon').fileServerType , ' ', parameters('moodleCommon').serviceObjective, ' ',  parameters('moodleCommon').skuTier, ' ',  parameters('moodleCommon').msDbSize )]"
                 },
                 "type": "CustomScript",
                 "typeHandlerVersion": "2.0"
             },
             "tags": {
-                "displayName": "install_moodle_with_redis"
+                "displayName": "install_moodle"
             }
         }
     ],
@@ -53,7 +59,6 @@
         "documentation15": "    msDbSize                    - MS SQL database size",
 
         "scriptUri": "[concat(parameters('moodleCommon').scriptLocation,parameters('moodleCommon').moodleInstallScriptFilename,parameters('moodleCommon').artifactsSasToken)]",
-        "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('moodleCommon').storageAccountName)]",
-        "redisResourceId": "[resourceId('Microsoft.Cache/Redis', parameters('moodleCommon').redisCacheName)]"
+        "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('moodleCommon').storageAccountName)]"
     }
 }
