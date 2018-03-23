@@ -1282,8 +1282,7 @@ EOF
       cat <<EOF > /etc/cron.d/sql-backup
 22 02 * * * root /usr/bin/pg_dump -Fc -h $postgresIP -U ${azuremoodledbuser} ${moodledbname} > /moodle/db-backup.sql
 EOF
-   else # mssql
-      # TODO It's missed earlier! Complete this!
+   #else # mssql. TODO It's missed earlier! Complete this!
    fi
 
    # Turning off services we don't need the controller running
