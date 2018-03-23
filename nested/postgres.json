@@ -24,7 +24,7 @@
     "resources": [
         {
             "type": "Microsoft.DBforPostgreSQL/servers",
-            "apiVersion": "2017-04-30-preview ",
+            "apiVersion": "2017-04-30-preview",
             "kind": "",
             "location": "[resourceGroup().location]",
             "name": "[parameters('moodleCommon').serverName]",
