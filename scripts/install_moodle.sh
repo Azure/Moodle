@@ -1266,7 +1266,7 @@ EOF
      add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main"
      wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
      apt-get update
-     apt-get install postgresql-client-9.6
+     apt-get install -y postgresql-client-9.6
    fi
 
    # create cron entry
@@ -1278,10 +1278,12 @@ EOF
       cat <<EOF > /etc/cron.d/sql-backup
 22 02 * * * root /usr/bin/mysqldump -h $mysqlIP -u ${azuremoodledbuser} -p'${moodledbpass}' --databases ${moodledbname} | gzip > /moodle/db-backup.sql.gz
 EOF
-   else
+   elif [ "$dbServerType" = "postgres" ]; then
       cat <<EOF > /etc/cron.d/sql-backup
 22 02 * * * root /usr/bin/pg_dump -Fc -h $postgresIP -U ${azuremoodledbuser} ${moodledbname} > /moodle/db-backup.sql
 EOF
+   else # mssql
+      # TODO It's missed earlier! Complete this!
    fi
 
    # Turning off services we don't need the controller running
