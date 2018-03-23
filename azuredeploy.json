@@ -58,6 +58,13 @@
             },
             "type": "bool"
         },
+        "htmlLocalCopySwitch": {
+            "defaultValue": false,
+            "metadata": {
+                "description": "Switch to create a local copy of /moodle/html or not"
+            },
+            "type": "bool"
+        },
         "storageAccountType": {
             "defaultValue": "Standard_LRS",
             "allowedValues": [
@@ -89,7 +96,7 @@
                 "nfs"
             ],
             "metadata": {
-                "description": "File server type: GlusterFS, Azure Files (CIFS)--disabled due to too slow perf, NFS--not yet highly available"
+                "description": "File server type: GlusterFS, NFS--not yet highly available"
             },
             "type": "string"
         },
@@ -435,7 +442,6 @@
             }
         },
         {
-            "condition": "[parameters('redisDeploySwitch')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
             "name": "redisTemplate",
@@ -450,7 +456,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'redis.json',parameters('_artifactsLocationSasToken'))]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'redis', if(parameters('redisDeploySwitch'), '', '-none'), '.json',parameters('_artifactsLocationSasToken'))]"
                 }
             }
         },
@@ -533,6 +539,9 @@
                     },
                     "ctlrPubIpId": {
                         "value": "[reference('networkTemplate').outputs.ctlrPubIpId.value]"
+                    },
+                    "redisKey": {
+                        "value": "[reference('redisTemplate').outputs.redisKey.value]"
                     }
                 },
                 "templateLink": {
@@ -681,6 +690,7 @@
             "glusterScriptFilename": "install_gluster.sh",
             "glusterVmCount": 2,
             "glusterVmSku": "[parameters('glusterVmSku')]",
+            "htmlLocalCopySwitch": "[parameters('htmlLocalCopySwitch')]",
             "installO365pluginsSwitch": "[parameters('installO365pluginsSwitch')]",
             "installElasticSearchSwitch": "[parameters('installElasticSearchSwitch')]",
             "ctlrNicName": "[concat('controller-vm-nic-',variables('resourceprefix'))]",
