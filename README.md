@@ -23,9 +23,9 @@ This template set deploys the following infrastructure:
 
 ![network_diagram](images/stack_diagram.png "Diagram of deployed stack")
 
-The template also optionally installs a handful of useful plugins that allow Moodle to be integrated with select Azure services (see below for details). 
+The template also optionally installs a handful of useful plugins that allow Moodle to be integrated with select Azure services (see below for details) and optionally allows you to configure a backup using Azure.
 
-## Useful Moodle plugins for running Moodle on Azure
+## Useful Moodle plugins for integrating Moodle with Azure Services
 There below is a listing of useful plugins allow Moodle to be integrated with select Azure services: 
 - [Azure Search Plugin](https://github.com/catalyst/moodle-search_azure) for [Azure Search](https://azure.microsoft.com/en-us/services/logic-apps/)
 - [Trigger Plugin](https://github.com/catalyst/moodle-tool_trigger) for [Azure Logic Apps](https://azure.microsoft.com/en-us/services/logic-apps/)
@@ -33,17 +33,17 @@ There below is a listing of useful plugins allow Moodle to be integrated with se
 - [Office 365 and Azure Active Directory Plugins for Moodle*](https://github.com/Microsoft/o365-moodle) for [Azure Active Directory](https://azure.microsoft.com/en-us/services/active-directory/)
 - [Elasticsearch Plugin*](https://github.com/catalyst/moodle-search_elastic)
 
-At the current time this template allows the optional installation of all of the plugins above with an * next to them. Please note these plugins can be installed at any time post deployment via Moodle's own plugin directory. You can find a list of all Azure relevant plugins in the Moodle plugin directory [here](https://moodle.org/plugins/browse.php?list=set&id=91). You might also choose to follow this list via RSS.
+At the current time this template allows the optional installation of all of the plugins above with an * next to them. Please note these plugins can be installed at any time post deployment via Moodle's own plugin directory. You can find a list of all Azure relevant plugins in the Moodle plugin directory [here](https://moodle.org/plugins/browse.php?list=set&id=91). You might also choose to follow this list via RSS. Azure does not offer a managed Elasticsearch service, so for those looking for a fully managed Search service Azure Search is recommended.
 
 ## Moodle as a Managed Application
-You can learn more about how to offer Moodle as a Managed Application on the Azure Marketplace or on an IT Service Catalog [here](https://github.com/Azure/Moodle/tree/master/managedApplication). 
+You can learn more about how you can offer Moodle as a Managed Application on the Azure Marketplace or on an IT Service Catalog [here](https://github.com/Azure/Moodle/tree/master/managedApplication). This is a great read if you are offering Moodle hosting services today for your customers. 
 
-## Common Questions about the template
-1.  **Is this template Moodle as IaaS or PaaS?**  While the current template leverages PaaS services such as Redis, MySQL, Postgres, MS SQL etc. the current template offers Moodle as IaaS. Given limitations to Moodle our focus is IaaS for the time being however we would love to be informed of your experience running Moodle as PaaS on Azure using Azure Container Service or Azure Web Apps. 
+## Common questions about this Template
+1.  **Is this template Moodle as IaaS or PaaS?**  While the current template leverages PaaS services such as Redis, MySQL, Postgres, MS SQL etc. the current template offers Moodle as IaaS. Given limitations to Moodle our focus is IaaS for the time being however we would love to be informed of your experience running Moodle as PaaS on Azure (i.e. using [Azure Container Service](https://azure.microsoft.com/en-us/services/container-service/) or [Azure App Service](https://azure.microsoft.com/en-us/services/container-service/)). 
 
-2.  **Will other OSs such as CentOS be supported in the future?** Unfortunately we only have plans to support Ubuntu at this time. It is highly unlikely that this will change.
+2.  **The current template uses Ubuntu. Will other Operating Systems such as CentOS or Windows Server be supported in the future?** Unfortunately we only have plans to support Ubuntu at this time. It is highly unlikely that this will change.
 
-3.  **Which database should I use?** This is entirely personal preference, however, at this time MySQL and MS SQL have higher performance than PostgreSQL. 
+3.  **Which database should I use?** This is entirely personal preference, however, at this time [Azure Database for MySQL](https://azure.microsoft.com/en-us/services/mysql/) and [Azure SQL Database](https://azure.microsoft.com/en-us/services/sql-database/) have higher performance than [Azure Database for PostgreSQL](https://azure.microsoft.com/en-us/services/postgresql/). 
 
 4. **Did Microsoft build this template alone or with the help of the Moodle community?** We did not build this template alone. We relied on the expertise and guidance of many capable Moodle partners around the world. The initial implementation of the template was done by [Catalyst IT](https://github.com/catalyst).
 
@@ -51,9 +51,17 @@ You can learn more about how to offer Moodle as a Managed Application on the Azu
 
 6. **How does this template relate to this [Azure Quickstart Template for Moodle](https://github.com/Azure/azure-quickstart-templates/tree/master/moodle-scalable-cluster-ubuntu)?** This repo is the working repo for the quickstart template. We will be pushing changes from this template to the quickstart template on a regular cadence.
 
-7. **I am already running Moodle on Azure. How does this benefit me?** We are looking for painpoints from the community that we can help solve. We are also looking to understand where our implementation of Moodle on Azure outperforms or underperforms other implementations out in the wild. If you have load testing scripts, performance benchmarks or just general feedback that you'd like to share we're extremely interested!
+7. **I am already running Moodle on Azure. How does this work benefit me?** We are looking for painpoints from you and the broader Moodle on Azure community that we can help solve. We are also looking to understand where our implementation of Moodle on Azure outperforms or underperforms other implementations such as yours that are out in the wild. If you have observations, performance benchmarks or just general feedback about your experience running Moodle on Azure that you'd like to share we're extremely interested! Load testing is a very big area of focus, so if you have scripts you wouldn't mind contributing please let us know. 
 
-8.  **How can I help with this effort?** Please see below. 
+8.  **Has anyone run this template sucessfully in production?** Yes they have. With that being said we do not make any performance guaruntees about this architecture.
+
+9.  **What type of improvements have you succeeded in making** Since we first began this effort we have managed to make great gains, achieving a >2x performance boost from our original configuration by making tweaks to things like where PHP files were stored. Our work is nowhere near over.  
+
+10.  **What other Azure Services (i.e. CDN, Media Services etc.) will you be integrating with when this effort is complete?** It's not clear yet. We'll need your [feedback](https://github.com/Azure/Moodle/issues) to decide.
+
+11.  **Why the database on a public subnet?** At this stage Azure Database for MySQL and PostgreSQL do not support being moved to a vnet. As a workaround, we use a firewall-based IP restriction allow access only to the controller VM and VMSS load-balancer IPs.  
+
+12.  **How can I help with this effort?** Please see below. 
 
 ## Contributing
 
