@@ -380,7 +380,7 @@
             "metadata": {
                 "description": "The base URI where artifacts required by this template are located. Under normal circumstances this will not be changed. If you want to create a customized version of these templates then change this parameter, otherwise leave as the default."
             },
-            "defaultValue": "https://raw.githubusercontent.com/Azure/Moodle/master/"
+            "defaultValue": "https://raw.githubusercontent.com/Azure/Moodle/docs/"
         },
         "_artifactsLocationSasToken": {
             "type": "securestring",
