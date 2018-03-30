@@ -32,7 +32,7 @@
         "vnetGwDeploySwitch": {
             "defaultValue": false,
             "metadata": {
-                "description": "Switch to deploy a Virtual Network Gateway or not. If you require VPN access to your cluster or communication with another Azure Virtual Network, you should set this to true. If you set this to true then you should review the `gateway*` parameters below to configure your gateway. VNet Gateways incur an additional cost. See https://docs.microsoft.com/azure/vpn-gateway/ for more information."
+                "description": "Switch to deploy a Virtual Network Gateway or not. If you require VPN access to your cluster or communication with another Azure Virtual Network, you should set this to true. If you set this to true then you should review the 'gateway*' parameters below to configure your gateway. VNet Gateways incur an additional cost. See https://docs.microsoft.com/azure/vpn-gateway/ for more information."
             },
             "type": "bool"
         },
@@ -74,7 +74,7 @@
                 "nfs"
             ],
             "metadata": {
-                "description": "Moodle files (the PHP source and Moodle Data) are stored on a fileserver. Gluster provides a replicated solution that is designed to provide higher avialbility, but incurs additional cost (it uses at least 2 additional VMs). Alternatively you can opt to use an NFS server which does not require an additional VM and is therefore cheaper, however, since it presents a single point of failure it may not be the preferred option. To further configure your fileserver see the `gluster*` and `fileserver` parameters below."
+                "description": "Moodle files (the PHP source and Moodle Data) are stored on a fileserver. Gluster provides a replicated solution that is designed to provide higher avialbility, but incurs additional cost (it uses at least 2 additional VMs). Alternatively you can opt to use an NFS server which does not require an additional VM and is therefore cheaper, however, since it presents a single point of failure it may not be the preferred option. To further configure your fileserver see the 'gluster*' and 'fileserver' parameters below."
             },
             "type": "string"
         },
@@ -120,7 +120,7 @@
         "elasticVmSku": {
             "defaultValue": "Standard_DS2_v2",
             "metadata": {
-                "description": "VM size for the elastic search nodes. This parameter is only used if `installElasticSearchSwitch` is set to true, in which case it defines the size of the three VMs used to provide Moodle Global Search using Elastic Search. For more information on VM sizes and prices see https://azure.microsoft.com/en-us/services/virtual-machines/."
+                "description": "VM size for the elastic search nodes. This parameter is only used if 'installElasticSearchSwitch' is set to true, in which case it defines the size of the three VMs used to provide Moodle Global Search using Elastic Search. For more information on VM sizes and prices see https://azure.microsoft.com/en-us/services/virtual-machines/."
             },
             "type": "string"
         },
@@ -140,7 +140,7 @@
             ],
             "defaultValue": "GatewaySubnet",
             "metadata": {
-                "description": "Name for Virtual Network Gateway Subnet as it will appear in the Azure subscription. This is not used unless `vnetGwDeploySwitch` is set to true. Under normal circumstances this will not need to be changed."
+                "description": "Name for Virtual Network Gateway Subnet as it will appear in the Azure subscription. This is not used unless 'vnetGwDeploySwitch' is set to true. Under normal circumstances this will not need to be changed."
             },
             "type": "string"
         },
@@ -151,14 +151,14 @@
             ],
             "defaultValue": "Vpn",
             "metadata": {
-                "description": "If `vnetGwDeploySwitch is set to true this parameter will set the Virtual Network Gateway Type, it will be either Virtual Private Network (Vpn) or Express Route (ER). For more information see https://docs.microsoft.com/azure/vpn-gateway/."
+                "description": "If 'vnetGwDeploySwitch' is set to true this parameter will set the Virtual Network Gateway Type, it will be either Virtual Private Network (Vpn) or Express Route (ER). For more information see https://docs.microsoft.com/azure/vpn-gateway/."
             },
             "type": "string"
         },
         "glusterVmSku": {
             "defaultValue": "Standard_DS2_v2",
             "metadata": {
-                "description": "VM size for the Gluster nodes. This parameter is only used if ``fileServerType` is set to 'gluster'. You should select a size that is appropriate for your expected load. For more information on VM sizes and prices see https://azure.microsoft.com/en-us/services/virtual-machines/."
+                "description": "VM size for the Gluster nodes. This parameter is only used if ''fileServerType' is set to 'gluster'. You should select a size that is appropriate for your expected load. For more information on VM sizes and prices see https://azure.microsoft.com/en-us/services/virtual-machines/."
             },
             "type": "string"
         },
@@ -167,14 +167,14 @@
             "minValue": 2,
             "maxValue": 8,
             "metadata": {
-                "description": "Number of disks in raid0 per Gluster node or NFS server. The size of the disks is configurable via the `fileServerDiskSize` parameter. You should opt for an appropriate balance between number of disks, size of disks and price."
+                "description": "Number of disks in raid0 per Gluster node or NFS server. The size of the disks is configurable via the 'fileServerDiskSize' parameter. You should opt for an appropriate balance between number of disks, size of disks and price."
             },
             "type": "int"
         },        
         "fileServerDiskSize": {
             "defaultValue": 127,
             "metadata": {
-                "description": "Size per disk for Gluster nodes or NFS server. The size of the disks is configurable via the `fileServerDiskSize` parameter. You should opt for an appropriate balance between number of disks, size of disks and price."
+                "description": "Size per disk for Gluster nodes or NFS server. The size of the disks is configurable via the 'fileServerDiskSize' parameter. You should opt for an appropriate balance between number of disks, size of disks and price."
             },
             "type": "int"
         },
@@ -217,7 +217,7 @@
             ],
             "defaultValue": 100,
             "metadata": {
-                "description": "Required Database Trasaction Units for MySQL or Postgres databases. This parameter is only used if `dbServerType` is set to 'mysql' or 'postgres'. DTU is a measure of the guaranteed level of resources for your database. It is a blended measure of CPU, memory, I/O (data and transaction log I/O). If your workload exceeds theselected amount of DTUs your throughput is throttled. It is important to selected a DTU level that can manage your workload without throttling but be aware that higher levels of DTUs will incur higher charges for your database. For more information on DTUs see https://docs.microsoft.com/azure/sql-database/sql-database-what-is-a-dtu."
+                "description": "Required Database Trasaction Units for MySQL or Postgres databases. This parameter is only used if 'dbServerType' is set to 'mysql' or 'postgres'. DTU is a measure of the guaranteed level of resources for your database. It is a blended measure of CPU, memory, I/O (data and transaction log I/O). If your workload exceeds theselected amount of DTUs your throughput is throttled. It is important to selected a DTU level that can manage your workload without throttling but be aware that higher levels of DTUs will incur higher charges for your database. For more information on DTUs see https://docs.microsoft.com/azure/sql-database/sql-database-what-is-a-dtu."
             },
             "type": "int"
         },
@@ -316,7 +316,7 @@
             ],
             "defaultValue": "S1",
             "metadata": {
-                "description": "Required Database Trasaction Units for MS SQL databases. This parameter is only used if `dbServerType` is set to 'mssql'. DTU is a measure of the guaranteed level of resources for your database. It is a blended measure of CPU, memory, I/O (data and transaction log I/O). If your workload exceeds theselected amount of DTUs your throughput is throttled. It is important to selected a DTU level that can manage your workload without throttling but be aware that higher levels of DTUs will incur higher charges for your database. For more information on DTUs see https://docs.microsoft.com/azure/sql-database/sql-database-what-is-a-dtu."
+                "description": "Required Database Trasaction Units for MS SQL databases. This parameter is only used if 'dbServerType' is set to 'mssql'. DTU is a measure of the guaranteed level of resources for your database. It is a blended measure of CPU, memory, I/O (data and transaction log I/O). If your workload exceeds theselected amount of DTUs your throughput is throttled. It is important to selected a DTU level that can manage your workload without throttling but be aware that higher levels of DTUs will incur higher charges for your database. For more information on DTUs see https://docs.microsoft.com/azure/sql-database/sql-database-what-is-a-dtu."
             },
             "type": "string"
         },
@@ -343,7 +343,7 @@
             ],
             "defaultValue": "250GB",
             "metadata": {
-                "description": "Required Database size for MS SQL databases. This parameter is only used if `dbServerType` is set to 'mssql'."
+                "description": "Required Database size for MS SQL databases. This parameter is only used if 'dbServerType' is set to 'mssql'."
             },
             "type": "string"
         },
