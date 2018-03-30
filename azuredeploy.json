@@ -65,123 +65,12 @@
             },
             "type": "bool"
         },
-        "storageAccountType": {
-            "defaultValue": "Standard_LRS",
-            "allowedValues": [
-                "Standard_LRS",
-                "Standard_GRS",
-                "Standard_ZRS"
-            ],
+        "siteURL": {
+            "defaultValue": "www.example.org",
             "metadata": {
-                "description": "Storage Account type"
+                "description": "URL for Moodle site"
             },
             "type": "string"
-        },
-        "dbServerType": {
-            "defaultValue": "mysql",
-            "allowedValues": [
-                "postgres",
-                "mysql",
-                "mssql"
-            ],
-            "metadata": {
-                "description": "Database type"
-            },
-            "type": "string"
-        },
-        "fileServerType": {
-            "defaultValue": "nfs",
-            "allowedValues": [
-                "gluster",
-                "nfs"
-            ],
-            "metadata": {
-                "description": "File server type: GlusterFS, NFS--not yet highly available"
-            },
-            "type": "string"
-        },
-        "webServerType": {
-            "defaultValue": "apache",
-            "allowedValues": [
-                "apache",
-                "nginx"
-            ],
-            "metadata": {
-                "description": "Web server type"
-            },
-            "type": "string"
-        },
-        "controllerVmSku": {
-            "defaultValue": "Standard_DS1_v2",
-            "metadata": {
-                "description": "VM size for the controller node"
-            },
-            "type": "string"
-        },
-        "autoscaleVmSku": {
-            "defaultValue": "Standard_DS2_v2",
-            "metadata": {
-                "description": "VM size for autoscaled nodes"
-            },
-            "type": "string"
-        },
-        "autoscaleVmCount": {
-            "defaultValue": 10,
-            "metadata": {
-                "description": "Maximum number of autoscaled nodes"
-            },
-            "type": "int"
-        },
-        "elasticVmSku": {
-            "defaultValue": "Standard_DS2_v2",
-            "metadata": {
-                "description": "VM size for the elastic search nodes"
-            },
-            "type": "string"
-        },
-        "gatewaySubnet": {
-            "allowedValues": [
-                "GatewaySubnet"
-            ],
-            "defaultValue": "GatewaySubnet",
-            "metadata": {
-                "description": "name for Virtual network gateway subnet"
-            },
-            "type": "string"
-        },
-        "gatewayType": {
-            "allowedValues": [
-                "Vpn",
-                "ER"
-            ],
-            "defaultValue": "Vpn",
-            "metadata": {
-                "description": "Virtual network gateway type"
-            },
-            "type": "string"
-        },
-        "glusterVmSku": {
-            "defaultValue": "Standard_DS2_v2",
-            "metadata": {
-                "description": "VM size for the gluster nodes"
-            },
-            "type": "string"
-        },
-        "fileServerDiskSize": {
-            "defaultValue": 127,
-            "metadata": {
-                "description": "Size per disk for gluster nodes or nfs server"
-            },
-            "type": "int"
-        },
-        "fileServerDiskCount": {
-            "defaultValue": 4,
-            "minValue": 2,
-            "maxValue": 8,
-            "metadata": {
-                "description": "Number of disks in raid0 per gluster node or nfs server"
-            },
-            "type": "int"
         },
         "moodleVersion": {
             "allowedValues": [
@@ -198,6 +87,63 @@
             },
             "type": "string"
         },
+        "sshPublicKey": {
+            "metadata": {
+                "description": "ssh public key"
+            },
+            "type": "string"
+        },
+        "sshUsername": {
+            "defaultValue": "azureadmin",
+            "metadata": {
+                "description": "ssh user name"
+            },
+            "type": "string"
+        },
+        "controllerVmSku": {
+            "defaultValue": "Standard_DS1_v2",
+            "metadata": {
+                "description": "VM size for the controller VM"
+            },
+            "type": "string"
+        },
+        "webServerType": {
+            "defaultValue": "apache",
+            "allowedValues": [
+                "apache",
+                "nginx"
+            ],
+            "metadata": {
+                "description": "Web server type"
+            },
+            "type": "string"
+        },
+        "autoscaleVmSku": {
+            "defaultValue": "Standard_DS2_v2",
+            "metadata": {
+                "description": "VM size for autoscaled web VMs"
+            },
+            "type": "string"
+        },
+        "autoscaleVmCount": {
+            "defaultValue": 10,
+            "metadata": {
+                "description": "Maximum number of autoscaled web VMs"
+            },
+            "type": "int"
+        },
+        "dbServerType": {
+            "defaultValue": "mysql",
+            "allowedValues": [
+                "postgres",
+                "mysql",
+                "mssql"
+            ],
+            "metadata": {
+                "description": "Database type"
+            },
+            "type": "string"
+        },
         "dbLogin": {
             "defaultValue": "dbadmin",
             "metadata": {
@@ -205,29 +151,87 @@
             },
             "type": "string"
         },
-        "siteURL": {
-            "defaultValue": "www.example.org",
-            "metadata": {
-                "description": "URL for Moodle site"
-            },
-            "type": "string"
-        },
-        "skuCapacityDTU": {
+        "mysqlPgresVcores": {
             "allowedValues": [
-                50,
-                100,
-                200,
-                400,
-                800
+                1,
+                2,
+                4,
+                8,
+                16,
+                32
             ],
-            "defaultValue": 100,
+            "defaultValue": 2,
             "metadata": {
-                "description": "MySql/Postgresql database trasaction units"
+                "description": "MySql/Postgresql vCores. For Basic tier, only 1 & 2 are allowed. For GeneralPurpose tier, 2, 4, 8, 16, 32 are allowed. For MemoryOptimized, 2, 4, 8, 16 are allowed."
             },
             "type": "int"
         },
-
-        "serviceObjective": {
+        "mysqlPgresStgSizeGB": {
+            "defaultValue": 125,
+            "minValue": 5,
+            "maxValue": 1024,
+            "metadata": {
+                "description": "MySql/Postgresql storage size in GB. Minimum 5GB, increase by 1GB, up to 1TB (1024 GB)"
+            },
+            "type": "int"
+        },
+        "mysqlPgresSkuTier": {
+            "allowedValues": [
+                "Basic",
+                "GeneralPurpose",
+                "MemoryOptimized"
+            ],
+            "defaultValue": "GeneralPurpose",
+            "metadata": {
+                "description": "MySql/Postgresql sku tier"
+            },
+            "type": "string"
+        },
+        "mysqlPgresSkuHwFamily": {
+            "allowedValues": [
+                "Gen4",
+                "Gen5"
+            ],
+            "defaultValue": "Gen4",
+            "metadata": {
+                "description": "MySql/Postgresql sku hardware family"
+            },
+            "type": "string"
+        },
+        "mysqlVersion": {
+            "allowedValues": [
+                "5.6",
+                "5.7"
+            ],
+            "defaultValue": "5.7",
+            "metadata": {
+                "description": "Mysql version"
+            },
+            "type": "string"
+        },
+        "postgresVersion": {
+            "allowedValues": [
+                "9.5",
+                "9.6"
+            ],
+            "defaultValue": "9.6",
+            "metadata": {
+                "description": "Postgresql version"
+            },
+            "type": "string"
+        },
+        "sslEnforcement": {
+            "allowedValues": [
+                "Disabled",
+                "Enabled"
+            ],
+            "defaultValue": "Disabled",
+            "metadata": {
+                "description": "MySql/Postgresql SSL connection"
+            },
+            "type": "string"
+        },
+        "mssqlDbServiceObjectiveName": {
             "allowedValues": [
                 "S1",
                 "S2",
@@ -240,11 +244,11 @@
             ],
             "defaultValue": "S1",
             "metadata": {
-                "description": "MS SQL  database trasaction units"
+                "description": "MS SQL database service object names"
             },
             "type": "string"
         },
-        "msDbSize": {
+        "mssqlDbSize": {
             "allowedValues": [
                 "100MB",
                 "250MB",
@@ -271,88 +275,14 @@
             },
             "type": "string"
         },
-        "skuName": {
-            "allowedValues": [
-                "PGSQLB50",
-                "PGSQLB100",
-                "PGSQLS100",
-                "PGSQLS200",
-                "PGSQLS400",
-                "PGSQLS800",
-                "MYSQLB50",
-                "MYSQLB100",
-                "MYSQLS100",
-                "MYSQLS200",
-                "MYSQLS400",
-                "MYSQLS800"
-            ],
-            "defaultValue": "MYSQLS100",
-            "metadata": {
-                "description": "MySql/Postgresql sku name"
-            },
-            "type": "string"
-        },
-        "skuSizeMB": {
-            "defaultValue": 128000,
-            "metadata": {
-                "description": "MySql/Postgresql sku size in MB. For Basic tier, minimum 50GB, increased by 125GB up to 1TB. For Standard tier, minimum 125GB, increase by 125GB up to 1TB"
-            },
-            "type": "int"
-        },
-        "skuTier": {
+        "mssqlDbEdition": {
             "allowedValues": [
                 "Basic",
                 "Standard"
             ],
             "defaultValue": "Standard",
             "metadata": {
-                "description": "MySql/Postgresql sku tier"
-            },
-            "type": "string"
-        },
-        "sshPublicKey": {
-            "metadata": {
-                "description": "ssh public key"
-            },
-            "type": "string"
-        },
-        "sshUsername": {
-            "defaultValue": "azureadmin",
-            "metadata": {
-                "description": "ssh user name"
-            },
-            "type": "string"
-        },
-        "sslEnforcement": {
-            "allowedValues": [
-                "Disabled",
-                "Enabled"
-            ],
-            "defaultValue": "Disabled",
-            "metadata": {
-                "description": "MySql/Postgresql SSL connection"
-            },
-            "type": "string"
-        },
-        "postgresVersion": {
-            "allowedValues": [
-                "9.5",
-                "9.6"
-            ],
-            "defaultValue": "9.6",
-            "metadata": {
-                "description": "Postgresql version"
-            },
-            "type": "string"
-        },
-        "mysqlVersion": {
-            "allowedValues": [
-                "5.6",
-                "5.7"
-            ],
-            "defaultValue": "5.7",
-            "metadata": {
-                "description": "Mysql version"
+                "description": "MS SQL DB edition"
             },
             "type": "string"
         },
@@ -366,10 +296,84 @@
             },
             "type": "string"
         },
+        "fileServerType": {
+            "defaultValue": "nfs",
+            "allowedValues": [
+                "gluster",
+                "nfs"
+            ],
+            "metadata": {
+                "description": "File server type: GlusterFS, NFS--not yet highly available"
+            },
+            "type": "string"
+        },
+        "fileServerDiskSize": {
+            "defaultValue": 127,
+            "metadata": {
+                "description": "Size per disk for gluster nodes or nfs server"
+            },
+            "type": "int"
+        },
+        "fileServerDiskCount": {
+            "defaultValue": 4,
+            "minValue": 2,
+            "maxValue": 8,
+            "metadata": {
+                "description": "Number of disks in raid0 per gluster node or nfs server"
+            },
+            "type": "int"
+        },
+        "glusterVmSku": {
+            "defaultValue": "Standard_DS2_v2",
+            "metadata": {
+                "description": "VM size for the gluster nodes"
+            },
+            "type": "string"
+        },
+        "storageAccountType": {
+            "defaultValue": "Standard_LRS",
+            "allowedValues": [
+                "Standard_LRS",
+                "Standard_GRS",
+                "Standard_ZRS"
+            ],
+            "metadata": {
+                "description": "Storage Account type"
+            },
+            "type": "string"
+        },
+        "elasticVmSku": {
+            "defaultValue": "Standard_DS2_v2",
+            "metadata": {
+                "description": "VM size for the elastic search nodes"
+            },
+            "type": "string"
+        },
         "vNetAddressSpace": {
             "defaultValue": "172.31.0.0",
             "metadata": {
                 "description": "Address range for the Moodle virtual network - presumed /16 - further subneting during vnet creation"
+            },
+            "type": "string"
+        },
+        "gatewaySubnet": {
+            "allowedValues": [
+                "GatewaySubnet"
+            ],
+            "defaultValue": "GatewaySubnet",
+            "metadata": {
+                "description": "name for Virtual network gateway subnet"
+            },
+            "type": "string"
+        },
+        "gatewayType": {
+            "allowedValues": [
+                "Vpn",
+                "ER"
+            ],
+            "defaultValue": "Vpn",
+            "metadata": {
+                "description": "Virtual network gateway type"
             },
             "type": "string"
         },
@@ -707,8 +711,15 @@
             "moodleDbUserAzure": "[concat('moodle', '@', parameters('dbServerType'), '-', variables('resourceprefix'))]",
             "moodleInstallScriptFilename": "install_moodle.sh",
             "moodleVersion": "[parameters('moodleVersion')]",
-            "msDbSize": "[parameters('msDbSize')]",
+            "mssqlDbServiceObjectiveName": "[parameters('mssqlDbServiceObjectiveName')]",
+            "mssqlDbSize": "[parameters('mssqlDbSize')]",
+            "mssqlDbEdition": "[parameters('mssqlDbEdition')]",
             "mssqlVersion": "[parameters('mssqlVersion')]",
+            "mysqlPgresSkuHwFamily": "[parameters('mysqlPgresSkuHwFamily')]",
+            "mysqlPgresSkuName": "[concat(if(equals(parameters('mysqlPgresSkuTier'),'Basic'),'B', if(equals(parameters('mysqlPgresSkuTier'),'GeneralPurpose'),'GP', 'MO')), '_', parameters('mysqlPgresSkuHwFamily'), '_', string(parameters('mysqlPgresVcores')))]",
+            "mysqlPgresSkuTier": "[parameters('mysqlPgresSkuTier')]",
+            "mysqlPgresStgSizeGB": "[parameters('mysqlPgresStgSizeGB')]",
+            "mysqlPgresVcores": "[parameters('mysqlPgresVcores')]",
             "mysqlVersion": "[parameters('mysqlVersion')]",
             "osType": {
                 "offer": "UbuntuServer",
@@ -722,13 +733,8 @@
             "redisDeploySwitch": "[parameters('redisDeploySwitch')]",
             "redisDns": "[concat('redis-',variables('resourceprefix'),'.redis.cache.windows.net')]",
             "resourcesPrefix": "[variables('resourceprefix')]",
-            "serviceObjective": "[parameters('serviceObjective')]",
             "serverName": "[concat(parameters('dbServerType'), '-',variables('resourceprefix'))]",
             "siteURL": "[if(or(empty(parameters('siteURL')), equals(parameters('siteURL'), 'www.example.org')), concat('lb-',variables('resourceprefix'),'.',resourceGroup().location,'.cloudapp.azure.com'), parameters('siteURL'))]",
-            "skuCapacityDTU": "[parameters('skuCapacityDTU')]",
-            "skuName": "[parameters('skuName')]",
-            "skuSizeMB": "[parameters('skuSizeMB')]",
-            "skuTier": "[parameters('skuTier')]",
             "sshPublicKey": "[parameters('sshPublicKey')]",
             "sshUsername": "[parameters('sshUsername')]",
             "sslEnforcement": "[parameters('sslEnforcement')]",

@@ -42,7 +42,7 @@ Type: securestring
 
 Possible Values: null
 
-Default:
+Default: 
 
 
 ### applyScriptsSwitch
@@ -56,6 +56,28 @@ Possible Values: null
 Default: true
 
 
+### autoscaleVmCount
+
+Maximum number of autoscaled web VMs
+
+Type: int
+
+Possible Values: null
+
+Default: 10
+
+
+### autoscaleVmSku
+
+VM size for autoscaled web VMs
+
+Type: string
+
+Possible Values: null
+
+Default: Standard_DS2_v2
+
+
 ### azureBackupSwitch
 
 Switch to configure AzureBackup and enlist VM's
@@ -67,59 +89,26 @@ Possible Values: null
 Default: false
 
 
-### redisDeploySwitch
+### controllerVmSku
 
-Switch to deploy a redis cache or not
-
-Type: bool
-
-Possible Values: null
-
-Default: true
-
-
-### vnetGwDeploySwitch
-
-Switch to deploy a virtual network gateway or not
-
-Type: bool
-
-Possible Values: null
-
-Default: false
-
-
-### installO365pluginsSwitch
-
-Switch to install Moodle Office 365 plugins
-
-Type: bool
-
-Possible Values: null
-
-Default: false
-
-
-### installElasticSearchSwitch
-
-Switch to install Moodle ElasticSearch plugins & VMs
-
-Type: bool
-
-Possible Values: null
-
-Default: false
-
-
-### storageAccountType
-
-Storage Account type
+VM size for the controller VM
 
 Type: string
 
-Possible Values: ["Standard_LRS","Standard_GRS","Standard_ZRS"]
+Possible Values: null
 
-Default: Standard_LRS
+Default: Standard_DS1_v2
+
+
+### dbLogin
+
+Database admin username
+
+Type: string
+
+Possible Values: null
+
+Default: dbadmin
 
 
 ### dbServerType
@@ -133,61 +122,6 @@ Possible Values: ["postgres","mysql","mssql"]
 Default: mysql
 
 
-### fileServerType
-
-File server type: GlusterFS, Azure Files (CIFS)--disabled due to too slow perf, NFS--not highly available
-
-Type: string
-
-Possible Values: ["gluster","nfs"]
-
-Default: gluster
-
-
-### webServerType
-
-Web server type
-
-Type: string
-
-Possible Values: ["apache","nginx"]
-
-Default: apache
-
-
-### controllerVmSku
-
-VM size for the controller node
-
-Type: string
-
-Possible Values: null
-
-Default: Standard_DS1_v2
-
-
-### autoscaleVmSku
-
-VM size for autoscaled nodes
-
-Type: string
-
-Possible Values: null
-
-Default: Standard_DS2_v2
-
-
-### autoscaleVmCount
-
-Maximum number of autoscaled nodes
-
-Type: int
-
-Possible Values: null
-
-Default: 10
-
-
 ### elasticVmSku
 
 VM size for the elastic search nodes
@@ -197,6 +131,39 @@ Type: string
 Possible Values: null
 
 Default: Standard_DS2_v2
+
+
+### fileServerDiskCount
+
+Number of disks in raid0 per gluster node or nfs server
+
+Type: int
+
+Possible Values: null
+
+Default: 4
+
+
+### fileServerDiskSize
+
+Size per disk for gluster nodes or nfs server
+
+Type: int
+
+Possible Values: null
+
+Default: 127
+
+
+### fileServerType
+
+File server type: GlusterFS, NFS--not yet highly available
+
+Type: string
+
+Possible Values: ["gluster","nfs"]
+
+Default: nfs
 
 
 ### gatewaySubnet
@@ -232,26 +199,37 @@ Possible Values: null
 Default: Standard_DS2_v2
 
 
-### fileServerDiskSize
+### htmlLocalCopySwitch
 
-Size per disk for gluster nodes or nfs server
+Switch to create a local copy of /moodle/html or not
 
-Type: int
-
-Possible Values: null
-
-Default: 127
-
-
-### fileServerDiskCount
-
-Number of disks in raid0 per gluster node or nfs server
-
-Type: int
+Type: bool
 
 Possible Values: null
 
-Default: 4
+Default: false
+
+
+### installElasticSearchSwitch
+
+Switch to install Moodle ElasticSearch plugins & VMs
+
+Type: bool
+
+Possible Values: null
+
+Default: false
+
+
+### installO365pluginsSwitch
+
+Switch to install Moodle Office 365 plugins
+
+Type: bool
+
+Possible Values: null
+
+Default: false
 
 
 ### moodleVersion
@@ -265,15 +243,125 @@ Possible Values: ["MOODLE_34_STABLE","MOODLE_33_STABLE","MOODLE_32_STABLE","MOOD
 Default: MOODLE_34_STABLE
 
 
-### dbLogin
+### mssqlDbEdition
 
-Database admin username
+MS SQL DB edition
 
 Type: string
 
+Possible Values: ["Basic","Standard"]
+
+Default: Standard
+
+
+### mssqlDbServiceObjectiveName
+
+MS SQL database service object names
+
+Type: string
+
+Possible Values: ["S1","S2","S3","S4","S5","S6","S7","S9"]
+
+Default: S1
+
+
+### mssqlDbSize
+
+MS SQL database size
+
+Type: string
+
+Possible Values: ["100MB","250MB","500MB","1GB","2GB","5GB","10GB","20GB","30GB","40GB","50GB","100GB","250GB","300GB","400GB","500GB","750GB","1024GB"]
+
+Default: 250GB
+
+
+### mssqlVersion
+
+Mssql version
+
+Type: string
+
+Possible Values: ["12.0"]
+
+Default: 12.0
+
+
+### mysqlPgresSkuHwFamily
+
+MySql/Postgresql sku hardware family
+
+Type: string
+
+Possible Values: ["Gen4","Gen5"]
+
+Default: Gen4
+
+
+### mysqlPgresSkuTier
+
+MySql/Postgresql sku tier
+
+Type: string
+
+Possible Values: ["Basic","GeneralPurpose","MemoryOptimized"]
+
+Default: GeneralPurpose
+
+
+### mysqlPgresStgSizeGB
+
+MySql/Postgresql storage size in GB. Minimum 5GB, increase by 1GB, up to 1TB (1024 GB)
+
+Type: int
+
 Possible Values: null
 
-Default: dbadmin
+Default: 125
+
+
+### mysqlPgresVcores
+
+MySql/Postgresql vCores. For Basic tier, only 1 & 2 are allowed. For GeneralPurpose tier, 2, 4, 8, 16, 32 are allowed. For MemoryOptimized, 2, 4, 8, 16 are allowed.
+
+Type: int
+
+Possible Values: [1,2,4,8,16,32]
+
+Default: 2
+
+
+### mysqlVersion
+
+Mysql version
+
+Type: string
+
+Possible Values: ["5.6","5.7"]
+
+Default: 5.7
+
+
+### postgresVersion
+
+Postgresql version
+
+Type: string
+
+Possible Values: ["9.5","9.6"]
+
+Default: 9.6
+
+
+### redisDeploySwitch
+
+Switch to deploy a redis cache or not
+
+Type: bool
+
+Possible Values: null
+
+Default: true
 
 
 ### siteURL
@@ -285,72 +373,6 @@ Type: string
 Possible Values: null
 
 Default: www.example.org
-
-
-### skuCapacityDTU
-
-MySql/Postgresql database trasaction units
-
-Type: int
-
-Possible Values: [50,100,200,400,800]
-
-Default: 100
-
-
-### serviceObjective
-
-MS SQL  database trasaction units
-
-Type: string
-
-Possible Values: ["S1","S2","S3","S4","S5","S6","S7","S9"]
-
-Default: S1
-
-
-### msDbSize
-
-MS SQL database size
-
-Type: string
-
-Possible Values: ["100MB","250MB","500MB","1GB","2GB","5GB","10GB","20GB","30GB","40GB","50GB","100GB","250GB","300GB","400GB","500GB","750GB","1024GB"]
-
-Default: 250GB
-
-
-### skuName
-
-MySql/Postgresql sku name
-
-Type: string
-
-Possible Values: ["PGSQLB50","PGSQLB100","PGSQLS100","PGSQLS200","PGSQLS400","PGSQLS800","MYSQLB50","MYSQLB100","MYSQLS100","MYSQLS200","MYSQLS400","MYSQLS800"]
-
-Default: MYSQLS100
-
-
-### skuSizeMB
-
-MySql/Postgresql sku size in MB. For Basic tier, minimum 50GB, increased by 125GB up to 1TB. For Standard tier, minimum 125GB, increase by 125GB up to 1TB
-
-Type: int
-
-Possible Values: null
-
-Default: 128000
-
-
-### skuTier
-
-MySql/Postgresql sku tier
-
-Type: string
-
-Possible Values: ["Basic","Standard"]
-
-Default: Standard
 
 
 ### sshPublicKey
@@ -386,37 +408,15 @@ Possible Values: ["Disabled","Enabled"]
 Default: Disabled
 
 
-### postgresVersion
+### storageAccountType
 
-Postgresql version
-
-Type: string
-
-Possible Values: ["9.5","9.6"]
-
-Default: 9.6
-
-
-### mysqlVersion
-
-Mysql version
+Storage Account type
 
 Type: string
 
-Possible Values: ["5.6","5.7"]
+Possible Values: ["Standard_LRS","Standard_GRS","Standard_ZRS"]
 
-Default: 5.7
-
-
-### mssqlVersion
-
-Mssql version
-
-Type: string
-
-Possible Values: ["12.0"]
-
-Default: 12.0
+Default: Standard_LRS
 
 
 ### vNetAddressSpace
@@ -430,6 +430,17 @@ Possible Values: null
 Default: 172.31.0.0
 
 
+### vnetGwDeploySwitch
+
+Switch to deploy a virtual network gateway or not
+
+Type: bool
+
+Possible Values: null
+
+Default: false
+
+
 ### vpnType
 
 Virtual network gateway vpn type
@@ -439,4 +450,16 @@ Type: string
 Possible Values: ["RouteBased","PolicyBased"]
 
 Default: RouteBased
+
+
+### webServerType
+
+Web server type
+
+Type: string
+
+Possible Values: ["apache","nginx"]
+
+Default: apache
+
 
