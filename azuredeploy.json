@@ -162,7 +162,7 @@
             ],
             "defaultValue": 2,
             "metadata": {
-                "description": "MySql/Postgresql vCores. For Baisc tier, only 1 & 2 are allowed. For GeneralPurpose tier, 2, 4, 8, 16, 32 are allowed. For MemoryOptimized, 2, 4, 8, 16 are allowed."
+                "description": "MySql/Postgresql vCores. For Basic tier, only 1 & 2 are allowed. For GeneralPurpose tier, 2, 4, 8, 16, 32 are allowed. For MemoryOptimized, 2, 4, 8, 16 are allowed."
             },
             "type": "int"
         },
@@ -244,7 +244,7 @@
             ],
             "defaultValue": "S1",
             "metadata": {
-                "description": "MS SQL database service object names. There are a lot more than S* (to be added later). See https://docs.microsoft.com/en-us/rest/api/sql/databases/createorupdate#ServiceObjectiveName"
+                "description": "MS SQL database service object names"
             },
             "type": "string"
         },
@@ -282,7 +282,7 @@
             ],
             "defaultValue": "Standard",
             "metadata": {
-                "description": "MS SQL DB edition. There are a lot more than Basic & Standard (to be added later). See https://docs.microsoft.com/en-us/rest/api/sql/databases/createorupdate#DatabaseEdition"
+                "description": "MS SQL DB edition"
             },
             "type": "string"
         },
