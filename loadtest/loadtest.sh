@@ -58,32 +58,36 @@ function show_command_to_run
 
 function check_db_sku_params
 {
-    local dtu=${1}
-    local size=${2}
+    local vcores=${1}
+    local size=${2}   # In GB
 
-    if [ "$dtu" != 100 -a "$dtu" != 200 -a "$dtu" != 400 -a "$dtu" != 800 ]; then
-        echo "Invalid DTU ($dtu). Only allowed are 100, 200, 400, 800."
+    if [ "$vcores" != 1 -a "$vcores" != 2 -a "$vcores" != 4 -a "$vcores" != 8 -a "$vcores" != 16 -a "$vcores" != 32 ]; then
+        echo "Invalid vCores ($vcores). Only allowed are 1, 2, 4, 8, 16, 32."
         return 1
     fi
-    if [ "$size" != 125 ] && [ "$size" != 250 ] && [ "$size" != 375 ] && [ "$size" != 500 ] && [ "$size" != 625 ] && [ "$size" != 750 ] && [ "$size" != 875 ] && [ "$size" 1000 ]; then
-        echo "Invalid DB size ($size). Only allowed are 125, 250, 375, ... 875, 1000."
+    if [ -z "${size##*[!0-9]*}" ] || [ "$size" -lt 5 ] || [ "$size" -gt 1024 ]; then
+        echo "Invalid DB size ($size). Only allowed are 5, 6, 7, ..., 1024."
         return 1
     fi
+    # TODO Add other SKU params: Tiers (Basic/GeneralPurpose/MemoryOptimized), HW family (Gen4/Gen5)
 }
 
 function get_db_sku_name
 {
-    local db_server_type=${1}
-    local db_dtu=${2}
+    local db_server_type=${1}  # TODO This is not really used any more with the latest APIs. Remove this and actually receive the relevant param: Gen4 or Gen5.
+    local db_vcores=${2}       # TODO Check the validity. Only allowed is an integer between 5 and 1024.
 
-    if [ "$db_server_type" = mysql ]; then
-        echo "MYSQLS${db_dtu}"
-    elif [ "$db_server_type" = postgres ]; then
-        echo "PGSQLS${db_dtu}"
-    else
-        echo "Invalid DB type ($db_server_type). Only mysql or postgres are allowed"
-        return 1
-    fi
+    # For old APIs, left only as references...
+    # if [ "$db_server_type" = mysql ]; then
+    #     echo "MYSQLS${db_vcores}"
+    # elif [ "$db_server_type" = postgres ]; then
+    #     echo "PGSQLS${db_vcores}"
+    # else
+    #     echo "Invalid DB type ($db_server_type). Only mysql or postgres are allowed"
+    #     return 1
+    # fi
+
+    echo "GP_Gen4_${db_vcores}" # TODO Allow different tiers (Basic & MemoryOptimized) and different HW family (Gen5)
 }
 
 # TODO hard-coded Azure location in global variable. Parametrize this later.
@@ -99,8 +103,8 @@ function deploy_moodle_with_some_parameters
     local web_server_type=${4}  # E.g., apache or nginx
     local web_vm_sku=${5}       # E.g., Standard_DS2_v2
     local db_server_type=${6}   # E.g., mysql or postgres
-    local db_dtu=${7}           # 100, 200, 400, 800 only
-    local db_size=${8}          # 125, 250, 375, 500, 625, 750, 875. 1000 only
+    local db_vcores=${7}        # 1, 2, 4, 8, 16, 32 only
+    local db_size_gb=${8}       # 5 to 1024, integer only
     local file_server_type=${9} # E.g., nfs or gluster
     local file_server_disk_count=${10}  # 2, 3, 4
     local file_server_disk_size=${11}   # in GB
@@ -108,16 +112,15 @@ function deploy_moodle_with_some_parameters
     local ssh_pub_key=${13}     # Your ssh authorized_keys content
     local no_wait_flag=${14}    # Must be "--no-wait" to be passed to az
 
-    check_db_sku_params $db_dtu $db_size || return 1
-    local db_sku_name=$(get_db_sku_name $db_server_type $db_dtu) || return 1
-    local db_size_mb=$(($db_size * 1024))
+    check_db_sku_params $db_vcores $db_size_gb || return 1
+    local db_sku_name=$(get_db_sku_name $db_server_type $db_vcores) || return 1
 
     local cmd="az group create --resource-group $resource_group --location $MOODLE_RG_LOCATION"
     show_command_to_run $cmd
     eval $cmd || return 1
 
     local deployment_name="${resource_group}-deployment"
-    local cmd="az group deployment create --resource-group $resource_group --name $deployment_name $no_wait_flag --template-uri $template_url --parameters @$parameters_template_file webServerType=$web_server_type autoscaleVmSku=$web_vm_sku dbServerType=$db_server_type mysqlPgresVcores=$db_dtu mysqlPgresSkuName=$db_sku_name mysqlPgresStgSizeGB=$db_size_mb fileServerType=$file_server_type fileServerDiskCount=$file_server_disk_count fileServerDiskSize=$file_server_disk_size redisDeploySwitch=$redis_cache sshPublicKey='$ssh_pub_key'"
+    local cmd="az group deployment create --resource-group $resource_group --name $deployment_name $no_wait_flag --template-uri $template_url --parameters @$parameters_template_file webServerType=$web_server_type autoscaleVmSku=$web_vm_sku dbServerType=$db_server_type mysqlPgresVcores=$db_vcores mysqlPgresSkuName=$db_sku_name mysqlPgresStgSizeGB=$db_size_gb fileServerType=$file_server_type fileServerDiskCount=$file_server_disk_count fileServerDiskSize=$file_server_disk_size redisDeploySwitch=$redis_cache sshPublicKey='$ssh_pub_key'"
     show_command_to_run $cmd
     eval $cmd
 }
@@ -296,8 +299,8 @@ function deploy_run_test1_teardown
     local web_server_type=${5}
     local web_vm_sku=${6}
     local db_server_type=${7}
-    local db_dtu=${8}
-    local db_size=${9}
+    local db_vcores=${8}
+    local db_size_gb=${9}
     local file_server_type=${10}
     local file_server_disk_count=${11}
     local file_server_disk_size=${12}
@@ -309,7 +312,7 @@ function deploy_run_test1_teardown
     local delete_resource_group_flag=${18}  # Any non-empty string is considered true
 
     MOODLE_RG_LOCATION=$location
-    deploy_moodle_with_some_parameters $resource_group $template_url $parameters_template_file $web_server_type $web_vm_sku $db_server_type $db_dtu $db_size $file_server_type $file_server_disk_count $file_server_disk_size $redis_cache "$ssh_pub_key" || return 1
+    deploy_moodle_with_some_parameters $resource_group $template_url $parameters_template_file $web_server_type $web_vm_sku $db_server_type $db_vcores $db_size_gb $file_server_type $file_server_disk_count $file_server_disk_size $redis_cache "$ssh_pub_key" || return 1
     run_simple_test_1_on_resource_group $resource_group $test_threads_count $test_rampup_time_sec $test_run_time_sec 1 || return 1
     if [ -n "$delete_resource_group_flag" ]; then
         az group delete -g $resource_group -y
@@ -331,5 +334,5 @@ function run_load_test_example
 {
     check_ssh_agent_and_added_key || return 1
 
-    deploy_run_test1_teardown ltest6 southcentralus https://raw.githubusercontent.com/Azure/Moodle/master/azuredeploy.json azuredeploy.parameters.loadtest.defaults.json apache Standard_DS2_v2 mysql 200 125 nfs 2 128 false "$(cat ~/.ssh/authorized_keys)" 1600 4800 18000
+    deploy_run_test1_teardown ltest6 southcentralus https://raw.githubusercontent.com/Azure/Moodle/master/azuredeploy.json azuredeploy.parameters.loadtest.defaults.json apache Standard_DS2_v2 mysql 4 125 nfs 2 128 false "$(cat ~/.ssh/authorized_keys)" 1600 4800 18000
 }
