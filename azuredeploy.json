@@ -65,123 +65,12 @@
             },
             "type": "bool"
         },
-        "storageAccountType": {
-            "defaultValue": "Standard_LRS",
-            "allowedValues": [
-                "Standard_LRS",
-                "Standard_GRS",
-                "Standard_ZRS"
-            ],
+        "siteURL": {
+            "defaultValue": "www.example.org",
             "metadata": {
-                "description": "Storage Account type"
+                "description": "URL for Moodle site"
             },
             "type": "string"
-        },
-        "dbServerType": {
-            "defaultValue": "mysql",
-            "allowedValues": [
-                "postgres",
-                "mysql",
-                "mssql"
-            ],
-            "metadata": {
-                "description": "Database type"
-            },
-            "type": "string"
-        },
-        "fileServerType": {
-            "defaultValue": "nfs",
-            "allowedValues": [
-                "gluster",
-                "nfs"
-            ],
-            "metadata": {
-                "description": "File server type: GlusterFS, NFS--not yet highly available"
-            },
-            "type": "string"
-        },
-        "webServerType": {
-            "defaultValue": "apache",
-            "allowedValues": [
-                "apache",
-                "nginx"
-            ],
-            "metadata": {
-                "description": "Web server type"
-            },
-            "type": "string"
-        },
-        "controllerVmSku": {
-            "defaultValue": "Standard_DS1_v2",
-            "metadata": {
-                "description": "VM size for the controller node"
-            },
-            "type": "string"
-        },
-        "autoscaleVmSku": {
-            "defaultValue": "Standard_DS2_v2",
-            "metadata": {
-                "description": "VM size for autoscaled nodes"
-            },
-            "type": "string"
-        },
-        "autoscaleVmCount": {
-            "defaultValue": 10,
-            "metadata": {
-                "description": "Maximum number of autoscaled nodes"
-            },
-            "type": "int"
-        },
-        "elasticVmSku": {
-            "defaultValue": "Standard_DS2_v2",
-            "metadata": {
-                "description": "VM size for the elastic search nodes"
-            },
-            "type": "string"
-        },
-        "gatewaySubnet": {
-            "allowedValues": [
-                "GatewaySubnet"
-            ],
-            "defaultValue": "GatewaySubnet",
-            "metadata": {
-                "description": "name for Virtual network gateway subnet"
-            },
-            "type": "string"
-        },
-        "gatewayType": {
-            "allowedValues": [
-                "Vpn",
-                "ER"
-            ],
-            "defaultValue": "Vpn",
-            "metadata": {
-                "description": "Virtual network gateway type"
-            },
-            "type": "string"
-        },
-        "glusterVmSku": {
-            "defaultValue": "Standard_DS2_v2",
-            "metadata": {
-                "description": "VM size for the gluster nodes"
-            },
-            "type": "string"
-        },
-        "fileServerDiskSize": {
-            "defaultValue": 127,
-            "metadata": {
-                "description": "Size per disk for gluster nodes or nfs server"
-            },
-            "type": "int"
-        },
-        "fileServerDiskCount": {
-            "defaultValue": 4,
-            "minValue": 2,
-            "maxValue": 8,
-            "metadata": {
-                "description": "Number of disks in raid0 per gluster node or nfs server"
-            },
-            "type": "int"
         },
         "moodleVersion": {
             "allowedValues": [
@@ -198,17 +87,67 @@
             },
             "type": "string"
         },
+        "sshPublicKey": {
+            "metadata": {
+                "description": "ssh public key"
+            },
+            "type": "string"
+        },
+        "sshUsername": {
+            "defaultValue": "azureadmin",
+            "metadata": {
+                "description": "ssh user name"
+            },
+            "type": "string"
+        },
+        "controllerVmSku": {
+            "defaultValue": "Standard_DS1_v2",
+            "metadata": {
+                "description": "VM size for the controller VM"
+            },
+            "type": "string"
+        },
+        "webServerType": {
+            "defaultValue": "apache",
+            "allowedValues": [
+                "apache",
+                "nginx"
+            ],
+            "metadata": {
+                "description": "Web server type"
+            },
+            "type": "string"
+        },
+        "autoscaleVmSku": {
+            "defaultValue": "Standard_DS2_v2",
+            "metadata": {
+                "description": "VM size for autoscaled web VMs"
+            },
+            "type": "string"
+        },
+        "autoscaleVmCount": {
+            "defaultValue": 10,
+            "metadata": {
+                "description": "Maximum number of autoscaled web VMs"
+            },
+            "type": "int"
+        },
+        "dbServerType": {
+            "defaultValue": "mysql",
+            "allowedValues": [
+                "postgres",
+                "mysql",
+                "mssql"
+            ],
+            "metadata": {
+                "description": "Database type"
+            },
+            "type": "string"
+        },
         "dbLogin": {
             "defaultValue": "dbadmin",
             "metadata": {
                 "description": "Database admin username"
-            },
-            "type": "string"
-        },
-        "siteURL": {
-            "defaultValue": "www.example.org",
-            "metadata": {
-                "description": "URL for Moodle site"
             },
             "type": "string"
         },
@@ -281,6 +220,17 @@
             },
             "type": "string"
         },
+        "sslEnforcement": {
+            "allowedValues": [
+                "Disabled",
+                "Enabled"
+            ],
+            "defaultValue": "Disabled",
+            "metadata": {
+                "description": "MySql/Postgresql SSL connection"
+            },
+            "type": "string"
+        },
         "mssqlDbServiceObjectiveName": {
             "allowedValues": [
                 "S1",
@@ -346,27 +296,56 @@
             },
             "type": "string"
         },
-        "sshPublicKey": {
-            "metadata": {
-                "description": "ssh public key"
-            },
-            "type": "string"
-        },
-        "sshUsername": {
-            "defaultValue": "azureadmin",
-            "metadata": {
-                "description": "ssh user name"
-            },
-            "type": "string"
-        },
-        "sslEnforcement": {
+        "fileServerType": {
+            "defaultValue": "nfs",
             "allowedValues": [
-                "Disabled",
-                "Enabled"
+                "gluster",
+                "nfs"
             ],
-            "defaultValue": "Disabled",
             "metadata": {
-                "description": "MySql/Postgresql SSL connection"
+                "description": "File server type: GlusterFS, NFS--not yet highly available"
+            },
+            "type": "string"
+        },
+        "fileServerDiskSize": {
+            "defaultValue": 127,
+            "metadata": {
+                "description": "Size per disk for gluster nodes or nfs server"
+            },
+            "type": "int"
+        },
+        "fileServerDiskCount": {
+            "defaultValue": 4,
+            "minValue": 2,
+            "maxValue": 8,
+            "metadata": {
+                "description": "Number of disks in raid0 per gluster node or nfs server"
+            },
+            "type": "int"
+        },
+        "glusterVmSku": {
+            "defaultValue": "Standard_DS2_v2",
+            "metadata": {
+                "description": "VM size for the gluster nodes"
+            },
+            "type": "string"
+        },
+        "storageAccountType": {
+            "defaultValue": "Standard_LRS",
+            "allowedValues": [
+                "Standard_LRS",
+                "Standard_GRS",
+                "Standard_ZRS"
+            ],
+            "metadata": {
+                "description": "Storage Account type"
+            },
+            "type": "string"
+        },
+        "elasticVmSku": {
+            "defaultValue": "Standard_DS2_v2",
+            "metadata": {
+                "description": "VM size for the elastic search nodes"
             },
             "type": "string"
         },
@@ -374,6 +353,27 @@
             "defaultValue": "172.31.0.0",
             "metadata": {
                 "description": "Address range for the Moodle virtual network - presumed /16 - further subneting during vnet creation"
+            },
+            "type": "string"
+        },
+        "gatewaySubnet": {
+            "allowedValues": [
+                "GatewaySubnet"
+            ],
+            "defaultValue": "GatewaySubnet",
+            "metadata": {
+                "description": "name for Virtual network gateway subnet"
+            },
+            "type": "string"
+        },
+        "gatewayType": {
+            "allowedValues": [
+                "Vpn",
+                "ER"
+            ],
+            "defaultValue": "Vpn",
+            "metadata": {
+                "description": "Virtual network gateway type"
             },
             "type": "string"
         },
