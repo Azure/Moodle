@@ -24,7 +24,7 @@
     "resources": [
         {
             "type": "Microsoft.DBforPostgreSQL/servers",
-            "apiVersion": "2017-04-30-preview",
+            "apiVersion": "2017-12-01",
             "kind": "",
             "location": "[resourceGroup().location]",
             "name": "[parameters('moodleCommon').serverName]",
@@ -32,12 +32,23 @@
                 "administratorLogin": "[parameters('moodleCommon').dbLogin]",
                 "administratorLoginPassword": "[parameters('moodleCommon').dbLoginPassword]",
                 "sslEnforcement": "[parameters('moodleCommon').sslEnforcement]",
-                "storageMB": "[parameters('moodleCommon').skuSizeMB]",
+                "storageProfile": {
+                    "storageMB": "[mul(parameters('moodleCommon').mysqlPgresStgSizeGB, 1024)]",
+                    "backupRetentionDays": "35",
+                    "geoRedundantBackup": "Enabled"
+                },
                 "version": "[parameters('moodleCommon').postgresVersion]"
+            },
+            "sku": {
+                "capacity": "[parameters('moodleCommon').mysqlPgresVcores]",
+                "name": "[parameters('moodleCommon').mysqlPgresSkuName]",
+                "size": "[parameters('moodleCommon').mysqlPgresStgSizeGB]",
+                "tier": "[parameters('moodleCommon').mysqlPgresSkuTier]",
+                "family": "[parameters('moodleCommon').mysqlPgresSkuHwFamily]"
             },
             "resources": [
                 {
-                    "apiVersion": "2017-04-30-preview",
+                    "apiVersion": "2017-12-01",
                     "dependsOn": [
                         "[concat('Microsoft.DBforPostgreSQL/servers/', parameters('moodleCommon').serverName)]"
                     ],
@@ -50,7 +61,7 @@
                     "type": "firewallRules"
                 },
                 {
-                    "apiVersion": "2017-04-30-preview",
+                    "apiVersion": "2017-12-01",
                     "dependsOn": [
                         "[concat('Microsoft.DBforPostgreSQL/servers/', parameters('moodleCommon').serverName)]"
                     ],
@@ -62,13 +73,7 @@
                     },
                     "type": "firewallRules"
                 }
-            ],
-            "sku": {
-                "capacity": "[parameters('moodleCommon').skuCapacityDTU]",
-                "name": "[parameters('moodleCommon').skuName]",
-                "size": "[parameters('moodleCommon').skuSizeMB]",
-                "tier": "[parameters('moodleCommon').skuTier]"
-            }
+            ]
         }
     ],
     "variables": {
@@ -78,9 +83,10 @@
         "documentation2": " administratorLogin          - postgresql admin username",
         "documentation3": " administratorLoginPassword  - postgresql admin password",
         "documentation4": " location                    - Postgresql server location",
-        "documentation5": " skuCapacityDTU              - Postgresql database trasaction units",
-        "documentation7": " skuName                     - Postgresql sku name",
-        "documentation8": " skuSizeMB                  - Postgresql sku size in mb",
-        "documentation9": " skuTier                    - Postgresql sku tier"
+        "documentation5": " mysqlPgresVcores            - Postgresql database trasaction units",
+        "documentation7": " mysqlPgresSkuName           - Postgresql sku name",
+        "documentation8": " mysqlPgresStgSizeGB         - Postgresql sku size in mb",
+        "documentation9": " mysqlPgresSkuTier           - Postgresql sku tier",
+        "documentationA": " mysqlPgresSkuHwFamily       - Mysql sku hardware family"
     }
 }

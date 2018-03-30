@@ -287,20 +287,20 @@ Possible Values: null
 Default: www.example.org
 
 
-### skuCapacityDTU
+### mysqlPgresVcores
 
 MySql/Postgresql database trasaction units
 
 Type: int
 
-Possible Values: [50,100,200,400,800]
+Possible Values: [1,2,4,8,16,32]
 
-Default: 100
+Default: 2
 
 
-### serviceObjective
+### mssqlDbServiceObjectiveName
 
-MS SQL  database trasaction units
+MS SQL database service object names. There are a lot more than S* (to be added later).
 
 Type: string
 
@@ -309,7 +309,7 @@ Possible Values: ["S1","S2","S3","S4","S5","S6","S7","S9"]
 Default: S1
 
 
-### msDbSize
+### mssqlDbSize
 
 MS SQL database size
 
@@ -320,18 +320,18 @@ Possible Values: ["100MB","250MB","500MB","1GB","2GB","5GB","10GB","20GB","30GB"
 Default: 250GB
 
 
-### skuName
+### mssqlDbEdition
 
-MySql/Postgresql sku name
+MS SQL DB edition
 
 Type: string
 
-Possible Values: ["PGSQLB50","PGSQLB100","PGSQLS100","PGSQLS200","PGSQLS400","PGSQLS800","MYSQLB50","MYSQLB100","MYSQLS100","MYSQLS200","MYSQLS400","MYSQLS800"]
+Possible Values: ["Basic","Standard"]
 
-Default: MYSQLS100
+Default: Standard
 
 
-### skuSizeMB
+### mysqlPgresStgSizeGB
 
 MySql/Postgresql sku size in MB. For Basic tier, minimum 50GB, increased by 125GB up to 1TB. For Standard tier, minimum 125GB, increase by 125GB up to 1TB
 
@@ -342,13 +342,13 @@ Possible Values: null
 Default: 128000
 
 
-### skuTier
+### mysqlPgresSkuTier
 
 MySql/Postgresql sku tier
 
 Type: string
 
-Possible Values: ["Basic","Standard"]
+Possible Values: ["Basic","GeneralPurpose","MemoryOptimized"]
 
 Default: Standard
 

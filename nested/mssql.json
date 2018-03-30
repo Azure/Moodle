@@ -31,7 +31,6 @@
             "properties": {
                 "administratorLogin": "[parameters('moodleCommon').dbLogin]",
                 "administratorLoginPassword": "[parameters('moodleCommon').dbLoginPassword]",
-                "storageMB": "[parameters('moodleCommon').skuSizeMB]",
                 "version": "[parameters('moodleCommon').mssqlVersion]"
             },
             "resources": [
@@ -70,10 +69,6 @@
         "documentation11": " mssqlVersion               - Mssql version",
         "documentation2": " administratorLogin          - Mssql admin username",
         "documentation3": " administratorLoginPassword  - Mssql admin password",
-        "documentation4": " location                    - Mssql server location",
-        "documentation5": " skuCapacityDTU              - Mssql database trasaction units",
-        "documentation7": " skuName                     - Mssql sku name",
-        "documentation8": " skuSizeMB                   - Mssql sku size in mb",
-        "documentation9": " skuTier                     - Mssql sku tier"
+        "documentation4": " location                    - Mssql server location"
     }
 }

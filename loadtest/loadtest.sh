@@ -117,7 +117,7 @@ function deploy_moodle_with_some_parameters
     eval $cmd || return 1
 
     local deployment_name="${resource_group}-deployment"
-    local cmd="az group deployment create --resource-group $resource_group --name $deployment_name $no_wait_flag --template-uri $template_url --parameters @$parameters_template_file webServerType=$web_server_type autoscaleVmSku=$web_vm_sku dbServerType=$db_server_type skuCapacityDTU=$db_dtu skuName=$db_sku_name skuSizeMB=$db_size_mb fileServerType=$file_server_type fileServerDiskCount=$file_server_disk_count fileServerDiskSize=$file_server_disk_size redisDeploySwitch=$redis_cache sshPublicKey='$ssh_pub_key'"
+    local cmd="az group deployment create --resource-group $resource_group --name $deployment_name $no_wait_flag --template-uri $template_url --parameters @$parameters_template_file webServerType=$web_server_type autoscaleVmSku=$web_vm_sku dbServerType=$db_server_type mysqlPgresVcores=$db_dtu mysqlPgresSkuName=$db_sku_name mysqlPgresStgSizeGB=$db_size_mb fileServerType=$file_server_type fileServerDiskCount=$file_server_disk_count fileServerDiskSize=$file_server_disk_size redisDeploySwitch=$redis_cache sshPublicKey='$ssh_pub_key'"
     show_command_to_run $cmd
     eval $cmd
 }

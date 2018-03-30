@@ -4,9 +4,8 @@
     "parameters": {
         "autoscaleVmSku":              { "value": "__WEB_VM_SKU__" },
         "dbServerType":                { "value": "__DB_SERVER_TYPE__" },
-        "skuCapacityDTU":              { "value": 100 },
-        "skuName":                     { "value": "__DB_SKU_NAME__" },
-        "skuSizeMB":                   { "value": 128 },
+        "mysqlPgresVcores":            { "value": 2 },
+        "mysqlPgresStgSizeGB":         { "value": 125 },
         "webServerType":               { "value": "__WEB_SERVER_TYPE__" },
         "fileServerType":              { "value": "__FILE_SERVER_TYPE__" },
         "fileServerDiskCount":         { "value": 2 },

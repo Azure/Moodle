@@ -43,9 +43,9 @@
     installElasticSearchSwitch=${19}
     dbServerType=${20}
     fileServerType=${21}
-    serviceObjective=${22}
-    serviceTier=${23}
-    serviceSize=${24}
+    mssqlDbServiceObjectiveName=${22}
+    mssqlDbEdition=${23}
+    mssqlDbSize=${24}
 
 
     echo $moodleVersion        >> /tmp/vars.txt
@@ -69,9 +69,9 @@
     echo $installElasticSearchSwitch  >> /tmp/vars.txt
     echo $dbServerType                >> /tmp/vars.txt
     echo $fileServerType              >> /tmp/vars.txt
-    echo $serviceObjective	>> /tmp/vars.txt
-    echo $serviceTier	>> /tmp/vars.txt
-    echo $serviceSize	>> /tmp/vars.txt
+    echo $mssqlDbServiceObjectiveName >> /tmp/vars.txt
+    echo $mssqlDbEdition	>> /tmp/vars.txt
+    echo $mssqlDbSize	>> /tmp/vars.txt
 
     . ./helper_functions.sh
     check_fileServerType_param $fileServerType
@@ -1170,7 +1170,7 @@ EOF
         echo "mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e \"CREATE DATABASE ${moodledbname};\"" >> /tmp/debug
         echo "mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e \"GRANT ALL ON ${moodledbname}.* TO ${moodledbuser} IDENTIFIED BY '${moodledbpass}';\"" >> /tmp/debug
     elif [ $dbServerType = "mssql" ]; then
-        /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -Q "CREATE DATABASE ${moodledbname} ( MAXSIZE = $serviceSize, EDITION = '$serviceTier', SERVICE_OBJECTIVE = '$serviceObjective' )"
+        /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -Q "CREATE DATABASE ${moodledbname} ( MAXSIZE = $mssqlDbSize, EDITION = '$mssqlDbEdition', SERVICE_OBJECTIVE = '$mssqlDbServiceObjectiveName' )"
         /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -Q "CREATE LOGIN ${moodledbuser} with password = '${moodledbpass}'" 
         /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d ${moodledbname} -Q "CREATE USER ${moodledbuser} FROM LOGIN ${moodledbuser}"
         /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d ${moodledbname} -Q "exec sp_addrolemember 'db_owner','${moodledbuser}'" 

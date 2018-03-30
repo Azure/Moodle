@@ -212,22 +212,22 @@
             },
             "type": "string"
         },
-        "skuCapacityDTU": {
+        "mysqlPgresVcores": {
             "allowedValues": [
-                50,
-                100,
-                200,
-                400,
-                800
+                1,
+                2,
+                4,
+                8,
+                16,
+                32
             ],
-            "defaultValue": 100,
+            "defaultValue": 2,
             "metadata": {
-                "description": "MySql/Postgresql database trasaction units"
+                "description": "MySql/Postgresql vCores. For Baisc tier, only 1 & 2 are allowed. For GeneralPurpose tier, 2, 4, 8, 16, 32 are allowed. For MemoryOptimized, 2, 4, 8, 16 are allowed."
             },
             "type": "int"
         },
-
-        "serviceObjective": {
+        "mssqlDbServiceObjectiveName": {
             "allowedValues": [
                 "S1",
                 "S2",
@@ -240,11 +240,11 @@
             ],
             "defaultValue": "S1",
             "metadata": {
-                "description": "MS SQL  database trasaction units"
+                "description": "MS SQL database service object names. There are a lot more than S* (to be added later). See https://docs.microsoft.com/en-us/rest/api/sql/databases/createorupdate#ServiceObjectiveName"
             },
             "type": "string"
         },
-        "msDbSize": {
+        "mssqlDbSize": {
             "allowedValues": [
                 "100MB",
                 "250MB",
@@ -271,42 +271,46 @@
             },
             "type": "string"
         },
-        "skuName": {
-            "allowedValues": [
-                "PGSQLB50",
-                "PGSQLB100",
-                "PGSQLS100",
-                "PGSQLS200",
-                "PGSQLS400",
-                "PGSQLS800",
-                "MYSQLB50",
-                "MYSQLB100",
-                "MYSQLS100",
-                "MYSQLS200",
-                "MYSQLS400",
-                "MYSQLS800"
-            ],
-            "defaultValue": "MYSQLS100",
-            "metadata": {
-                "description": "MySql/Postgresql sku name"
-            },
-            "type": "string"
-        },
-        "skuSizeMB": {
-            "defaultValue": 128000,
-            "metadata": {
-                "description": "MySql/Postgresql sku size in MB. For Basic tier, minimum 50GB, increased by 125GB up to 1TB. For Standard tier, minimum 125GB, increase by 125GB up to 1TB"
-            },
-            "type": "int"
-        },
-        "skuTier": {
+        "mssqlDbEdition": {
             "allowedValues": [
                 "Basic",
                 "Standard"
             ],
             "defaultValue": "Standard",
             "metadata": {
+                "description": "MS SQL DB edition. There are a lot more than Basic & Standard (to be added later). See https://docs.microsoft.com/en-us/rest/api/sql/databases/createorupdate#DatabaseEdition"
+            },
+            "type": "string"
+        },
+        "mysqlPgresStgSizeGB": {
+            "defaultValue": 125,
+            "minValue": 5,
+            "maxValue": 1024,
+            "metadata": {
+                "description": "MySql/Postgresql storage size in GB. Minimum 5GB, increase by 1GB, up to 1TB (1024 GB)"
+            },
+            "type": "int"
+        },
+        "mysqlPgresSkuTier": {
+            "allowedValues": [
+                "Basic",
+                "GeneralPurpose",
+                "MemoryOptimized"
+            ],
+            "defaultValue": "GeneralPurpose",
+            "metadata": {
                 "description": "MySql/Postgresql sku tier"
+            },
+            "type": "string"
+        },
+        "mysqlPgresSkuHwFamily": {
+            "allowedValues": [
+                "Gen4",
+                "Gen5"
+            ],
+            "defaultValue": "Gen4",
+            "metadata": {
+                "description": "MySql/Postgresql sku hardware family"
             },
             "type": "string"
         },
@@ -707,7 +711,8 @@
             "moodleDbUserAzure": "[concat('moodle', '@', parameters('dbServerType'), '-', variables('resourceprefix'))]",
             "moodleInstallScriptFilename": "install_moodle.sh",
             "moodleVersion": "[parameters('moodleVersion')]",
-            "msDbSize": "[parameters('msDbSize')]",
+            "mssqlDbSize": "[parameters('mssqlDbSize')]",
+            "mssqlDbEdition": "[parameters('mssqlDbEdition')]",
             "mssqlVersion": "[parameters('mssqlVersion')]",
             "mysqlVersion": "[parameters('mysqlVersion')]",
             "osType": {
@@ -722,13 +727,14 @@
             "redisDeploySwitch": "[parameters('redisDeploySwitch')]",
             "redisDns": "[concat('redis-',variables('resourceprefix'),'.redis.cache.windows.net')]",
             "resourcesPrefix": "[variables('resourceprefix')]",
-            "serviceObjective": "[parameters('serviceObjective')]",
+            "mssqlDbServiceObjectiveName": "[parameters('mssqlDbServiceObjectiveName')]",
             "serverName": "[concat(parameters('dbServerType'), '-',variables('resourceprefix'))]",
             "siteURL": "[if(or(empty(parameters('siteURL')), equals(parameters('siteURL'), 'www.example.org')), concat('lb-',variables('resourceprefix'),'.',resourceGroup().location,'.cloudapp.azure.com'), parameters('siteURL'))]",
-            "skuCapacityDTU": "[parameters('skuCapacityDTU')]",
-            "skuName": "[parameters('skuName')]",
-            "skuSizeMB": "[parameters('skuSizeMB')]",
-            "skuTier": "[parameters('skuTier')]",
+            "mysqlPgresVcores": "[parameters('mysqlPgresVcores')]",
+            "mysqlPgresSkuName": "[concat(if(equals(parameters('mysqlPgresSkuTier'),'Basic'),'B', if(equals(parameters('mysqlPgresSkuTier'),'GeneralPurpose'),'GP', 'MO')), '_', parameters('mysqlPgresSkuHwFamily'), '_', string(parameters('mysqlPgresVcores')))]",
+            "mysqlPgresStgSizeGB": "[parameters('mysqlPgresStgSizeGB')]",
+            "mysqlPgresSkuTier": "[parameters('mysqlPgresSkuTier')]",
+            "mysqlPgresSkuHwFamily": "[parameters('mysqlPgresSkuHwFamily')]",
             "sshPublicKey": "[parameters('sshPublicKey')]",
             "sshUsername": "[parameters('sshUsername')]",
             "sslEnforcement": "[parameters('sslEnforcement')]",
