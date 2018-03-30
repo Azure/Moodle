@@ -20,7 +20,12 @@ Your controller Virtual Machine has Moodle code and data stored in
 data is replicated across dual gluster nodes to provide high
 availability. This directory is also mounted to your autoscaled
 frontends so all changes to files on the controller VM are immediately
-available to all frontend machines.
+available to all frontend machines (when the `htmlLocalCopySwitch` in `azuredeploy.json`
+is false--otherwise, see below). Note that any updates on Moodle code/settings
+(e.g., additional plugin installations, Moodle version upgrade) have to be done
+on the controller VM using shell commands, not through a web browser, because the
+HTML directory's permission is read-only for the web frontend VMs (thus any web-based
+Moodle code updates will fail).
 
 Depending on how large your Gluster disks are sized, it may be helpful
 to keep multiple older versions (/moodle/html1, /moodle/html2, etc) to
@@ -57,6 +62,32 @@ Subsequent executions of an SSH command will not require this
 validation step. For more information there is an excellent
 [superuser.com
 Q&A](https://superuser.com/questions/421074/ssh-the-authenticity-of-host-host-cant-be-established/421084#421084).
+
+### If you set `htmlLocalCopySwitch` to true (this is the default now)
+
+Originally the `/moodle/html` directory was shared across all autoscaled
+web VMs through the specified file server (Gluster or NFS), and this is
+not good for web response time. Therefore, we introduced the
+`htmlLocalCopySwitch` that'll copy the `/moodle/html` directory to
+`/var/www/html` in each autoscaled web VM and reconfigures the web
+server (apache/nginx)'s server root directory accordingly, when it's set
+to true. This now requires directory sync between `/moodle/html` and
+`/var/www/html`, and currently it's addressed by simple polling
+(minutely). Therefore, if you are going to update your Moodle
+code/settings with the switch set to true, please follow the
+following steps:
+
+* Put your Moodle site to maintenance mode.
+  * This will need to be done on the contoller VM with some shell command.
+  * It should be followed by running the following command to propagate the change to all autoscaled web VMs:
+    ```bash
+    $ sudo /usr/local/bin/update_last_modified_time_update.moodle_on_azure.sh
+    ```
+  * Once this command is executed, each autoscaled web VM will pick up (sync) the changes within 1 minute, so wait for one minute.
+* Then you can start updating your Moodle code/settings, like installing/updating plugins or upgrading Moodle version or changing Moodle configurations. Again, note that this should be all done on the controller VM using some shell commands.
+* When you are done updating your Moodle code/settings, run the same command as above to let each autoscaled web VM pick up (sync) the changes (wait for another minute here, for the same reason).
+
+Please do let us know on this Github repo's Issues if you encounter any problems with this process.
 
 ## Getting an SQL dump
 
