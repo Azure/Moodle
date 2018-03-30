@@ -227,6 +227,60 @@
             },
             "type": "int"
         },
+        "mysqlPgresStgSizeGB": {
+            "defaultValue": 125,
+            "minValue": 5,
+            "maxValue": 1024,
+            "metadata": {
+                "description": "MySql/Postgresql storage size in GB. Minimum 5GB, increase by 1GB, up to 1TB (1024 GB)"
+            },
+            "type": "int"
+        },
+        "mysqlPgresSkuTier": {
+            "allowedValues": [
+                "Basic",
+                "GeneralPurpose",
+                "MemoryOptimized"
+            ],
+            "defaultValue": "GeneralPurpose",
+            "metadata": {
+                "description": "MySql/Postgresql sku tier"
+            },
+            "type": "string"
+        },
+        "mysqlPgresSkuHwFamily": {
+            "allowedValues": [
+                "Gen4",
+                "Gen5"
+            ],
+            "defaultValue": "Gen4",
+            "metadata": {
+                "description": "MySql/Postgresql sku hardware family"
+            },
+            "type": "string"
+        },
+        "mysqlVersion": {
+            "allowedValues": [
+                "5.6",
+                "5.7"
+            ],
+            "defaultValue": "5.7",
+            "metadata": {
+                "description": "Mysql version"
+            },
+            "type": "string"
+        },
+        "postgresVersion": {
+            "allowedValues": [
+                "9.5",
+                "9.6"
+            ],
+            "defaultValue": "9.6",
+            "metadata": {
+                "description": "Postgresql version"
+            },
+            "type": "string"
+        },
         "mssqlDbServiceObjectiveName": {
             "allowedValues": [
                 "S1",
@@ -282,35 +336,13 @@
             },
             "type": "string"
         },
-        "mysqlPgresStgSizeGB": {
-            "defaultValue": 125,
-            "minValue": 5,
-            "maxValue": 1024,
-            "metadata": {
-                "description": "MySql/Postgresql storage size in GB. Minimum 5GB, increase by 1GB, up to 1TB (1024 GB)"
-            },
-            "type": "int"
-        },
-        "mysqlPgresSkuTier": {
+        "mssqlVersion": {
             "allowedValues": [
-                "Basic",
-                "GeneralPurpose",
-                "MemoryOptimized"
+                "12.0"
             ],
-            "defaultValue": "GeneralPurpose",
+            "defaultValue": "12.0",
             "metadata": {
-                "description": "MySql/Postgresql sku tier"
-            },
-            "type": "string"
-        },
-        "mysqlPgresSkuHwFamily": {
-            "allowedValues": [
-                "Gen4",
-                "Gen5"
-            ],
-            "defaultValue": "Gen4",
-            "metadata": {
-                "description": "MySql/Postgresql sku hardware family"
+                "description": "Mssql version"
             },
             "type": "string"
         },
@@ -335,38 +367,6 @@
             "defaultValue": "Disabled",
             "metadata": {
                 "description": "MySql/Postgresql SSL connection"
-            },
-            "type": "string"
-        },
-        "postgresVersion": {
-            "allowedValues": [
-                "9.5",
-                "9.6"
-            ],
-            "defaultValue": "9.6",
-            "metadata": {
-                "description": "Postgresql version"
-            },
-            "type": "string"
-        },
-        "mysqlVersion": {
-            "allowedValues": [
-                "5.6",
-                "5.7"
-            ],
-            "defaultValue": "5.7",
-            "metadata": {
-                "description": "Mysql version"
-            },
-            "type": "string"
-        },
-        "mssqlVersion": {
-            "allowedValues": [
-                "12.0"
-            ],
-            "defaultValue": "12.0",
-            "metadata": {
-                "description": "Mssql version"
             },
             "type": "string"
         },
@@ -711,9 +711,15 @@
             "moodleDbUserAzure": "[concat('moodle', '@', parameters('dbServerType'), '-', variables('resourceprefix'))]",
             "moodleInstallScriptFilename": "install_moodle.sh",
             "moodleVersion": "[parameters('moodleVersion')]",
+            "mssqlDbServiceObjectiveName": "[parameters('mssqlDbServiceObjectiveName')]",
             "mssqlDbSize": "[parameters('mssqlDbSize')]",
             "mssqlDbEdition": "[parameters('mssqlDbEdition')]",
             "mssqlVersion": "[parameters('mssqlVersion')]",
+            "mysqlPgresSkuHwFamily": "[parameters('mysqlPgresSkuHwFamily')]",
+            "mysqlPgresSkuName": "[concat(if(equals(parameters('mysqlPgresSkuTier'),'Basic'),'B', if(equals(parameters('mysqlPgresSkuTier'),'GeneralPurpose'),'GP', 'MO')), '_', parameters('mysqlPgresSkuHwFamily'), '_', string(parameters('mysqlPgresVcores')))]",
+            "mysqlPgresSkuTier": "[parameters('mysqlPgresSkuTier')]",
+            "mysqlPgresStgSizeGB": "[parameters('mysqlPgresStgSizeGB')]",
+            "mysqlPgresVcores": "[parameters('mysqlPgresVcores')]",
             "mysqlVersion": "[parameters('mysqlVersion')]",
             "osType": {
                 "offer": "UbuntuServer",
@@ -727,14 +733,8 @@
             "redisDeploySwitch": "[parameters('redisDeploySwitch')]",
             "redisDns": "[concat('redis-',variables('resourceprefix'),'.redis.cache.windows.net')]",
             "resourcesPrefix": "[variables('resourceprefix')]",
-            "mssqlDbServiceObjectiveName": "[parameters('mssqlDbServiceObjectiveName')]",
             "serverName": "[concat(parameters('dbServerType'), '-',variables('resourceprefix'))]",
             "siteURL": "[if(or(empty(parameters('siteURL')), equals(parameters('siteURL'), 'www.example.org')), concat('lb-',variables('resourceprefix'),'.',resourceGroup().location,'.cloudapp.azure.com'), parameters('siteURL'))]",
-            "mysqlPgresVcores": "[parameters('mysqlPgresVcores')]",
-            "mysqlPgresSkuName": "[concat(if(equals(parameters('mysqlPgresSkuTier'),'Basic'),'B', if(equals(parameters('mysqlPgresSkuTier'),'GeneralPurpose'),'GP', 'MO')), '_', parameters('mysqlPgresSkuHwFamily'), '_', string(parameters('mysqlPgresVcores')))]",
-            "mysqlPgresStgSizeGB": "[parameters('mysqlPgresStgSizeGB')]",
-            "mysqlPgresSkuTier": "[parameters('mysqlPgresSkuTier')]",
-            "mysqlPgresSkuHwFamily": "[parameters('mysqlPgresSkuHwFamily')]",
             "sshPublicKey": "[parameters('sshPublicKey')]",
             "sshUsername": "[parameters('sshUsername')]",
             "sslEnforcement": "[parameters('sslEnforcement')]",
