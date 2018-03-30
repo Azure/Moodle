@@ -133,6 +133,16 @@ First frontend VM IP:
 MOODLE_FIRST_FRONTEND_VM_IP="$(az group deployment show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out tsv --query *.outputs.firstFrontendVmIP.value)"
 ```
 
+## Retrieving Parameters Using the Portal
+
+If you are using the portal you can retrive the parameter values with the following steps:
+
+  1. Navigate to the Resource Group containing your deployment
+  2. Click "Deployments" in the overview section
+  3. Click the master deployment that will be called "Microsoft.Template" (or "Master Deploy" if you deployed using the CLI)
+  4. Click "Outputs"
+  5. Scroll down to see a list of the outputs from your deployment, each of the outputs described above will be available.
+
 # Validation
 
 After having run each of the commands in this document you should have
