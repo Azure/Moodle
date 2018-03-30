@@ -5,6 +5,8 @@ environment variables to ensure consistency. If you are running these
 scripts through SimDem you can customize these values by copying and
 editing `env.json` into `env.local.json`.
 
+## Moodle on Azure Configuration
+
 We'll need a unique name for our Resource Group in Azure, but when
 running in an automated mode it is useful to have a (mostly) unique
 name for your deployment and related resources. We'll use a timestamp.
@@ -46,6 +48,15 @@ Ensure the workspace for this particular deployment exists:
 
 ```
 mkdir -p $MOODLE_AZURE_WORKSPACE/$MOODLE_RG_NAME
+```
+
+## Azure Resource Manager Configuration
+
+Sometimes we want to work with a version of the template other than
+the master in GitHub.
+
+``` bash
+GITHUB_AZURE_MOODLE_BRANCH=master
 ```
 
 ## Validation
