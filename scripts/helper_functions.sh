@@ -300,6 +300,18 @@ function get_o365plugin_version_from_moodle_version {
   fi
 }
 
+# For Moodle tags (e.g., "v3.4.2"), the unzipped Moodle dir is no longer
+# "moodle-$moodleVersion", because for tags, it's without "v". That is,
+# it's "moodle-3.4.2". Therefore, we need a separate helper function for that...
+function get_moodle_unzip_dir_from_moodle_version {
+  local moodleVersion=${1}
+  if [[ "$moodleVersion" =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
+    echo "moodle-${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}"
+  else
+    echo "moodle-$moodleVersion"
+  fi
+}
+
 # Long Redis cache Moodle config file generation code moved here
 function create_redis_configuration_in_moodledata_muc_config_php
 {

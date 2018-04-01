@@ -193,6 +193,7 @@
     chown -R www-data.www-data /moodle
 
     o365pluginVersion=$(get_o365plugin_version_from_moodle_version $moodleVersion)
+    moodleUnzipDir=$(get_moodle_unzip_dir_from_moodle_version $moodleVersion)
 
     # install Moodle 
     echo '#!/bin/bash
@@ -201,7 +202,7 @@
     # downloading moodle 
     /usr/bin/curl -k --max-redirs 10 https://github.com/moodle/moodle/archive/'$moodleVersion'.zip -L -o moodle.zip
     /usr/bin/unzip -q moodle.zip
-    /bin/mv -v moodle-'$moodleVersion' /moodle/html/moodle
+    /bin/mv -v '$moodleUnzipDir' /moodle/html/moodle
 
     if [ "'$installO365pluginsSwitch'" = "True" ]; then
         # install Office 365 plugins
