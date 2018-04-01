@@ -42,7 +42,6 @@
             "sku": {
                 "capacity": "[parameters('moodleCommon').mysqlPgresVcores]",
                 "name": "[parameters('moodleCommon').mysqlPgresSkuName]",
-                "size": "[parameters('moodleCommon').mysqlPgresStgSizeGB]",
                 "tier": "[parameters('moodleCommon').mysqlPgresSkuTier]",
                 "family": "[parameters('moodleCommon').mysqlPgresSkuHwFamily]"
             },
