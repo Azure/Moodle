@@ -27,7 +27,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
-            "name": "moodleMinimalTemplate",
+            "name": "mainTemplate",
             "properties": {
                 "mode": "Incremental",
                 "parameters": {
@@ -46,7 +46,12 @@
             }
         }
     ],
-    "outputs": "[reference('moodleMinimalTemplate').outputs]",
+    "outputs": {
+        "mainTemplateOutputs": {
+            "type": "object",
+            "value": "[reference('mainTemplate').outputs]"
+        }
+    },
     "variables": {
         "documentation01": "This wrapper template calls the main-template with bare minimum configs and the only required parameter (sshPublicKey).",
         "documentation02": "To speed up deployment and consume least resources, other parameters are fixed in this tempalte and overriden as follows:",
