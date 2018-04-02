@@ -48,7 +48,7 @@
                                         ]
                                     },
                                     "protectedSettings":{
-                                        "commandToExecute": "[concat('bash ',parameters('moodleCommon').webServerSetupScriptFilename,' ',parameters('moodleCommon').gfsNameRoot,'0', ' ','data', ' ', parameters('moodleCommon').siteURL, ' ', concat('jumpbox-vm-',parameters('moodleCommon').resourcesPrefix), ' ', parameters('moodleCommon').webServerType, ' ', parameters('moodleCommon').fileServerType, ' ', parameters('moodleCommon').storageAccountName, ' ', listKeys(variables('storageAccountId'), '2017-06-01').keys[0].value, ' ', parameters('moodleCommon').jboxVmName)]"
+                                        "commandToExecute": "[concat('bash ',parameters('moodleCommon').webServerSetupScriptFilename,' ',parameters('moodleCommon').gfsNameRoot,'0', ' ','data', ' ', parameters('moodleCommon').siteURL, ' ', concat('controller-vm-',parameters('moodleCommon').resourcesPrefix), ' ', parameters('moodleCommon').webServerType, ' ', parameters('moodleCommon').fileServerType, ' ', parameters('moodleCommon').storageAccountName, ' ', listKeys(variables('storageAccountId'), '2017-06-01').keys[0].value, ' ', parameters('moodleCommon').ctlrVmName, ' ', parameters('moodleCommon').htmlLocalCopySwitch)]"
                                     },
                                     "type": "CustomScript",
                                     "typeHandlerVersion": "2.0"
@@ -109,7 +109,7 @@
                 }
             },
             "sku": {
-                "capacity": 2,
+                "capacity": 1,
                 "name": "[parameters('moodleCommon').autoscaleVmSku]",
                 "tier": "Standard"
             },
@@ -131,9 +131,9 @@
                 "profiles": [
                     {
                         "capacity": {
-                            "default": "2",
+                            "default": "1",
                             "maximum": "[parameters('moodleCommon').autoscaleVmCount]",
-                            "minimum": "2"
+                            "minimum": "1"
                         },
                         "name": "Profile1",
                         "rules": [
@@ -144,13 +144,13 @@
                                     "metricResourceUri": "[variables('vmssID')]",
                                     "operator": "GreaterThan",
                                     "statistic": "Average",
-                                    "threshold": 80,
+                                    "threshold": 60,
                                     "timeAggregation": "Average",
                                     "timeGrain": "PT1M",
                                     "timeWindow": "PT5M"
                                 },
                                 "scaleAction": {
-                                    "cooldown": "PT1M",
+                                    "cooldown": "PT10M",
                                     "direction": "Increase",
                                     "type": "ChangeCount",
                                     "value": "1"
@@ -163,13 +163,13 @@
                                     "metricResourceUri": "[variables('vmssID')]",
                                     "operator": "LessThan",
                                     "statistic": "Average",
-                                    "threshold": 50,
+                                    "threshold": 30,
                                     "timeAggregation": "Average",
                                     "timeGrain": "PT1M",
                                     "timeWindow": "PT5M"
                                 },
                                 "scaleAction": {
-                                    "cooldown": "PT5M",
+                                    "cooldown": "PT10M",
                                     "direction": "Decrease",
                                     "type": "ChangeCount",
                                     "value": "1"

@@ -8,9 +8,9 @@ this repository.
 ## Prerequisites
 
 To run load tests using the resources in this directory, you'll want
-to spin up an Ubuntu VM (let's call it the [Load Test VM](./Deploy_Load_Test_VM.md)) in your Azure subscription. This VM
-will generate the traffic, running it in Azure will minimize network
-charges.
+to spin up a VM to manage the [Load Test](Deploy_Load_Test_VM.md) in
+your Azure subscription. This VM will generate the traffic, running it
+in Azure will minimize network charges.
 
 ## Deploying Moodle using templates and running load test
 
@@ -31,25 +31,7 @@ See the included example `run_load_test_example` in
 configured as follows:
 
 ``` bash
-deploy_run_test1_teardown \
-    ltest6 \
-    southcentralus \
-    https://raw.githubusercontent.com/Azure/Moodle/master/azuredeploy.json \
-    azuredeploy.parameters.loadtest.defaults.json \
-    apache \
-    Standard_DS2_v2 \
-    mysql \
-    200 \
-    125 \
-    nfs \
-    2 \
-    128 \
-    false \
-    "$(cat ~/.ssh/authorized_keys)" \
-    1600 \
-    4800 \
-    18000
-}
+ssh $ipAddress "az login --username $AZURE_LOGIN --password $AZURE_PASSWORD; az account set --subscription $AZURE_SUBSCRIPTION_ID; run_load_test_example"
 ```
 
 Running this example will deploy a cluster with the following configuration:
@@ -76,7 +58,7 @@ Moodle users on Azure can have better confidence with their Moodle deployment on
 We are just starting out in that direction and here are descriptions of currently
 available test plans.
 
-### [simple-test-1.jmx](./simple-test-1.jmx)
+### Simple Scenario [simple-test-1.jmx](./simple-test-1.jmx)
 
 This test plan is a simple scenario that performs the following operations repeatedly:
 
@@ -90,7 +72,7 @@ This test plan is a simple scenario that performs the following operations repea
 
 The scripts in [loadtest.sh](./loadtest.sh) are tailored for this test plan.
 
-### [simple-test-2.jmx](./simple-test-2.jmx)
+### Moodle Data Stress Testing [simple-test-2.jmx](./simple-test-2.jmx)
 
 Currently [loadtest.sh](./loadtest.sh) doesn't have any tailored scripts for this
 test plan. Therefore, this test plan will need to be executed by issuing the
@@ -108,7 +90,7 @@ This test plan basically performs the following operations repeatedly:
 
 * Login to the Moodle site
 * Open the Moodle user's Private Files repository
-* Upload a random file (of a random size within a hard-coded range)
+* Upload a randomly generated file (of a random size within a hard-coded range)
 * Save the change
 
 This way, we were able to populate the shared moodledata directory with
