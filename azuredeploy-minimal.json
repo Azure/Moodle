@@ -33,12 +33,12 @@
                 "parameters": {
                     "_artifactsLocation":           { "value": "[parameters('_artifactsLocation')]" },
                     "_artifactsLocationSasToken":   { "value": "[parameters('_artifactsLocationSasToken')]" },
+                    "redisDeploySwitch":            { "value": false },
                     "sshPublicKey":                 { "value": "[parameters('sshPublicKey')]" },
-                    "fileServerType":               { "value": "nfs" },
-                    "fileServerDiskCount":          { "value": 2 },
                     "autoscaleVmSku":               { "value": "Standard_DS1_v2" },
                     "dbServerType":                 { "value": "mssql" },
-                    "redisDeploySwitch":            { "value": false }
+                    "fileServerDiskCount":          { "value": 2 },
+                    "fileServerDiskSize":           { "value": 32 }
                 },
                 "templateLink": {
                     "uri": "[concat(parameters('_artifactsLocation'), 'azuredeploy.json', parameters('_artifactsLocationSasToken'))]"
