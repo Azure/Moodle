@@ -75,6 +75,8 @@
         "moodleVersion": {
             "allowedValues": [
                 "MOODLE_34_STABLE",
+                "v3.4.2",
+                "v3.4.1",
                 "MOODLE_33_STABLE",
                 "MOODLE_32_STABLE",
                 "MOODLE_31_STABLE",
