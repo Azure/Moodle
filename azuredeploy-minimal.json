@@ -7,7 +7,7 @@
             "metadata": {
                 "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
             },
-            "defaultValue": "https://raw.githubusercontent.com/Azure/Moodle/master/"
+            "defaultValue": "https://raw.githubusercontent.com/Azure/Moodle/hs-minimal-tmpl/"
         },
         "_artifactsLocationSasToken": {
             "type": "securestring",
@@ -31,24 +31,14 @@
             "properties": {
                 "mode": "Incremental",
                 "parameters": {
-                    "sshPublicKey": {
-                        "value": "[parameters('sshPublicKey')]"
-                    },
-                    "fileServerType": {
-                        "value": "nfs"
-                    },
-                    "fileServerDiskCount": {
-                        "value": 2
-                    },
-                    "autoscaleVmSku": {
-                        "value": "Standard_DS1_v2"
-                    },
-                    "dbServerType": {
-                        "value": "mssql"
-                    },
-                    "redisDeploySwitch": {
-                        "value": false
-                    }
+                    "_artifactsLocation":           { "value": "[parameters('_artifactsLocation')]" },
+                    "_artifactsLocationSasToken":   { "value": "[parameters('_artifactsLocationSasToken')]" },
+                    "sshPublicKey":                 { "value": "[parameters('sshPublicKey')]" },
+                    "fileServerType":               { "value": "nfs" },
+                    "fileServerDiskCount":          { "value": 2 },
+                    "autoscaleVmSku":               { "value": "Standard_DS1_v2" },
+                    "dbServerType":                 { "value": "mssql" },
+                    "redisDeploySwitch":            { "value": false }
                 },
                 "templateLink": {
                     "uri": "[concat(parameters('_artifactsLocation'), 'azuredeploy.json', parameters('_artifactsLocationSasToken'))]"
@@ -56,48 +46,7 @@
             }
         }
     ],
-    "outputs": {
-      "siteURL": {
-        "type": "string",
-        "value": "[reference('moodleMinimalTemplate').outputs.siteURL.value]"
-      },
-      "controllerInstanceIP": {
-        "type": "string",
-        "value": "[reference('moodleMinimalTemplate').outputs.controllerInstanceIP.value]"
-      },
-      "databaseDNS": {
-        "type": "string",
-        "value": "[reference('moodleMinimalTemplate').outputs.databaseDNS.value]"
-      },
-      "databaseAdminUsername": {
-        "type": "string",
-        "value": "[reference('moodleMinimalTemplate').outputs.databaseAdminUsername.value]"
-      },
-      "databaseAdminPassword": {
-        "type": "string",
-        "value": "[reference('moodleMinimalTemplate').outputs.databaseAdminPassword.value]"
-      },
-      "firstFrontendVmIP": {
-        "type": "string",
-        "value": "[reference('moodleMinimalTemplate').outputs.firstFrontendVmIP.value]"
-      },
-      "moodleAdminPassword": {
-        "type": "string",
-        "value": "[reference('moodleMinimalTemplate').outputs.moodleAdminPassword.value]"
-      },
-      "moodleDbUsername": {
-        "type": "string",
-        "value": "[reference('moodleMinimalTemplate').outputs.moodleDbUsername.value]"
-      },
-      "moodleDbPassword": {
-        "type": "string",
-        "value": "[reference('moodleMinimalTemplate').outputs.moodleDbPassword.value]"
-      },
-      "loadBalancerDNS": {
-        "type": "string",
-        "value": "[reference('moodleMinimalTemplate').outputs.loadBalancerDNS.value]"
-      }
-    },
+    "outputs": "[reference('moodleMinimalTemplate').outputs]",
     "variables": {
         "documentation01": "This wrapper template calls the main-template with bare minimum configs and the only required parameter (sshPublicKey).",
         "documentation02": "To speed up deployment and consume least resources, other parameters are fixed in this tempalte and overriden as follows:",
