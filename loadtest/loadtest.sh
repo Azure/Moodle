@@ -336,3 +336,10 @@ function run_load_test_example
 
     deploy_run_test1_teardown ltest6 southcentralus https://raw.githubusercontent.com/Azure/Moodle/master/azuredeploy.json azuredeploy.parameters.loadtest.defaults.json apache Standard_DS2_v2 mysql 4 125 nfs 2 128 false "$(cat ~/.ssh/authorized_keys)" 1600 4800 18000
 }
+
+function run_load_test_postgres
+{
+    check_ssh_agent_and_added_key || return 1
+
+    deploy_run_test1_teardown pgres southcentralus https://raw.githubusercontent.com/Azure/Moodle/master/azuredeploy.json azuredeploy.parameters.loadtest.defaults.json apache Standard_DS2_v2 postgres 16 256 nfs 2 128 false "$(cat ~/.ssh/authorized_keys)" 1600 4800 18000
+}
