@@ -33,12 +33,13 @@
                 "parameters": {
                     "_artifactsLocation":           { "value": "[parameters('_artifactsLocation')]" },
                     "_artifactsLocationSasToken":   { "value": "[parameters('_artifactsLocationSasToken')]" },
-                    "redisDeploySwitch":            { "value": false },
+                    "azureBackupSwitch":            { "value": true },
+                    "installElasticSearchSwitch":   { "value": true },
                     "sshPublicKey":                 { "value": "[parameters('sshPublicKey')]" },
-                    "autoscaleVmSku":               { "value": "Standard_DS1_v2" },
-                    "dbServerType":                 { "value": "mssql" },
-                    "fileServerDiskCount":          { "value": 2 },
-                    "fileServerDiskSize":           { "value": 32 }
+                    "mysqlPgresVcores":             { "value": 16 },
+                    "mysqlPgresStgSizeGB":          { "value": 512 },
+                    "fileServerType":               { "value": "gluster" },
+                    "fileServerDiskSize":           { "value": 512 }
                 },
                 "templateLink": {
                     "uri": "[concat(parameters('_artifactsLocation'), 'azuredeploy.json', parameters('_artifactsLocationSasToken'))]"
@@ -53,12 +54,7 @@
         }
     },
     "variables": {
-        "documentation01": "This wrapper template calls the main-template with bare minimum configs and the only required parameter (sshPublicKey).",
-        "documentation02": "To speed up deployment and consume least resources, other parameters are fixed in this tempalte and overriden as follows:",
-        "documentation03": "   - fileServerType: nfs",
-        "documentation04": "   - autoscaleVmSku: Standard_DS1_vs",
-        "documentation05": "   - fileServerDiskCount: 2",
-        "documentation06": "   - dbServerType: mssql",
-        "documentation07": "   - redisDeploySwitch: false"
+        "documentation01": "This wrapper template calls the main-template with maximum configs and the only required parameter (sshPublicKey).",
+        "documentation02": "For the best-possible performance, highly available, and most Moodle features, other parameters are fixed in this tempalte and overriden as above."
     }
 }
