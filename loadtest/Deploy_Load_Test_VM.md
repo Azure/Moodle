@@ -73,14 +73,14 @@ Now we can install the load testing scripts, we will have these loaded
 via the `.profile` so that they are always availble.
 
 ``` bash
-ssh #ipAddress echo ". ~/Moodle/loadtest/loadtest.sh" >> ~/.profile
+ssh $ipAddress 'echo ". ~/Moodle/loadtest/loadtest.sh" >> ~/.profile'
 ```
 
 This script provides some helper functions for installing dependencies
 on the VM.
 
 ``` bash
-ssh $ipAddress install_java_and_jmeter; install_az_cli
+ssh $ipAddress 'install_java_and_jmeter; install_az_cli'
 ```
 
 We need to login to Azure using the CLI. The command below is
