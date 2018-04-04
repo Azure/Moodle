@@ -44,6 +44,13 @@
             },
             "type": "bool"
         },
+        "installObjectFsSwitch": {
+            "defaultValue": false,
+            "metadata": {
+                "description": "Switch to install Moodle Object FS plugins (with Azure Blob storage)"
+            },
+            "type": "bool"
+        },
         "installO365pluginsSwitch": {
             "defaultValue": false,
             "metadata": {
@@ -698,6 +705,7 @@
             "glusterVmSku": "[parameters('glusterVmSku')]",
             "htmlLocalCopySwitch": "[parameters('htmlLocalCopySwitch')]",
             "installO365pluginsSwitch": "[parameters('installO365pluginsSwitch')]",
+            "installObjectFsSwitch": "[parameters('installObjectFsSwitch')]",
             "installElasticSearchSwitch": "[parameters('installElasticSearchSwitch')]",
             "ctlrNicName": "[concat('controller-vm-nic-',variables('resourceprefix'))]",
             "ctlrNsgName": "[concat('controller-nsg-',variables('resourceprefix'))]",
