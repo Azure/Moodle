@@ -44,10 +44,24 @@
             },
             "type": "bool"
         },
+        "installObjectFsSwitch": {
+            "defaultValue": false,
+            "metadata": {
+                "description": "Switch to install Moodle Object FS plugins (with Azure Blob storage)"
+            },
+            "type": "bool"
+        },
         "installO365pluginsSwitch": {
             "defaultValue": false,
             "metadata": {
                 "description": "Switch to install Moodle Office 365 plugins"
+            },
+            "type": "bool"
+        },
+        "installGdprPluginsSwitch": {
+            "defaultValue": false,
+            "metadata": {
+                "description": "Switch to install Moodle GDPR plugins. Note these require Moodle versions 3.4.2+ or 3.3.5+ and these will be included by default in Moodle 3.5"
             },
             "type": "bool"
         },
@@ -697,8 +711,10 @@
             "glusterVmCount": 2,
             "glusterVmSku": "[parameters('glusterVmSku')]",
             "htmlLocalCopySwitch": "[parameters('htmlLocalCopySwitch')]",
-            "installO365pluginsSwitch": "[parameters('installO365pluginsSwitch')]",
             "installElasticSearchSwitch": "[parameters('installElasticSearchSwitch')]",
+            "installGdprPluginsSwitch": "[parameters('installGdprPluginsSwitch')]",
+            "installO365pluginsSwitch": "[parameters('installO365pluginsSwitch')]",
+            "installObjectFsSwitch": "[parameters('installObjectFsSwitch')]",
             "ctlrNicName": "[concat('controller-vm-nic-',variables('resourceprefix'))]",
             "ctlrNsgName": "[concat('controller-nsg-',variables('resourceprefix'))]",
             "ctlrPipName": "[concat('controller-pubip-',variables('resourceprefix'))]",
