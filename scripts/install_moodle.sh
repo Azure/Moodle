@@ -47,7 +47,7 @@
     mssqlDbEdition=${23}
     mssqlDbSize=${24}
     installObjectFsSwitch=${25}
-
+    installGdprPluginsSwitch=${26}
 
     echo $moodleVersion        >> /tmp/vars.txt
     echo $glusterNode          >> /tmp/vars.txt
@@ -74,6 +74,7 @@
     echo $mssqlDbEdition	>> /tmp/vars.txt
     echo $mssqlDbSize	>> /tmp/vars.txt
     echo $installObjectFsSwitch >> /tmp/vars.txt
+    echo $installGdprPluginsSwitch >> /tmp/vars.txt
 
     . ./helper_functions.sh
     check_fileServerType_param $fileServerType
@@ -197,6 +198,7 @@
     chown -R www-data.www-data /moodle
 
     o365pluginVersion=$(get_o365plugin_version_from_moodle_version $moodleVersion)
+    moodleStableVersion=$o365pluginVersion  # Need Moodle stable version for GDPR plugins, and o365pluginVersion is just Moodle stable version, so reuse it.
     moodleUnzipDir=$(get_moodle_unzip_dir_from_moodle_version $moodleVersion)
 
     # install Moodle 
@@ -207,6 +209,21 @@
     /usr/bin/curl -k --max-redirs 10 https://github.com/moodle/moodle/archive/'$moodleVersion'.zip -L -o moodle.zip
     /usr/bin/unzip -q moodle.zip
     /bin/mv -v '$moodleUnzipDir' /moodle/html/moodle
+
+    if [ "'$installGdprPluginsSwitch'" = "True" ]; then
+        # install Moodle GDPR plugins (Note: This is only for Moodle versions 3.4.2+ or 3.3.5+ and will be included in Moodle 3.5, so no need for 3.5)
+        curl -k --max-redirs 10 https://github.com/moodlehq/moodle-tool_policy/archive/'$moodleStableVersion'.zip -L -o plugin-policy.zip
+        unzip -q plugin-policy.zip
+        mkdir -p /moodle/html/moodle/admin/tool/policy
+        cp -r moodle-tool_policy-'$moodleStableVersion'/* /moodle/html/moodle/admin/tool/policy
+        rm -rf moodle-tool_policy-'$moodleStableVersion'
+
+        curl -k --max-redirs 10 https://github.com/moodlehq/moodle-tool_dataprivacy/archive/'$moodleStableVersion'.zip -L -o plugin-dataprivacy.zip
+        unzip -q plugin-dataprivacy.zip
+        mkdir -p /moodle/html/moodle/admin/tool/dataprivacy
+        cp -r moodle-tool_dataprivacy-'$moodleStableVersion'/* /moodle/html/moodle/admin/tool/dataprivacy
+        rm -rf moodle-tool_dataprivacy-'$moodleStableVersion'
+    fi
 
     if [ "'$installO365pluginsSwitch'" = "True" ]; then
         # install Office 365 plugins
