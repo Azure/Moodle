@@ -209,17 +209,7 @@ describe('Template', function () {
   }
 
   // Generates the mocha tests based on directories in the existing repo.
-  var srcPath = './';
-  var testDirectories = fs.readdirSync(srcPath).filter(function (fileEntry) {
-    var fileEntryPath = path.join(srcPath, fileEntry);
-    return fs.statSync(fileEntryPath).isDirectory() &&
-      fileEntry !== '.git' &&
-      fileEntry !== 'node_modules' &&
-      !fileExists(path.join(fileEntryPath, '.ci_skip')) &&
-      // if we are only validating modified templates
-      // only add test if this directory template has been modified
-      (!validateModifiedOnly || modifiedDirectories[fileEntry]);
-  });
+  var testDirectories = ['.'];
 
   describe('Local Validation', function () {
     testDirectories.forEach(function (testDirectory) {
