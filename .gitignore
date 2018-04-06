@@ -106,3 +106,5 @@ loadtest/test_outputs/
 # Emacs
 *#*#
 
+# Node Modules
+node_modules
