@@ -422,7 +422,7 @@ EOF
         cat /var/lib/waagent/$thumbprintSslCert.prv > /moodle/certs/nginx.key
         cat /var/lib/waagent/$thumbprintSslCert.crt > /moodle/certs/nginx.crt
         if [ "$thumbprintCaCert" != "None" ]; then
-            echo "CA cert was specified (/var/lib/waagent/$thumbprintCaCert.*), so append it to nginx.crt..."
+            echo "CA cert was specified (/var/lib/waagent/$thumbprintCaCert.crt), so append it to nginx.crt..."
             cat /var/lib/waagent/$thumbprintCaCert.crt >> /moodle/certs/nginx.crt
         fi
     else

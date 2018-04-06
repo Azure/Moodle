@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Based on https://github.com/Azure/azure-quickstart-templates/blob/master/201-vmss-ubuntu-web-ssl/keyvault.sh
+
 #set -e
 
 usage()
@@ -150,9 +152,12 @@ then
     rm -f $cacertpfxfile
 fi
 
-echo "Cert URL=$certid"
-echo "Cert thumbprint=$certprint"
-echo "CA cert URL=$cacertid"
-echo "CA cert thumbprint=$cacertprint"
-echo "Azure Key Vault resource ID=$(az keyvault show --name $vaultname --query id -o tsv)"
+echo "Specified SSL cert/key .pem files are now stored in your Azure Key Vault and ready to be used by the template."
+echo "Use the following values for the related template parameters:"
+echo
+echo "- keyVaultResourceId: $(az keyvault show --name $vaultname --query id -o tsv)"
+echo "- sslCertKeyVaultURL: $certid"
+echo "- sslCertThumbprint:  $certprint"
+echo "- caCertKeyVaultURL:  $cacertid"
+echo "- caCertThumbprint:   $cacertprint"
 echo Done
