@@ -48,6 +48,8 @@
     mssqlDbSize=${24}
     installObjectFsSwitch=${25}
     installGdprPluginsSwitch=${26}
+    thumbprintSslCert=${27}
+    thumbprintCaCert=${28}
 
     echo $moodleVersion        >> /tmp/vars.txt
     echo $glusterNode          >> /tmp/vars.txt
@@ -75,6 +77,8 @@
     echo $mssqlDbSize	>> /tmp/vars.txt
     echo $installObjectFsSwitch >> /tmp/vars.txt
     echo $installGdprPluginsSwitch >> /tmp/vars.txt
+    echo $thumbprintSslCert >> /tmp/vars.txt
+    echo $thumbprintCaCert >> /tmp/vars.txt
 
     . ./helper_functions.sh
     check_fileServerType_param $fileServerType
@@ -412,8 +416,21 @@ server {
 }
 EOF
 
-    echo -e "Generating SSL self-signed certificate"
-    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /moodle/certs/nginx.key -out /moodle/certs/nginx.crt -subj "/C=BR/ST=SP/L=SaoPaulo/O=IT/CN=$siteFQDN"
+    ### SSL cert ###
+    if [ "$thumbprintSslCert" != "None" ]; then
+        echo "Using VM's cert (/var/lib/waagent/$thumbprintSslCert.*) for SSL..."
+        cat /var/lib/waagent/$thumbprintSslCert.prv > /moodle/certs/nginx.key
+        cat /var/lib/waagent/$thumbprintSslCert.crt > /moodle/certs/nginx.crt
+        if [ "$thumbprintCaCert" != "None" ]; then
+            echo "CA cert was specified (/var/lib/waagent/$thumbprintCaCert.crt), so append it to nginx.crt..."
+            cat /var/lib/waagent/$thumbprintCaCert.crt >> /moodle/certs/nginx.crt
+        fi
+    else
+        echo -e "Generating SSL self-signed certificate"
+        openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /moodle/certs/nginx.key -out /moodle/certs/nginx.crt -subj "/C=BR/ST=SP/L=SaoPaulo/O=IT/CN=$siteFQDN"
+    fi
+    chown www-data:www-data /moodle/certs/nginx.*
+    chmod 0400 /moodle/certs/nginx.*
 
    # php config 
    PhpIni=/etc/php/7.0/fpm/php.ini
