@@ -52,7 +52,7 @@
             "type": "string"
         },
         "azureSearchReplicaCount": {
-            "defaultValue": "3",
+            "defaultValue": 3,
             "minValue": 1,
             "maxValue": 12,
             "metadata": {
