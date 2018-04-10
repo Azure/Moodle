@@ -256,9 +256,8 @@
         /usr/bin/unzip -q local-aws.zip
         /bin/mkdir -p /moodle/html/moodle/local/aws
         /bin/cp -r moodle-local_aws-master/* /moodle/html/moodle/local/aws
-    fi
 
-    if [ "'$azureSearchSwitch'" = "True" ]; then
+    elif [ "'$azureSearchSwitch'" = "True" ]; then
         # Install Azure Search service plugin
         /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-search_azure/archive/master.zip -L -o plugin-azure-search.zip
         /usr/bin/unzip -q plugin-azure-search.zip
