@@ -19,9 +19,9 @@
 		"name": "[parameters('moodleCommon').azureSearchSku]"
             },
             "properties": {
-		"replicaCount": "[parameters('moodleCommon').azureSearchReplicaCount",
-		"partitionCount": "[parameters('moodleCommon').azureSearchPartitionCount",
-		"hostingMode": "[parameters('moodleCommon').azureSearchHostingMode"
+		"replicaCount": "[parameters('moodleCommon').azureSearchReplicaCount]",
+		"partitionCount": "[parameters('moodleCommon').azureSearchPartitionCount]",
+		"hostingMode": "[parameters('moodleCommon').azureSearchHostingMode]"
             }
         }
     ],
