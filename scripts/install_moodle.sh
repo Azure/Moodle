@@ -837,9 +837,11 @@ EOF
 
     if [ "$azureSearchSwitch" = "True" ]; then
         # Set up Azure Search service plugin
-        sed -i "23 a \$CFG->forced_plugin_settings = ['search_azure' => ['hostname' => 'http://$azureSearchNameHost']];" /moodle/html/moodle/config.php
+        sed -i "23 a \$CFG->forced_plugin_settings = ['search_azure' => ['searchurl' => 'http://$azureSearchNameHost', 'apikey' => '$azureSearchKey']];" /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->searchengine = 'azure';" /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->enableglobalsearch = 'true';" /moodle/html/moodle/config.php
+	# create index
+	sudo -u www-data php /moodle/html/moodle/search/cli/indexer.php --force --reindex
     fi
 
     if [ "$installObjectFsSwitch" = "True" ]; then
