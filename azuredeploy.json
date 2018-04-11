@@ -612,6 +612,9 @@
             "condition": "[parameters('azureSearchSwitch')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/networkTemplate"
+            ],
             "name": "azureSearchTemplate",
             "properties": {
                 "mode": "Incremental",
@@ -621,7 +624,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'redis', if(parameters('azureSearchSwitch'), '', '-none'), '.json',parameters('_artifactsLocationSasToken'))]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'azuresearch', if(parameters('azureSearchSwitch'), '', '-none'), '.json',parameters('_artifactsLocationSasToken'))]"
                 }
             }
         },
@@ -656,6 +659,7 @@
                 "Microsoft.Resources/deployments/networkTemplate",
                 "Microsoft.Resources/deployments/dbTemplate",
                 "Microsoft.Resources/deployments/redisTemplate",
+                "Microsoft.Resources/deployments/azureSearchTemplate",
                 "Microsoft.Resources/deployments/storageAccountTemplate"
             ],
             "name": "controllerTemplate",
