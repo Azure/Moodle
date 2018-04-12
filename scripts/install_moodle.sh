@@ -50,6 +50,9 @@
     installGdprPluginsSwitch=${26}
     thumbprintSslCert=${27}
     thumbprintCaCert=${28}
+    azureSearchSwitch=${29}
+    azureSearchKey=${30}
+    azureSearchNameHost=${31}
 
     echo $moodleVersion        >> /tmp/vars.txt
     echo $glusterNode          >> /tmp/vars.txt
@@ -79,6 +82,9 @@
     echo $installGdprPluginsSwitch >> /tmp/vars.txt
     echo $thumbprintSslCert >> /tmp/vars.txt
     echo $thumbprintCaCert >> /tmp/vars.txt
+    echo $azureSearchSwitch >> /tmp/vars.txt
+    echo $azureSearchKey >> /tmp/vars.txt
+    echo $azureSearchNameHost >> /tmp/vars.txt
 
     . ./helper_functions.sh
     check_fileServerType_param $fileServerType
@@ -250,6 +256,14 @@
         /usr/bin/unzip -q local-aws.zip
         /bin/mkdir -p /moodle/html/moodle/local/aws
         /bin/cp -r moodle-local_aws-master/* /moodle/html/moodle/local/aws
+
+    elif [ "'$azureSearchSwitch'" = "True" ]; then
+        # Install Azure Search service plugin
+        /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-search_azure/archive/master.zip -L -o plugin-azure-search.zip
+        /usr/bin/unzip -q plugin-azure-search.zip
+        /bin/mkdir -p /moodle/html/moodle/search/engine/azure
+        /bin/cp -r moodle-search_azure-master/* /moodle/html/moodle/search/engine/azure
+        /bin/rm -rf moodle-search_azure-master
     fi
 
     if [ "'$installObjectFsSwitch'" = "True" ]; then
@@ -819,6 +833,15 @@ EOF
         sed -i "23 a \$CFG->forced_plugin_settings = ['search_elastic' => ['hostname' => 'http://$elasticVm1IP']];" /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->searchengine = 'elastic';" /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->enableglobalsearch = 'true';" /moodle/html/moodle/config.php
+    fi
+
+    if [ "$azureSearchSwitch" = "True" ]; then
+        # Set up Azure Search service plugin
+        sed -i "23 a \$CFG->forced_plugin_settings = ['search_azure' => ['searchurl' => 'https://$azureSearchNameHost', 'apikey' => '$azureSearchKey']];" /moodle/html/moodle/config.php
+        sed -i "23 a \$CFG->searchengine = 'azure';" /moodle/html/moodle/config.php
+        sed -i "23 a \$CFG->enableglobalsearch = 'true';" /moodle/html/moodle/config.php
+	# create index
+	sudo -u www-data php /moodle/html/moodle/search/cli/indexer.php --force --reindex
     fi
 
     if [ "$installObjectFsSwitch" = "True" ]; then

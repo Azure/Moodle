@@ -7,6 +7,7 @@
                 "webServerType":               { "value": "apache" },
                 "dbServerType":                { "value": "mssql" },
                 "fileServerDiskCount":         { "value": 2 },
-                "fileServerDiskSize":          { "value": 32 }
+                "fileServerDiskSize":          { "value": 32 },
+		"azureSearchSwitch":           { "value": true }
         }
 }
