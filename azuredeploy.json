@@ -652,7 +652,7 @@
                         "value": "[reference('redisTemplate').outputs.redisKey.value]"
                     },
                     "azureSearchKey": {
-                        "value": "[reference('azureSearchTemplate').outputs.azureSearchKey.value]"
+                        "value": "[reference('searchTemplate').outputs.azureSearchKey.value]"
                     }
                 },
                 "templateLink": {
