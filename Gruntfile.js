@@ -10,15 +10,6 @@ grunt.initConfig({
           jshintrc: '.jshintrc'
       }
   },
-  jscs: {
-      files: {
-          src: templates
-      },
-      options: {
-          config: '.jscsrc',
-          esnext: true
-      }
-  },
   jsbeautifier: {
       test: {
           files: {
@@ -57,4 +48,4 @@ grunt.initConfig({
       }
   }
 });
-grunt.registerTask('test', ['jshint', 'jscs', 'jsbeautifier:test', 'jsbeautifier:write']);
+grunt.registerTask('test', ['jshint', 'jsbeautifier:test', 'jsbeautifier:write']);
