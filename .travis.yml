@@ -12,7 +12,7 @@ addons:
       - azure-cli # Install the Azure CLI tools
 
 before_script:
-  - npm install -g grunt-cli mocha # Install task runners for lint checking.
+  - npm install -g grunt-cli # Install task runners for lint checking.
 
 node_js:
   - "0.12"
