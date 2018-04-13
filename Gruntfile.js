@@ -1,7 +1,7 @@
 var grunt = require('grunt');
 require('load-grunt-tasks')(grunt);
 
-var templates = ['**/*.json'];
+var templates = ['nested/*.json', 'managedApplication/*.json', 'loadtest/*.json', '*.json'];
 
 grunt.initConfig({
   jshint: {
