@@ -6,7 +6,7 @@ language: node_js # Base language is Nodejs (used for liniting and basic validat
 addons:
   apt:
     sources:
-    - sourceline: 'deb https://packages.microsoft.com/repos/azure-cli/trusty main'
+    - sourceline: 'deb https://packages.microsoft.com/repos/azure-cli/ trusty main'
       key_url: 'https://packages.microsoft.com/keys/microsoft.asc'
     packages:
       - azure-cli # Install the Azure CLI tools
