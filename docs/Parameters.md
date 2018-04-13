@@ -89,17 +89,6 @@ Possible Values: null
 Default: false
 
 
-### azureSearchSwitch
-
-Switch to configure Azure Search service
-
-Type: bool
-
-Possible Values: null
-
-Default: true
-
-
 ### azureSearchSku
 
 The search service level you want to create
@@ -287,17 +276,6 @@ Possible Values: null
 Default: true
 
 
-### installElasticSearchSwitch
-
-Switch to install Moodle ElasticSearch plugins & VMs
-
-Type: bool
-
-Possible Values: null
-
-Default: false
-
-
 ### installGdprPluginsSwitch
 
 Switch to install Moodle GDPR plugins. Note these require Moodle versions 3.4.2+ or 3.3.5+ and these will be included by default in Moodle 3.5
@@ -472,6 +450,17 @@ Type: bool
 Possible Values: null
 
 Default: true
+
+
+### searchType
+
+Options of Moodle Global Search
+
+Type: string
+
+Possible Values: ["none-search", "azure-search", "elastic-search"]
+
+Default: azure-search
 
 
 ### siteURL

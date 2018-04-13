@@ -24,22 +24,27 @@
             "type": "bool"
         },
         "azureBackupSwitch": {
-            "defaultValue": true,
+            "defaultValue": false,
             "metadata": {
                 "description": "Switch to configure AzureBackup and enlist VM's"
             },
             "type": "bool"
         },
-        "azureSearchSwitch": {
-            "defaultValue": false,
+        "searchType": {
+            "defaultValue": "azure-search",
+            "allowedValues": [
+		"none-search",
+                "azure-search",
+                "elastic-search"
+            ],
             "metadata": {
-                "description": "Switch to configure Azure Search"
+                "description": "options of moodle global search"
             },
-            "type": "bool"
+            "type": "string"
         },
         "azureSearchSku": {
             "defaultValue": "basic",
-	    "allowedValues": [
+            "allowedValues": [
 		"free",
                 "basic",
                 "standard",
@@ -118,13 +123,6 @@
             "defaultValue": false,
             "metadata": {
                 "description": "Switch to install Moodle GDPR plugins. Note these require Moodle versions 3.4.2+ or 3.3.5+ and these will be included by default in Moodle 3.5"
-            },
-            "type": "bool"
-        },
-        "installElasticSearchSwitch": {
-            "defaultValue": false,
-            "metadata": {
-                "description": "Switch to install Moodle ElasticSearch plugins & VMs"
             },
             "type": "bool"
         },
@@ -588,14 +586,13 @@
             }
         },
         {
-            "condition": "[parameters('installElasticSearchSwitch')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
             "dependsOn": [
                 "Microsoft.Resources/deployments/networkTemplate",
                 "Microsoft.Resources/deployments/recoveryTemplate"
             ],
-            "name": "elasticTemplate",
+            "name": "searchTemplate",
             "properties": {
                 "mode": "Incremental",
                 "parameters": {
@@ -604,27 +601,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'elastic.json',parameters('_artifactsLocationSasToken'))]"
-                }
-            }
-        },
-        {
-            "condition": "[parameters('azureSearchSwitch')]",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2017-05-10",
-            "dependsOn": [
-                "Microsoft.Resources/deployments/networkTemplate"
-            ],
-            "name": "azureSearchTemplate",
-            "properties": {
-                "mode": "Incremental",
-                "parameters": {
-                    "moodleCommon": {
-                        "value": "[variables('moodleCommon')]"
-                    }
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'azuresearch', if(parameters('azureSearchSwitch'), '', '-none'), '.json',parameters('_artifactsLocationSasToken'))]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl, parameters('searchType'), '.json', parameters('_artifactsLocationSasToken'))]"
                 }
             }
         },
@@ -653,13 +630,12 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
             "dependsOn": [
-                "Microsoft.Resources/deployments/elasticTemplate",
                 "Microsoft.Resources/deployments/glusterTemplate",
                 "Microsoft.Resources/deployments/recoveryTemplate",
                 "Microsoft.Resources/deployments/networkTemplate",
                 "Microsoft.Resources/deployments/dbTemplate",
                 "Microsoft.Resources/deployments/redisTemplate",
-                "Microsoft.Resources/deployments/azureSearchTemplate",
+                "Microsoft.Resources/deployments/searchTemplate",
                 "Microsoft.Resources/deployments/storageAccountTemplate"
             ],
             "name": "controllerTemplate",
@@ -791,7 +767,6 @@
             "azureSearchNameHost": "[concat('azure-search-',variables('resourceprefix'),'.search.windows.net')]",
             "azureSearchPartitionCount": "[parameters( 'azureSearchPartitionCount')]",
             "azureSearchReplicaCount": "[parameters( 'azureSearchReplicaCount')]",
-            "azureSearchSwitch": "[parameters( 'azureSearchSwitch')]",
             "azureSearchSku": "[parameters( 'azureSearchSku')]",
             "commonFunctionsScriptUri": "[concat(parameters('_artifactsLocation'),'scripts/helper_functions.sh',parameters('_artifactsLocationSasToken'))]",
             "controllerVmSku": "[parameters('controllerVmSku')]",
@@ -833,7 +808,6 @@
             "glusterVmCount": 2,
             "glusterVmSku": "[parameters('glusterVmSku')]",
             "htmlLocalCopySwitch": "[parameters('htmlLocalCopySwitch')]",
-            "installElasticSearchSwitch": "[parameters('installElasticSearchSwitch')]",
             "installGdprPluginsSwitch": "[parameters('installGdprPluginsSwitch')]",
             "installO365pluginsSwitch": "[parameters('installO365pluginsSwitch')]",
             "installObjectFsSwitch": "[parameters('installObjectFsSwitch')]",
@@ -874,6 +848,7 @@
             "redisDeploySwitch": "[parameters('redisDeploySwitch')]",
             "redisDns": "[concat('redis-',variables('resourceprefix'),'.redis.cache.windows.net')]",
             "resourcesPrefix": "[variables('resourceprefix')]",
+            "searchType": "[parameters( 'searchType')]",
             "serverName": "[concat(parameters('dbServerType'), '-',variables('resourceprefix'))]",
             "siteURL": "[if(or(empty(parameters('siteURL')), equals(parameters('siteURL'), 'www.example.org')), concat('lb-',variables('resourceprefix'),'.',resourceGroup().location,'.cloudapp.azure.com'), parameters('siteURL'))]",
             "sshPublicKey": "[parameters('sshPublicKey')]",

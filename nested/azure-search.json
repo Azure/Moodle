@@ -10,18 +10,18 @@
         }
     },
     "resources": [
-        {
+	{
             "type": "Microsoft.Search/searchServices",
             "apiVersion": "2015-08-19",
             "location": "[resourceGroup().location]",
             "name": "[parameters('moodleCommon').azureSearchName]",
             "sku": {
-		"name": "[parameters('moodleCommon').azureSearchSku]"
+                "name": "[parameters('moodleCommon').azureSearchSku]"
             },
             "properties": {
-		"replicaCount": "[parameters('moodleCommon').azureSearchReplicaCount]",
-		"partitionCount": "[parameters('moodleCommon').azureSearchPartitionCount]",
-		"hostingMode": "[parameters('moodleCommon').azureSearchHostingMode]"
+                "replicaCount": "[parameters('moodleCommon').azureSearchReplicaCount]",
+                "partitionCount": "[parameters('moodleCommon').azureSearchPartitionCount]",
+                "hostingMode": "[parameters('moodleCommon').azureSearchHostingMode]"
             }
         }
     ],
@@ -33,7 +33,7 @@
         "documentation06": "	azureSearchReplicaCount		- number of Azure Search replicas.",
         "documentation07": "	azureSearchPartitionCount	- number of Azure Search partitions.",
         "documentation08": "	azureSearchHostingMode		- the type of Azure Search hosting mode.",
-	"azureSearchServiceId": "[resourceId('Microsoft.Search/searchServices', parameters('moodleCommon').azureSearchName)]"
+        "azureSearchServiceId": "[resourceId('Microsoft.Search/searchServices', parameters('moodleCommon').azureSearchName)]"
     },
     "outputs": {
         "azureSearchKey": {
