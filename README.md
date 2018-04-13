@@ -1,3 +1,4 @@
+
 # Deploy and Manage a Scalable Moodle Cluster on Azure
 
 This repo contains guides and [Azure Resource Manager](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-overview) templates designed to help you deploy and manage a highly available and scalable
@@ -28,7 +29,7 @@ The template also optionally installs a handful of useful plugins that allow Moo
 ## Useful Moodle plugins for integrating Moodle with Azure Services
 There below is a listing of useful plugins allow Moodle to be integrated with select Azure services: 
 - [Azure Search Plugin](https://github.com/catalyst/moodle-search_azure) for [Azure Search](https://azure.microsoft.com/en-us/services/logic-apps/)
-- [Trigger Plugin](https://github.com/catalyst/moodle-tool_trigger) for [Azure Logic Apps](https://azure.microsoft.com/en-us/services/logic-apps/) (In Development)
+- [Trigger Plugin](https://github.com/catalyst/moodle-tool_trigger) and [Restful Webservice Plugin](https://github.com/catalyst/moodle-webservice_restful) for [Azure Logic Apps](https://azure.microsoft.com/en-us/services/logic-apps/) (requires use of [Moodle Connector](https://github.com/catalyst/azure-connector_moodle) now in development)
 - [Object File System Plugin*](https://github.com/catalyst/moodle-tool_objectfs) for [Azure Blob Storage](https://azure.microsoft.com/en-us/services/storage/blobs/)
 - [Office 365 and Azure Active Directory Plugins for Moodle*](https://github.com/Microsoft/o365-moodle) for [Azure Active Directory](https://azure.microsoft.com/en-us/services/active-directory/)
 - [Elasticsearch Plugin*](https://github.com/catalyst/moodle-search_elastic)
