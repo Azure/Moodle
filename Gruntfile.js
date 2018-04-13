@@ -1,26 +1,18 @@
 var grunt = require('grunt');
 require('load-grunt-tasks')(grunt);
 
-var files = ['test/tests.js'];
 var templates = ['**/*.json'];
 
 grunt.initConfig({
-  mochacli: {
-      options: {
-          reporter: 'spec',
-          bail: false
-      },
-      all: files
-  },
   jshint: {
-      files: files,
+      files: templates,
       options: {
           jshintrc: '.jshintrc'
       }
   },
   jscs: {
       files: {
-          src: files
+          src: templates
       },
       options: {
           config: '.jscsrc',
@@ -30,7 +22,7 @@ grunt.initConfig({
   jsbeautifier: {
       test: {
           files: {
-              src: files
+              src: templates
           },
           options: {
               mode: 'VERIFY_ONLY',
@@ -57,7 +49,7 @@ grunt.initConfig({
       },
       write: {
           files: {
-              src: files
+              src: templates
           },
           options: {
               config: '.beautifyrc'
@@ -65,4 +57,4 @@ grunt.initConfig({
       }
   }
 });
-grunt.registerTask('test', ['jshint', 'jscs', 'jsbeautifier:test', 'jsbeautifier:write', 'mochacli']);
+grunt.registerTask('test', ['jshint', 'jscs', 'jsbeautifier:test', 'jsbeautifier:write']);

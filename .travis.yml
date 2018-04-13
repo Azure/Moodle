@@ -21,8 +21,6 @@ cache:
   directories:
     - node_modules
 
-# Node JS environments in Travis run `npm test` by default as the entry point
-# By default `npm test` invokes the "scripts"->"test" section of package JSON
-
 script:
   - az
+  - npm test # Invokes the "scripts"->"test" section of package.json which runs `grunt test`
