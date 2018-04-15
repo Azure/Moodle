@@ -23,7 +23,8 @@ cache:
 
 script:
   - npm test # Invokes the "scripts"->"test" section of package.json which runs `grunt test`
-  - if [ $azureapi == true ]; then
+  - echo $azureapi
+  - if [ $azureapi ]; then
       echo "Runnig Azure validation and build steps.";
       az
     else
