@@ -24,7 +24,7 @@ cache:
 script:
   - az
   - npm test # Invokes the "scripts"->"test" section of package.json which runs `grunt test`
-  - if [ azureapi == true ]; then
+  - if [ env(azureapi) == true ]; then
             echo "API SET";
         else
             echo "Np such thing";
