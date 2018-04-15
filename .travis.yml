@@ -22,11 +22,11 @@ cache:
     - node_modules
 
 script:
-  - az
   - npm test # Invokes the "scripts"->"test" section of package.json which runs `grunt test`
-  - if [ env(azureapi) == true ]; then
-            echo "API SET";
-        else
-            echo "Np such thing";
+  - if [ $azureapi == true ]; then
+      echo "Runnig Azure validation and build steps.";
+      az
+    else
+      echo "Skipping Azure validation and build.";
     fi
     
