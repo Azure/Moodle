@@ -19,7 +19,6 @@
     "debug": "^2.2.0",
     "grunt": "^0.4.5",
     "grunt-contrib-jshint": "^0.11.3",
-    "grunt-jsbeautifier": "^0.2.10",
     "load-grunt-tasks": "^3.3.0",
     "rsvp": "^3.1.0",
     "skeemas": "^1.2.1",
