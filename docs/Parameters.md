@@ -458,9 +458,9 @@ Options of Moodle Global Search
 
 Type: string
 
-Possible Values: ["none-search", "azure-search", "elastic-search"]
+Possible Values: ["none", "azure", "elastic"]
 
-Default: azure-search
+Default: none
 
 
 ### siteURL
