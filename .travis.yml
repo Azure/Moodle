@@ -34,4 +34,6 @@ script: # Run the lint tests, then if env vars are present validate the template
     fi
 
 after_script: # Teardown group and created resource after build.
-  - az group delete -g "moodle-azure-$TRAVIS_BUILD_NUMBER" -y
+  - if [ $SPNAME ] && [ $SPPASSWORD ] && [ $SPTENANT ]; then
+      az group delete -g "moodle-azure-$TRAVIS_BUILD_NUMBER" -y;
+    fi
