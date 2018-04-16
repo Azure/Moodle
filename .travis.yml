@@ -24,13 +24,23 @@ cache:
 script: # Run the lint tests, then if env vars are present validate the template then try building the stack.
   - npm test
   - if [ $SPNAME ] && [ $SPPASSWORD ] && [ $SPTENANT ]; then
-      echo "Runnig Azure validation and build steps.";
+      echo "Runnig Azure setup steps.";
       az login --service-principal -u "$SPNAME" -p "$SPPASSWORD" --tenant "$SPTENANT";
       az group create -l westus -g "moodle-azure-$TRAVIS_BUILD_NUMBER";
+    else
+      echo "Skipping Azure setup.";
+    fi
+  - if [ $SPNAME ] && [ $SPPASSWORD ] && [ $SPTENANT ]; then
+      echo "Runnig Azure validation step.";
       az group deployment validate --resource-group "moodle-azure-$TRAVIS_BUILD_NUMBER" --template-file azuredeploy.json --parameters azuredeploy.parameters.json;
+    else
+      echo "Skipping Azure validation.";
+    fi
+  - if [ $SPNAME ] && [ $SPPASSWORD ] && [ $SPTENANT ]; then
+      echo "Runnig Azure build step.";
       az group deployment create --resource-group "moodle-azure-$TRAVIS_BUILD_NUMBER" --template-file azuredeploy.json --parameters azuredeploy.parameters.json;
     else
-      echo "Skipping Azure validation and build.";
+      echo "Skipping Azure build.";
     fi
 
 after_script: # Teardown group and created resource after build.
