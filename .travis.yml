@@ -27,8 +27,8 @@ script: # Run the lint tests, then if env vars are present validate the template
       echo "Runnig Azure validation and build steps.";
       az login --service-principal -u "$SPNAME" -p "$SPPASSWORD" --tenant "$SPTENANT";
       az group create -l westus -g "moodle-azure-$TRAVIS_BUILD_NUMBER";
-      az group deployment validate --resource-group "moodle-azure-$TRAVIS_BUILD_NUMBER" --template-file azuredeploy.json --parameters azuredeploy.parameters.json --debug;
-      az group deployment create --resource-group "moodle-azure-$TRAVIS_BUILD_NUMBER" --template-file azuredeploy.json --parameters azuredeploy.parameters.json --debug;
+      az group deployment validate --resource-group "moodle-azure-$TRAVIS_BUILD_NUMBER" --template-file azuredeploy.json --parameters azuredeploy.parameters.json;
+      az group deployment create --resource-group "moodle-azure-$TRAVIS_BUILD_NUMBER" --template-file azuredeploy.json --parameters azuredeploy.parameters.json;
     else
       echo "Skipping Azure validation and build.";
     fi
