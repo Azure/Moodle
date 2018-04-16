@@ -23,20 +23,20 @@ cache:
 
 script: # Run the lint tests, then if env vars are present validate the template then try building the stack.
   - npm test
-  - if [ "$SPNAME" -ne "" ] && [ "$SPPASSWORD" -ne "" ] && [ "$SPTENANT" -ne "" ] && [ "$SPSSHKEY" -ne "" ]; then
+  - if [ "$SPNAME" -ne ""  &&  "$SPPASSWORD" -ne ""  &&  "$SPTENANT" -ne ""  &&  "$SPSSHKEY" -ne "" ]; then
       echo "Running Azure setup steps.";
       az login --service-principal -u "$SPNAME" -p "$SPPASSWORD" --tenant "$SPTENANT";
       az group create -l westus -g "moodle-azure-$TRAVIS_BUILD_NUMBER";
     else
       echo "Skipping Azure setup.";
     fi
-  - if [ "$SPNAME" -ne "" ] && [ "$SPPASSWORD" -ne "" ] && [ "$SPTENANT" -ne "" ] && [ "$SPSSHKEY" -ne "" ]; then
+  - if [ "$SPNAME" -ne ""  &&  "$SPPASSWORD" -ne ""  &&  "$SPTENANT" -ne ""  &&  "$SPSSHKEY" -ne "" ]; then
       echo "Running Azure validation step.";
       az group deployment validate --resource-group "moodle-azure-$TRAVIS_BUILD_NUMBER" --template-file azuredeploy.json --parameters azuredeploy.parameters.json --parameters sshPublicKey=$SPSSHKEY;
     else
       echo "Skipping Azure validation.";
     fi
-  - if [ "$SPNAME" -ne "" ] && [ "$SPPASSWORD" -ne "" ] && [ "$SPTENANT" -ne "" ] && [ "$SPSSHKEY" -ne "" ]; then
+  - if [ "$SPNAME" -ne ""  &&  "$SPPASSWORD" -ne ""  &&  "$SPTENANT" -ne ""  &&  "$SPSSHKEY" -ne "" ]; then
       echo "Running Azure build step.";
       az group deployment create --resource-group "moodle-azure-$TRAVIS_BUILD_NUMBER" --template-file azuredeploy.json --parameters azuredeploy.parameters.json --verbose;
     else
@@ -44,6 +44,6 @@ script: # Run the lint tests, then if env vars are present validate the template
     fi
 
 after_script: # Teardown group and created resource after build.
-  - if [ "$SPNAME" -ne "" ] && [ "$SPPASSWORD" -ne "" ] && [ "$SPTENANT" -ne "" ] && [ "$SPSSHKEY" -ne "" ]; then
+  - if [ "$SPNAME" -ne ""  &&  "$SPPASSWORD" -ne ""  &&  "$SPTENANT" -ne ""  &&  "$SPSSHKEY" -ne "" ]; then
       az group delete -g "moodle-azure-$TRAVIS_BUILD_NUMBER" -y;
     fi
