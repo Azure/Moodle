@@ -114,6 +114,7 @@
                 "osProfile": {
                     "adminUsername": "[parameters('moodleCommon').sshUsername]",
                     "computerName": "[parameters('moodleCommon').ctlrVmName]",
+                    "secrets": "[parameters('moodleCommon').ctlrVmSecrets]",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": true,
                         "ssh": {

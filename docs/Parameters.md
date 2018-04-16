@@ -89,6 +89,28 @@ Possible Values: null
 Default: false
 
 
+### caCertKeyVaultURL
+
+Azure Key Vault URL for your stored CA (Certificate Authority) cert. This value can be obtained from keyvault.sh output if you used the script to store your CA cert in your Key Vault. This parameter is ignored if the keyVaultResourceId parameter is blank.
+
+Type: string
+
+Possible Values: null
+
+Default: 
+
+
+### caCertThumbprint
+
+Thumbprint of your stored CA cert. This value can be obtained from keyvault.sh output if you used the script to store your CA cert in your Key Vault. This parameter is ignored if the keyVaultResourceId parameter is blank.
+
+Type: string
+
+Possible Values: null
+
+Default: 
+
+
 ### controllerVmSku
 
 VM size for the controller VM
@@ -207,12 +229,23 @@ Type: bool
 
 Possible Values: null
 
-Default: false
+Default: true
 
 
 ### installElasticSearchSwitch
 
 Switch to install Moodle ElasticSearch plugins & VMs
+
+Type: bool
+
+Possible Values: null
+
+Default: false
+
+
+### installGdprPluginsSwitch
+
+Switch to install Moodle GDPR plugins. Note these require Moodle versions 3.4.2+ or 3.3.5+ and these will be included by default in Moodle 3.5
 
 Type: bool
 
@@ -232,13 +265,35 @@ Possible Values: null
 Default: false
 
 
+### installObjectFsSwitch
+
+Switch to install Moodle Object FS plugins (with Azure Blob storage)
+
+Type: bool
+
+Possible Values: null
+
+Default: false
+
+
+### keyVaultResourceId
+
+Azure Resource Manager resource ID of the Key Vault in case you stored your SSL cert in an Azure Key Vault (Note that this Key Vault must have been pre-created on the same Azure region where this template is being deployed). Leave this blank if you didn't. Resource ID example: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/xxx/providers/Microsoft.KeyVault/vaults/yyy. This value can be obtained from keyvault.sh output if you used the script to store your SSL cert in your Key Vault.
+
+Type: string
+
+Possible Values: null
+
+Default: 
+
+
 ### moodleVersion
 
 The Moodle version you want to install.
 
 Type: string
 
-Possible Values: ["MOODLE_34_STABLE","MOODLE_33_STABLE","MOODLE_32_STABLE","MOODLE_31_STABLE","MOODLE_30_STABLE","MOODLE_29_STABLE"]
+Possible Values: ["MOODLE_34_STABLE","v3.4.2","v3.4.1","MOODLE_33_STABLE","MOODLE_32_STABLE","MOODLE_31_STABLE","MOODLE_30_STABLE","MOODLE_29_STABLE"]
 
 Default: MOODLE_34_STABLE
 
@@ -395,6 +450,28 @@ Type: string
 Possible Values: null
 
 Default: azureadmin
+
+
+### sslCertKeyVaultURL
+
+Azure Key Vault URL for your stored SSL cert. This value can be obtained from keyvault.sh output if you used the script to store your SSL cert in your Key Vault. This parameter is ignored if the keyVaultResourceId parameter is blank.
+
+Type: string
+
+Possible Values: null
+
+Default: 
+
+
+### sslCertThumbprint
+
+Thumbprint of your stored SSL cert. This value can be obtained from keyvault.sh output if you used the script to store your SSL cert in your Key Vault. This parameter is ignored if the keyVaultResourceId parameter is blank.
+
+Type: string
+
+Possible Values: null
+
+Default: 
 
 
 ### sslEnforcement

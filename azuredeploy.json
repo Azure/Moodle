@@ -346,6 +346,41 @@
             },
             "type": "string"
         },
+        "keyVaultResourceId": {
+            "defaultValue": "",
+            "metadata": {
+                "description": "Azure Resource Manager resource ID of the Key Vault in case you stored your SSL cert in an Azure Key Vault (Note that this Key Vault must have been pre-created on the same Azure region where this template is being deployed). Leave this blank if you didn't. Resource ID example: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/xxx/providers/Microsoft.KeyVault/vaults/yyy. This value can be obtained from keyvault.sh output if you used the script to store your SSL cert in your Key Vault."
+            },
+            "type": "string"
+        },
+        "sslCertKeyVaultURL": {
+            "defaultValue": "",
+            "metadata": {
+                "description": "Azure Key Vault URL for your stored SSL cert. This value can be obtained from keyvault.sh output if you used the script to store your SSL cert in your Key Vault. This parameter is ignored if the keyVaultResourceId parameter is blank."
+            },
+            "type": "string"
+        },
+        "sslCertThumbprint": {
+            "defaultValue": "",
+            "metadata": {
+                "description": "Thumbprint of your stored SSL cert. This value can be obtained from keyvault.sh output if you used the script to store your SSL cert in your Key Vault. This parameter is ignored if the keyVaultResourceId parameter is blank."
+            },
+            "type": "string"
+        },
+        "caCertKeyVaultURL": {
+            "defaultValue": "",
+            "metadata": {
+                "description": "Azure Key Vault URL for your stored CA (Certificate Authority) cert. This value can be obtained from keyvault.sh output if you used the script to store your CA cert in your Key Vault. This parameter is ignored if the keyVaultResourceId parameter is blank."
+            },
+            "type": "string"
+        },
+        "caCertThumbprint": {
+            "defaultValue": "",
+            "metadata": {
+                "description": "Thumbprint of your stored CA cert. This value can be obtained from keyvault.sh output if you used the script to store your CA cert in your Key Vault. This parameter is ignored if the keyVaultResourceId parameter is blank."
+            },
+            "type": "string"
+        },
         "storageAccountType": {
             "defaultValue": "Standard_LRS",
             "allowedValues": [
@@ -719,6 +754,7 @@
             "ctlrNsgName": "[concat('controller-nsg-',variables('resourceprefix'))]",
             "ctlrPipName": "[concat('controller-pubip-',variables('resourceprefix'))]",
             "ctlrVmName": "[concat('controller-vm-',variables('resourceprefix'))]",
+            "ctlrVmSecrets": "[take(variables('ctlrVmSecretsArray'), if(empty(parameters('keyVaultResourceId')), 0, 1))]",
             "lbDns": "[concat('lb-',variables('resourceprefix'),'.',resourceGroup().location,'.cloudapp.azure.com')]",
             "lbName": "[concat('lb-',variables('resourceprefix'))]",
             "lbPipName": "[concat('lb-pubip-',variables('resourceprefix'))]",
@@ -770,6 +806,8 @@
             "subnetWeb": "[concat('web-subnet-',variables('resourceprefix'))]",
             "subnetWebPrefix": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),0)))]",
             "subnetWebRange": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),0)), '.0/24')]",
+            "thumbprintSslCert": "[if(or(empty(parameters('keyVaultResourceId')), empty(parameters('sslCertThumbprint'))), 'None', parameters('sslCertThumbprint'))]",
+            "thumbprintCaCert": "[if(or(empty(parameters('keyVaultResourceId')), empty(parameters('caCertThumbprint'))), 'None', parameters('caCertThumbprint'))]",
             "vNetAddressSpace": "[parameters('vNetAddressSpace')]",
             "vaultName": "[concat('vault-',variables('resourceprefix'))]",
             "vmssName": "[concat('vmss-',variables('resourceprefix'))]",
@@ -780,6 +818,22 @@
             "webServerSetupScriptFilename": "setup_webserver.sh",
             "webServerType": "[parameters('webServerType')]"
         },
+        "certUrlArray": [
+            {
+                "certificateUrl": "[parameters('sslCertKeyVaultURL')]"
+            },
+            {
+                "certificateUrl": "[parameters('caCertKeyVaultURL')]"
+            }
+        ],
+        "ctlrVmSecretsArray": [
+            {
+                "sourceVault": {
+                    "id": "[parameters('keyVaultResourceId')]"
+                },
+                "vaultCertificates": "[take(variables('certUrlArray'), if(empty(parameters('caCertKeyVaultURL')), 1, 2))]"
+            }
+        ],
         "octets": "[split(parameters('vNetAddressSpace'), '.')]",
         "resourceprefix": "[substring(uniqueString(resourceGroup().id, deployment().name), 3, 6)]"
     }
