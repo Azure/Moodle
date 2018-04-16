@@ -31,7 +31,7 @@
             "type": "bool"
         },
         "searchType": {
-            "defaultValue": "azure",
+            "defaultValue": "none",
             "allowedValues": [
 		"none",
                 "azure",
@@ -45,7 +45,7 @@
         "azureSearchSku": {
             "defaultValue": "basic",
             "allowedValues": [
-		"free",
+                "free",
                 "basic",
                 "standard",
                 "standard2",
@@ -67,13 +67,13 @@
         },
         "azureSearchPartitionCount": {
             "defaultValue": 1,
-	    "allowedValues": [
-		1,
+            "allowedValues": [
+                1,
                 2,
                 3,
                 4,
                 6,
-		12
+               12
             ],
             "metadata": {
                 "description": "Partitions allow for scaling of document count as well as faster indexing by sharding your index over multiple Azure Search units."
@@ -848,7 +848,7 @@
             "redisDeploySwitch": "[parameters('redisDeploySwitch')]",
             "redisDns": "[concat('redis-',variables('resourceprefix'),'.redis.cache.windows.net')]",
             "resourcesPrefix": "[variables('resourceprefix')]",
-            "searchType": "[parameters( 'searchType')]",
+            "searchType": "[parameters('searchType')]",
             "serverName": "[concat(parameters('dbServerType'), '-',variables('resourceprefix'))]",
             "siteURL": "[if(or(empty(parameters('siteURL')), equals(parameters('siteURL'), 'www.example.org')), concat('lb-',variables('resourceprefix'),'.',resourceGroup().location,'.cloudapp.azure.com'), parameters('siteURL'))]",
             "sshPublicKey": "[parameters('sshPublicKey')]",
