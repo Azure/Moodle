@@ -241,7 +241,7 @@
         rm -rf o365-moodle-'$o365pluginVersion'
     fi
 
-    if [ "'$searchType'" == "elastic-search" ]; then
+    if [ "'$searchType'" == "elastic" ]; then
         # Install ElasticSearch plugin
         /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-search_elastic/archive/master.zip -L -o plugin-elastic.zip
         /usr/bin/unzip -q plugin-elastic.zip
@@ -255,7 +255,7 @@
         /bin/mkdir -p /moodle/html/moodle/local/aws
         /bin/cp -r moodle-local_aws-master/* /moodle/html/moodle/local/aws
 
-    elif [ "'$searchType'" == "azure-search" ]; then
+    elif [ "'$searchType'" == "azure" ]; then
         # Install Azure Search service plugin
         /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-search_azure/archive/master.zip -L -o plugin-azure-search.zip
         /usr/bin/unzip -q plugin-azure-search.zip
@@ -826,12 +826,12 @@ EOF
     # We proxy ssl, so moodle needs to know this
     sed -i "23 a \$CFG->sslproxy  = 'true';" /moodle/html/moodle/config.php
 
-    if [ "$searchType" == "elastic-search" ]; then
+    if [ "$searchType" == "elastic" ]; then
         # Set up elasticsearch plugin
         sed -i "23 a \$CFG->forced_plugin_settings = ['search_elastic' => ['hostname' => 'http://$elasticVm1IP']];" /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->searchengine = 'elastic';" /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->enableglobalsearch = 'true';" /moodle/html/moodle/config.php
-    elif [ "$searchType" == "azure-search" ]; then
+    elif [ "$searchType" == "azure" ]; then
         # Set up Azure Search service plugin
         sed -i "23 a \$CFG->forced_plugin_settings = ['search_azure' => ['searchurl' => 'https://$azureSearchNameHost', 'apikey' => '$azureSearchKey']];" /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->searchengine = 'azure';" /moodle/html/moodle/config.php
