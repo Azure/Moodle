@@ -31,11 +31,11 @@
             "type": "bool"
         },
         "searchType": {
-            "defaultValue": "azure-search",
+            "defaultValue": "azure",
             "allowedValues": [
-		"none-search",
-                "azure-search",
-                "elastic-search"
+		"none",
+                "azure",
+                "elastic"
             ],
             "metadata": {
                 "description": "options of moodle global search"
@@ -601,7 +601,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl, parameters('searchType'), '.json', parameters('_artifactsLocationSasToken'))]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl, parameters('searchType'), '-search.json', parameters('_artifactsLocationSasToken'))]"
                 }
             }
         },
@@ -652,7 +652,7 @@
                         "value": "[reference('redisTemplate').outputs.redisKey.value]"
                     },
                     "azureSearchKey": {
-                        "value": "[if(equals(parameters('searchType'), 'azure-search'), reference('searchTemplate').outputs.azureSearchKey.value, '')]"
+                        "value": "[if(equals(parameters('searchType'), 'azure'), reference('searchTemplate').outputs.azureSearchKey.value, '')]"
                     }
                 },
                 "templateLink": {
