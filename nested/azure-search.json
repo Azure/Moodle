@@ -10,7 +10,7 @@
         }
     },
     "resources": [
-	{
+        {
             "type": "Microsoft.Search/searchServices",
             "apiVersion": "2015-08-19",
             "location": "[resourceGroup().location]",

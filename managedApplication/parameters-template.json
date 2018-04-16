@@ -5,5 +5,5 @@
     "fileServerType":       { "value": "nfs" },
     "autoscaleVmSku":       { "value": "Standard_DS1_v2" },
     "fileServerDiskCount":  { "value": 2 },
-    "searchType":           { "value": "azure-search" }
+    "searchType":           { "value": "none" }
 }

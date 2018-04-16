@@ -12,6 +12,6 @@
         "fileServerDiskSize":          { "value": 128 },
         "redisDeploySwitch":           { "value": false },
         "sshPublicKey":                { "value": "__SSH_PUB_KEY__" },
-        "searchType":	               { "value": "azure-search" }
+        "searchType":                  { "value": "none" }
     }
 }
