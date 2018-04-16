@@ -38,7 +38,7 @@ script: # Run the lint tests, then if env vars are present validate the template
     fi
   - if [ "$SPNAME" != ""  -a  "$SPPASSWORD" != ""  -a  "$SPTENANT" != ""  -a  "$SPSSHKEY" != "" ]; then
       echo "Running Azure build step.";
-      az group deployment create --resource-group "moodle-azure-$TRAVIS_BUILD_NUMBER" --template-file azuredeploy.json --parameters azuredeploy.parameters.json --parameters sshPublicKey="$SPSSHKEY" --verbose;
+      az group deployment create --resource-group "moodle-azure-$TRAVIS_BUILD_NUMBER" --template-file azuredeploy.json --parameters azuredeploy.parameters.json --parameters sshPublicKey="$SPSSHKEY" --debug --verbose;
     else
       echo "Skipping Azure build.";
     fi
