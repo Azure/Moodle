@@ -40,16 +40,18 @@
     redisAuth=${16}
     elasticVm1IP=${17}
     installO365pluginsSwitch=${18}
-    installElasticSearchSwitch=${19}
-    dbServerType=${20}
-    fileServerType=${21}
-    mssqlDbServiceObjectiveName=${22}
-    mssqlDbEdition=${23}
-    mssqlDbSize=${24}
-    installObjectFsSwitch=${25}
-    installGdprPluginsSwitch=${26}
-    thumbprintSslCert=${27}
-    thumbprintCaCert=${28}
+    dbServerType=${19}
+    fileServerType=${20}
+    mssqlDbServiceObjectiveName=${21}
+    mssqlDbEdition=${22}
+    mssqlDbSize=${23}
+    installObjectFsSwitch=${24}
+    installGdprPluginsSwitch=${25}
+    thumbprintSslCert=${26}
+    thumbprintCaCert=${27}
+    searchType=${28}
+    azureSearchKey=${29}
+    azureSearchNameHost=${30}
 
     echo $moodleVersion        >> /tmp/vars.txt
     echo $glusterNode          >> /tmp/vars.txt
@@ -69,7 +71,6 @@
     echo $redisAuth            >> /tmp/vars.txt
     echo $elasticVm1IP         >> /tmp/vars.txt
     echo $installO365pluginsSwitch    >> /tmp/vars.txt
-    echo $installElasticSearchSwitch  >> /tmp/vars.txt
     echo $dbServerType                >> /tmp/vars.txt
     echo $fileServerType              >> /tmp/vars.txt
     echo $mssqlDbServiceObjectiveName >> /tmp/vars.txt
@@ -79,6 +80,9 @@
     echo $installGdprPluginsSwitch >> /tmp/vars.txt
     echo $thumbprintSslCert >> /tmp/vars.txt
     echo $thumbprintCaCert >> /tmp/vars.txt
+    echo $searchType >> /tmp/vars.txt
+    echo $azureSearchKey >> /tmp/vars.txt
+    echo $azureSearchNameHost >> /tmp/vars.txt
 
     . ./helper_functions.sh
     check_fileServerType_param $fileServerType
@@ -237,7 +241,7 @@
         rm -rf o365-moodle-'$o365pluginVersion'
     fi
 
-    if [ "'$installElasticSearchSwitch'" = "True" ]; then
+    if [ "'$searchType'" = "elastic" ]; then
         # Install ElasticSearch plugin
         /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-search_elastic/archive/master.zip -L -o plugin-elastic.zip
         /usr/bin/unzip -q plugin-elastic.zip
@@ -250,6 +254,14 @@
         /usr/bin/unzip -q local-aws.zip
         /bin/mkdir -p /moodle/html/moodle/local/aws
         /bin/cp -r moodle-local_aws-master/* /moodle/html/moodle/local/aws
+
+    elif [ "'$searchType'" = "azure" ]; then
+        # Install Azure Search service plugin
+        /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-search_azure/archive/master.zip -L -o plugin-azure-search.zip
+        /usr/bin/unzip -q plugin-azure-search.zip
+        /bin/mkdir -p /moodle/html/moodle/search/engine/azure
+        /bin/cp -r moodle-search_azure-master/* /moodle/html/moodle/search/engine/azure
+        /bin/rm -rf moodle-search_azure-master
     fi
 
     if [ "'$installObjectFsSwitch'" = "True" ]; then
@@ -814,11 +826,20 @@ EOF
     # We proxy ssl, so moodle needs to know this
     sed -i "23 a \$CFG->sslproxy  = 'true';" /moodle/html/moodle/config.php
 
-    if [ "$installElasticSearchSwitch" = "True" ]; then
+    if [ "$searchType" = "elastic" ]; then
         # Set up elasticsearch plugin
         sed -i "23 a \$CFG->forced_plugin_settings = ['search_elastic' => ['hostname' => 'http://$elasticVm1IP']];" /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->searchengine = 'elastic';" /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->enableglobalsearch = 'true';" /moodle/html/moodle/config.php
+	# create index
+        sudo -u www-data php /moodle/html/moodle/search/cli/indexer.php --force --reindex
+    elif [ "$searchType" = "azure" ]; then
+        # Set up Azure Search service plugin
+        sed -i "23 a \$CFG->forced_plugin_settings = ['search_azure' => ['searchurl' => 'https://$azureSearchNameHost', 'apikey' => '$azureSearchKey']];" /moodle/html/moodle/config.php
+        sed -i "23 a \$CFG->searchengine = 'azure';" /moodle/html/moodle/config.php
+        sed -i "23 a \$CFG->enableglobalsearch = 'true';" /moodle/html/moodle/config.php
+	# create index
+        sudo -u www-data php /moodle/html/moodle/search/cli/indexer.php --force --reindex
     fi
 
     if [ "$installObjectFsSwitch" = "True" ]; then
