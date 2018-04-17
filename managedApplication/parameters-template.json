@@ -4,6 +4,5 @@
     "dbServerType":         { "value": "mysql" },
     "fileServerType":       { "value": "nfs" },
     "autoscaleVmSku":       { "value": "Standard_DS1_v2" },
-    "fileServerDiskCount":  { "value": 2 },
-    "searchType":           { "value": "none" }
+    "fileServerDiskCount":  { "value": 2 }
 }

@@ -11,7 +11,6 @@
         "fileServerDiskCount":         { "value": 2 },
         "fileServerDiskSize":          { "value": 128 },
         "redisDeploySwitch":           { "value": false },
-        "sshPublicKey":                { "value": "__SSH_PUB_KEY__" },
-        "searchType":                  { "value": "none" }
+        "sshPublicKey":                { "value": "__SSH_PUB_KEY__" }
     }
 }

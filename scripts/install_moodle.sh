@@ -241,7 +241,7 @@
         rm -rf o365-moodle-'$o365pluginVersion'
     fi
 
-    if [ "'$searchType'" == "elastic" ]; then
+    if [ "'$searchType'" = "elastic" ]; then
         # Install ElasticSearch plugin
         /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-search_elastic/archive/master.zip -L -o plugin-elastic.zip
         /usr/bin/unzip -q plugin-elastic.zip
@@ -255,7 +255,7 @@
         /bin/mkdir -p /moodle/html/moodle/local/aws
         /bin/cp -r moodle-local_aws-master/* /moodle/html/moodle/local/aws
 
-    elif [ "'$searchType'" == "azure" ]; then
+    elif [ "'$searchType'" = "azure" ]; then
         # Install Azure Search service plugin
         /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-search_azure/archive/master.zip -L -o plugin-azure-search.zip
         /usr/bin/unzip -q plugin-azure-search.zip

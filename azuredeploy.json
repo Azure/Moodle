@@ -33,7 +33,7 @@
         "searchType": {
             "defaultValue": "none",
             "allowedValues": [
-		"none",
+                "none",
                 "azure",
                 "elastic"
             ],
@@ -82,8 +82,8 @@
         },
         "azureSearchHostingMode": {
             "defaultValue": "default",
-	    "allowedValues": [
-		"default",
+            "allowedValues": [
+                "default",
                 "highDensity"
             ],
             "metadata": {
