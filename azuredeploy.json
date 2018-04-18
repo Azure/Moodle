@@ -624,7 +624,7 @@
             }
         },
         {
-            "condition": "[equals(or((parameters('searchType'), 'azure'), (paramenters('searchType'), 'elastic')))]",
+            "condition": "[not(bool(equals(parameters('searchType'), 'none')))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
             "dependsOn": [

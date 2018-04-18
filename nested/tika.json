@@ -23,7 +23,7 @@
                             "privateIPAllocationMethod": "Static",
                             "privateIPAddress": "[parameters('moodleCommon').tikaVmIP]",
                             "subnet": {
-                                "id": "[variables('subnetElasticRef')]"
+                                "id": "[variables('subnetTikaRef')]"
                             }
                         }
                     }
