@@ -2,9 +2,7 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
         "parameters": {
-                "redisDeploySwitch":           { "value": false },
                 "sshPublicKey":                { "value": "GEN-SSH-PUB-KEY" },
-                "webServerType":               { "value": "apache" },
                 "dbServerType":                { "value": "mssql" },
                 "fileServerDiskCount":         { "value": 2 },
                 "fileServerDiskSize":          { "value": 32 }

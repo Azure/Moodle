@@ -92,7 +92,7 @@
             "type": "string"
         },
         "redisDeploySwitch": {
-            "defaultValue": true,
+            "defaultValue": false,
             "metadata": {
                 "description": "Switch to deploy a redis cache or not"
             },
