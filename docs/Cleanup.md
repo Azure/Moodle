@@ -1,4 +1,4 @@
-# Cleanup All Resource
+# Cleanup All Resources
 
 To cleanup a Moodle deployment simply delete the Resource Group that
 contains it. The commands below will iterate over your workspace
