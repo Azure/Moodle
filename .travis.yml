@@ -23,14 +23,16 @@ cache:
 
 env: 
   - RUNBUILD="false"
-  - LOCATION="westus"
 
 script: # Run the lint tests, then if env vars are present validate the template then try building the stack.
   - npm test
   - if [ "$SPNAME" != ""  -a  "$SPPASSWORD" != ""  -a  "$SPTENANT" != ""  -a  "$SPSSHKEY" != "" ]; then
-      export RUNBUILD="true"
+      export RUNBUILD="true";
     fi
-  - if [ $RUNBUILD != "false" ]; then
+  - if [ "$LOCATION" == "" ]; then
+      export $LOCATION="westus";
+    fi
+  - if [ "$RUNBUILD" != "false" ]; then
       echo "Running Azure setup steps.";
       az login --service-principal -u "$SPNAME" -p "$SPPASSWORD" --tenant "$SPTENANT";
       az group create -l "$LOCATION" -g "moodle-azure-$TRAVIS_BUILD_NUMBER";
