@@ -33,7 +33,7 @@ echo "Running Azure build step."
 az group deployment create --resource-group "$AZMDLGROUP" --template-file azuredeploy.json --parameters @azuredeploy.parameters.json sshPublicKey="$SPSSHKEY"
 
 while true; do
-  echo -n .
+  echo .
   sleep 30
   PROV_STATE=$(az group deployment show -g $AZMDLGROUP -n azuredeploy --query properties.provisioningState -o tsv)
   if [ "$PROV_STATE" != "Running" ]; then
