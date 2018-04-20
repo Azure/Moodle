@@ -25,7 +25,6 @@ script: # Run the lint tests, then if env vars are present validate the template
   - npm test
   - if [ "$SPNAME" != ""  -a  "$SPPASSWORD" != ""  -a  "$SPTENANT" != ""  -a  "$SPSSHKEY" != "" ]; then
       export RUNBUILD="true";
-      echo $RUNBUILD;
     fi
   - if [ "$LOCATION" == "" ]; then
       export LOCATION="westus";
