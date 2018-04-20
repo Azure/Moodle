@@ -30,4 +30,26 @@ if [ -n "$VALIDATION_RESULT" ]; then
 fi
 
 echo "Running Azure build step."
-az group deployment create --resource-group "$AZMDLGROUP" --template-file azuredeploy.json --parameters @azuredeploy.parameters.json sshPublicKey="$SPSSHKEY" --debug --verbose
+az group deployment create --resource-group "$AZMDLGROUP" --template-file azuredeploy.json --parameters @azuredeploy.parameters.json sshPublicKey="$SPSSHKEY"
+
+while true; do
+  echo -n .
+  sleep 30
+  PROV_STATE=$(az group deployment show -g $AZMDLGROUP -n azuredeploy --query properties.provisioningState -o tsv)
+  if [ "$PROV_STATE" != "Running" ]; then
+    echo "Provisioning state is now non-running ('$PROV_STATE'), stop polling"
+    break
+  fi
+done
+
+if [ "$PROV_STATE" != "Succeeded" ]; then
+  DEPL_ERROR=$(az group deployment show -g $AZMDLGROUP -n azuredeploy --query error)
+  echo "Azure deployment failed! Error message:"
+  echo $DEPL_ERROR
+  exit 1
+else
+  DEPL_OUTPUT=$(az group deployment show -g $AZMDLGROUP -n azuredeploy)
+  echo "Azure deployment succeeded! Deployment results:"
+  echo $DEPL_OUTPUT
+  exit 0
+fi
