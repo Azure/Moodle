@@ -30,7 +30,7 @@ az login --service-principal -u "$SPNAME" -p "$SPPASSWORD" --tenant "$SPTENANT"
 az group create -l "$LOCATION" -g "$AZMDLGROUP"
 
 echo "Running Azure validation step."
-VALIDATION_RESULT=$(az group deployment validate --resource-group "$AZMDLGROUP" --template-file azuredeploy.json --parameters @azuredeploy.parameters.json sshPublicKey="$SPSSHKEY" _artifactsLocation="$GITHUB_SLUG_BRANCH" --query error)
+VALIDATION_RESULT=$(az group deployment validate --resource-group "$AZMDLGROUP" --template-file azuredeploy.json --parameters @azuredeploy.parameters.json sshPublicKey="$SPSSHKEY" _artifactsLocation="$ARTIFACTS_LOCATION" --query error)
 if [ -n "$VALIDATION_RESULT" ]; then
   echo "Azure template validation failed! Error message:"
   echo $VALIDATION_RESULT
@@ -38,7 +38,7 @@ if [ -n "$VALIDATION_RESULT" ]; then
 fi
 
 echo "Running Azure build step."
-az group deployment create --resource-group "$AZMDLGROUP" --template-file azuredeploy.json --parameters @azuredeploy.parameters.json sshPublicKey="$SPSSHKEY" _artifactsLocation="$GITHUB_SLUG_BRANCH" --no-wait
+az group deployment create --resource-group "$AZMDLGROUP" --template-file azuredeploy.json --parameters @azuredeploy.parameters.json sshPublicKey="$SPSSHKEY" _artifactsLocation="$ARTIFACTS_LOCATION" --no-wait
 
 while true; do
   echo -n .
