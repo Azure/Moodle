@@ -5,16 +5,24 @@ set -ev
 # Run the lint tests, then if env vars are present validate the template then try building the stack.
 npm test
 
+AZMDLGROUP="azmdl-travis-$TRAVIS_BUILD_NUMBER"
+echo "AZMDLGROUP=$AZMDLGROUP"
+
+if [ -z "$LOCATION" ]; then
+  LOCATION="southcentralus"
+fi
+echo "LOCATION=$LOCATION"
+
+GITHUB_SLUG_BRANCH="${TRAVIS_REPO_SLUG}/${TRAVIS_BRANCH}"
+if [ -n "$TRAVIS_PULL_REQUEST_SLUG" ]; then
+  GITHUB_SLUG_BRANCH="${TRAVIS_PULL_REQUEST_SLUG}/${TRAVIS_PULL_REQUEST_BRANCH}"
+fi
+ARTIFACTS_LOCATION="https://raw.githubusercontent.com/${GITHUB_SLUG_BRANCH}/"
+echo "ARTIFACTS_LOCATION=$ARTIFACTS_LOCATION"
+
 if [ -z "$SPNAME" -o -z "$SPPASSWORD" -o -z "$SPTENANT" -o -z "$SPSSHKEY" ]; then
   echo "No Azure deployment info given, skipping test deployment and exiting..."
   exit 0
-fi
-
-export RUNBUILD="true"
-export AZMDLGROUP="azmdl-travis-$TRAVIS_BUILD_NUMBER"
-
-if [ -z "$LOCATION" ]; then
-  export LOCATION="southcentralus"
 fi
 
 echo "Running Azure setup steps."
@@ -22,7 +30,7 @@ az login --service-principal -u "$SPNAME" -p "$SPPASSWORD" --tenant "$SPTENANT"
 az group create -l "$LOCATION" -g "$AZMDLGROUP"
 
 echo "Running Azure validation step."
-VALIDATION_RESULT=$(az group deployment validate --resource-group "$AZMDLGROUP" --template-file azuredeploy.json --parameters azuredeploy.parameters.json --parameters sshPublicKey="$SPSSHKEY" --query error)
+VALIDATION_RESULT=$(az group deployment validate --resource-group "$AZMDLGROUP" --template-file azuredeploy.json --parameters @azuredeploy.parameters.json sshPublicKey="$SPSSHKEY" _artifactsLocation="$GITHUB_SLUG_BRANCH" --query error)
 if [ -n "$VALIDATION_RESULT" ]; then
   echo "Azure template validation failed! Error message:"
   echo $VALIDATION_RESULT
@@ -30,7 +38,7 @@ if [ -n "$VALIDATION_RESULT" ]; then
 fi
 
 echo "Running Azure build step."
-az group deployment create --resource-group "$AZMDLGROUP" --template-file azuredeploy.json --parameters @azuredeploy.parameters.json sshPublicKey="$SPSSHKEY" --no-wait
+az group deployment create --resource-group "$AZMDLGROUP" --template-file azuredeploy.json --parameters @azuredeploy.parameters.json sshPublicKey="$SPSSHKEY" _artifactsLocation="$GITHUB_SLUG_BRANCH" --no-wait
 
 while true; do
   echo -n .
