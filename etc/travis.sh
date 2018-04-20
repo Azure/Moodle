@@ -22,7 +22,7 @@ az login --service-principal -u "$SPNAME" -p "$SPPASSWORD" --tenant "$SPTENANT"
 az group create -l "$LOCATION" -g "$AZMDLGROUP"
 
 echo "Running Azure validation step."
-VALIDATION_RESULT=$(az group deployment validate --resource-group "$AZMDLGROUP" --template-file azuredeploy.json --parameters azuredeploy.parameters.json --parameters sshPublicKey="$SPSSHKEY")
+VALIDATION_RESULT=$(az group deployment validate --resource-group "$AZMDLGROUP" --template-file azuredeploy.json --parameters azuredeploy.parameters.json --parameters sshPublicKey="$SPSSHKEY" --query error)
 if [ -n "$VALIDATION_RESULT" ]; then
   echo "Azure template validation failed! Error message:"
   echo $VALIDATION_RESULT
