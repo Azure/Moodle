@@ -30,10 +30,10 @@ if [ -n "$VALIDATION_RESULT" ]; then
 fi
 
 echo "Running Azure build step."
-az group deployment create --resource-group "$AZMDLGROUP" --template-file azuredeploy.json --parameters @azuredeploy.parameters.json sshPublicKey="$SPSSHKEY"
+az group deployment create --resource-group "$AZMDLGROUP" --template-file azuredeploy.json --parameters @azuredeploy.parameters.json sshPublicKey="$SPSSHKEY" --no-wait
 
 while true; do
-  echo .
+  echo -n .
   sleep 30
   PROV_STATE=$(az group deployment show -g $AZMDLGROUP -n azuredeploy --query properties.provisioningState -o tsv)
   if [ "$PROV_STATE" != "Running" ]; then
