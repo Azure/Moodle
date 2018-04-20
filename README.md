@@ -28,13 +28,13 @@ The template also optionally installs a handful of useful plugins that allow Moo
 
 ## Useful Moodle plugins for integrating Moodle with Azure Services
 There below is a listing of useful plugins allow Moodle to be integrated with select Azure services: 
-- [Azure Search Plugin](https://github.com/catalyst/moodle-search_azure) for [Azure Search](https://azure.microsoft.com/en-us/services/logic-apps/)
+- [Azure Search Plugin*](https://github.com/catalyst/moodle-search_azure) for [Azure Search](https://azure.microsoft.com/en-us/services/logic-apps/)
 - [Trigger Plugin](https://github.com/catalyst/moodle-tool_trigger) and [Restful Webservice Plugin](https://github.com/catalyst/moodle-webservice_restful) for [Azure Logic Apps](https://azure.microsoft.com/en-us/services/logic-apps/) (requires use of [Moodle Connector](https://github.com/catalyst/azure-connector_moodle) now in development)
 - [Object File System Plugin*](https://github.com/catalyst/moodle-tool_objectfs) for [Azure Blob Storage](https://azure.microsoft.com/en-us/services/storage/blobs/)
 - [Office 365 and Azure Active Directory Plugins for Moodle*](https://github.com/Microsoft/o365-moodle) for [Azure Active Directory](https://azure.microsoft.com/en-us/services/active-directory/)
 - [Elasticsearch Plugin*](https://github.com/catalyst/moodle-search_elastic)
 
-At the current time this template allows the optional installation of all of the plugins above with an * next to them. Please note these plugins can be installed at any time post deployment via Moodle's own plugin directory. You can find a list of all Azure relevant plugins in the Moodle plugin directory [here](https://moodle.org/plugins/browse.php?list=set&id=91). You might also choose to follow this list via RSS. Azure supports running an Elasticsearch cluster, however it does not offer a fully-managed Elasticsearch service, so for those looking for a fully-managed Search service Azure Search is recommended.
+At the current time this template allows the optional installation of all of the plugins above with an * next to them. Please note these plugins can be installed at any time post deployment via Moodle's own [plugin directory](https://moodle.org/plugins/). You can find a list of all Azure relevant plugins in the Moodle plugin directory [here](https://moodle.org/plugins/browse.php?list=set&id=91). You might also choose to follow this list via RSS.
 
 ## Moodle as a Managed Application
 You can learn more about how you can offer Moodle as a Managed Application on the Azure Marketplace or on an IT Service Catalog [here](https://github.com/Azure/Moodle/tree/master/managedApplication). This is a great read if you are offering Moodle hosting services today for your customers. 
@@ -45,11 +45,11 @@ The following sections describe observations about the current template that you
 
 **Database.** Currently the best performance is achieved with [Azure Database for MySQL](https://azure.microsoft.com/en-us/services/mysql/) and [Azure SQL Database](https://azure.microsoft.com/en-us/services/sql-database/). With [Azure Database for PostgreSQL](https://azure.microsoft.com/en-us/services/postgresql/) we have hit database constraints which caused processes to load up on the frontends until they ran out of memory. It is possible some PostgreSQL tuning might help here.  At this stage Azure Database for MySQL and PostgreSQL do not support being moved to a vnet. As a workaround, we use a firewall-based IP restriction allow access only to the controller VM and VMSS load-balancer IPs. 
 
-**Search.** Azure supports running an Elasticsearch cluster, however it does not offer a fully-managed Elasticsearch service, so for those looking for a fully-managed Search service [Azure Search](https://azure.microsoft.com/en-us/services/logic-apps/) is recommended. To enable Azure Search this you will need to manually install the [Azure Search Plugin](https://github.com/catalyst/moodle-search_azure) and follow the steps in the README to configure this functionality. 
+**Search.** Azure supports running an Elasticsearch cluster, however it does not offer a fully-managed Elasticsearch service, so for those looking for a fully-managed Search service [Azure Search](https://azure.microsoft.com/en-us/services/logic-apps/) is recommended. 
 
-**Caching** While enabling Redis cache can improve performance can be improved for a large Moodle site we have not seen it be very effective for small-to-medium size sites.
+**Caching.** While enabling Redis cache can improve performance can be improved for a large Moodle site we have not seen it be very effective for small-to-medium size sites.
 
-**Regions** Note that not all resources types (such as databases) may be available in your region. You should check the list of [Azure Products by Region](https://azure.microsoft.com/en-us/global-infrastructure/services/) to for local availabiliy. 
+**Regions.** Note that not all resources types (such as databases) may be available in your region. You should check the list of [Azure Products by Region](https://azure.microsoft.com/en-us/global-infrastructure/services/) to for local availabiliy. 
 
 ## Common questions about this Template
 1.  **Is this template Moodle as IaaS or PaaS?**  While the current template leverages PaaS services such as Redis, MySQL, Postgres, MS SQL etc. the current template offers Moodle as IaaS. Given limitations to Moodle our focus is IaaS for the time being however we would love to be informed of your experience running Moodle as PaaS on Azure (i.e. using [Azure Container Service](https://azure.microsoft.com/en-us/services/container-service/) or [Azure App Service](https://azure.microsoft.com/en-us/services/container-service/)). 
