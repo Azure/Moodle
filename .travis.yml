@@ -28,4 +28,4 @@ cache:
 script: ./etc/travis.sh
 
 after_script: # Teardown group and created resource after build.
-  - az login --service-principal -u "$SPNAME" -p "$SPPASSWORD" --tenant "$SPTENANT" && az group delete -g azmdl-travis-$TRAVIS_BUILD_NUMBER -y --no-wait
+  - [ -n "$SPNAME" -a -n "$SPPASSWORD" -a -n "$SPTENANT" ] && az login --service-principal -u "$SPNAME" -p "$SPPASSWORD" --tenant "$SPTENANT" && az group delete -g azmdl-travis-$TRAVIS_BUILD_NUMBER -y --no-wait
