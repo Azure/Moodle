@@ -74,7 +74,52 @@ The following sections describe observations about the current template that you
 
 11.  **Why the database on a public subnet?** At this stage Azure Database for MySQL and PostgreSQL do not support being moved to a vnet. As a workaround, we use a firewall-based IP restriction allow access only to the controller VM and VMSS load-balancer IPs.  
 
-12.  **How can I help with this effort?** Please see below. 
+12.  **How can I help with this effort?** Please see below.
+
+## Automated Testing (Travis CI)
+This repository uses (Travis CI)[https://travis-ci.org/] to deliver automated testing.
+
+The following tests are carried out for every Pull Request and will also run in a Travis CI enabled forked repository:
+* **JSON Linting** - All JSON files are linted to ensure they do not contain any syntax errors.
+* **JSON Code Style** - All JSON files are tested to ensure they comply with project code style rules.
+
+The following tests are carried out as part of the Pull Request merging prior to a contribution being accepted into the release branch:
+* **Template Validation** - The template is subbmitted to Azure to ensure it is correclty formatted and contains valid logic.
+* **Template Build** - The template is submitted to Azure and the stack described in the template is built to ensure a stack is correctly deployed.
+
+### Setting Up Travis CI for Template Build
+The following describes the process required if you want to run the template validation and build steps using your own Travis and Azure accounts.
+
+To set up the build process, you will need:
+* An Azure account or active subscription
+* A fork of this repository linked to Travis CI
+* Access to an installed instance of the Azure CLI
+* A SSH keypair
+
+The Travis CI process uses the *Azure CLI Service Principal* login method to authenticate against Azure. The documentation for logging in via a Service Principal can be found here: https://docs.microsoft.com/en-us/cli/azure/authenticate-azure-cli?view=azure-cli-latest#logging-in-with-a-service-principal
+
+Before you can log in using the Service Principal process you need to create a *Service Principal*. The documentation to create a Service Principal login can be found here: https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?view=azure-cli-latest
+
+When a Service Principal is created using the Azure CLI a JSON response is returned containing:
+* **name** - This is the Service Principal username.
+* **password** - This is the Service Principal password.
+* **tenantId** - This is the Service Principal tenant unique ID.
+
+You will need these three above values to have Travis and Azure deploy and test your template.
+
+The next step is to take the above values returned by the Service Principal creation and use them to define *environment variables* in Travis CI.
+
+The following link shows how to set up per repository environment variables in Travis CI: https://docs.travis-ci.com/user/environment-variables/#Defining-Variables-in-Repository-Settings Using this documention set up the following three *hidden* environment variables in Travis CI for your fork of this repository.
+
+* **SPNAME** - The value of the *name* parameter returned by the Service Principal create proccess.
+* **SPPASSWORD** - The value of the *password* parameter returned by the Service Principal create proccess.
+* **SPTENANT** - The value of the *tenant* parameter returned by the Service Principal create proccess.
+* **SPSSHKEY** - A public SSH key that you have the corresponding private key for. This is currently not used but is required for the build to be successful.
+
+**NOTE:** Make sure you set the environment variables to hidden otherwise they will be exposed publically at run time. 
+**NOTE:** As per the Travis CI documentation make sure you have correctly escaped the enviroment variable values when they are defined.
+
+Once the environment variables are defined, Travis CI will run the template validate and build steps as part of the test process.
 
 ## Contributing
 
