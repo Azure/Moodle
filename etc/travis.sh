@@ -14,7 +14,7 @@ export RUNBUILD="true"
 export AZMDLGROUP="azmdl-travis-$TRAVIS_BUILD_NUMBER"
 
 if [ -z "$LOCATION" ]; then
-  export LOCATION="westus"
+  export LOCATION="southcentralus"
 fi
 
 echo "Running Azure setup steps."
@@ -30,4 +30,4 @@ if [ -n "$VALIDATION_RESULT" ]; then
 fi
 
 echo "Running Azure build step."
-az group deployment create --resource-group "$AZMDLGROUP" --template-file azuredeploy.json --parameters azuredeploy.parameters.json --parameters sshPublicKey="$SPSSHKEY" --debug --verbose
+az group deployment create --resource-group "$AZMDLGROUP" --template-file azuredeploy.json --parameters @azuredeploy.parameters.json sshPublicKey="$SPSSHKEY" --debug --verbose

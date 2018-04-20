@@ -29,5 +29,5 @@ script: ./etc/travis.sh
 
 after_script: # Teardown group and created resource after build.
   - if [ "$RUNBUILD" = "true" ]; then
-      az group delete -g "$AZMDLGROUP" -y --no-wait
+      az group delete -g "$AZMDLGROUP" -y --no-wait;
     fi
