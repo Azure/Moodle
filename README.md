@@ -88,7 +88,7 @@ The following tests are carried out as part of the Pull Request merging prior to
 * **Template Build** - The template is submitted to Azure and the stack described in the template is built to ensure a stack is correctly deployed.
 
 ### Setting Up Travis CI for Template Build
-The following desceribes the process required if you want to run the template validation and build steps using your own Travis and Azure accounts.
+The following describes the process required if you want to run the template validation and build steps using your own Travis and Azure accounts.
 
 To set up the build process, you will need:
 * An Azure account or active subscription

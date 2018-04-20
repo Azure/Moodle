@@ -21,22 +21,29 @@ cache:
   directories:
     - node_modules
 
+env: 
+  - RUNBUILD="false"
+  - LOCATION="westus"
+
 script: # Run the lint tests, then if env vars are present validate the template then try building the stack.
   - npm test
   - if [ "$SPNAME" != ""  -a  "$SPPASSWORD" != ""  -a  "$SPTENANT" != ""  -a  "$SPSSHKEY" != "" ]; then
+      export RUNBUILD="true"
+    fi
+  - if [ $RUNBUILD != "false" ]; then
       echo "Running Azure setup steps.";
       az login --service-principal -u "$SPNAME" -p "$SPPASSWORD" --tenant "$SPTENANT";
-      az group create -l westus -g "moodle-azure-$TRAVIS_BUILD_NUMBER";
+      az group create -l "$LOCATION" -g "moodle-azure-$TRAVIS_BUILD_NUMBER";
     else
       echo "Skipping Azure setup.";
     fi
-  - if [ "$SPNAME" != ""  -a  "$SPPASSWORD" != ""  -a  "$SPTENANT" != ""  -a  "$SPSSHKEY" != "" ]; then
+  - if [ $RUNBUILD != "false" ]; then
       echo "Running Azure validation step.";
       az group deployment validate --resource-group "moodle-azure-$TRAVIS_BUILD_NUMBER" --template-file azuredeploy.json --parameters azuredeploy.parameters.json --parameters sshPublicKey="$SPSSHKEY";
     else
       echo "Skipping Azure validation.";
     fi
-  - if [ "$SPNAME" != ""  -a  "$SPPASSWORD" != ""  -a  "$SPTENANT" != ""  -a  "$SPSSHKEY" != "" ]; then
+  - if [ $RUNBUILD != "false" ]; then
       echo "Running Azure build step.";
       az group deployment create --resource-group "moodle-azure-$TRAVIS_BUILD_NUMBER" --template-file azuredeploy.json --parameters azuredeploy.parameters.json --parameters sshPublicKey="$SPSSHKEY" --debug --verbose;
     else
@@ -44,6 +51,6 @@ script: # Run the lint tests, then if env vars are present validate the template
     fi
 
 after_script: # Teardown group and created resource after build.
-  - if [ "$SPNAME" != ""  -a  "$SPPASSWORD" != ""  -a  "$SPTENANT" != ""  -a  "$SPSSHKEY" != "" ]; then
+  - if [ $RUNBUILD != "false" ]; then
       az group delete -g "moodle-azure-$TRAVIS_BUILD_NUMBER" -y;
     fi
