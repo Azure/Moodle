@@ -77,7 +77,7 @@ The following sections describe observations about the current template that you
 12.  **How can I help with this effort?** Please see below.
 
 ## Automated Testing (Travis CI)
-This repository uses (Travis CI)[https://travis-ci.org/] to deliver automated testing.
+This repository uses [Travis CI](https://travis-ci.org/) to deliver automated testing.
 
 The following tests are carried out for every Pull Request and will also run in a Travis CI enabled forked repository:
 * **JSON Linting** - All JSON files are linted to ensure they do not contain any syntax errors.
