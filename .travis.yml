@@ -1,11 +1,14 @@
 dist: trusty
-sudo: off
 
 branches:
   only:
   - master
 
-language: node_js # Base language is Nodejs (used for liniting and basic validation).
+language: python
+
+node_js: "0.12"
+
+python: "3.5"
 
 addons:
   apt:
@@ -15,17 +18,17 @@ addons:
     packages:
       - azure-cli # Install the Azure CLI tools
 
-before_script:
-  - npm install -g grunt-cli # Install task runners for lint checking.
-
-node_js:
-  - "0.12"
+install:
+  - npm install # Install task runners for lint checking.
+  - pip install azure keyring # Install Azure Python SDK
 
 cache:
-  directories:
-    - node_modules
+  - directories: node_modules
+  - pip
 
-script: ./etc/travis.sh
+script:
+  - npm test
+  - ./etc/travis.py
 
 after_script: # Teardown group and created resource after build.
   - test -n "$SPNAME" -a -n "$SPPASSWORD" -a -n "$SPTENANT" && az login --service-principal -u "$SPNAME" -p "$SPPASSWORD" --tenant "$SPTENANT" && az group delete -g azmdl-travis-$TRAVIS_BUILD_NUMBER -y --no-wait
