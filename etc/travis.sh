@@ -5,14 +5,6 @@ fi
 ARTIFACTS_LOCATION="https://raw.githubusercontent.com/${GITHUB_SLUG_BRANCH}/"
 echo "ARTIFACTS_LOCATION=$ARTIFACTS_LOCATION"
 
-echo "Running Azure validation step."
-VALIDATION_RESULT=$(az group deployment validate --resource-group "$AZMDLGROUP" --template-file azuredeploy.json --parameters @azuredeploy.parameters.json sshPublicKey="$SPSSHKEY" _artifactsLocation="$ARTIFACTS_LOCATION" --query error)
-if [ -n "$VALIDATION_RESULT" ]; then
-  echo "Azure template validation failed! Error message:"
-  echo $VALIDATION_RESULT
-  exit 1
-fi
-
 echo "Running Azure build step."
 az group deployment create --resource-group "$AZMDLGROUP" --template-file azuredeploy.json --parameters @azuredeploy.parameters.json sshPublicKey="$SPSSHKEY" _artifactsLocation="$ARTIFACTS_LOCATION" --no-wait
 
