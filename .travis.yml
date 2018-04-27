@@ -18,13 +18,19 @@ addons:
     packages:
       - azure-cli # Install the Azure CLI tools
 
+cache:
+  - directories: node_modules
+  - pip
+
+env:
+  - PYTHONUNBUFFERED=TRUE
+
 install:
   - npm install # Install task runners for lint checking.
   - pip install azure keyring # Install Azure Python SDK
 
-cache:
-  - directories: node_modules
-  - pip
+before_script:
+  - ssh-keygen -q -f azure_moodle_id_rsa -N "" # Generate SSH keys to send to deployment
 
 script:
   - npm test
