@@ -1,15 +1,21 @@
+import pycurl
 import sys
 import time
+from pycurl import Curl
 
 from azure.mgmt.resource import ResourceManagementClient
 from msrestazure.azure_active_directory import ServicePrincipalCredentials
 
 from travis.Configuration import Configuration
 
-DEPLOYMENT_NAME = 'azure-moodle-deployment-test'
-
 
 class DeploymentTester:
+    @staticmethod
+    def elapsed(since):
+        elapsed = int(time.time() - since)
+        elapsed = '{:02d}:{:02d}:{:02d}'.format(elapsed // 3600, (elapsed % 3600 // 60), elapsed % 60)
+        return elapsed
+
     def __init__(self):
         self.config = Configuration()
         self.deployment = None
@@ -80,7 +86,7 @@ class DeploymentTester:
 
         print("Checking deployment response...")
         properties = deployment.result(0).properties
-        if not properties.provisioning_state == 'Succeeded':
+        if properties.provisioning_state != 'Succeeded':
             print("*** DEPLOY FAILED ***")
             print('Provisioning state: ' + properties.provisioning_state)
             sys.exit(1)
@@ -94,9 +100,16 @@ class DeploymentTester:
             print("- Found: " + key)
 
     def moodle_smoke_test(self):
-        pass
-
-    def elapsed(self, since):
-        elapsed = int(time.time() - since)
-        elapsed = '{:02d}:{:02d}:{:02d}'.format(elapsed // 3600, (elapsed % 3600 // 60), elapsed % 60)
-        return elapsed
+        print("Moodle Smoke Test...")
+        url = 'https://' + self.deployment['siteURL']
+        curl = Curl()
+        curl.setopt(pycurl.URL, url)
+        curl.setopt(pycurl.SSL_VERIFYPEER, False)
+        curl.setopt(pycurl.WRITEFUNCTION, lambda x: None)
+        curl.perform()
+        status = curl.getinfo(pycurl.HTTP_CODE)
+        if status != 200:
+            print("*** DEPLOY FAILED ***")
+            print('HTTP Status Code: ' + status)
+            sys.exit(1)
+        print('(ok: {})'.format(status))
