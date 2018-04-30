@@ -63,6 +63,11 @@ echo $ssh_pub_key
 sed "s|GEN-SSH-PUB-KEY|$ssh_pub_key|g" $MOODLE_AZURE_WORKSPACE/arm_template/azuredeploy.parameters.json > $MOODLE_AZURE_WORKSPACE/$MOODLE_RG_NAME/azuredeploy.parameters.json
 ```
 
+If you'd like to configure the Moodle cluster (to be deployed)
+with your own SSL certificate for your domain (siteURL) at the
+deployment time, you can do so by using [Azure Key Vault](https://azure.microsoft.com/en-us/services/key-vault/)
+and following the instructions in the [SSL cert documentation](SslCert.md).
+
 For more information see the [parameters documentation](Parameters.md).
 
 ## Deploy cluster

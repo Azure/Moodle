@@ -1,0 +1,31 @@
+dist: trusty
+sudo: off
+
+branches:
+  only:
+  - master
+
+language: node_js # Base language is Nodejs (used for liniting and basic validation).
+
+addons:
+  apt:
+    sources:
+    - sourceline: 'deb https://packages.microsoft.com/repos/azure-cli/ trusty main'
+      key_url: 'https://packages.microsoft.com/keys/microsoft.asc'
+    packages:
+      - azure-cli # Install the Azure CLI tools
+
+before_script:
+  - npm install -g grunt-cli # Install task runners for lint checking.
+
+node_js:
+  - "0.12"
+
+cache:
+  directories:
+    - node_modules
+
+script: ./etc/travis.sh
+
+after_script: # Teardown group and created resource after build.
+  - test -n "$SPNAME" -a -n "$SPPASSWORD" -a -n "$SPTENANT" && az login --service-principal -u "$SPNAME" -p "$SPPASSWORD" --tenant "$SPTENANT" && az group delete -g azmdl-travis-$TRAVIS_BUILD_NUMBER -y --no-wait

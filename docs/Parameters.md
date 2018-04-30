@@ -89,6 +89,72 @@ Possible Values: null
 Default: false
 
 
+### azureSearchSku
+
+The search service level you want to create
+
+Type: string
+
+Possible Values: ["free", "basic", "standard", "standard2", "standard3"]
+
+Default: basic
+
+
+### azureSearchReplicaCount
+
+Replicas distribute search workloads across the service. You need 2 or more to support high availability (applies to Basic and Standard only)
+
+Type: int
+
+Possible Values: null 
+
+Default: 3
+
+
+### azureSearchPartitionCount
+
+Partitions allow for scaling of document count as well as faster indexing by sharding your index over multiple Azure Search units
+
+Type: int
+
+Possible Values: [1,2,3,4,6,12]
+
+Default: 1
+
+
+### azureSearchHostingMode
+
+Applicable only for azureSearchSku set to standard3. You can set this property to enable a single, high density partition that allows up to 1000 indexes, which is much higher than the maximum indexes allowed for any other azureSearchSku.
+
+Type: string
+
+Possible Values: ["default", "highDensity"]
+
+Default: default
+ 
+
+### caCertKeyVaultURL
+
+Azure Key Vault URL for your stored CA (Certificate Authority) cert. This value can be obtained from keyvault.sh output if you used the script to store your CA cert in your Key Vault. This parameter is ignored if the keyVaultResourceId parameter is blank.
+
+Type: string
+
+Possible Values: null
+
+Default: 
+
+
+### caCertThumbprint
+
+Thumbprint of your stored CA cert. This value can be obtained from keyvault.sh output if you used the script to store your CA cert in your Key Vault. This parameter is ignored if the keyVaultResourceId parameter is blank.
+
+Type: string
+
+Possible Values: null
+
+Default: 
+
+
 ### controllerVmSku
 
 VM size for the controller VM
@@ -207,12 +273,12 @@ Type: bool
 
 Possible Values: null
 
-Default: false
+Default: true
 
 
-### installElasticSearchSwitch
+### installGdprPluginsSwitch
 
-Switch to install Moodle ElasticSearch plugins & VMs
+Switch to install Moodle GDPR plugins. Note these require Moodle versions 3.4.2+ or 3.3.5+ and these will be included by default in Moodle 3.5
 
 Type: bool
 
@@ -232,13 +298,35 @@ Possible Values: null
 Default: false
 
 
+### installObjectFsSwitch
+
+Switch to install Moodle Object FS plugins (with Azure Blob storage)
+
+Type: bool
+
+Possible Values: null
+
+Default: false
+
+
+### keyVaultResourceId
+
+Azure Resource Manager resource ID of the Key Vault in case you stored your SSL cert in an Azure Key Vault (Note that this Key Vault must have been pre-created on the same Azure region where this template is being deployed). Leave this blank if you didn't. Resource ID example: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/xxx/providers/Microsoft.KeyVault/vaults/yyy. This value can be obtained from keyvault.sh output if you used the script to store your SSL cert in your Key Vault.
+
+Type: string
+
+Possible Values: null
+
+Default: 
+
+
 ### moodleVersion
 
 The Moodle version you want to install.
 
 Type: string
 
-Possible Values: ["MOODLE_34_STABLE","MOODLE_33_STABLE","MOODLE_32_STABLE","MOODLE_31_STABLE","MOODLE_30_STABLE","MOODLE_29_STABLE"]
+Possible Values: ["MOODLE_34_STABLE","v3.4.2","v3.4.1","MOODLE_33_STABLE","MOODLE_32_STABLE","MOODLE_31_STABLE","MOODLE_30_STABLE","MOODLE_29_STABLE"]
 
 Default: MOODLE_34_STABLE
 
@@ -364,6 +452,17 @@ Possible Values: null
 Default: true
 
 
+### searchType
+
+Options of Moodle Global Search
+
+Type: string
+
+Possible Values: ["none", "azure", "elastic"]
+
+Default: none
+
+
 ### siteURL
 
 URL for Moodle site
@@ -395,6 +494,28 @@ Type: string
 Possible Values: null
 
 Default: azureadmin
+
+
+### sslCertKeyVaultURL
+
+Azure Key Vault URL for your stored SSL cert. This value can be obtained from keyvault.sh output if you used the script to store your SSL cert in your Key Vault. This parameter is ignored if the keyVaultResourceId parameter is blank.
+
+Type: string
+
+Possible Values: null
+
+Default: 
+
+
+### sslCertThumbprint
+
+Thumbprint of your stored SSL cert. This value can be obtained from keyvault.sh output if you used the script to store your SSL cert in your Key Vault. This parameter is ignored if the keyVaultResourceId parameter is blank.
+
+Type: string
+
+Possible Values: null
+
+Default: 
 
 
 ### sslEnforcement

@@ -19,6 +19,12 @@
                 "description": "Redis cache key from the redis deployment ('None' if redis is not selected). This just gets passed through to the controllerconfig.json."
             },
             "type": "string"
+        },
+        "azureSearchKey": {
+            "metadata": {
+                "description": "Azure Search primary key from the Azure Search service deployment ('None' if Azure Search service is not selected)"
+            },
+            "type": "string"
         }
     },
     "resources": [
@@ -114,6 +120,7 @@
                 "osProfile": {
                     "adminUsername": "[parameters('moodleCommon').sshUsername]",
                     "computerName": "[parameters('moodleCommon').ctlrVmName]",
+                    "secrets": "[parameters('moodleCommon').ctlrVmSecrets]",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": true,
                         "ssh": {
@@ -158,6 +165,9 @@
                     },
                     "redisKey": {
                         "value": "[parameters('redisKey')]"
+                    },
+                    "azureSearchKey": {
+                        "value": "[parameters('azureSearchKey')]"
                     }
                 },
                 "templateLink": {
