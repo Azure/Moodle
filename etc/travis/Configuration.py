@@ -34,6 +34,7 @@ class Configuration:
             parameters = json.load(parameters_fd)
         parameters = parameters['parameters']
         parameters['sshPublicKey']['value'] = self.ssh_key
+        parameters['_artifactsLocation'] = {'value': self.identify_artifacts_location()}
 
         return {
             'mode': DeploymentMode.incremental,
@@ -41,10 +42,29 @@ class Configuration:
             'parameters': parameters,
         }
 
+    def identify_artifacts_location(self):
+        slug = os.getenv('TRAVIS_PULL_REQUEST_SLUG')
+        branch = os.getenv('TRAVIS_PULL_REQUEST_BRANCH')
+
+        if not slug or not branch:
+            slug = os.getenv('TRAVIS_REPO_SLUG')
+            branch = os.getenv('TRAVIS_BRANCH')
+
+        if not slug or not branch:
+            return None
+
+        return "https://raw.githubusercontent.com/{}/{}/".format(slug, branch)
+
     def is_valid(self):
         valid = True
+
         for key, value in vars(self).items():
             if value is None:
                 valid = False
                 print('(missing configuration for {})'.format(key))
+
+        if self.deployment_properties['parameters']['_artifactsLocation']['value'] is None:
+            valid = False
+            print('(could not identify _artifactsLocation)')
+
         return valid

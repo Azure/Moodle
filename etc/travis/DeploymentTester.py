@@ -41,6 +41,8 @@ class DeploymentTester:
             print('No Azure deployment info given, skipping test deployment and exiting.')
             print('Further information: https://github.com/Azure/Moodle#automated-testing-travis-ci')
             sys.exit()
+        artifacts_location = self.config.deployment_properties['parameters']['_artifactsLocation']
+        print('- Detected "_artifactsLocation": ' + artifacts_location['value'])
         print("(all check)")
 
     def login(self):
@@ -66,8 +68,10 @@ class DeploymentTester:
                                                                self.config.deployment_name,
                                                                self.config.deployment_properties)
         if validation.error is not None:
-            print("*** VALIDATION FAILED ***")
+            print("*** VALIDATION FAILED ({}) ***".format(validation.error))
             print(validation.error.message)
+            for detail in validation.error.details:
+                print("- {}:\n{}".format(detail.code, detail.message))
             sys.exit(1)
 
         print("(valid)")
