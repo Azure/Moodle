@@ -60,6 +60,19 @@
                             "sourceAddressPrefix": "*",
                             "sourcePortRange": "*"
                         }
+                    },
+                    {
+                        "name": "Allow_tika",
+                        "properties": {
+                            "access": "Allow",
+                            "destinationAddressPrefix": "9998",
+                            "destinationPortRange": "9998",
+                            "direction": "Inbound",
+                            "priority": 1010,
+                            "protocol": "*",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*"
+                        }
                     }
                 ]
             },
