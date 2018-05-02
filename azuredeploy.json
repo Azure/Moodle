@@ -753,7 +753,8 @@
             "webServerSetupScriptFilename": "setup_webserver.sh",
             "webServerType": "[parameters('webServerType')]",
             "serviceObjective": "[parameters('serviceObjective')]",
-            "msDbSize": "[parameters('msDbSize')]"
+            "msDbSize": "[parameters('msDbSize')]",
+            "webServerType": "[parameters('webServerType')]"
         },
         "octets": "[split(parameters('vNetAddressSpace'), '.')]",
         "resourceprefix": "[substring(uniqueString(resourceGroup().id, deployment().name), 3, 6)]"
