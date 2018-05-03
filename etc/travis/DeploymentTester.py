@@ -1,6 +1,10 @@
+import os
 import pycurl
 import sys
+import tempfile
 import time
+import urllib
+from io import BytesIO
 from pycurl import Curl
 
 from azure.mgmt.resource import ResourceManagementClient
@@ -34,6 +38,7 @@ class DeploymentTester:
         self.validate()
         self.deploy()
         self.moodle_smoke_test()
+        self.moodle_admin_login()
         print('\n\nJob done!')
 
     def check_configuration(self):
@@ -109,7 +114,7 @@ class DeploymentTester:
             print("- Found: " + key)
 
     def moodle_smoke_test(self):
-        print("Moodle Smoke Test...")
+        print("\nMoodle Smoke Test...")
         url = 'https://' + self.deployment['siteURL']
         curl = Curl()
         curl.setopt(pycurl.URL, url)
@@ -122,3 +127,36 @@ class DeploymentTester:
             print('HTTP Status Code: ' + status)
             sys.exit(1)
         print('(ok: {})'.format(status))
+
+    def moodle_admin_login(self):
+        print("\nLogging in into Moodle as 'admin'...")
+        response = self.moodle_admin_login_curl()
+        if 'Admin User' not in response:
+            print("*** FAILED: 'Admin User' keyword not found ***")
+            sys.exit(1)
+        print('(it worked)')
+
+    def moodle_admin_login_curl(self):
+        fd, path = tempfile.mkstemp()
+        try:
+            response = BytesIO()
+            url = 'https://' + self.deployment['siteURL'] + '/login/index.php'
+            curl = Curl()
+            curl.setopt(pycurl.URL, url)
+            curl.setopt(pycurl.SSL_VERIFYPEER, False)
+            curl.setopt(pycurl.WRITEFUNCTION, response.write)
+            curl.setopt(pycurl.POST, True)
+            curl.setopt(pycurl.COOKIEJAR, path)
+            curl.setopt(pycurl.COOKIEFILE, path)
+            post = urllib.parse.urlencode({'username': 'admin', 'password': self.deployment['moodleAdminPassword']})
+            curl.setopt(pycurl.POSTFIELDS, post)
+            curl.setopt(pycurl.FOLLOWLOCATION, True)
+            curl.perform()
+            status = curl.getinfo(pycurl.HTTP_CODE)
+            if status != 200:
+                print("*** FAILED: {} ***".format(status))
+                sys.exit(1)
+            response = response.getvalue().decode('utf-8')
+        finally:
+            os.remove(path)
+        return response
