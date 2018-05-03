@@ -22,20 +22,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-glusterNode=$1
-glusterVolume=$2 
-siteFQDN=$3
-syslogserver=$4
-webServerType=$5
-fileServerType=$6
-storageAccountName=$7
-storageAccountKey=$8
-nfsVmName=$9
-htmlLocalCopySwitch=${10}
+glusterNode=${1}
+glusterVolume=${2}
+siteFQDN=${3}
+httpsTermination=${4}
+syslogserver=${5}
+webServerType=${6}
+fileServerType=${7}
+storageAccountName=${8}
+storageAccountKey=${9}
+nfsVmName=${10}
+htmlLocalCopySwitch=${11}
 
 echo $glusterNode    >> /tmp/vars.txt
 echo $glusterVolume  >> /tmp/vars.txt
 echo $siteFQDN >> /tmp/vars.txt
+echo $httpsTermination >> /tmp/vars.txt
 echo $syslogserver >> /tmp/vars.txt
 echo $webServerType >> /tmp/vars.txt
 echo $fileServerType >> /tmp/vars.txt

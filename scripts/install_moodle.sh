@@ -26,37 +26,39 @@
     glusterNode=${2}
     glusterVolume=${3}
     siteFQDN=${4}
-    dbIP=${5}
-    moodledbname=${6}
-    moodledbuser=${7}
-    moodledbpass=${8}
-    adminpass=${9}
-    dbadminlogin=${10}
-    dbadminpass=${11}
-    wabsacctname=${12}
-    wabsacctkey=${13}
-    azuremoodledbuser=${14}
-    redisDns=${15}
-    redisAuth=${16}
-    elasticVm1IP=${17}
-    installO365pluginsSwitch=${18}
-    dbServerType=${19}
-    fileServerType=${20}
-    mssqlDbServiceObjectiveName=${21}
-    mssqlDbEdition=${22}
-    mssqlDbSize=${23}
-    installObjectFsSwitch=${24}
-    installGdprPluginsSwitch=${25}
-    thumbprintSslCert=${26}
-    thumbprintCaCert=${27}
-    searchType=${28}
-    azureSearchKey=${29}
-    azureSearchNameHost=${30}
+    httpsTermination=${5}
+    dbIP=${6}
+    moodledbname=${7}
+    moodledbuser=${8}
+    moodledbpass=${9}
+    adminpass=${10}
+    dbadminlogin=${11}
+    dbadminpass=${12}
+    wabsacctname=${13}
+    wabsacctkey=${14}
+    azuremoodledbuser=${15}
+    redisDns=${16}
+    redisAuth=${17}
+    elasticVm1IP=${18}
+    installO365pluginsSwitch=${19}
+    dbServerType=${20}
+    fileServerType=${21}
+    mssqlDbServiceObjectiveName=${22}
+    mssqlDbEdition=${23}
+    mssqlDbSize=${24}
+    installObjectFsSwitch=${25}
+    installGdprPluginsSwitch=${26}
+    thumbprintSslCert=${27}
+    thumbprintCaCert=${28}
+    searchType=${29}
+    azureSearchKey=${30}
+    azureSearchNameHost=${31}
 
     echo $moodleVersion        >> /tmp/vars.txt
     echo $glusterNode          >> /tmp/vars.txt
     echo $glusterVolume        >> /tmp/vars.txt
     echo $siteFQDN             >> /tmp/vars.txt
+    echo $httpsTermination     >> /tmp/vars.txt
     echo $dbIP                 >> /tmp/vars.txt
     echo $moodledbname         >> /tmp/vars.txt
     echo $moodledbuser         >> /tmp/vars.txt
@@ -348,7 +350,7 @@ server {
         listen 81 default;
         server_name ${siteFQDN};
         root /moodle/html/moodle;
-	index index.php index.html index.htm;
+        index index.php index.html index.htm;
 
         # Log to syslog
         error_log syslog:server=localhost,facility=local1,severity=error,tag=moodle;
@@ -379,26 +381,26 @@ server {
 		try_files \$uri \$uri/index.php?\$query_string;
 	}
  
-        location ~ [^/]\.php(/|$) {
-          fastcgi_split_path_info ^(.+?\.php)(/.*)$;
-          if (!-f \$document_root\$fastcgi_script_name) {
-                  return 404;
-          }
- 
-          fastcgi_buffers 16 16k;
-          fastcgi_buffer_size 32k;
-          fastcgi_param   SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
-          fastcgi_pass unix:/run/php/php7.0-fpm.sock;
-          fastcgi_read_timeout 3600;
-          fastcgi_index index.php;
-          include fastcgi_params;
+    location ~ [^/]\.php(/|$) {
+        fastcgi_split_path_info ^(.+?\.php)(/.*)$;
+        if (!-f \$document_root\$fastcgi_script_name) {
+                return 404;
         }
+
+        fastcgi_buffers 16 16k;
+        fastcgi_buffer_size 32k;
+        fastcgi_param   SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+        fastcgi_pass unix:/run/php/php7.0-fpm.sock;
+        fastcgi_read_timeout 3600;
+        fastcgi_index index.php;
+        include fastcgi_params;
+    }
 }
 
 server {
         listen 443 ssl;
         root /moodle/html/moodle;
-	index index.php index.html index.htm;
+        index index.php index.html index.htm;
 
         ssl on;
         ssl_certificate /moodle/certs/nginx.crt;
