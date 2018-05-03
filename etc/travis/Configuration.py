@@ -12,7 +12,6 @@ class Configuration:
         self.client_id = os.getenv('SPNAME')
         self.secret = os.getenv('SPPASSWORD')
         self.tenant_id = os.getenv('SPTENANT')
-        self.subscription_id = os.getenv('SPSUBSCRIPTION')
         self.location = os.getenv('LOCATION', 'southcentralus')
 
         self.ssh_key = os.getenv('SPSSHKEY')

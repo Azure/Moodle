@@ -4,6 +4,7 @@ import time
 from pycurl import Curl
 
 from azure.mgmt.resource import ResourceManagementClient
+from azure.mgmt.subscription import SubscriptionClient
 from msrestazure.azure_active_directory import ServicePrincipalCredentials
 
 from travis.Configuration import Configuration
@@ -52,7 +53,11 @@ class DeploymentTester:
             secret=self.config.secret,
             tenant=self.config.tenant_id,
         )
-        self.resource_client = ResourceManagementClient(self.credentials, self.config.subscription_id)
+        print('(got credentials)')
+        subscription_client = SubscriptionClient(self.credentials)
+        subscription = next(subscription_client.subscriptions.list())
+        print('(found subscription)')
+        self.resource_client = ResourceManagementClient(self.credentials, subscription.subscription_id)
         print("(logged in)")
 
     def create_resource_group(self):
