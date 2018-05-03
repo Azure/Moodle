@@ -104,7 +104,7 @@
       pgadminlogin=$dbadminlogin
       pgadminpass=$dbadminpass
     else
-      echo "Invalid dbServerType ($dbServerType) given. Only 'mysql' or 'postgres' is allowed. Exiting"
+      echo "Invalid dbServerType ($dbServerType) given. Only 'mysql' or 'postgres' or 'mssql' is allowed. Exiting"
       exit 1
     fi
 
@@ -852,14 +852,14 @@ EOF
 
     if [ "$searchType" = "elastic" ]; then
         # Set up elasticsearch plugin
-        sed -i "23 a \$CFG->forced_plugin_settings = ['search_elastic' => ['hostname' => 'http://$elasticVm1IP', 'fileindexing' => 'true'], 'search_elastic_fileindexing' => ['tikahostname' => 'http://$tikaVmIP', 'tikaport' => '9998']];" /moodle/html/moodle/config.php
+        sed -i "23 a \$CFG->forced_plugin_settings = ['search_elastic' => ['hostname' => 'http://$elasticVm1IP', 'fileindexing' => 'true', 'tikahostname' => 'http://$tikaVmIP', 'tikaport' => '9998'],];" /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->searchengine = 'elastic';" /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->enableglobalsearch = 'true';" /moodle/html/moodle/config.php
 	# create index
         sudo -u www-data php /moodle/html/moodle/search/cli/indexer.php --force --reindex
     elif [ "$searchType" = "azure" ]; then
         # Set up Azure Search service plugin
-        sed -i "23 a \$CFG->forced_plugin_settings = ['search_azure' => ['searchurl' => 'https://$azureSearchNameHost', 'apikey' => '$azureSearchKey', 'enrichmentsettings' => 'true'], 'search_azure_enrichsettings' => ['tikahostname' => 'http://$tikaVmIP', 'tikaport' => '9998']];" /moodle/html/moodle/config.php
+        sed -i "23 a \$CFG->forced_plugin_settings = ['search_azure' => ['searchurl' => 'https://$azureSearchNameHost', 'apikey' => '$azureSearchKey', 'fileindexing' => '1', 'tikahostname' => 'http://$tikaVmIP', 'tikaport' => '9998'],];" /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->searchengine = 'azure';" /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->enableglobalsearch = 'true';" /moodle/html/moodle/config.php
 	# create index
