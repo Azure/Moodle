@@ -173,7 +173,9 @@ The following link shows how to set up per repository environment variables in T
 * **SPNAME** - The value of the *name* parameter returned by the Service Principal create proccess.
 * **SPPASSWORD** - The value of the *password* parameter returned by the Service Principal create proccess.
 * **SPTENANT** - The value of the *tenant* parameter returned by the Service Principal create proccess.
-* **SPSSHKEY** - A public SSH key that you have the corresponding private key for. This is currently not used but is required for the build to be successful.
+* **SPSSHKEY** *(default: generate new)*- A public SSH key that you have the corresponding private key for. This is currently not used but is required for the build to be successful.
+* **LOCATION** *(default: southcentralus)*- Location for the test resource group.
+* **RESOURCEGROUP** *(default: azmdl-travis-XXX)*- Name to use for the resource group.
 
 **NOTE:** Make sure you set the environment variables to hidden otherwise they will be exposed publically at run time. 
 **NOTE:** As per the Travis CI documentation make sure you have correctly escaped the enviroment variable values when they are defined.
