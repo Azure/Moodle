@@ -12,6 +12,7 @@ class Configuration:
         self.secret = os.getenv('SPPASSWORD')
         self.tenant_id = os.getenv('SPTENANT')
         self.location = os.getenv('LOCATION', 'southcentralus')
+        self.source_branch = self.identify_source_branch()
         self.ssh_key = self.identify_ssh_key()
         self.resource_group = self.identify_resource_group()
         self.deployment_properties = self.generate_deployment_properties()
@@ -47,16 +48,15 @@ class Configuration:
 
     def identify_artifacts_location(self):
         slug = os.getenv('TRAVIS_PULL_REQUEST_SLUG')
-        branch = os.getenv('TRAVIS_PULL_REQUEST_BRANCH')
-
-        if not slug or not branch:
+        if not slug:
             slug = os.getenv('TRAVIS_REPO_SLUG')
+        return "https://raw.githubusercontent.com/{}/{}/".format(slug, self.source_branch)
+
+    def identify_source_branch(self):
+        branch = os.getenv('TRAVIS_PULL_REQUEST_BRANCH')
+        if not branch:
             branch = os.getenv('TRAVIS_BRANCH')
-
-        if not slug or not branch:
-            return None
-
-        return "https://raw.githubusercontent.com/{}/{}/".format(slug, branch)
+        return branch
 
     def is_valid(self):
         valid = True
@@ -71,3 +71,6 @@ class Configuration:
             print('(could not identify _artifactsLocation)')
 
         return valid
+
+    def should_run_full_ci(self):
+        return self.source_branch == 'master'
