@@ -13,6 +13,7 @@ class Configuration:
         self.tenant_id = os.getenv('SPTENANT')
         self.location = os.getenv('LOCATION', 'southcentralus')
         self.source_branch = self.identify_source_branch()
+        self.fullci_branches = os.getenv('FULLCI_BRANCHES', 'master').split(':')
         self.ssh_key = self.identify_ssh_key()
         self.resource_group = self.identify_resource_group()
         self.deployment_properties = self.generate_deployment_properties()
@@ -73,4 +74,7 @@ class Configuration:
         return valid
 
     def should_run_full_ci(self):
-        return self.source_branch == 'master'
+        if self.source_branch in self.fullci_branches:
+            return True
+
+        return False
