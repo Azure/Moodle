@@ -14,6 +14,7 @@ class Configuration:
         self.location = os.getenv('LOCATION', 'southcentralus')
         self.source_branch = self.identify_source_branch()
         self.fullci_branches = os.getenv('FULLCI_BRANCHES', 'master').split(':')
+        self.commit_message = os.getenv('TRAVIS_COMMIT_MESSAGE', None)
         self.ssh_key = self.identify_ssh_key()
         self.resource_group = self.identify_resource_group()
         self.deployment_properties = self.generate_deployment_properties()
@@ -75,6 +76,10 @@ class Configuration:
 
     def should_run_full_ci(self):
         if self.source_branch in self.fullci_branches:
+            return True
+
+        message = self.commit_message.upper()
+        if '[FULL CI]' in message or '[FULLCI]' in message:
             return True
 
         return False
