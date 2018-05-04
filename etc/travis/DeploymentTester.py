@@ -36,10 +36,13 @@ class DeploymentTester:
         self.login()
         self.create_resource_group()
         self.validate()
+        if not self.config.should_run_full_ci():
+            print('\n\nBasic CI tests successful.')
+            return
         self.deploy()
         self.moodle_smoke_test()
         self.moodle_admin_login()
-        print('\n\nJob done!')
+        print('\n\nFull CI tests successful!')
 
     def check_configuration(self):
         print('\nChecking configuration...')

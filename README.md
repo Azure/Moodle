@@ -176,8 +176,12 @@ The following link shows how to set up per repository environment variables in T
 * **SPSSHKEY** *(default: generate new)*- A public SSH key that you have the corresponding private key for. This is currently not used but is required for the build to be successful.
 * **LOCATION** *(default: southcentralus)*- Location for the test resource group.
 * **RESOURCEGROUP** *(default: azmdl-travis-XXX)*- Name to use for the resource group.
+* **FULLCI_BRANCHES** *(default: master)*- Name of branches (separated by ':') to always run FULL CI (if credentials are provided). Full CI will run a deployment test which will create and use resources from your Azure account.
 
-**NOTE:** Make sure you set the environment variables to hidden otherwise they will be exposed publically at run time. 
+**NOTE:** You can trigger a full CI test by adding *[full ci]* or *[fullci]* anywhere in the commit message.  
+
+**NOTE:** Make sure you set the environment variables to hidden otherwise they will be exposed publically at run time.
+ 
 **NOTE:** As per the Travis CI documentation make sure you have correctly escaped the enviroment variable values when they are defined.
 
 Once the environment variables are defined, Travis CI will run the template validate and build steps as part of the test process.
