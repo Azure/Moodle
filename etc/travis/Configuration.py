@@ -8,24 +8,28 @@ from azure.mgmt.resource.resources.v2017_05_10.models import DeploymentMode
 class Configuration:
     def __init__(self):
         self.deployment_name = 'azuredeploy'
-
         self.client_id = os.getenv('SPNAME')
         self.secret = os.getenv('SPPASSWORD')
         self.tenant_id = os.getenv('SPTENANT')
         self.location = os.getenv('LOCATION', 'southcentralus')
+        self.ssh_key = self.identify_ssh_key()
+        self.resource_group = self.identify_resource_group()
+        self.deployment_properties = self.generate_deployment_properties()
 
-        self.ssh_key = os.getenv('SPSSHKEY')
-        if self.ssh_key is None:
+    def identify_resource_group(self):
+        resource_group = os.getenv('RESOURCEGROUP')
+        if resource_group is None:
+            resource_group = 'azmdl-travis-' + os.getenv('TRAVIS_BUILD_NUMBER', 'manual-{}'.format(time.time()))
+        return resource_group
+
+    def identify_ssh_key(self):
+        ssh_key = os.getenv('SPSSHKEY')
+        if ssh_key is None:
             with open('azure_moodle_id_rsa.pub', 'r') as sshkey_fd:
-                self.ssh_key = sshkey_fd.read()
+                ssh_key = sshkey_fd.read()
+        return ssh_key
 
-        self.resource_group = os.getenv('RESOURCEGROUP')
-        if self.resource_group is None:
-            self.resource_group = 'azmdl-travis-' + os.getenv('TRAVIS_BUILD_NUMBER', 'manual-{}'.format(time.time()))
-
-        self.deployment_properties = self.generate_properties()
-
-    def generate_properties(self):
+    def generate_deployment_properties(self):
         with open('azuredeploy.json', 'r') as template_fd:
             template = json.load(template_fd)
 

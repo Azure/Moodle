@@ -1,9 +1,5 @@
 dist: trusty
 
-branches:
-  only:
-  - master
-
 language: python
 
 node_js: "0.12"
