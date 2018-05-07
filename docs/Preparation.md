@@ -45,6 +45,7 @@ checkout the template into our workspace.
 ```
 git clone git@github.com:Azure/Moodle.git $MOODLE_AZURE_WORKSPACE/arm_template || (pushd $MOODLE_AZURE_WORKSPACE/arm_template ; git pull ; popd)
 pushd $MOODLE_AZURE_WORKSPACE/arm_template
+git fetch
 git checkout $GITHUB_AZURE_MOODLE_BRANCH
 popd
 ```
@@ -71,6 +72,17 @@ We should also have a number of applications installed, such as the Azure CLI:
 if hash az 2>/dev/null; then echo "Azure CLI Installed"; else echo "Missing dependency: Azure CLI"; fi
 ```
 
+Results:
+
 ```
 AzureCLI Installed
+```
+
+Check we have the source:
+
+```bash
+pushd $MOODLE_AZURE_WORKSPACE/arm_template
+git fetch
+git checkout $GITHUB_AZURE_MOODLE_BRANCH
+popd
 ```

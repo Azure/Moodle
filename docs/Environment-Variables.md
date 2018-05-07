@@ -15,7 +15,7 @@ create a new value using a timestamp:
 
 
 ``` shell
-if [ -z "$MOODLE_RG_NAME" ]; then MOODLE_RG_NAME=moodle_$(date +%Y-%m-%d-%H); fi
+if [ -z "$MOODLE_RG_NAME" ]; then MOODLE_RG_NAME=moodle_$(date +%Y-%m-%d-%H-%M); fi
 ```
 
 Other configurable values for our Azure deployment include the
@@ -56,7 +56,7 @@ Sometimes we want to work with a version of the template other than
 the master in GitHub.
 
 ``` bash
-GITHUB_AZURE_MOODLE_BRANCH=master
+GITHUB_AZURE_MOODLE_BRANCH=docs
 ```
 
 ## Validation
@@ -75,7 +75,7 @@ echo "Resource Group for deployment: $MOODLE_RG_NAME"
 Results:
 
 ```
-Resource Group for deployment: southcentralus
+Resource Group for deployment: moodle_2018_MM_DD_HH_MM
 ```
 
 The resource group location is:
