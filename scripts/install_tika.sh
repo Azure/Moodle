@@ -33,8 +33,7 @@ echo $tikavmip     >> /tmp/vars.txt
   sudo apt-get -y install unattended-upgrades
 
   # download apache tika server
-  mkdir -p /usr/local/src/tika-1.18/tika-server/target/
-  wget -q http://apache.mirror.amaze.com.au/tika/tika-server-1.18.jar --directory-prefix=/usr/share/java/
+  sudo wget -q http://mirrors.ocf.berkeley.edu/apache/tika/tika-server-1.18.jar --directory-prefix=/usr/share/java/
 
   # install the required packages
   sudo apt-get install -y openjdk-8-jre openjdk-8-jdk default-jre default-jdk
