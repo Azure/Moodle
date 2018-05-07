@@ -61,7 +61,7 @@ EOF
 #!/bin/sh
 SERVICE_NAME=tika-server
 PATH_TO_JAR=/usr/share/java/tika-server-1.18.jar
-PID_PATH_NAME=/tmp/tika-server-pid
+PID_PATH_NAME=/var/run/tika-server-pid
 case \$1 in
     start)
         echo "Starting \$SERVICE_NAME ..."
