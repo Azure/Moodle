@@ -63,6 +63,11 @@ echo $ssh_pub_key
 sed "s|GEN-SSH-PUB-KEY|$ssh_pub_key|g" $MOODLE_AZURE_WORKSPACE/arm_template/azuredeploy.parameters.json > $MOODLE_AZURE_WORKSPACE/$MOODLE_RG_NAME/azuredeploy.parameters.json
 ```
 
+If you'd like to configure the Moodle cluster (to be deployed)
+with your own SSL certificate for your domain (siteURL) at the
+deployment time, you can do so by using [Azure Key Vault](https://azure.microsoft.com/en-us/services/key-vault/)
+and following the instructions in the [SSL cert documentation](SslCert.md).
+
 For more information see the [parameters documentation](Parameters.md).
 
 ## Deploy cluster
@@ -115,13 +120,14 @@ together.
 
 ### Database Sizing
 
-As of the time of this writing, Azure supports "Basic" and "Standard"
-tiers for database instances. In addition the skuCapacityDTU defines
-Compute Units, and the number of those you can use is limited by
+As of the time of this writing, Azure supports "Basic", "General Purpose" and "Memory Optimized"
+tiers for MySQL/PostgreSQL database instances. In addition the mysqlPgresVcores defines
+the number of vCores for each DB server instance, and the number of those you can use is limited by
 database tier:
 
-- Basic: 50, 100
-- Standard: 100, 200, 400, 800
+- Basic: 1, 2
+- General Purpose: 2, 4, 8, 16, 32
+- Memory Optimized: 2, 4, 8, 16
 
 This value also limits the maximum number of connections, as defined
 here: https://docs.microsoft.com/en-us/azure/mysql/concepts-limits
@@ -129,14 +135,13 @@ here: https://docs.microsoft.com/en-us/azure/mysql/concepts-limits
 As the Moodle database will handle cron processes as well as the
 website, any public facing website with more than 10 users will likely
 require upgrading to 100. Once the site reaches 30+ users it will
-require upgrading to Standard for more compute units. This depends
+require upgrading to General Purpose for more compute units. This depends
 entirely on the individual site. As MySQL databases cannot change (or
 be restored to a different tier) once deployed it is a good idea to
 slightly overspec your database.
 
-Standard instances have a minimum storage requirement of 128000MB. All
-database storage, regardless of tier, has a hard upper limit of 1
-terrabyte. After 128GB you gain additional iops for each GB, so if
+All MySQL/PostgreSQL database storage, regardless of tier, has a hard upper limit of 1
+terabyte (1024 GB), starting from 5 GB minimum, increasing by 1 GB. You gain additional iops for each added GB, so if
 you're expecting a heavy amount of traffic you will want to oversize
 your storage. The current maximum iops with a 1TB disk is 3000.
 

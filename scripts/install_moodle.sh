@@ -40,13 +40,18 @@
     redisAuth=${16}
     elasticVm1IP=${17}
     installO365pluginsSwitch=${18}
-    installElasticSearchSwitch=${19}
-    dbServerType=${20}
-    fileServerType=${21}
-    serviceObjective=${22}
-    serviceTier=${23}
-    serviceSize=${24}
-
+    dbServerType=${19}
+    fileServerType=${20}
+    mssqlDbServiceObjectiveName=${21}
+    mssqlDbEdition=${22}
+    mssqlDbSize=${23}
+    installObjectFsSwitch=${24}
+    installGdprPluginsSwitch=${25}
+    thumbprintSslCert=${26}
+    thumbprintCaCert=${27}
+    searchType=${28}
+    azureSearchKey=${29}
+    azureSearchNameHost=${30}
 
     echo $moodleVersion        >> /tmp/vars.txt
     echo $glusterNode          >> /tmp/vars.txt
@@ -66,12 +71,18 @@
     echo $redisAuth            >> /tmp/vars.txt
     echo $elasticVm1IP         >> /tmp/vars.txt
     echo $installO365pluginsSwitch    >> /tmp/vars.txt
-    echo $installElasticSearchSwitch  >> /tmp/vars.txt
     echo $dbServerType                >> /tmp/vars.txt
     echo $fileServerType              >> /tmp/vars.txt
-    echo $serviceObjective	>> /tmp/vars.txt
-    echo $serviceTier	>> /tmp/vars.txt
-    echo $serviceSize	>> /tmp/vars.txt
+    echo $mssqlDbServiceObjectiveName >> /tmp/vars.txt
+    echo $mssqlDbEdition	>> /tmp/vars.txt
+    echo $mssqlDbSize	>> /tmp/vars.txt
+    echo $installObjectFsSwitch >> /tmp/vars.txt
+    echo $installGdprPluginsSwitch >> /tmp/vars.txt
+    echo $thumbprintSslCert >> /tmp/vars.txt
+    echo $thumbprintCaCert >> /tmp/vars.txt
+    echo $searchType >> /tmp/vars.txt
+    echo $azureSearchKey >> /tmp/vars.txt
+    echo $azureSearchNameHost >> /tmp/vars.txt
 
     . ./helper_functions.sh
     check_fileServerType_param $fileServerType
@@ -98,492 +109,7 @@
     sudo apt-get -y update
     sudo apt-get -y install unattended-upgrades fail2ban
 
-    # configure fail2ban
-    cat <<EOF > /etc/fail2ban/jail.conf
-# Fail2Ban configuration file.
-#
-# This file was composed for Debian systems from the original one
-# provided now under /usr/share/doc/fail2ban/examples/jail.conf
-# for additional examples.
-#
-# Comments: use '#' for comment lines and ';' for inline comments
-#
-# To avoid merges during upgrades DO NOT MODIFY THIS FILE
-# and rather provide your changes in /etc/fail2ban/jail.local
-#
-
-# The DEFAULT allows a global definition of the options. They can be overridden
-# in each jail afterwards.
-
-[DEFAULT]
-
-# "ignoreip" can be an IP address, a CIDR mask or a DNS host. Fail2ban will not
-# ban a host which matches an address in this list. Several addresses can be
-# defined using space separator.
-ignoreip = 127.0.0.1/8
-
-# "bantime" is the number of seconds that a host is banned.
-bantime  = 600
-
-# A host is banned if it has generated "maxretry" during the last "findtime"
-# seconds.
-findtime = 600
-maxretry = 3
-
-# "backend" specifies the backend used to get files modification.
-# Available options are "pyinotify", "gamin", "polling" and "auto".
-# This option can be overridden in each jail as well.
-#
-# pyinotify: requires pyinotify (a file alteration monitor) to be installed.
-#            If pyinotify is not installed, Fail2ban will use auto.
-# gamin:     requires Gamin (a file alteration monitor) to be installed.
-#            If Gamin is not installed, Fail2ban will use auto.
-# polling:   uses a polling algorithm which does not require external libraries.
-# auto:      will try to use the following backends, in order:
-#            pyinotify, gamin, polling.
-backend = auto
-
-# "usedns" specifies if jails should trust hostnames in logs,
-#   warn when reverse DNS lookups are performed, or ignore all hostnames in logs
-#
-# yes:   if a hostname is encountered, a reverse DNS lookup will be performed.
-# warn:  if a hostname is encountered, a reverse DNS lookup will be performed,
-#        but it will be logged as a warning.
-# no:    if a hostname is encountered, will not be used for banning,
-#        but it will be logged as info.
-usedns = warn
-
-#
-# Destination email address used solely for the interpolations in
-# jail.{conf,local} configuration files.
-destemail = root@localhost
-
-#
-# Name of the sender for mta actions
-sendername = Fail2Ban
-
-#
-# ACTIONS
-#
-
-# Default banning action (e.g. iptables, iptables-new,
-# iptables-multiport, shorewall, etc) It is used to define
-# action_* variables. Can be overridden globally or per
-# section within jail.local file
-banaction = iptables-multiport
-
-# email action. Since 0.8.1 upstream fail2ban uses sendmail
-# MTA for the mailing. Change mta configuration parameter to mail
-# if you want to revert to conventional 'mail'.
-mta = sendmail
-
-# Default protocol
-protocol = tcp
-
-# Specify chain where jumps would need to be added in iptables-* actions
-chain = INPUT
-
-#
-# Action shortcuts. To be used to define action parameter
-
-# The simplest action to take: ban only
-action_ = %(banaction)s[name=%(__name__)s, port="%(port)s", protocol="%(protocol)s", chain="%(chain)s"]
-
-# ban & send an e-mail with whois report to the destemail.
-action_mw = %(banaction)s[name=%(__name__)s, port="%(port)s", protocol="%(protocol)s", chain="%(chain)s"]
-              %(mta)s-whois[name=%(__name__)s, dest="%(destemail)s", protocol="%(protocol)s", chain="%(chain)s", sendername="%(sendername)s"]
-
-# ban & send an e-mail with whois report and relevant log lines
-# to the destemail.
-action_mwl = %(banaction)s[name=%(__name__)s, port="%(port)s", protocol="%(protocol)s", chain="%(chain)s"]
-               %(mta)s-whois-lines[name=%(__name__)s, dest="%(destemail)s", logpath=%(logpath)s, chain="%(chain)s", sendername="%(sendername)s"]
-
-# Choose default action.  To change, just override value of 'action' with the
-# interpolation to the chosen action shortcut (e.g.  action_mw, action_mwl, etc) in jail.local
-# globally (section [DEFAULT]) or per specific section
-action = %(action_)s
-
-#
-# JAILS
-#
-
-# Next jails corresponds to the standard configuration in Fail2ban 0.6 which
-# was shipped in Debian. Enable any defined here jail by including
-#
-# [SECTION_NAME]
-# enabled = true
-
-#
-# in /etc/fail2ban/jail.local.
-#
-# Optionally you may override any other parameter (e.g. banaction,
-# action, port, logpath, etc) in that section within jail.local
-
-[ssh]
-
-enabled  = true
-port     = ssh
-filter   = sshd
-logpath  = /var/log/auth.log
-maxretry = 6
-
-[dropbear]
-
-enabled  = false
-port     = ssh
-filter   = dropbear
-logpath  = /var/log/auth.log
-maxretry = 6
-
-# Generic filter for pam. Has to be used with action which bans all ports
-# such as iptables-allports, shorewall
-[pam-generic]
-
-enabled  = false
-# pam-generic filter can be customized to monitor specific subset of 'tty's
-filter   = pam-generic
-# port actually must be irrelevant but lets leave it all for some possible uses
-port     = all
-banaction = iptables-allports
-port     = anyport
-logpath  = /var/log/auth.log
-maxretry = 6
-
-[xinetd-fail]
-
-enabled   = false
-filter    = xinetd-fail
-port      = all
-banaction = iptables-multiport-log
-logpath   = /var/log/daemon.log
-maxretry  = 2
-
-
-[ssh-ddos]
-
-enabled  = false
-port     = ssh
-filter   = sshd-ddos
-logpath  = /var/log/auth.log
-maxretry = 6
-
-
-# Here we use blackhole routes for not requiring any additional kernel support
-# to store large volumes of banned IPs
-
-[ssh-route]
-
-enabled = false
-filter = sshd
-action = route
-logpath = /var/log/sshd.log
-maxretry = 6
-
-# Here we use a combination of Netfilter/Iptables and IPsets
-# for storing large volumes of banned IPs
-#
-# IPset comes in two versions. See ipset -V for which one to use
-# requires the ipset package and kernel support.
-[ssh-iptables-ipset4]
-
-enabled  = false
-port     = ssh
-filter   = sshd
-banaction = iptables-ipset-proto4
-logpath  = /var/log/sshd.log
-maxretry = 6
-
-[ssh-iptables-ipset6]
-
-enabled  = false
-port     = ssh
-filter   = sshd
-banaction = iptables-ipset-proto6
-logpath  = /var/log/sshd.log
-maxretry = 6
-
-
-#
-# HTTP servers
-#
-
-[apache]
-
-enabled  = false
-port     = http,https
-filter   = apache-auth
-logpath  = /var/log/apache*/*error.log
-maxretry = 6
-
-# default action is now multiport, so apache-multiport jail was left
-# for compatibility with previous (<0.7.6-2) releases
-[apache-multiport]
-
-enabled   = false
-port      = http,https
-filter    = apache-auth
-logpath   = /var/log/apache*/*error.log
-maxretry  = 6
-
-[apache-noscript]
-
-enabled  = false
-port     = http,https
-filter   = apache-noscript
-logpath  = /var/log/apache*/*error.log
-maxretry = 6
-
-[apache-overflows]
-
-enabled  = false
-port     = http,https
-filter   = apache-overflows
-logpath  = /var/log/apache*/*error.log
-maxretry = 2
-
-# Ban attackers that try to use PHP's URL-fopen() functionality
-# through GET/POST variables. - Experimental, with more than a year
-# of usage in production environments.
-
-[php-url-fopen]
-
-enabled = false
-port    = http,https
-filter  = php-url-fopen
-logpath = /var/www/*/logs/access_log
-
-# A simple PHP-fastcgi jail which works with lighttpd.
-# If you run a lighttpd server, then you probably will
-# find these kinds of messages in your error_log:
-#   ALERT – tried to register forbidden variable ‘GLOBALS’
-#   through GET variables (attacker '1.2.3.4', file '/var/www/default/htdocs/index.php')
-
-[lighttpd-fastcgi]
-
-enabled = false
-port    = http,https
-filter  = lighttpd-fastcgi
-logpath = /var/log/lighttpd/error.log
-
-# Same as above for mod_auth
-# It catches wrong authentifications
-
-[lighttpd-auth]
-
-enabled = false
-port    = http,https
-filter  = suhosin
-logpath = /var/log/lighttpd/error.log
-
-[nginx-http-auth]
-
-enabled = false
-filter  = nginx-http-auth
-port    = http,https
-logpath = /var/log/nginx/error.log
-
-# Monitor roundcube server
-
-[roundcube-auth]
-
-enabled  = false
-filter   = roundcube-auth
-port     = http,https
-logpath  = /var/log/roundcube/userlogins
-
-
-[sogo-auth]
-
-enabled  = false
-filter   = sogo-auth
-port     = http, https
-# without proxy this would be:
-# port    = 20000
-logpath  = /var/log/sogo/sogo.log
-
-
-#
-# FTP servers
-#
-
-[vsftpd]
-
-enabled  = false
-port     = ftp,ftp-data,ftps,ftps-data
-filter   = vsftpd
-logpath  = /var/log/vsftpd.log
-# or overwrite it in jails.local to be
-# logpath = /var/log/auth.log
-# if you want to rely on PAM failed login attempts
-# vsftpd's failregex should match both of those formats
-maxretry = 6
-
-
-[proftpd]
-
-enabled  = false
-port     = ftp,ftp-data,ftps,ftps-data
-filter   = proftpd
-logpath  = /var/log/proftpd/proftpd.log
-maxretry = 6
-
-
-[pure-ftpd]
-
-enabled  = false
-port     = ftp,ftp-data,ftps,ftps-data
-filter   = pure-ftpd
-logpath  = /var/log/syslog
-maxretry = 6
-
-
-[wuftpd]
-
-enabled  = false
-port     = ftp,ftp-data,ftps,ftps-data
-filter   = wuftpd
-logpath  = /var/log/syslog
-maxretry = 6
-
-
-#
-# Mail servers
-#
-
-[postfix]
-
-enabled  = false
-port     = smtp,ssmtp,submission
-filter   = postfix
-logpath  = /var/log/mail.log
-
-
-[couriersmtp]
-
-enabled  = false
-port     = smtp,ssmtp,submission
-filter   = couriersmtp
-logpath  = /var/log/mail.log
-
-
-#
-# Mail servers authenticators: might be used for smtp,ftp,imap servers, so
-# all relevant ports get banned
-#
-
-[courierauth]
-
-enabled  = false
-port     = smtp,ssmtp,submission,imap2,imap3,imaps,pop3,pop3s
-filter   = courierlogin
-logpath  = /var/log/mail.log
-
-
-[sasl]
-
-enabled  = false
-port     = smtp,ssmtp,submission,imap2,imap3,imaps,pop3,pop3s
-filter   = postfix-sasl
-# You might consider monitoring /var/log/mail.warn instead if you are
-# running postfix since it would provide the same log lines at the
-# "warn" level but overall at the smaller filesize.
-logpath  = /var/log/mail.log
-
-[dovecot]
-
-enabled = false
-port    = smtp,ssmtp,submission,imap2,imap3,imaps,pop3,pop3s
-filter  = dovecot
-logpath = /var/log/mail.log
-
-# To log wrong MySQL access attempts add to /etc/my.cnf:
-# log-error=/var/log/mysqld.log
-# log-warning = 2
-[mysqld-auth]
-
-enabled  = false
-filter   = mysqld-auth
-port     = 3306
-logpath  = /var/log/mysqld.log
-
-
-# DNS Servers
-
-
-# These jails block attacks against named (bind9). By default, logging is off
-# with bind9 installation. You will need something like this:
-#
-# logging {
-#     channel security_file {
-#         file "/var/log/named/security.log" versions 3 size 30m;
-#         severity dynamic;
-#         print-time yes;
-#     };
-#     category security {
-#         security_file;
-#     };
-# };
-#
-# in your named.conf to provide proper logging
-
-# !!! WARNING !!!
-#   Since UDP is connection-less protocol, spoofing of IP and imitation
-#   of illegal actions is way too simple.  Thus enabling of this filter
-#   might provide an easy way for implementing a DoS against a chosen
-#   victim. See
-#    http://nion.modprobe.de/blog/archives/690-fail2ban-+-dns-fail.html
-#   Please DO NOT USE this jail unless you know what you are doing.
-#[named-refused-udp]
-#
-#enabled  = false
-#port     = domain,953
-#protocol = udp
-#filter   = named-refused
-#logpath  = /var/log/named/security.log
-
-[named-refused-tcp]
-
-enabled  = false
-port     = domain,953
-protocol = tcp
-filter   = named-refused
-logpath  = /var/log/named/security.log
-
-# Multiple jails, 1 per protocol, are necessary ATM:
-# see https://github.com/fail2ban/fail2ban/issues/37
-[asterisk-tcp]
-
-enabled  = false
-filter   = asterisk
-port     = 5060,5061
-protocol = tcp
-logpath  = /var/log/asterisk/messages
-
-[asterisk-udp]
-
-enabled  = false
-filter	 = asterisk
-port     = 5060,5061
-protocol = udp
-logpath  = /var/log/asterisk/messages
-
-
-# Jail for more extended banning of persistent abusers
-# !!! WARNING !!!
-#   Make sure that your loglevel specified in fail2ban.conf/.local
-#   is not at DEBUG level -- which might then cause fail2ban to fall into
-#   an infinite loop constantly feeding itself with non-informative lines
-[recidive]
-
-enabled  = false
-filter   = recidive
-logpath  = /var/log/fail2ban.log
-action   = iptables-allports[name=recidive]
-           sendmail-whois-lines[name=recidive, logpath=/var/log/fail2ban.log]
-bantime  = 604800  ; 1 week
-findtime = 86400   ; 1 day
-maxretry = 5
-EOF
+    config_fail2ban
 
     # create gluster, nfs or Azure Files mount point
     mkdir -p /moodle
@@ -614,37 +140,39 @@ EOF
         sudo apt-get -y --force-yes install postgresql-client >> /tmp/apt3.log
     fi
 
-    # install azure cli & setup container
-    echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ wheezy main" | \
-        sudo tee /etc/apt/sources.list.d/azure-cli.list
+    if [ "$installObjectFsSwitch" = "True" -o "$fileServerType" = "azurefiles" ]; then
+        # install azure cli & setup container
+        echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ wheezy main" | \
+            sudo tee /etc/apt/sources.list.d/azure-cli.list
 
-    sudo apt-key adv --keyserver packages.microsoft.com --recv-keys 52E16F86FEE04B979B07E28DB02C46DF417A0893 >> /tmp/apt4.log
-    sudo apt-get -y install apt-transport-https >> /tmp/apt4.log
-    sudo apt-get -y update > /dev/null
-    sudo apt-get -y install azure-cli >> /tmp/apt4.log
+        sudo apt-key adv --keyserver packages.microsoft.com --recv-keys 52E16F86FEE04B979B07E28DB02C46DF417A0893 >> /tmp/apt4.log
+        sudo apt-get -y install apt-transport-https >> /tmp/apt4.log
+        sudo apt-get -y update > /dev/null
+        sudo apt-get -y install azure-cli >> /tmp/apt4.log
 
-    az storage container create \
-        --name objectfs \
-        --account-name $wabsacctname \
-        --account-key $wabsacctkey \
-        --public-access off \
-        --fail-on-exist >> /tmp/wabs.log
+        az storage container create \
+            --name objectfs \
+            --account-name $wabsacctname \
+            --account-key $wabsacctkey \
+            --public-access off \
+            --fail-on-exist >> /tmp/wabs.log
 
-    az storage container policy create \
-        --account-name $wabsacctname \
-        --account-key $wabsacctkey \
-        --container-name objectfs \
-        --name readwrite \
-        --start $(date --date="1 day ago" +%F) \
-        --expiry $(date --date="2199-01-01" +%F) \
-        --permissions rw >> /tmp/wabs.log
+        az storage container policy create \
+            --account-name $wabsacctname \
+            --account-key $wabsacctkey \
+            --container-name objectfs \
+            --name readwrite \
+            --start $(date --date="1 day ago" +%F) \
+            --expiry $(date --date="2199-01-01" +%F) \
+            --permissions rw >> /tmp/wabs.log
 
-    sas=$(az storage container generate-sas \
-        --account-name $wabsacctname \
-        --account-key $wabsacctkey \
-        --name objectfs \
-        --policy readwrite \
-        --output tsv)
+        sas=$(az storage container generate-sas \
+            --account-name $wabsacctname \
+            --account-key $wabsacctkey \
+            --name objectfs \
+            --policy readwrite \
+            --output tsv)
+    fi
 
     if [ $fileServerType = "gluster" ]; then
         # mount gluster files system
@@ -677,6 +205,10 @@ EOF
     mkdir -p /moodle/moodledata
     chown -R www-data.www-data /moodle
 
+    o365pluginVersion=$(get_o365plugin_version_from_moodle_version $moodleVersion)
+    moodleStableVersion=$o365pluginVersion  # Need Moodle stable version for GDPR plugins, and o365pluginVersion is just Moodle stable version, so reuse it.
+    moodleUnzipDir=$(get_moodle_unzip_dir_from_moodle_version $moodleVersion)
+
     # install Moodle 
     echo '#!/bin/bash
     cd /tmp
@@ -684,17 +216,32 @@ EOF
     # downloading moodle 
     /usr/bin/curl -k --max-redirs 10 https://github.com/moodle/moodle/archive/'$moodleVersion'.zip -L -o moodle.zip
     /usr/bin/unzip -q moodle.zip
-    /bin/mv -v moodle-'$moodleVersion' /moodle/html/moodle
+    /bin/mv -v '$moodleUnzipDir' /moodle/html/moodle
+
+    if [ "'$installGdprPluginsSwitch'" = "True" ]; then
+        # install Moodle GDPR plugins (Note: This is only for Moodle versions 3.4.2+ or 3.3.5+ and will be included in Moodle 3.5, so no need for 3.5)
+        curl -k --max-redirs 10 https://github.com/moodlehq/moodle-tool_policy/archive/'$moodleStableVersion'.zip -L -o plugin-policy.zip
+        unzip -q plugin-policy.zip
+        mkdir -p /moodle/html/moodle/admin/tool/policy
+        cp -r moodle-tool_policy-'$moodleStableVersion'/* /moodle/html/moodle/admin/tool/policy
+        rm -rf moodle-tool_policy-'$moodleStableVersion'
+
+        curl -k --max-redirs 10 https://github.com/moodlehq/moodle-tool_dataprivacy/archive/'$moodleStableVersion'.zip -L -o plugin-dataprivacy.zip
+        unzip -q plugin-dataprivacy.zip
+        mkdir -p /moodle/html/moodle/admin/tool/dataprivacy
+        cp -r moodle-tool_dataprivacy-'$moodleStableVersion'/* /moodle/html/moodle/admin/tool/dataprivacy
+        rm -rf moodle-tool_dataprivacy-'$moodleStableVersion'
+    fi
 
     if [ "'$installO365pluginsSwitch'" = "True" ]; then
         # install Office 365 plugins
-        curl -k --max-redirs 10 https://github.com/Microsoft/o365-moodle/archive/'$moodleVersion'.zip -L -o o365.zip
+        curl -k --max-redirs 10 https://github.com/Microsoft/o365-moodle/archive/'$o365pluginVersion'.zip -L -o o365.zip
         unzip -q o365.zip
-        cp -r o365-moodle-'$moodleVersion'/* /moodle/html/moodle
-        rm -rf o365-moodle-'$moodleVersion'
+        cp -r o365-moodle-'$o365pluginVersion'/* /moodle/html/moodle
+        rm -rf o365-moodle-'$o365pluginVersion'
     fi
 
-    if [ "'$installElasticSearchSwitch'" = "True" ]; then
+    if [ "'$searchType'" = "elastic" ]; then
         # Install ElasticSearch plugin
         /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-search_elastic/archive/master.zip -L -o plugin-elastic.zip
         /usr/bin/unzip -q plugin-elastic.zip
@@ -707,21 +254,31 @@ EOF
         /usr/bin/unzip -q local-aws.zip
         /bin/mkdir -p /moodle/html/moodle/local/aws
         /bin/cp -r moodle-local_aws-master/* /moodle/html/moodle/local/aws
+
+    elif [ "'$searchType'" = "azure" ]; then
+        # Install Azure Search service plugin
+        /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-search_azure/archive/master.zip -L -o plugin-azure-search.zip
+        /usr/bin/unzip -q plugin-azure-search.zip
+        /bin/mkdir -p /moodle/html/moodle/search/engine/azure
+        /bin/cp -r moodle-search_azure-master/* /moodle/html/moodle/search/engine/azure
+        /bin/rm -rf moodle-search_azure-master
     fi
 
-    # Install the ObjectFS plugin
-    /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-tool_objectfs/archive/master.zip -L -o plugin-objectfs.zip
-    /usr/bin/unzip -q plugin-objectfs.zip
-    /bin/mkdir -p /moodle/html/moodle/admin/tool/objectfs
-    /bin/cp -r moodle-tool_objectfs-master/* /moodle/html/moodle/admin/tool/objectfs
-    /bin/rm -rf moodle-tool_objectfs-master
+    if [ "'$installObjectFsSwitch'" = "True" ]; then
+        # Install the ObjectFS plugin
+        /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-tool_objectfs/archive/master.zip -L -o plugin-objectfs.zip
+        /usr/bin/unzip -q plugin-objectfs.zip
+        /bin/mkdir -p /moodle/html/moodle/admin/tool/objectfs
+        /bin/cp -r moodle-tool_objectfs-master/* /moodle/html/moodle/admin/tool/objectfs
+        /bin/rm -rf moodle-tool_objectfs-master
 
-    # Install the ObjectFS Azure library
-    /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-local_azure_storage/archive/master.zip -L -o plugin-azurelibrary.zip
-    /usr/bin/unzip -q plugin-azurelibrary.zip
-    /bin/mkdir -p /moodle/html/moodle/local/azure_storage
-    /bin/cp -r moodle-local_azure_storage-master/* /moodle/html/moodle/local/azure_storage
-    /bin/rm -rf moodle-local_azure_storage-master
+        # Install the ObjectFS Azure library
+        /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-local_azure_storage/archive/master.zip -L -o plugin-azurelibrary.zip
+        /usr/bin/unzip -q plugin-azurelibrary.zip
+        /bin/mkdir -p /moodle/html/moodle/local/azure_storage
+        /bin/cp -r moodle-local_azure_storage-master/* /moodle/html/moodle/local/azure_storage
+        /bin/rm -rf moodle-local_azure_storage-master
+    fi
     ' > /tmp/setup-moodle.sh 
 
     chmod 755 /tmp/setup-moodle.sh
@@ -871,8 +428,21 @@ server {
 }
 EOF
 
-    echo -e "Generating SSL self-signed certificate"
-    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /moodle/certs/nginx.key -out /moodle/certs/nginx.crt -subj "/C=BR/ST=SP/L=SaoPaulo/O=IT/CN=$siteFQDN"
+    ### SSL cert ###
+    if [ "$thumbprintSslCert" != "None" ]; then
+        echo "Using VM's cert (/var/lib/waagent/$thumbprintSslCert.*) for SSL..."
+        cat /var/lib/waagent/$thumbprintSslCert.prv > /moodle/certs/nginx.key
+        cat /var/lib/waagent/$thumbprintSslCert.crt > /moodle/certs/nginx.crt
+        if [ "$thumbprintCaCert" != "None" ]; then
+            echo "CA cert was specified (/var/lib/waagent/$thumbprintCaCert.crt), so append it to nginx.crt..."
+            cat /var/lib/waagent/$thumbprintCaCert.crt >> /moodle/certs/nginx.crt
+        fi
+    else
+        echo -e "Generating SSL self-signed certificate"
+        openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /moodle/certs/nginx.key -out /moodle/certs/nginx.crt -subj "/C=BR/ST=SP/L=SaoPaulo/O=IT/CN=$siteFQDN"
+    fi
+    chown www-data:www-data /moodle/certs/nginx.*
+    chmod 0400 /moodle/certs/nginx.*
 
    # php config 
    PhpIni=/etc/php/7.0/fpm/php.ini
@@ -1170,7 +740,7 @@ EOF
         echo "mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e \"CREATE DATABASE ${moodledbname};\"" >> /tmp/debug
         echo "mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e \"GRANT ALL ON ${moodledbname}.* TO ${moodledbuser} IDENTIFIED BY '${moodledbpass}';\"" >> /tmp/debug
     elif [ $dbServerType = "mssql" ]; then
-        /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -Q "CREATE DATABASE ${moodledbname} ( MAXSIZE = $serviceSize, EDITION = '$serviceTier', SERVICE_OBJECTIVE = '$serviceObjective' )"
+        /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -Q "CREATE DATABASE ${moodledbname} ( MAXSIZE = $mssqlDbSize, EDITION = '$mssqlDbEdition', SERVICE_OBJECTIVE = '$mssqlDbServiceObjectiveName' )"
         /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -Q "CREATE LOGIN ${moodledbuser} with password = '${moodledbpass}'" 
         /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d ${moodledbname} -Q "CREATE USER ${moodledbuser} FROM LOGIN ${moodledbuser}"
         /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d ${moodledbname} -Q "exec sp_addrolemember 'db_owner','${moodledbuser}'" 
@@ -1204,32 +774,37 @@ EOF
         echo -e "cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot=https://"$siteFQDN" --dataroot=/moodle/moodledata --dbhost="$mysqlIP" --dbname="$moodledbname" --dbuser="$azuremoodledbuser" --dbpass="$moodledbpass" --dbtype=mysqli --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass="$adminpass" --adminemail=admin@"$siteFQDN" --non-interactive --agree-license --allow-unstable || true "
         cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot=https://$siteFQDN   --dataroot=/moodle/moodledata --dbhost=$mysqlIP   --dbname=$moodledbname   --dbuser=$azuremoodledbuser   --dbpass=$moodledbpass   --dbtype=mysqli --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass=$adminpass   --adminemail=admin@$siteFQDN   --non-interactive --agree-license --allow-unstable || true
 
-        mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'enabletasks', 1);" 
-        mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'filesystem', '\\\tool_objectfs\\\azure_file_system');"
-        mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_accountname', '${wabsacctname}');"
-        mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_container', 'objectfs');"
-        mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_sastoken', '${sas}');"
+        if [ "$installObjectFsSwitch" = "True" ]; then
+            mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'enabletasks', 1);" 
+            mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'filesystem', '\\\tool_objectfs\\\azure_file_system');"
+            mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_accountname', '${wabsacctname}');"
+            mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_container', 'objectfs');"
+            mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_sastoken', '${sas}');"
+        fi
     elif [ $dbServerType = "mssql" ]; then
         cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot=https://$siteFQDN   --dataroot=/moodle/moodledata --dbhost=$mssqlIP   --dbname=$moodledbname   --dbuser=$azuremoodledbuser   --dbpass=$moodledbpass   --dbtype=sqlsrv --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass=$adminpass   --adminemail=admin@$siteFQDN   --non-interactive --agree-license --allow-unstable || true
 
-       /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d ${moodledbname} -Q "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'enabletasks', 1)" 
-       /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d ${moodledbname} -Q "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'filesystem', '\\\tool_objectfs\\\azure_file_system')"
-       /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d ${moodledbname} -Q "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_accountname', '${wabsacctname}')"
-       /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d ${moodledbname} -Q "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_container', 'objectfs')"
-       /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d${moodledbname} -Q "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_sastoken', '${sas}')"
-
+        if [ "$installObjectFsSwitch" = "True" ]; then
+            /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d ${moodledbname} -Q "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'enabletasks', 1)" 
+            /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d ${moodledbname} -Q "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'filesystem', '\\\tool_objectfs\\\azure_file_system')"
+            /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d ${moodledbname} -Q "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_accountname', '${wabsacctname}')"
+            /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d ${moodledbname} -Q "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_container', 'objectfs')"
+            /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d${moodledbname} -Q "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_sastoken', '${sas}')"
+        fi
     else
         echo -e "cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot=https://"$siteFQDN" --dataroot=/moodle/moodledata --dbhost="$postgresIP" --dbname="$moodledbname" --dbuser="$azuremoodledbuser" --dbpass="$moodledbpass" --dbtype=pgsql --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass="$adminpass" --adminemail=admin@"$siteFQDN" --non-interactive --agree-license --allow-unstable || true "
         cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot=https://$siteFQDN   --dataroot=/moodle/moodledata --dbhost=$postgresIP   --dbname=$moodledbname   --dbuser=$azuremoodledbuser   --dbpass=$moodledbpass   --dbtype=pgsql --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass=$adminpass   --adminemail=admin@$siteFQDN   --non-interactive --agree-license --allow-unstable || true
 
-        # Add the ObjectFS configuration to Moodle.
-        echo "${postgresIP}:5432:${moodledbname}:${azuremoodledbuser}:${moodledbpass}" > /root/.pgpass
-        chmod 600 /root/.pgpass
-        psql -h $postgresIP -U $azuremoodledbuser -c "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'enabletasks', 1);" $moodledbname
-        psql -h $postgresIP -U $azuremoodledbuser -c "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'filesystem', '\tool_objectfs\azure_file_system');" $moodledbname
-        psql -h $postgresIP -U $azuremoodledbuser -c "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_accountname', '$wabsacctname');" $moodledbname
-        psql -h $postgresIP -U $azuremoodledbuser -c "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_container', 'objectfs');" $moodledbname
-        psql -h $postgresIP -U $azuremoodledbuser -c "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_sastoken', '$sas');" $moodledbname
+        if [ "$installObjectFsSwitch" = "True" ]; then
+            # Add the ObjectFS configuration to Moodle.
+            echo "${postgresIP}:5432:${moodledbname}:${azuremoodledbuser}:${moodledbpass}" > /root/.pgpass
+            chmod 600 /root/.pgpass
+            psql -h $postgresIP -U $azuremoodledbuser -c "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'enabletasks', 1);" $moodledbname
+            psql -h $postgresIP -U $azuremoodledbuser -c "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'filesystem', '\tool_objectfs\azure_file_system');" $moodledbname
+            psql -h $postgresIP -U $azuremoodledbuser -c "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_accountname', '$wabsacctname');" $moodledbname
+            psql -h $postgresIP -U $azuremoodledbuser -c "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_container', 'objectfs');" $moodledbname
+            psql -h $postgresIP -U $azuremoodledbuser -c "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_sastoken', '$sas');" $moodledbname
+        fi
     fi
 
     echo -e "\n\rDone! Installation completed!\n\r"
@@ -1251,22 +826,33 @@ EOF
     # We proxy ssl, so moodle needs to know this
     sed -i "23 a \$CFG->sslproxy  = 'true';" /moodle/html/moodle/config.php
 
-    if [ "$installElasticSearchSwitch" = "True" ]; then
+    if [ "$searchType" = "elastic" ]; then
         # Set up elasticsearch plugin
         sed -i "23 a \$CFG->forced_plugin_settings = ['search_elastic' => ['hostname' => 'http://$elasticVm1IP']];" /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->searchengine = 'elastic';" /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->enableglobalsearch = 'true';" /moodle/html/moodle/config.php
+	# create index
+        sudo -u www-data php /moodle/html/moodle/search/cli/indexer.php --force --reindex
+    elif [ "$searchType" = "azure" ]; then
+        # Set up Azure Search service plugin
+        sed -i "23 a \$CFG->forced_plugin_settings = ['search_azure' => ['searchurl' => 'https://$azureSearchNameHost', 'apikey' => '$azureSearchKey']];" /moodle/html/moodle/config.php
+        sed -i "23 a \$CFG->searchengine = 'azure';" /moodle/html/moodle/config.php
+        sed -i "23 a \$CFG->enableglobalsearch = 'true';" /moodle/html/moodle/config.php
+	# create index
+        sudo -u www-data php /moodle/html/moodle/search/cli/indexer.php --force --reindex
     fi
 
-    # Set the ObjectFS alternate filesystem
-    sed -i "23 a \$CFG->alternative_file_system_class = '\\\tool_objectfs\\\azure_file_system';" /moodle/html/moodle/config.php
+    if [ "$installObjectFsSwitch" = "True" ]; then
+        # Set the ObjectFS alternate filesystem
+        sed -i "23 a \$CFG->alternative_file_system_class = '\\\tool_objectfs\\\azure_file_system';" /moodle/html/moodle/config.php
+    fi
 
    if [ "$dbServerType" = "postgres" ]; then
      # Get a new version of Postgres to match Azure version
      add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main"
      wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
      apt-get update
-     apt-get install postgresql-client-9.6
+     apt-get install -y postgresql-client-9.6
    fi
 
    # create cron entry
@@ -1278,13 +864,14 @@ EOF
       cat <<EOF > /etc/cron.d/sql-backup
 22 02 * * * root /usr/bin/mysqldump -h $mysqlIP -u ${azuremoodledbuser} -p'${moodledbpass}' --databases ${moodledbname} | gzip > /moodle/db-backup.sql.gz
 EOF
-   else
+   elif [ "$dbServerType" = "postgres" ]; then
       cat <<EOF > /etc/cron.d/sql-backup
 22 02 * * * root /usr/bin/pg_dump -Fc -h $postgresIP -U ${azuremoodledbuser} ${moodledbname} > /moodle/db-backup.sql
 EOF
+   #else # mssql. TODO It's missed earlier! Complete this!
    fi
 
-   # Turning off services we don't need the jumpbox running
+   # Turning off services we don't need the controller running
    service nginx stop
    service php7.0-fpm stop
    service varnish stop
@@ -1315,4 +902,7 @@ EOF
       # rm -rf /moodle_old_delete_me || true # Keep the files just in case
    fi
 
+   create_last_modified_time_update_script
+   run_once_last_modified_time_update_script
+   
 }  > /tmp/install.log

@@ -18,7 +18,7 @@ sudp apt install jq
 ```
 
 ``` bash
-For more information ajq -r '.parameters | to_entries[] | "### " + .key + "\n\n" + .value.metadata.description + "\n\nType: " + .value.type + "\n\nPossible Values: " + (.value.allowedValues | @text) + "\n\nDefault: " + (.value.defaultValue | @text) + "\n\n"' azuredeploy.json
+jq -r '.parameters | to_entries[] | "### " + .key + "\n\n" + .value.metadata.description + "\n\nType: " + .value.type + "\n\nPossible Values: " + (.value.allowedValues | @text) + "\n\nDefault: " + (.value.defaultValue | @text) + "\n\n"' azuredeploy.json
 ```
 
 ## Available Parameters
@@ -42,7 +42,7 @@ Type: securestring
 
 Possible Values: null
 
-Default:
+Default: 
 
 
 ### applyScriptsSwitch
@@ -56,6 +56,28 @@ Possible Values: null
 Default: true
 
 
+### autoscaleVmCount
+
+Maximum number of autoscaled web VMs
+
+Type: int
+
+Possible Values: null
+
+Default: 10
+
+
+### autoscaleVmSku
+
+VM size for autoscaled web VMs
+
+Type: string
+
+Possible Values: null
+
+Default: Standard_DS2_v2
+
+
 ### azureBackupSwitch
 
 Switch to configure AzureBackup and enlist VM's
@@ -67,59 +89,92 @@ Possible Values: null
 Default: false
 
 
-### redisDeploySwitch
+### azureSearchSku
 
-Switch to deploy a redis cache or not
-
-Type: bool
-
-Possible Values: null
-
-Default: true
-
-
-### vnetGwDeploySwitch
-
-Switch to deploy a virtual network gateway or not
-
-Type: bool
-
-Possible Values: null
-
-Default: false
-
-
-### installO365pluginsSwitch
-
-Switch to install Moodle Office 365 plugins
-
-Type: bool
-
-Possible Values: null
-
-Default: false
-
-
-### installElasticSearchSwitch
-
-Switch to install Moodle ElasticSearch plugins & VMs
-
-Type: bool
-
-Possible Values: null
-
-Default: false
-
-
-### storageAccountType
-
-Storage Account type
+The search service level you want to create
 
 Type: string
 
-Possible Values: ["Standard_LRS","Standard_GRS","Standard_ZRS"]
+Possible Values: ["free", "basic", "standard", "standard2", "standard3"]
 
-Default: Standard_LRS
+Default: basic
+
+
+### azureSearchReplicaCount
+
+Replicas distribute search workloads across the service. You need 2 or more to support high availability (applies to Basic and Standard only)
+
+Type: int
+
+Possible Values: null 
+
+Default: 3
+
+
+### azureSearchPartitionCount
+
+Partitions allow for scaling of document count as well as faster indexing by sharding your index over multiple Azure Search units
+
+Type: int
+
+Possible Values: [1,2,3,4,6,12]
+
+Default: 1
+
+
+### azureSearchHostingMode
+
+Applicable only for azureSearchSku set to standard3. You can set this property to enable a single, high density partition that allows up to 1000 indexes, which is much higher than the maximum indexes allowed for any other azureSearchSku.
+
+Type: string
+
+Possible Values: ["default", "highDensity"]
+
+Default: default
+ 
+
+### caCertKeyVaultURL
+
+Azure Key Vault URL for your stored CA (Certificate Authority) cert. This value can be obtained from keyvault.sh output if you used the script to store your CA cert in your Key Vault. This parameter is ignored if the keyVaultResourceId parameter is blank.
+
+Type: string
+
+Possible Values: null
+
+Default: 
+
+
+### caCertThumbprint
+
+Thumbprint of your stored CA cert. This value can be obtained from keyvault.sh output if you used the script to store your CA cert in your Key Vault. This parameter is ignored if the keyVaultResourceId parameter is blank.
+
+Type: string
+
+Possible Values: null
+
+Default: 
+
+
+### controllerVmSku
+
+VM size for the controller VM
+
+Type: string
+
+Possible Values: null
+
+Default: Standard_DS1_v2
+
+
+### dbLogin
+
+Database admin username
+
+Type: string
+
+Possible Values: null
+
+Default: dbadmin
 
 
 ### dbServerType
@@ -133,61 +188,6 @@ Possible Values: ["postgres","mysql","mssql"]
 Default: mysql
 
 
-### fileServerType
-
-File server type: GlusterFS, Azure Files (CIFS)--disabled due to too slow perf, NFS--not highly available
-
-Type: string
-
-Possible Values: ["gluster","nfs"]
-
-Default: gluster
-
-
-### webServerType
-
-Web server type
-
-Type: string
-
-Possible Values: ["apache","nginx"]
-
-Default: apache
-
-
-### controllerVmSku
-
-VM size for the controller node
-
-Type: string
-
-Possible Values: null
-
-Default: Standard_DS1_v2
-
-
-### autoscaleVmSku
-
-VM size for autoscaled nodes
-
-Type: string
-
-Possible Values: null
-
-Default: Standard_DS2_v2
-
-
-### autoscaleVmCount
-
-Maximum number of autoscaled nodes
-
-Type: int
-
-Possible Values: null
-
-Default: 10
-
-
 ### elasticVmSku
 
 VM size for the elastic search nodes
@@ -199,15 +199,37 @@ Possible Values: null
 Default: Standard_DS2_v2
 
 
-### firewallRuleName
+### fileServerDiskCount
 
-Database firewall rule name
+Number of disks in raid0 per gluster node or nfs server
 
-Type: string
+Type: int
 
 Possible Values: null
 
-Default: open-to-the-world
+Default: 4
+
+
+### fileServerDiskSize
+
+Size per disk for gluster nodes or nfs server
+
+Type: int
+
+Possible Values: null
+
+Default: 127
+
+
+### fileServerType
+
+File server type: GlusterFS, NFS--not yet highly available
+
+Type: string
+
+Possible Values: ["gluster","nfs"]
+
+Default: nfs
 
 
 ### gatewaySubnet
@@ -243,26 +265,59 @@ Possible Values: null
 Default: Standard_DS2_v2
 
 
-### fileServerDiskSize
+### htmlLocalCopySwitch
 
-Size per disk for gluster nodes or nfs server
+Switch to create a local copy of /moodle/html or not
 
-Type: int
-
-Possible Values: null
-
-Default: 127
-
-
-### fileServerDiskCount
-
-Number of disks in raid0 per gluster node or nfs server
-
-Type: int
+Type: bool
 
 Possible Values: null
 
-Default: 4
+Default: true
+
+
+### installGdprPluginsSwitch
+
+Switch to install Moodle GDPR plugins. Note these require Moodle versions 3.4.2+ or 3.3.5+ and these will be included by default in Moodle 3.5
+
+Type: bool
+
+Possible Values: null
+
+Default: false
+
+
+### installO365pluginsSwitch
+
+Switch to install Moodle Office 365 plugins
+
+Type: bool
+
+Possible Values: null
+
+Default: false
+
+
+### installObjectFsSwitch
+
+Switch to install Moodle Object FS plugins (with Azure Blob storage)
+
+Type: bool
+
+Possible Values: null
+
+Default: false
+
+
+### keyVaultResourceId
+
+Azure Resource Manager resource ID of the Key Vault in case you stored your SSL cert in an Azure Key Vault (Note that this Key Vault must have been pre-created on the same Azure region where this template is being deployed). Leave this blank if you didn't. Resource ID example: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/xxx/providers/Microsoft.KeyVault/vaults/yyy. This value can be obtained from keyvault.sh output if you used the script to store your SSL cert in your Key Vault.
+
+Type: string
+
+Possible Values: null
+
+Default: 
 
 
 ### moodleVersion
@@ -271,20 +326,141 @@ The Moodle version you want to install.
 
 Type: string
 
-Possible Values: ["MOODLE_34_STABLE","MOODLE_33_STABLE","MOODLE_32_STABLE","MOODLE_31_STABLE","MOODLE_30_STABLE","MOODLE_29_STABLE"]
+Possible Values: ["MOODLE_34_STABLE","v3.4.2","v3.4.1","MOODLE_33_STABLE","MOODLE_32_STABLE","MOODLE_31_STABLE","MOODLE_30_STABLE","MOODLE_29_STABLE"]
 
 Default: MOODLE_34_STABLE
 
 
-### dbLogin
+### mssqlDbEdition
 
-Database admin username
+MS SQL DB edition
 
 Type: string
 
+Possible Values: ["Basic","Standard"]
+
+Default: Standard
+
+
+### mssqlDbServiceObjectiveName
+
+MS SQL database service object names
+
+Type: string
+
+Possible Values: ["S1","S2","S3","S4","S5","S6","S7","S9"]
+
+Default: S1
+
+
+### mssqlDbSize
+
+MS SQL database size
+
+Type: string
+
+Possible Values: ["100MB","250MB","500MB","1GB","2GB","5GB","10GB","20GB","30GB","40GB","50GB","100GB","250GB","300GB","400GB","500GB","750GB","1024GB"]
+
+Default: 250GB
+
+
+### mssqlVersion
+
+Mssql version
+
+Type: string
+
+Possible Values: ["12.0"]
+
+Default: 12.0
+
+
+### mysqlPgresSkuHwFamily
+
+MySql/Postgresql sku hardware family
+
+Type: string
+
+Possible Values: ["Gen4","Gen5"]
+
+Default: Gen4
+
+
+### mysqlPgresSkuTier
+
+MySql/Postgresql sku tier
+
+Type: string
+
+Possible Values: ["Basic","GeneralPurpose","MemoryOptimized"]
+
+Default: GeneralPurpose
+
+
+### mysqlPgresStgSizeGB
+
+MySql/Postgresql storage size in GB. Minimum 5GB, increase by 1GB, up to 1TB (1024 GB)
+
+Type: int
+
 Possible Values: null
 
-Default: dbadmin
+Default: 125
+
+
+### mysqlPgresVcores
+
+MySql/Postgresql vCores. For Basic tier, only 1 & 2 are allowed. For GeneralPurpose tier, 2, 4, 8, 16, 32 are allowed. For MemoryOptimized, 2, 4, 8, 16 are allowed.
+
+Type: int
+
+Possible Values: [1,2,4,8,16,32]
+
+Default: 2
+
+
+### mysqlVersion
+
+Mysql version
+
+Type: string
+
+Possible Values: ["5.6","5.7"]
+
+Default: 5.7
+
+
+### postgresVersion
+
+Postgresql version
+
+Type: string
+
+Possible Values: ["9.5","9.6"]
+
+Default: 9.6
+
+
+### redisDeploySwitch
+
+Switch to deploy a redis cache or not
+
+Type: bool
+
+Possible Values: null
+
+Default: true
+
+
+### searchType
+
+Options of Moodle Global Search
+
+Type: string
+
+Possible Values: ["none", "azure", "elastic"]
+
+Default: none
 
 
 ### siteURL
@@ -296,83 +472,6 @@ Type: string
 Possible Values: null
 
 Default: www.example.org
-
-
-### skuCapacityDTU
-
-MySql/Postgresql database trasaction units
-
-Type: int
-
-Possible Values: [50,100,200,400,800]
-
-Default: 100
-
-
-### serviceObjective
-
-MS SQL  database trasaction units
-
-Type: string
-
-Possible Values: ["S1","S2","S3","S4","S5","S6","S7","S9"]
-
-Default: S1
-
-
-### msDbSize
-
-MS SQL database size
-
-Type: string
-
-Possible Values: ["100MB","250MB","500MB","1GB","2GB","5GB","10GB","20GB","30GB","40GB","50GB","100GB","250GB","300GB","400GB","500GB","750GB","1024GB"]
-
-Default: 250GB
-
-
-### skuFamily
-
-MySql/Postgresql sku family
-
-Type: string
-
-Possible Values: ["SkuFamily"]
-
-Default: SkuFamily
-
-
-### skuName
-
-MySql/Postgresql sku name
-
-Type: string
-
-Possible Values: ["PGSQLB50","PGSQLB100","PGSQLS100","PGSQLS200","PGSQLS400","PGSQLS800","MYSQLB50","MYSQLB100","MYSQLS100","MYSQLS200","MYSQLS400","MYSQLS800"]
-
-Default: MYSQLS100
-
-
-### skuSizeMB
-
-MySql/Postgresql sku size in MB. For Basic tier, minimum 50GB, increased by 125GB up to 1TB. For Standard tier, minimum 125GB, increase by 125GB up to 1TB
-
-Type: int
-
-Possible Values: null
-
-Default: 128000
-
-
-### skuTier
-
-MySql/Postgresql sku tier
-
-Type: string
-
-Possible Values: ["Basic","Standard"]
-
-Default: Standard
 
 
 ### sshPublicKey
@@ -397,6 +496,28 @@ Possible Values: null
 Default: azureadmin
 
 
+### sslCertKeyVaultURL
+
+Azure Key Vault URL for your stored SSL cert. This value can be obtained from keyvault.sh output if you used the script to store your SSL cert in your Key Vault. This parameter is ignored if the keyVaultResourceId parameter is blank.
+
+Type: string
+
+Possible Values: null
+
+Default: 
+
+
+### sslCertThumbprint
+
+Thumbprint of your stored SSL cert. This value can be obtained from keyvault.sh output if you used the script to store your SSL cert in your Key Vault. This parameter is ignored if the keyVaultResourceId parameter is blank.
+
+Type: string
+
+Possible Values: null
+
+Default: 
+
+
 ### sslEnforcement
 
 MySql/Postgresql SSL connection
@@ -408,37 +529,15 @@ Possible Values: ["Disabled","Enabled"]
 Default: Disabled
 
 
-### postgresVersion
+### storageAccountType
 
-Postgresql version
-
-Type: string
-
-Possible Values: ["9.5","9.6"]
-
-Default: 9.6
-
-
-### mysqlVersion
-
-Mysql version
+Storage Account type
 
 Type: string
 
-Possible Values: ["5.6","5.7"]
+Possible Values: ["Standard_LRS","Standard_GRS","Standard_ZRS"]
 
-Default: 5.7
-
-
-### mssqlVersion
-
-Mssql version
-
-Type: string
-
-Possible Values: ["12.0"]
-
-Default: 12.0
+Default: Standard_LRS
 
 
 ### vNetAddressSpace
@@ -452,6 +551,17 @@ Possible Values: null
 Default: 172.31.0.0
 
 
+### vnetGwDeploySwitch
+
+Switch to deploy a virtual network gateway or not
+
+Type: bool
+
+Possible Values: null
+
+Default: false
+
+
 ### vpnType
 
 Virtual network gateway vpn type
@@ -461,4 +571,16 @@ Type: string
 Possible Values: ["RouteBased","PolicyBased"]
 
 Default: RouteBased
+
+
+### webServerType
+
+Web server type
+
+Type: string
+
+Possible Values: ["apache","nginx"]
+
+Default: apache
+
 

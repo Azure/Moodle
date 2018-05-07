@@ -31,6 +31,7 @@ fileServerType=$6
 storageAccountName=$7
 storageAccountKey=$8
 nfsVmName=$9
+htmlLocalCopySwitch=${10}
 
 echo $glusterNode    >> /tmp/vars.txt
 echo $glusterVolume  >> /tmp/vars.txt
@@ -41,6 +42,7 @@ echo $fileServerType >> /tmp/vars.txt
 echo $storageAccountName >> /tmp/vars.txt
 echo $storageAccountKey >> /tmp/vars.txt
 echo $nfsVmName >> /tmp/vars.txt
+echo $htmlLocalCopySwitch >> /tmp/vars.txt
 
 . ./helper_functions.sh
 check_fileServerType_param $fileServerType
@@ -164,11 +166,20 @@ http {
 }
 EOF
 
+  # Set up html dir local copy if specified
+  htmlRootDir="/moodle/html/moodle"
+  if [ "$htmlLocalCopySwitch" = "True" ]; then
+    mkdir -p /var/www/html
+    rsync -av --delete /moodle/html/moodle /var/www/html
+    htmlRootDir="/var/www/html/moodle"
+    setup_html_local_copy_cron_job
+  fi
+
   # Configure nginx/https
   cat <<EOF >> /etc/nginx/sites-enabled/${siteFQDN}.conf
 server {
         listen 443 ssl;
-        root /moodle/html/moodle;
+        root ${htmlRootDir};
 	index index.php index.html index.htm;
 
         ssl on;
@@ -209,7 +220,7 @@ EOF
 server {
         listen 81 default;
         server_name ${siteFQDN};
-        root /moodle/html/moodle;
+        root ${htmlRootDir};
 	index index.php index.html index.htm;
 
         # Log to syslog
@@ -270,9 +281,9 @@ EOF
 	ServerName ${siteFQDN}
 
 	ServerAdmin webmaster@localhost
-	DocumentRoot /moodle/html/moodle
+	DocumentRoot ${htmlRootDir}
 
-	<Directory /moodle/html/moodle>
+	<Directory ${htmlRootDir}>
 		Options FollowSymLinks
 		AllowOverride All
 		Require all granted
