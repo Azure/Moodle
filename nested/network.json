@@ -51,9 +51,8 @@
         },
         {
             "condition": "[not(equals(parameters('moodleCommon').searchType, 'none'))]",
-            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "type": "subnets",
             "apiVersion": "2017-10-01",
-            "location": "[resourceGroup().location]",
             "name": "[parameters('moodleCommon').subnetElastic]",
             "properties": {
                 "addressPrefix": "[parameters('moodleCommon').subnetElasticRange]"
@@ -61,9 +60,8 @@
         },
         {
             "condition": "[and(equals(parameters('moodleCommon').tikaService, 'tika'), not(equals(parameters('moodleCommon').searchType, 'none')))]",
-            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "type": "subnets",
             "apiVersion": "2017-10-01",
-            "location": "[resourceGroup().location]",
             "name": "[parameters('moodleCommon').subnetTika]",
             "properties": {
                 "addressPrefix": "[parameters('moodleCommon').subnetTikaRange]"
