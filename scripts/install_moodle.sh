@@ -132,13 +132,13 @@
 
     if [ $fileServerType = "gluster" ]; then
         sudo apt-get -y --force-yes install glusterfs-client                 >> /tmp/apt3.log
-    else # "azurefiles"
+    elif [ "$fileServerType" = "azurefiles" ]; then
         sudo apt-get -y --force-yes install cifs-utils                       >> /tmp/apt3.log
     fi
 
     if [ $dbServerType = "mysql" ]; then
         sudo apt-get -y --force-yes install mysql-client >> /tmp/apt3.log
-    else
+    elif [ "$dbServerType" = "postgres" ]; then
         sudo apt-get -y --force-yes install postgresql-client >> /tmp/apt3.log
     fi
 
@@ -328,13 +328,19 @@ http {
   gzip_buffers 16 8k;
   gzip_http_version 1.1;
   gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+EOF
 
+    if [ "$httpsTermination" != "None" ]; then
+        cat <<EOF >> /etc/nginx/nginx.conf
   map \$http_x_forwarded_proto \$fastcgi_https {                                                                                          
     default \$https;                                                                                                                   
     http '';                                                                                                                          
     https on;                                                                                                                         
-  }   
+  }
+EOF
+    fi
 
+    cat <<EOF >> /etc/nginx/nginx.conf
   log_format moodle_combined '\$remote_addr - \$upstream_http_x_moodleuser [\$time_local] '
                              '"\$request" \$status \$body_bytes_sent '
                              '"\$http_referer" "\$http_user_agent"';
@@ -363,15 +369,18 @@ server {
         set_real_ip_from    192.168.0.0/16;
         real_ip_header      X-Forwarded-For;
         real_ip_recursive   on;
-
-
+EOF
+    if [ "$httpsTermination" != "None" ]; then
+        cat <<EOF >> /etc/nginx/sites-enabled/${siteFQDN}.conf
         # Redirect to https
         if (\$http_x_forwarded_proto != https) {
                 return 301 https://\$server_name\$request_uri;
         }
         rewrite ^/(.*\.php)(/)(.*)$ /\$1?file=/\$3 last;
+EOF
+    fi
 
-
+    cat <<EOF >> /etc/nginx/sites-enabled/${siteFQDN}.conf
         # Filter out php-fpm status page
         location ~ ^/server-status {
             return 404;
@@ -396,7 +405,9 @@ server {
         include fastcgi_params;
     }
 }
-
+EOF
+    if [ "$httpsTermination" = "VMSS" ]; then
+        cat <<EOF >> /etc/nginx/sites-enabled/${siteFQDN}.conf
 server {
         listen 443 ssl;
         root /moodle/html/moodle;
@@ -429,22 +440,25 @@ server {
         }
 }
 EOF
-
-    ### SSL cert ###
-    if [ "$thumbprintSslCert" != "None" ]; then
-        echo "Using VM's cert (/var/lib/waagent/$thumbprintSslCert.*) for SSL..."
-        cat /var/lib/waagent/$thumbprintSslCert.prv > /moodle/certs/nginx.key
-        cat /var/lib/waagent/$thumbprintSslCert.crt > /moodle/certs/nginx.crt
-        if [ "$thumbprintCaCert" != "None" ]; then
-            echo "CA cert was specified (/var/lib/waagent/$thumbprintCaCert.crt), so append it to nginx.crt..."
-            cat /var/lib/waagent/$thumbprintCaCert.crt >> /moodle/certs/nginx.crt
-        fi
-    else
-        echo -e "Generating SSL self-signed certificate"
-        openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /moodle/certs/nginx.key -out /moodle/certs/nginx.crt -subj "/C=BR/ST=SP/L=SaoPaulo/O=IT/CN=$siteFQDN"
     fi
-    chown www-data:www-data /moodle/certs/nginx.*
-    chmod 0400 /moodle/certs/nginx.*
+
+    if [ "$httpsTermination" = "VMSS" ]; then
+        ### SSL cert ###
+        if [ "$thumbprintSslCert" != "None" ]; then
+            echo "Using VM's cert (/var/lib/waagent/$thumbprintSslCert.*) for SSL..."
+            cat /var/lib/waagent/$thumbprintSslCert.prv > /moodle/certs/nginx.key
+            cat /var/lib/waagent/$thumbprintSslCert.crt > /moodle/certs/nginx.crt
+            if [ "$thumbprintCaCert" != "None" ]; then
+                echo "CA cert was specified (/var/lib/waagent/$thumbprintCaCert.crt), so append it to nginx.crt..."
+                cat /var/lib/waagent/$thumbprintCaCert.crt >> /moodle/certs/nginx.crt
+            fi
+        else
+            echo -e "Generating SSL self-signed certificate"
+            openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /moodle/certs/nginx.key -out /moodle/certs/nginx.crt -subj "/C=US/ST=WA/L=Redmond/O=IT/CN=$siteFQDN"
+        fi
+        chown www-data:www-data /moodle/certs/nginx.*
+        chmod 0400 /moodle/certs/nginx.*
+    fi
 
    # php config 
    PhpIni=/etc/php/7.0/fpm/php.ini
@@ -481,7 +495,7 @@ EOF
    rm -f /etc/nginx/sites-enabled/default
 
    # restart Nginx
-    sudo service nginx restart 
+   sudo service nginx restart 
 
    # Configure varnish startup for 16.04
    VARNISHSTART="ExecStart=\/usr\/sbin\/varnishd -j unix,user=vcache -F -a :80 -T localhost:6082 -f \/etc\/varnish\/moodle.vcl -S \/etc\/varnish\/secret -s malloc,1024m -p thread_pool_min=200 -p thread_pool_max=4000 -p thread_pool_add_delay=2 -p timeout_linger=100 -p timeout_idle=30 -p send_timeout=1800 -p thread_pools=4 -p http_max_hdr=512 -p workspace_backend=512k"
