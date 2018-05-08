@@ -79,7 +79,7 @@
             ],
             "defaultValue": "VMSS",
             "metadata": {
-                "description": "Indicates where https termination occurs. 'VMSS' is for https termination at the VMSS instance VMs (using nginx https proxy). 'None' is for a manually integrated Application Gateway https termination (or any other such facility). 'None' should not be used without a properly configured-and-connected Application Gateway or a corresponding https termination layer."
+                "description": "Indicates where https termination occurs. 'VMSS' is for https termination at the VMSS instance VMs (using nginx https proxy). 'None' is for testing only with no https. 'None' may not be used with a separately configured https termination layer. If you want to use the 'None' option with your separately configured https termination layer, you'll need to update your Moodle config.php manually for $cfg->wwwroot and $cfg->sslproxy."
             },
             "type": "string"
         },
