@@ -409,6 +409,17 @@
             },
             "type": "string"
         },
+        "tikaService": {
+            "defaultValue": "none",
+            "allowedValues": [
+                "none",
+                "tika"
+            ],
+            "metadata": {
+                "description": "options of enabling tika service for file searching in moodle"
+            },
+            "type": "string"
+        },
         "azureSearchSku": {
             "defaultValue": "basic",
             "allowedValues": [
@@ -624,7 +635,7 @@
             }
         },
         {
-            "condition": "[not(bool(equals(parameters('searchType'), 'none')))]",
+            "condition": "[and(equals(parameters('tikaService'), 'tika'), equals(not(equals(parameters('searchType'), 'none'))))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
             "dependsOn": [
@@ -915,6 +926,7 @@
             "thumbprintCaCert": "[if(or(empty(parameters('keyVaultResourceId')), empty(parameters('caCertThumbprint'))), 'None', parameters('caCertThumbprint'))]",
             "tikaNicName": "[concat('tika-vm-nic-',variables('resourceprefix'))]",
             "tikaScriptFilename": "install_tika.sh",
+            "tikaService": "[parameters('tikaService')]",
             "tikaVmIP": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),5)), '.20')]",
             "tikaVmName": "[concat('tika-vm-',variables('resourceprefix'))]",
             "tikaVmSku": "[parameters('tikaVmSku')]",

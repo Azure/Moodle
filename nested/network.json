@@ -47,6 +47,7 @@
                         }
                     },
                     {
+                        "condition": "[equals(parameters('moodleCommon').tikaService, 'tika')]",
                         "name": "[parameters('moodleCommon').subnetTika]",
                         "properties": {
                             "addressPrefix": "[parameters('moodleCommon').subnetTikaRange]"
