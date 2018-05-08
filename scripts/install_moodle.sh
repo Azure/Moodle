@@ -26,37 +26,39 @@
     glusterNode=${2}
     glusterVolume=${3}
     siteFQDN=${4}
-    dbIP=${5}
-    moodledbname=${6}
-    moodledbuser=${7}
-    moodledbpass=${8}
-    adminpass=${9}
-    dbadminlogin=${10}
-    dbadminpass=${11}
-    wabsacctname=${12}
-    wabsacctkey=${13}
-    azuremoodledbuser=${14}
-    redisDns=${15}
-    redisAuth=${16}
-    elasticVm1IP=${17}
-    installO365pluginsSwitch=${18}
-    dbServerType=${19}
-    fileServerType=${20}
-    mssqlDbServiceObjectiveName=${21}
-    mssqlDbEdition=${22}
-    mssqlDbSize=${23}
-    installObjectFsSwitch=${24}
-    installGdprPluginsSwitch=${25}
-    thumbprintSslCert=${26}
-    thumbprintCaCert=${27}
-    searchType=${28}
-    azureSearchKey=${29}
-    azureSearchNameHost=${30}
+    httpsTermination=${5}
+    dbIP=${6}
+    moodledbname=${7}
+    moodledbuser=${8}
+    moodledbpass=${9}
+    adminpass=${10}
+    dbadminlogin=${11}
+    dbadminpass=${12}
+    wabsacctname=${13}
+    wabsacctkey=${14}
+    azuremoodledbuser=${15}
+    redisDns=${16}
+    redisAuth=${17}
+    elasticVm1IP=${18}
+    installO365pluginsSwitch=${19}
+    dbServerType=${20}
+    fileServerType=${21}
+    mssqlDbServiceObjectiveName=${22}
+    mssqlDbEdition=${23}
+    mssqlDbSize=${24}
+    installObjectFsSwitch=${25}
+    installGdprPluginsSwitch=${26}
+    thumbprintSslCert=${27}
+    thumbprintCaCert=${28}
+    searchType=${29}
+    azureSearchKey=${30}
+    azureSearchNameHost=${31}
 
     echo $moodleVersion        >> /tmp/vars.txt
     echo $glusterNode          >> /tmp/vars.txt
     echo $glusterVolume        >> /tmp/vars.txt
     echo $siteFQDN             >> /tmp/vars.txt
+    echo $httpsTermination     >> /tmp/vars.txt
     echo $dbIP                 >> /tmp/vars.txt
     echo $moodledbname         >> /tmp/vars.txt
     echo $moodledbuser         >> /tmp/vars.txt
@@ -130,13 +132,13 @@
 
     if [ $fileServerType = "gluster" ]; then
         sudo apt-get -y --force-yes install glusterfs-client                 >> /tmp/apt3.log
-    else # "azurefiles"
+    elif [ "$fileServerType" = "azurefiles" ]; then
         sudo apt-get -y --force-yes install cifs-utils                       >> /tmp/apt3.log
     fi
 
     if [ $dbServerType = "mysql" ]; then
         sudo apt-get -y --force-yes install mysql-client >> /tmp/apt3.log
-    else
+    elif [ "$dbServerType" = "postgres" ]; then
         sudo apt-get -y --force-yes install postgresql-client >> /tmp/apt3.log
     fi
 
@@ -326,13 +328,19 @@ http {
   gzip_buffers 16 8k;
   gzip_http_version 1.1;
   gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+EOF
 
+    if [ "$httpsTermination" != "None" ]; then
+        cat <<EOF >> /etc/nginx/nginx.conf
   map \$http_x_forwarded_proto \$fastcgi_https {                                                                                          
     default \$https;                                                                                                                   
     http '';                                                                                                                          
     https on;                                                                                                                         
-  }   
+  }
+EOF
+    fi
 
+    cat <<EOF >> /etc/nginx/nginx.conf
   log_format moodle_combined '\$remote_addr - \$upstream_http_x_moodleuser [\$time_local] '
                              '"\$request" \$status \$body_bytes_sent '
                              '"\$http_referer" "\$http_user_agent"';
@@ -348,7 +356,7 @@ server {
         listen 81 default;
         server_name ${siteFQDN};
         root /moodle/html/moodle;
-	index index.php index.html index.htm;
+        index index.php index.html index.htm;
 
         # Log to syslog
         error_log syslog:server=localhost,facility=local1,severity=error,tag=moodle;
@@ -361,15 +369,18 @@ server {
         set_real_ip_from    192.168.0.0/16;
         real_ip_header      X-Forwarded-For;
         real_ip_recursive   on;
-
-
+EOF
+    if [ "$httpsTermination" != "None" ]; then
+        cat <<EOF >> /etc/nginx/sites-enabled/${siteFQDN}.conf
         # Redirect to https
         if (\$http_x_forwarded_proto != https) {
                 return 301 https://\$server_name\$request_uri;
         }
         rewrite ^/(.*\.php)(/)(.*)$ /\$1?file=/\$3 last;
+EOF
+    fi
 
-
+    cat <<EOF >> /etc/nginx/sites-enabled/${siteFQDN}.conf
         # Filter out php-fpm status page
         location ~ ^/server-status {
             return 404;
@@ -379,26 +390,28 @@ server {
 		try_files \$uri \$uri/index.php?\$query_string;
 	}
  
-        location ~ [^/]\.php(/|$) {
-          fastcgi_split_path_info ^(.+?\.php)(/.*)$;
-          if (!-f \$document_root\$fastcgi_script_name) {
-                  return 404;
-          }
- 
-          fastcgi_buffers 16 16k;
-          fastcgi_buffer_size 32k;
-          fastcgi_param   SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
-          fastcgi_pass unix:/run/php/php7.0-fpm.sock;
-          fastcgi_read_timeout 3600;
-          fastcgi_index index.php;
-          include fastcgi_params;
+    location ~ [^/]\.php(/|$) {
+        fastcgi_split_path_info ^(.+?\.php)(/.*)$;
+        if (!-f \$document_root\$fastcgi_script_name) {
+                return 404;
         }
-}
 
+        fastcgi_buffers 16 16k;
+        fastcgi_buffer_size 32k;
+        fastcgi_param   SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+        fastcgi_pass unix:/run/php/php7.0-fpm.sock;
+        fastcgi_read_timeout 3600;
+        fastcgi_index index.php;
+        include fastcgi_params;
+    }
+}
+EOF
+    if [ "$httpsTermination" = "VMSS" ]; then
+        cat <<EOF >> /etc/nginx/sites-enabled/${siteFQDN}.conf
 server {
         listen 443 ssl;
         root /moodle/html/moodle;
-	index index.php index.html index.htm;
+        index index.php index.html index.htm;
 
         ssl on;
         ssl_certificate /moodle/certs/nginx.crt;
@@ -427,22 +440,25 @@ server {
         }
 }
 EOF
-
-    ### SSL cert ###
-    if [ "$thumbprintSslCert" != "None" ]; then
-        echo "Using VM's cert (/var/lib/waagent/$thumbprintSslCert.*) for SSL..."
-        cat /var/lib/waagent/$thumbprintSslCert.prv > /moodle/certs/nginx.key
-        cat /var/lib/waagent/$thumbprintSslCert.crt > /moodle/certs/nginx.crt
-        if [ "$thumbprintCaCert" != "None" ]; then
-            echo "CA cert was specified (/var/lib/waagent/$thumbprintCaCert.crt), so append it to nginx.crt..."
-            cat /var/lib/waagent/$thumbprintCaCert.crt >> /moodle/certs/nginx.crt
-        fi
-    else
-        echo -e "Generating SSL self-signed certificate"
-        openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /moodle/certs/nginx.key -out /moodle/certs/nginx.crt -subj "/C=BR/ST=SP/L=SaoPaulo/O=IT/CN=$siteFQDN"
     fi
-    chown www-data:www-data /moodle/certs/nginx.*
-    chmod 0400 /moodle/certs/nginx.*
+
+    if [ "$httpsTermination" = "VMSS" ]; then
+        ### SSL cert ###
+        if [ "$thumbprintSslCert" != "None" ]; then
+            echo "Using VM's cert (/var/lib/waagent/$thumbprintSslCert.*) for SSL..."
+            cat /var/lib/waagent/$thumbprintSslCert.prv > /moodle/certs/nginx.key
+            cat /var/lib/waagent/$thumbprintSslCert.crt > /moodle/certs/nginx.crt
+            if [ "$thumbprintCaCert" != "None" ]; then
+                echo "CA cert was specified (/var/lib/waagent/$thumbprintCaCert.crt), so append it to nginx.crt..."
+                cat /var/lib/waagent/$thumbprintCaCert.crt >> /moodle/certs/nginx.crt
+            fi
+        else
+            echo -e "Generating SSL self-signed certificate"
+            openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /moodle/certs/nginx.key -out /moodle/certs/nginx.crt -subj "/C=US/ST=WA/L=Redmond/O=IT/CN=$siteFQDN"
+        fi
+        chown www-data:www-data /moodle/certs/nginx.*
+        chmod 0400 /moodle/certs/nginx.*
+    fi
 
    # php config 
    PhpIni=/etc/php/7.0/fpm/php.ini
@@ -479,7 +495,7 @@ EOF
    rm -f /etc/nginx/sites-enabled/default
 
    # restart Nginx
-    sudo service nginx restart 
+   sudo service nginx restart 
 
    # Configure varnish startup for 16.04
    VARNISHSTART="ExecStart=\/usr\/sbin\/varnishd -j unix,user=vcache -F -a :80 -T localhost:6082 -f \/etc\/varnish\/moodle.vcl -S \/etc\/varnish\/secret -s malloc,1024m -p thread_pool_min=200 -p thread_pool_max=4000 -p thread_pool_add_delay=2 -p timeout_linger=100 -p timeout_idle=30 -p send_timeout=1800 -p thread_pools=4 -p http_max_hdr=512 -p workspace_backend=512k"
@@ -770,9 +786,14 @@ EOF
     service rsyslog restart
 
     # Fire off moodle setup
+    if [ "$httpsTermination" = "None" ]; then
+        siteProtocol="http"
+    else
+        siteProtocol="https"
+    fi
     if [ $dbServerType = "mysql" ]; then
-        echo -e "cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot=https://"$siteFQDN" --dataroot=/moodle/moodledata --dbhost="$mysqlIP" --dbname="$moodledbname" --dbuser="$azuremoodledbuser" --dbpass="$moodledbpass" --dbtype=mysqli --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass="$adminpass" --adminemail=admin@"$siteFQDN" --non-interactive --agree-license --allow-unstable || true "
-        cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot=https://$siteFQDN   --dataroot=/moodle/moodledata --dbhost=$mysqlIP   --dbname=$moodledbname   --dbuser=$azuremoodledbuser   --dbpass=$moodledbpass   --dbtype=mysqli --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass=$adminpass   --adminemail=admin@$siteFQDN   --non-interactive --agree-license --allow-unstable || true
+        echo -e "cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot="$siteProtocol"://"$siteFQDN" --dataroot=/moodle/moodledata --dbhost="$mysqlIP" --dbname="$moodledbname" --dbuser="$azuremoodledbuser" --dbpass="$moodledbpass" --dbtype=mysqli --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass="$adminpass" --adminemail=admin@"$siteFQDN" --non-interactive --agree-license --allow-unstable || true "
+        cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot=$siteProtocol://$siteFQDN   --dataroot=/moodle/moodledata --dbhost=$mysqlIP   --dbname=$moodledbname   --dbuser=$azuremoodledbuser   --dbpass=$moodledbpass   --dbtype=mysqli --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass=$adminpass   --adminemail=admin@$siteFQDN   --non-interactive --agree-license --allow-unstable || true
 
         if [ "$installObjectFsSwitch" = "True" ]; then
             mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'enabletasks', 1);" 
@@ -782,7 +803,7 @@ EOF
             mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_sastoken', '${sas}');"
         fi
     elif [ $dbServerType = "mssql" ]; then
-        cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot=https://$siteFQDN   --dataroot=/moodle/moodledata --dbhost=$mssqlIP   --dbname=$moodledbname   --dbuser=$azuremoodledbuser   --dbpass=$moodledbpass   --dbtype=sqlsrv --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass=$adminpass   --adminemail=admin@$siteFQDN   --non-interactive --agree-license --allow-unstable || true
+        cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot=$siteProtocol://$siteFQDN   --dataroot=/moodle/moodledata --dbhost=$mssqlIP   --dbname=$moodledbname   --dbuser=$azuremoodledbuser   --dbpass=$moodledbpass   --dbtype=sqlsrv --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass=$adminpass   --adminemail=admin@$siteFQDN   --non-interactive --agree-license --allow-unstable || true
 
         if [ "$installObjectFsSwitch" = "True" ]; then
             /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d ${moodledbname} -Q "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'enabletasks', 1)" 
@@ -792,8 +813,8 @@ EOF
             /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d${moodledbname} -Q "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_sastoken', '${sas}')"
         fi
     else
-        echo -e "cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot=https://"$siteFQDN" --dataroot=/moodle/moodledata --dbhost="$postgresIP" --dbname="$moodledbname" --dbuser="$azuremoodledbuser" --dbpass="$moodledbpass" --dbtype=pgsql --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass="$adminpass" --adminemail=admin@"$siteFQDN" --non-interactive --agree-license --allow-unstable || true "
-        cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot=https://$siteFQDN   --dataroot=/moodle/moodledata --dbhost=$postgresIP   --dbname=$moodledbname   --dbuser=$azuremoodledbuser   --dbpass=$moodledbpass   --dbtype=pgsql --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass=$adminpass   --adminemail=admin@$siteFQDN   --non-interactive --agree-license --allow-unstable || true
+        echo -e "cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot="$siteProtocol"://"$siteFQDN" --dataroot=/moodle/moodledata --dbhost="$postgresIP" --dbname="$moodledbname" --dbuser="$azuremoodledbuser" --dbpass="$moodledbpass" --dbtype=pgsql --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass="$adminpass" --adminemail=admin@"$siteFQDN" --non-interactive --agree-license --allow-unstable || true "
+        cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot=$siteProtocol://$siteFQDN   --dataroot=/moodle/moodledata --dbhost=$postgresIP   --dbname=$moodledbname   --dbuser=$azuremoodledbuser   --dbpass=$moodledbpass   --dbtype=pgsql --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass=$adminpass   --adminemail=admin@$siteFQDN   --non-interactive --agree-license --allow-unstable || true
 
         if [ "$installObjectFsSwitch" = "True" ]; then
             # Add the ObjectFS configuration to Moodle.
@@ -823,8 +844,10 @@ EOF
         sed -i "23 a \$CFG->session_handler_class = '\\\core\\\session\\\redis';" /moodle/html/moodle/config.php
     fi
 
-    # We proxy ssl, so moodle needs to know this
-    sed -i "23 a \$CFG->sslproxy  = 'true';" /moodle/html/moodle/config.php
+    if [ "$httpsTermination" != "None" ]; then
+        # We proxy ssl, so moodle needs to know this
+        sed -i "23 a \$CFG->sslproxy  = 'true';" /moodle/html/moodle/config.php
+    fi
 
     if [ "$searchType" = "elastic" ]; then
         # Set up elasticsearch plugin
