@@ -41,24 +41,32 @@
                         }
                     },
                     {
-                        "name": "[parameters('moodleCommon').subnetElastic]",
-                        "properties": {
-                            "addressPrefix": "[parameters('moodleCommon').subnetElasticRange]"
-                        }
-                    },
-                    {
-                        "name": "[parameters('moodleCommon').subnetTika]",
-                        "properties": {
-                            "addressPrefix": "[if(equals(parameters('moodleCommon').tikaService, 'tika'), parameters('moodleCommon').subnetTikaRange, json('null'))]"
-                        }
-                    },
-                    {
                         "name": "[parameters('moodleCommon').gatewaySubnet]",
                         "properties": {
                             "addressPrefix": "[parameters('moodleCommon').gatewaySubnetRange]"
                         }
                     }
                 ]
+            }
+        },
+        {
+            "condition": "[not(equals(parameters('moodleCommon').searchType, 'none'))]",
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2017-10-01",
+            "location": "[resourceGroup().location]",
+            "name": "[parameters('moodleCommon').subnetElastic]",
+            "properties": {
+                "addressPrefix": "[parameters('moodleCommon').subnetElasticRange]"
+            }
+        },
+        {
+            "condition": "[and(equals(parameters('moodleCommon').tikaService, 'tika'), not(equals(parameters('moodleCommon').searchType, 'none')))]",
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2017-10-01",
+            "location": "[resourceGroup().location]",
+            "name": "[parameters('moodleCommon').subnetTika]",
+            "properties": {
+                "addressPrefix": "[parameters('moodleCommon').subnetTikaRange]"
             }
         },
         {

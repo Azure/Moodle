@@ -635,7 +635,7 @@
             }
         },
         {
-            "condition": "[and(equals(parameters('tikaService'), 'tika'), equals(not(equals(parameters('searchType'), 'none'))))]",
+            "condition": "[and(equals(parameters('tikaService'), 'tika'), not(equals(parameters('searchType'), 'none')))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
             "dependsOn": [
