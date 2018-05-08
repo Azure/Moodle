@@ -75,11 +75,12 @@
         "httpsTermination": {
             "allowedValues": [
                 "VMSS",
+                "AppGw",
                 "None"
             ],
             "defaultValue": "VMSS",
             "metadata": {
-                "description": "Indicates where https termination occurs. 'VMSS' is for https termination at the VMSS instance VMs (using nginx https proxy). 'None' is for testing only with no https. 'None' may not be used with a separately configured https termination layer. If you want to use the 'None' option with your separately configured https termination layer, you'll need to update your Moodle config.php manually for $cfg->wwwroot and $cfg->sslproxy."
+                "description": "Indicates where https termination occurs. 'VMSS' is for https termination at the VMSS instance VMs (using nginx https proxy). 'AppGw' is for https termination with an Azure Application Gateway. When selecting this, you need to specify all appGw* parameters. 'None' is for testing only with no https. 'None' may not be used with a separately configured https termination layer. If you want to use the 'None' option with your separately configured https termination layer, you'll need to update your Moodle config.php manually for $cfg->wwwroot and $cfg->sslproxy."
             },
             "type": "string"
         },
@@ -353,35 +354,49 @@
         "keyVaultResourceId": {
             "defaultValue": "",
             "metadata": {
-                "description": "Azure Resource Manager resource ID of the Key Vault in case you stored your SSL cert in an Azure Key Vault (Note that this Key Vault must have been pre-created on the same Azure region where this template is being deployed). Leave this blank if you didn't. Resource ID example: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/xxx/providers/Microsoft.KeyVault/vaults/yyy. This value can be obtained from keyvault.sh output if you used the script to store your SSL cert in your Key Vault."
+                "description": "(VMSS https termination only) Azure Resource Manager resource ID of the Key Vault in case you stored your SSL cert in an Azure Key Vault (Note that this Key Vault must have been pre-created on the same Azure region where this template is being deployed). Leave this blank if you didn't. Resource ID example: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/xxx/providers/Microsoft.KeyVault/vaults/yyy. This value can be obtained from keyvault.sh output if you used the script to store your SSL cert in your Key Vault."
             },
             "type": "string"
         },
         "sslCertKeyVaultURL": {
             "defaultValue": "",
             "metadata": {
-                "description": "Azure Key Vault URL for your stored SSL cert. This value can be obtained from keyvault.sh output if you used the script to store your SSL cert in your Key Vault. This parameter is ignored if the keyVaultResourceId parameter is blank."
+                "description": "(VMSS https termination only) Azure Key Vault URL for your stored SSL cert. This value can be obtained from keyvault.sh output if you used the script to store your SSL cert in your Key Vault. This parameter is ignored if the keyVaultResourceId parameter is blank."
             },
             "type": "string"
         },
         "sslCertThumbprint": {
             "defaultValue": "",
             "metadata": {
-                "description": "Thumbprint of your stored SSL cert. This value can be obtained from keyvault.sh output if you used the script to store your SSL cert in your Key Vault. This parameter is ignored if the keyVaultResourceId parameter is blank."
+                "description": "(VMSS https termination only) Thumbprint of your stored SSL cert. This value can be obtained from keyvault.sh output if you used the script to store your SSL cert in your Key Vault. This parameter is ignored if the keyVaultResourceId parameter is blank."
             },
             "type": "string"
         },
         "caCertKeyVaultURL": {
             "defaultValue": "",
             "metadata": {
-                "description": "Azure Key Vault URL for your stored CA (Certificate Authority) cert. This value can be obtained from keyvault.sh output if you used the script to store your CA cert in your Key Vault. This parameter is ignored if the keyVaultResourceId parameter is blank."
+                "description": "(VMSS https termination only) Azure Key Vault URL for your stored CA (Certificate Authority) cert. This value can be obtained from keyvault.sh output if you used the script to store your CA cert in your Key Vault. This parameter is ignored if the keyVaultResourceId parameter is blank."
             },
             "type": "string"
         },
         "caCertThumbprint": {
             "defaultValue": "",
             "metadata": {
-                "description": "Thumbprint of your stored CA cert. This value can be obtained from keyvault.sh output if you used the script to store your CA cert in your Key Vault. This parameter is ignored if the keyVaultResourceId parameter is blank."
+                "description": "(VMSS https termination only) Thumbprint of your stored CA cert. This value can be obtained from keyvault.sh output if you used the script to store your CA cert in your Key Vault. This parameter is ignored if the keyVaultResourceId parameter is blank."
+            },
+            "type": "string"
+        },
+        "appGwSslCertKeyVaultResourceId": {
+            "defaultValue": "",
+            "metadata": {
+                "description": "(App Gateway https termination only) Azure Key Vault URL for your stored SSL cert, again for App Gateway https termination case only. (Note that this Key Vault must have been pre-created on the same Azure region where this template is being deployed). Leave this blank if you didn't. Resource ID example: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/xxx/providers/Microsoft.KeyVault/vaults/yyy."
+            },
+            "type": "string"
+        },
+        "appGwSslCertKeyVaultSecretName": {
+            "defaultValue": "",
+            "metadata": {
+                "description": "(App Gateway https termination only) Name of the Azure Key Vault secret that's stored in the previously specified Key Vault as a PFX certificate (with no password) for your site's SSL cert. This secret must be pre-populated in the specified Key Vault with the matching name."
             },
             "type": "string"
         },
@@ -808,6 +823,10 @@
             "scriptLocation": "[concat(parameters('_artifactsLocation'), 'scripts/')]",
             "artifactsSasToken": "[parameters('_artifactsLocationSasToken')]",
 
+            "appGwBePoolName": "[concat('appgw-bepool-', variables('resourceprefix'))]",
+            "appGwName": "[concat('appgw-', variables('resourceprefix'))]",
+            "appGwSslCertKeyVaultResourceId": "[parameters('appGwSslCertKeyVaultResourceId')]",
+            "appGwSslCertKeyVaultSecretName": "[parameters('appGwSslCertKeyVaultSecretName')]",
             "applyScriptsSwitch": "[parameters('applyScriptsSwitch')]",
             "autoscaleVmCount": "[parameters('autoscaleVmCount')]",
             "autoscaleVmSku": "[parameters('autoscaleVmSku')]",
@@ -907,6 +926,9 @@
             "sslEnforcement": "[parameters('sslEnforcement')]",
             "storageAccountName": "[tolower(concat('abs',variables('resourceprefix')))]",
             "storageAccountType": "[parameters('storageAccountType')]",
+            "subnetAppGw": "[concat('appgw-subnet-',variables('resourceprefix'))]",
+            "subnetAppGwPrefix": "[concat(variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),6)))]",
+            "subnetAppGwRange": "[concat(variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),6)), '.0/24')]",
             "subnetElastic": "[concat('elastic-subnet-',variables('resourceprefix'))]",
             "subnetElasticPrefix": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),4)))]",
             "subnetElasticRange": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),4)), '.0/24')]",

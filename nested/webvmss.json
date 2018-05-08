@@ -65,11 +65,8 @@
                                         {
                                             "name": "ipcfg_lb",
                                             "properties": {
-                                                "loadBalancerBackendAddressPools": [
-                                                    {
-                                                        "id": "[variables('extBeID')]"
-                                                    }
-                                                ],
+                                                "loadBalancerBackendAddressPools": "[take(variables('lbBePoolArray'), variables('lbBePoolArrayTakeCount'))]",
+                                                "applicationGatewayBackendAddressPools": "[take(variables('appGwBePoolArray'), variables('appGwBePoolArrayTakeCount'))]",
                                                 "subnet": {
                                                     "id": "[variables('subnetWebRef')]"
                                                 }
@@ -193,7 +190,23 @@
         "subnetWebRef": "[concat(resourceId('Microsoft.Network/virtualNetworks',parameters('moodleCommon').vnetName),'/subnets/',parameters('moodleCommon').subnetWeb)]",
         "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('moodleCommon').storageAccountName)]",
         "vmssID": "[resourceId('Microsoft.Compute/virtualMachineScaleSets',parameters('moodleCommon').vmssName)]",
-        "webvmss1NIC": "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('moodleCommon').vmssName, '/virtualMachines/0/networkInterfaces/vmssnic')]"
+        "webvmss1NIC": "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('moodleCommon').vmssName, '/virtualMachines/0/networkInterfaces/vmssnic')]",
+        "appGwName": "[parameters('moodleCommon').appGwName]",
+        "appGwID": "[resourceId('Microsoft.Network/applicationGateways',variables('appGwName'))]",
+        "appGwBePoolName": "[parameters('moodleCommon').appGwBePoolName]",
+        "appGwBePoolId": "[concat(variables('appGwID'), '/backendAddressPools/', variables('appGwBePoolName'))]",
+        "lbBePoolArray": [
+            {
+                "id": "[variables('extBeID')]"
+            }
+        ],
+        "lbBePoolArrayTakeCount": "[if(equals(parameters('moodleCommon').httpsTermination, 'AppGw'), 0, 1)]",
+        "appGwBePoolArray": [
+            {
+                "id": "[variables('appGwBePoolId')]"
+            }
+        ],
+        "appGwBePoolArrayTakeCount": "[if(equals(parameters('moodleCommon').httpsTermination, 'AppGw'), 1, 0)]"
     },
     "outputs": {
         "webvm1IP": {

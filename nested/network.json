@@ -57,6 +57,12 @@
                         "properties": {
                             "addressPrefix": "[parameters('moodleCommon').gatewaySubnetRange]"
                         }
+                    },
+                    {
+                        "name": "[parameters('moodleCommon').subnetAppGw]",
+                        "properties": {
+                            "addressPrefix": "[parameters('moodleCommon').subnetAppGwRange]"
+                        }
                     }
                 ]
             }
@@ -153,6 +159,7 @@
             }
         },
         {
+            "condition": "[not(equals(parameters('moodleCommon').httpsTermination, 'AppGw'))]",
             "type": "Microsoft.Network/loadBalancers",
             "apiVersion": "2017-10-01",
             "dependsOn": [
@@ -227,6 +234,35 @@
                         }
                     }
                 ]
+            }
+        },
+        {
+            "condition": "[equals(parameters('moodleCommon').httpsTermination, 'AppGw')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('moodleCommon').vnetName)]",
+                "[concat('Microsoft.Network/publicIPAddresses/',parameters('moodleCommon').lbPipName)]"
+            ],
+            "name": "appGwTemplate",
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {
+                    "moodleCommon": {
+                        "value": "[parameters('moodleCommon')]"
+                    },
+                    "sslCertData": {
+                        "reference": {
+                            "keyVault": {
+                                "id": "[parameters('moodleCommon').appGwSslCertKeyVaultResourceId]"
+                            },
+                            "secretName": "[parameters('moodleCommon').appGwSslCertKeyVaultSecretName]"
+                        }
+                    }
+                },
+                "templateLink": {
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'appgw.json',parameters('moodleCommon').artifactsSasToken)]"
+                }
             }
         }
     ],
