@@ -927,7 +927,7 @@
             "tikaNicName": "[concat('tika-vm-nic-',variables('resourceprefix'))]",
             "tikaScriptFilename": "install_tika.sh",
             "tikaService": "[parameters('tikaService')]",
-            "tikaVmIP": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),5)), '.20')]",
+            "tikaVmIP": "[if(equals(parameters('tikaService'), 'tika'), concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),5)), '.20'), 'none')]",
             "tikaVmName": "[concat('tika-vm-',variables('resourceprefix'))]",
             "tikaVmSku": "[parameters('tikaVmSku')]",
             "vNetAddressSpace": "[parameters('vNetAddressSpace')]",
