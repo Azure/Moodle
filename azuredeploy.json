@@ -825,6 +825,7 @@
 
             "appGwBePoolName": "[concat('appgw-bepool-', variables('resourceprefix'))]",
             "appGwName": "[concat('appgw-', variables('resourceprefix'))]",
+            "appGwPipName": "[concat('appgw-pubip-',variables('resourceprefix'))]",
             "appGwSslCertKeyVaultResourceId": "[parameters('appGwSslCertKeyVaultResourceId')]",
             "appGwSslCertKeyVaultSecretName": "[parameters('appGwSslCertKeyVaultSecretName')]",
             "applyScriptsSwitch": "[parameters('applyScriptsSwitch')]",

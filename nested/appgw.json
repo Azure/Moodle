@@ -120,7 +120,7 @@
         "virtualNetworkName": "[parameters('moodleCommon').vnetName]",
         "virtualNetworkID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
         "appGwBePoolName": "[parameters('moodleCommon').appGwBePoolName]",
-        "appGwPublicIPAddressID": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('moodleCommon').lbPipName)]",
+        "appGwPublicIPAddressID": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('moodleCommon').appGwPipName)]",
         "appGwSubnetName": "[parameters('moodleCommon').subnetAppGw]",
         "appGwSubnetID": "[concat(variables('virtualNetworkID'),'/subnets/',variables('appGwSubnetName'))]",
         "appGwName": "[parameters('moodleCommon').appGwName]",

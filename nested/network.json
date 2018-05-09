@@ -129,6 +129,7 @@
             }
         },
         {
+            "condition": "[not(equals(parameters('moodleCommon').httpsTermination, 'AppGw'))]",
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2017-10-01",
             "location": "[resourceGroup().location]",
@@ -141,6 +142,22 @@
             },
             "tags": {
                 "displayName": "Load Balancer Public IP"
+            }
+        },
+        {
+            "condition": "[equals(parameters('moodleCommon').httpsTermination, 'AppGw')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2017-10-01",
+            "location": "[resourceGroup().location]",
+            "name": "[parameters('moodleCommon').appGwPipName]",
+            "properties": {
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('moodleCommon').appGwName]"
+                },
+                "publicIPAllocationMethod": "Dynamic"
+            },
+            "tags": {
+                "displayName": "App Gateway Public IP (must be dynamic)"
             }
         },
         {
@@ -290,7 +307,7 @@
     },
     "outputs": {
         "lbPubIp": {
-            "value": "[reference(parameters('moodleCommon').lbPipName, '2017-10-01').ipAddress]",
+            "value": "[if(equals(parameters('moodleCommon').httpsTermination, 'AppGw'), '0.0.0.0', reference(parameters('moodleCommon').lbPipName, '2017-10-01').ipAddress)]",
             "type": "string"
         },
         "ctlrPubIp": {
