@@ -34,3 +34,7 @@ script:
 
 after_script: # Teardown group and created resource after build.
   - test -n "$SPNAME" -a -n "$SPPASSWORD" -a -n "$SPTENANT" && az login --service-principal -u "$SPNAME" -p "$SPPASSWORD" --tenant "$SPTENANT" && az group delete -g azmdl-travis-$TRAVIS_BUILD_NUMBER -y --no-wait
+
+notifications:
+
+webhooks: https://outlook.office.com/webhook/e75ee820-3466-49a6-bb0f-ecae0daf8fe1@72f988bf-86f1-41af-91ab-2d7cd011db47/TravisCI/00abc9d7ce1044818f216da49d30d54d/a38fc8f6-fb60-4169-bde6-dd2bbf01304f
