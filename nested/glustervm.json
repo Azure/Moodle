@@ -13,6 +13,12 @@
                 "description": "Common Moodle values"
             },
             "type": "object"
+        },
+        "subnetIdSan": {
+            "metadata": {
+                "description": "Azure resource ID of the subnet where this gluster cluster is to be deployed"
+            },
+            "type": "string"
         }
     },
     "resources": [
@@ -28,7 +34,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                                "id": "[variables('subnetSanRef')]"
+                                "id": "[parameters('subnetIdSan')]"
                             }
                         }
                     }
@@ -172,7 +178,6 @@
         "documentation20": " fileServerDiskSize         - Size per disk for gluster",
         "nicName": "[concat(variables('vmName'),'-nic')]",
         "nicRef": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]",
-        "subnetSanRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('moodleCommon').vnetName, parameters('moodleCommon').subnetSan)]",
         "vmName": "[concat(parameters('moodleCommon').gfsNameRoot,parameters('counter'))]"
     }
 }

@@ -8,6 +8,12 @@
             },
             "type": "object"
         },
+        "subnetIdWeb": {
+            "metadata": {
+                "description": "Azure resource ID of the subnet where this VM is to be deployed"
+            },
+            "type": "string"
+        },
         "ctlrPubIpId": {
             "metadata": {
                 "description": "Resource ID of the controller VM public IP address"
@@ -88,7 +94,7 @@
                                 "id": "[parameters('ctlrPubIpId')]"
                             },
                             "subnet": {
-                                "id": "[variables('subnetWebRef')]"
+                                "id": "[parameters('subnetIdWeb')]"
                             }
                         }
                     }
@@ -212,7 +218,6 @@
         "documentation18": "    recoveryservicesEnlist - conditionally enlists the VM into the backup regimen",
         "nicRef": "[resourceId('Microsoft.Network/networkInterfaces', parameters('moodleCommon').ctlrNicName)]",
         "nsgRef": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('moodleCommon').ctlrNsgName)]",
-        "subnetWebRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('moodleCommon').vnetName, parameters('moodleCommon').subnetWeb)]",
         "copy": [
             {
                 "name": "nfsDiskArray",

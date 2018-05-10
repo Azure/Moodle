@@ -8,6 +8,12 @@
             },
             "type": "object"
         },
+        "subnetIdAppGw": {
+            "metadata": {
+                "description": "Azure resource ID of the subnet where this App Gw should be deployed"
+            },
+            "type": "string"
+        },
         "sslCertData": {
             "metadata": {
                 "description": "Base64-encoded PFX (no password protected) file content for the SSL cert to be used on the App Gateway for SSL termination. Should be passed from an Azure Key Vault."
@@ -32,7 +38,7 @@
                         "name": "appGwIpConfig",
                         "properties": {
                             "subnet": {
-                                "id": "[variables('appGwSubnetID')]"
+                                "id": "[parameters('subnetIdAppGw')]"
                             }
                         }
                     }
@@ -117,13 +123,8 @@
     ],
     "variables": {
         "documentation1": "This sub-template creates an Azure Application Gateway for SSL offloading. It expects certain values in the 'common' datastructure.",
-        "virtualNetworkName": "[parameters('moodleCommon').vnetName]",
-        "virtualNetworkID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
         "appGwBePoolName": "[parameters('moodleCommon').appGwBePoolName]",
         "appGwPublicIPAddressID": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('moodleCommon').appGwPipName)]",
-        "appGwSubnetName": "[parameters('moodleCommon').subnetAppGw]",
-        "appGwSubnetID": "[concat(variables('virtualNetworkID'),'/subnets/',variables('appGwSubnetName'))]",
-        "appGwName": "[parameters('moodleCommon').appGwName]",
-        "appGwID": "[resourceId('Microsoft.Network/applicationGateways',variables('appGwName'))]"
+        "appGwID": "[resourceId('Microsoft.Network/applicationGateways', parameters('moodleCommon').appGwName)]"
     }
 }

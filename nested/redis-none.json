@@ -7,6 +7,12 @@
                 "description": "Common Moodle values"
             },
             "type": "object"
+        },
+        "subnetIdRedis": {
+            "metadata": {
+                "description": "Azure resource ID of the subnet where this Redis instance is to be deployed"
+            },
+            "type": "string"
         }
     },
     "resources": [

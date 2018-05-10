@@ -7,6 +7,12 @@
                 "description": "Common Moodle values"
             },
             "type": "object"
+        },
+        "subnetIdSan": {
+            "metadata": {
+                "description": "Azure resource ID of the subnet where this gluster cluster is to be deployed"
+            },
+            "type": "string"
         }
     },
     "resources": [
@@ -45,6 +51,9 @@
                     },
                     "moodleCommon": {
                         "value": "[parameters('moodleCommon')]"
+                    },
+                    "subnetIdSan": {
+                        "value": "[parameters('subnetIdSan')]"
                     }
                 },
                 "templateLink": {

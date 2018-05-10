@@ -7,6 +7,12 @@
                 "description": "Common Moodle values"
             },
             "type": "object"
+        },
+        "subnetIdWeb": {
+            "metadata": {
+                "description": "Azure resource ID of the subnet where this VMSS is to be deployed"
+            },
+            "type": "string"
         }
     },
     "resources": [
@@ -68,7 +74,7 @@
                                                 "loadBalancerBackendAddressPools": "[take(variables('lbBePoolArray'), variables('lbBePoolArrayTakeCount'))]",
                                                 "applicationGatewayBackendAddressPools": "[take(variables('appGwBePoolArray'), variables('appGwBePoolArrayTakeCount'))]",
                                                 "subnet": {
-                                                    "id": "[variables('subnetWebRef')]"
+                                                    "id": "[parameters('subnetIdWeb')]"
                                                 }
                                             }
                                         }
@@ -187,14 +193,11 @@
         "extProbeID": "[concat(variables('extLbID'),'/probes/',parameters('moodleCommon').extProbe  )]",
         "pipID": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('moodleCommon').lbPipName)]",
         "scriptUri": "[concat(parameters('moodleCommon').scriptLocation,parameters('moodleCommon').webServerSetupScriptFilename,parameters('moodleCommon').artifactsSasToken)]",
-        "subnetWebRef": "[concat(resourceId('Microsoft.Network/virtualNetworks',parameters('moodleCommon').vnetName),'/subnets/',parameters('moodleCommon').subnetWeb)]",
         "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('moodleCommon').storageAccountName)]",
         "vmssID": "[resourceId('Microsoft.Compute/virtualMachineScaleSets',parameters('moodleCommon').vmssName)]",
         "webvmss1NIC": "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('moodleCommon').vmssName, '/virtualMachines/0/networkInterfaces/vmssnic')]",
-        "appGwName": "[parameters('moodleCommon').appGwName]",
-        "appGwID": "[resourceId('Microsoft.Network/applicationGateways',variables('appGwName'))]",
-        "appGwBePoolName": "[parameters('moodleCommon').appGwBePoolName]",
-        "appGwBePoolId": "[concat(variables('appGwID'), '/backendAddressPools/', variables('appGwBePoolName'))]",
+        "appGwID": "[resourceId('Microsoft.Network/applicationGateways', parameters('moodleCommon').appGwName)]",
+        "appGwBePoolId": "[concat(variables('appGwID'), '/backendAddressPools/', parameters('moodleCommon').appGwBePoolName)]",
         "lbBePoolArray": [
             {
                 "id": "[variables('extBeID')]"

@@ -7,6 +7,12 @@
                 "description": "Common Moodle values"
             },
             "type": "object"
+        },
+        "subnetIdElastic": {
+            "metadata": {
+                "description": "Azure resource ID of the subnet where the Elastic Search VMs are to be deployed (if any)"
+            },
+            "type": "string"
         }
     },
     "resources": [

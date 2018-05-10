@@ -7,6 +7,12 @@
                 "description": "Common Moodle values"
             },
             "type": "object"
+        },
+        "subnetIdElastic": {
+            "metadata": {
+                "description": "Azure resource ID of the subnet where the Elastic Search VMs are to be deployed (if any)"
+            },
+            "type": "string"
         }
     },
     "resources": [
@@ -23,7 +29,7 @@
                             "privateIPAllocationMethod": "Static",
                             "privateIPAddress": "[parameters('moodleCommon').elasticVm1IP]",
                             "subnet": {
-                                "id": "[variables('subnetElasticRef')]"
+                                "id": "[parameters('subnetIdElastic')]"
                             }
                         }
                     }
@@ -140,7 +146,7 @@
                             "privateIPAllocationMethod": "Static",
                             "privateIPAddress": "[parameters('moodleCommon').elasticVm2IP]",
                             "subnet": {
-                                "id": "[variables('subnetElasticRef')]"
+                                "id": "[parameters('subnetIdElastic')]"
                             }
                         }
                     }
@@ -257,7 +263,7 @@
                             "privateIPAllocationMethod": "Static",
                             "privateIPAddress": "[parameters('moodleCommon').elasticVm3IP]",
                             "subnet": {
-                                "id": "[variables('subnetElasticRef')]"
+                                "id": "[parameters('subnetIdElastic')]"
                             }
                         }
                     }
@@ -381,7 +387,6 @@
         "documentation17": "    recoveryservicesEnlist - conditionally enlists the VM into the backup regimen",
         "nicRef1": "[resourceId('Microsoft.Network/networkInterfaces', parameters('moodleCommon').elasticNicName1)]",
         "nicRef2": "[resourceId('Microsoft.Network/networkInterfaces', parameters('moodleCommon').elasticNicName2)]",
-        "nicRef3": "[resourceId('Microsoft.Network/networkInterfaces', parameters('moodleCommon').elasticNicName3)]",
-        "subnetElasticRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('moodleCommon').vnetName, parameters('moodleCommon').subnetElastic)]"
+        "nicRef3": "[resourceId('Microsoft.Network/networkInterfaces', parameters('moodleCommon').elasticNicName3)]"
     }
 }

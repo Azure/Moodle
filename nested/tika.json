@@ -7,6 +7,12 @@
                 "description": "Common Moodle values"
             },
             "type": "object"
+        },
+        "subnetIdTika": {
+            "metadata": {
+                "description": "Azure resource ID of the subnet where this Tika VM is to be deployed"
+            },
+            "type": "string"
         }
     },
     "resources": [
@@ -23,7 +29,7 @@
                             "privateIPAllocationMethod": "Static",
                             "privateIPAddress": "[parameters('moodleCommon').tikaVmIP]",
                             "subnet": {
-                                "id": "[variables('subnetTikaRef')]"
+                                "id": "[parameters('subnetIdTika')]"
                             }
                         }
                     }
@@ -139,7 +145,6 @@
         "documentation15": "This sub-template calls other sub-templates",
         "documentation16": "    tikaconfig             - conditionally applies post-deployment script on the VM",
         "documentation17": "    recoveryservicesEnlist - conditionally enlists the VM into the backup regimen",
-        "nicRef": "[resourceId('Microsoft.Network/networkInterfaces', parameters('moodleCommon').tikaNicName)]",
-        "subnetTikaRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('moodleCommon').vnetName, parameters('moodleCommon').subnetTika)]"
+        "nicRef": "[resourceId('Microsoft.Network/networkInterfaces', parameters('moodleCommon').tikaNicName)]"
     }
 }

@@ -532,10 +532,17 @@
             },
             "type": "string"
         },
+        "customVnetId": {
+            "defaultValue": "",
+            "metadata": {
+                "description": "Azure Resource ID of the Azure virtual network where you want to deploy your Moodle resources. A vnet resource ID is of the following format: /subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxxxxxx/resourceGroups/gggg/providers/Microsoft.Network/virtualNetworks/vvvv. Note that this virtual network must be on the same Azure location as this template deployment location. If this parameter is blank, a new Azure virtual network will be created and used. In that case, the address space of the newly created virtual network will be */16 of the following vNetAddressSpace parameter value below."
+            },
+            "type": "string"
+        },
         "vNetAddressSpace": {
             "defaultValue": "172.31.0.0",
             "metadata": {
-                "description": "Address range for the Moodle virtual network - presumed /16 - further subneting during vnet creation"
+                "description": "Address range for the Moodle virtual network and various subnets - presumed /16 for a newly created vnet in case customVnetId is blank. Further subneting (a number of */24 subnets starting from the xxx.yyy.zzz.0/24 will be created on a newly created vnet or your BYO-vnet (specified in customVnetId parameter)."
             },
             "type": "string"
         },
@@ -630,6 +637,9 @@
                 "parameters": {
                     "moodleCommon": {
                         "value": "[variables('moodleCommon')]"
+                    },
+                    "subnetIdRedis": {
+                        "value": "[reference('networkTemplate').outputs.subnetIdRedis.value]"
                     }
                 },
                 "templateLink": {
@@ -666,6 +676,9 @@
                 "parameters": {
                     "moodleCommon": {
                         "value": "[variables('moodleCommon')]"
+                    },
+                    "subnetIdElastic": {
+                        "value": "[reference('networkTemplate').outputs.subnetIdElastic.value]"
                     }
                 },
                 "templateLink": {
@@ -687,6 +700,9 @@
                 "parameters": {
                     "moodleCommon": {
                         "value": "[variables('moodleCommon')]"
+                    },
+                    "subnetIdTika": {
+                        "value": "[reference('networkTemplate').outputs.subnetIdTika.value]"
                     }
                 },
                 "templateLink": {
@@ -708,6 +724,9 @@
                 "parameters": {
                     "moodleCommon": {
                         "value": "[variables('moodleCommon')]"
+                    },
+                    "subnetIdSan": {
+                        "value": "[reference('networkTemplate').outputs.subnetIdSan.value]"
                     }
                 },
                 "templateLink": {
@@ -733,6 +752,9 @@
                 "parameters": {
                     "moodleCommon": {
                         "value": "[variables('moodleCommon')]"
+                    },
+                    "subnetIdWeb": {
+                        "value": "[reference('networkTemplate').outputs.subnetIdWeb.value]"
                     },
                     "ctlrPubIpId": {
                         "value": "[reference('networkTemplate').outputs.ctlrPubIpId.value]"
@@ -764,6 +786,9 @@
                 "parameters": {
                     "moodleCommon": {
                         "value": "[variables('moodleCommon')]"
+                    },
+                    "subnetIdWeb": {
+                        "value": "[reference('networkTemplate').outputs.subnetIdWeb.value]"
                     }
                 },
                 "templateLink": {
@@ -867,6 +892,7 @@
             "azureSearchSku": "[parameters('azureSearchSku')]",
             "commonFunctionsScriptUri": "[concat(parameters('_artifactsLocation'),'scripts/helper_functions.sh',parameters('_artifactsLocationSasToken'))]",
             "controllerVmSku": "[parameters('controllerVmSku')]",
+            "customVnetId": "[parameters('customVnetId')]",
             "dbLogin": "[parameters('dbLogin')]",
             "dbLoginPassword": "[concat(substring(uniqueString(resourceGroup().id, deployment().name), 2, 11), '*7', toUpper('pfiwb'))]",
             "dbServerType": "[parameters('dbServerType')]",
