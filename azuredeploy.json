@@ -400,6 +400,40 @@
             },
             "type": "string"
         },
+        "appGwSkuName": {
+            "defaultValue": "Standard_Medium",
+            "allowedValues": [
+                "Standard_Small",
+                "Standard_Medium",
+                "Standard_Large",
+                "WAF_Medium",
+                "WAF_Large"
+            ],
+            "metadata": {
+                "description": "(App Gateway https termination only) Name of the Applicate Gateway SKU"
+            },
+            "type": "string"
+        },
+        "appGwSkuTier": {
+            "defaultValue": "Standard",
+            "allowedValues": [
+                "Standard",
+                "WAF"
+            ],
+            "metadata": {
+                "description": "(App Gateway https termination only) Tier of the Applicate Gateway"
+            },
+            "type": "string"
+        },
+        "appGwSkuCapacity": {
+            "defaultValue": 2,
+            "maxValue": 10,
+            "minValue": 2,
+            "metadata": {
+                "description": "(App Gateway https termination only) Capacity instance count) of the Applicate Gateway"
+            },
+            "type": "int"
+        },
         "storageAccountType": {
             "defaultValue": "Standard_LRS",
             "allowedValues": [
@@ -828,6 +862,9 @@
             "appGwPipName": "[concat('appgw-pubip-',variables('resourceprefix'))]",
             "appGwSslCertKeyVaultResourceId": "[parameters('appGwSslCertKeyVaultResourceId')]",
             "appGwSslCertKeyVaultSecretName": "[parameters('appGwSslCertKeyVaultSecretName')]",
+            "appGwSkuCapacity": "[parameters('appGwSkuCapacity')]",
+            "appGwSkuName": "[parameters('appGwSkuName')]",
+            "appGwSkuTier": "[parameters('appGwSkuTier')]",
             "applyScriptsSwitch": "[parameters('applyScriptsSwitch')]",
             "autoscaleVmCount": "[parameters('autoscaleVmCount')]",
             "autoscaleVmSku": "[parameters('autoscaleVmSku')]",

@@ -111,3 +111,6 @@ node_modules
 
 # Eclipse
 .project
+
+# Specific azuredeploy.parameters.json files for dev testing (ignored not to expose ssh pub keys)
+.params/

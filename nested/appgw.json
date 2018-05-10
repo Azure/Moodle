@@ -23,9 +23,9 @@
             "apiVersion": "2018-02-01",
             "properties": {
                 "sku": {
-                    "name": "Standard_Medium",
-                    "tier": "Standard",
-                    "capacity": "2"
+                    "name": "[parameters('moodleCommon').appGwSkuName]",
+                    "tier": "[parameters('moodleCommon').appGwSkuTier]",
+                    "capacity": "[parameters('moodleCommon').appGwSkuCapacity]"
                 },
                 "gatewayIPConfigurations": [
                     {
