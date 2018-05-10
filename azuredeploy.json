@@ -539,16 +539,6 @@
             },
             "type": "string"
         },
-        "gatewaySubnet": {
-            "allowedValues": [
-                "GatewaySubnet"
-            ],
-            "defaultValue": "GatewaySubnet",
-            "metadata": {
-                "description": "name for Virtual network gateway subnet"
-            },
-            "type": "string"
-        },
         "gatewayType": {
             "allowedValues": [
                 "Vpn",
@@ -905,9 +895,6 @@
             "fileServerType": "[parameters('fileServerType')]",
             "gatewayName": "[concat('vnet-gateway-',variables('resourceprefix'))]",
             "gatewayPublicIPName": "[concat('vnet-gw-ip-',variables('resourceprefix'))]",
-            "gatewaySubnet": "[parameters('gatewaySubnet')]",
-            "gatewaySubnetPrefix": "[concat(variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),2)))]",
-            "gatewaySubnetRange": "[concat(variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),2)), '.0/24')]",
             "gatewayType": "[parameters('gatewayType')]",
             "gfsNameRoot": "[concat('gluster-vm-',variables('resourceprefix'))]",
             "gfxAvailabilitySetName": "[concat('gluster-avset-',variables('resourceprefix'))]",
@@ -970,6 +957,9 @@
             "subnetElastic": "[concat('elastic-subnet-',variables('resourceprefix'))]",
             "subnetElasticPrefix": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),4)))]",
             "subnetElasticRange": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),4)), '.0/24')]",
+            "subnetGateway": "[concat('gateway-subnet-',variables('resourceprefix'))]",
+            "subnetGatewayPrefix": "[concat(variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),2)))]",
+            "subnetGatewayRange": "[concat(variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),2)), '.0/24')]",
             "subnetRedis": "[concat('redis-subnet-',variables('resourceprefix'))]",
             "subnetRedisPrefix": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),3)))]",
             "subnetRedisRange": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),3)), '.0/24')]",

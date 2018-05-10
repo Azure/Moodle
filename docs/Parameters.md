@@ -232,7 +232,7 @@ Possible Values: ["gluster","nfs"]
 Default: nfs
 
 
-### gatewaySubnet
+### subnetGateway
 
 name for Virtual network gateway subnet
 
