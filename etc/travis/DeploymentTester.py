@@ -127,7 +127,7 @@ class DeploymentTester:
         status = curl.getinfo(pycurl.HTTP_CODE)
         if status != 200:
             print("*** DEPLOY FAILED ***")
-            print('HTTP Status Code: ' + status)
+            print('HTTP Status Code: {}'.format(status))
             sys.exit(1)
         print('(ok: {})'.format(status))
 
