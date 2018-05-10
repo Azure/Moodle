@@ -43,6 +43,7 @@ class DeploymentTester:
         self.moodle_smoke_test()
         self.moodle_admin_login()
         print('\n\nFull CI tests successful!')
+        self.delete_resource_group()
 
     def check_configuration(self):
         print('\nChecking configuration...')
@@ -127,7 +128,7 @@ class DeploymentTester:
         status = curl.getinfo(pycurl.HTTP_CODE)
         if status != 200:
             print("*** DEPLOY FAILED ***")
-            print('HTTP Status Code: ' + status)
+            print('HTTP Status Code: {}'.format(status))
             sys.exit(1)
         print('(ok: {})'.format(status))
 
@@ -163,3 +164,8 @@ class DeploymentTester:
         finally:
             os.remove(path)
         return response
+
+    def delete_resource_group(self):
+        print('\n\nDeleting the resource group for this passing build...')
+        self.resource_client.resource_groups.delete(self.config.resource_group, polling=False)
+        print('(delete initiated, not polling)')

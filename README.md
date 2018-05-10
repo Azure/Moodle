@@ -14,7 +14,7 @@ deployment. The number of configuration options might be overwhelming, and we'll
 detailed sizing guidelines in the future. Some pre-defined/restricted deployment options for
 typical scenarios follow this.
 
-[![Deploy to Azure Fully Configurable](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Ftshirt-sizing%2Fazuredeploy.json)  [![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.png)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Ftshirt-sizing%2Fazuredeploy.json)
+[![Deploy to Azure Fully Configurable](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy.json)  [![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.png)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy.json)
 
 ## Minimal deployment
 
@@ -27,7 +27,7 @@ smaller autoscale web frontend VM sku (1 core) that'll give faster deployment ti
 in the calculator is the minimum cost. The actual cost will be bigger with potentially
 autoscaled VMs and network cost.
 
-[![Deploy to Azure Minimally](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Ftshirt-sizing%2Fazuredeploy-minimal.json)
+[![Deploy to Azure Minimally](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy-minimal.json)
 
 ## Small-to-mid size deployment (without high availability)
 
@@ -39,7 +39,7 @@ without other options like elastic search or redis cache. The cost of this deplo
 in the calculator is the minimum cost. The actual cost will be bigger with potentially
 autoscaled VMs and network cost.
 
-[![Deploy to Azure Minimally](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Ftshirt-sizing%2Fazuredeploy-small2mid-noha.json)
+[![Deploy to Azure Minimally](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy-small2mid-noha.json)
 
 ## Large size deployment (with high availability)
 
@@ -51,7 +51,7 @@ without other options like elastic search. The cost of this deployment can be es
 in the calculator is the minimum cost. The actual cost will be bigger with potentially
 autoscaled VMs and network cost.
 
-[![Deploy to Azure Minimally](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Ftshirt-sizing%2Fazuredeploy-large-ha.json)
+[![Deploy to Azure Minimally](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy-large-ha.json)
 
 ## Maximal deployment
 
@@ -66,7 +66,7 @@ at [this Azure Pricing Calculator link](https://azure.com/e/e0f959b93ed84eb891dc
 in the calculator is the minimum cost of this deployment. The actual cost will be bigger with potentially
 autoscaled VMs, backups, and network cost.
 
-[![Deploy to Azure Maximally](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Ftshirt-sizing%2Fazuredeploy-maximal.json)
+[![Deploy to Azure Maximally](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy-maximal.json)
 
 ## Stack Architecture
 
