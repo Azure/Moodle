@@ -261,7 +261,7 @@
                 "S5",
                 "S6",
                 "S7",
-                "S9" 
+                "S9"
             ],
             "defaultValue": "S1",
             "metadata": {
@@ -292,7 +292,7 @@
             ],
             "defaultValue": "250GB",
             "metadata": {
-                "description": "MS SQL database size" 
+                "description": "MS SQL database size"
             },
             "type": "string"
         },
@@ -500,7 +500,7 @@
                 3,
                 4,
                 6,
-               12
+                12
             ],
             "metadata": {
                 "description": "Partitions allow for scaling of document count as well as faster indexing by sharding your index over multiple Azure Search units."
@@ -604,7 +604,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl, parameters('dbServerType'), '.json', parameters('_artifactsLocationSasToken'))]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl, 'db-', parameters('dbServerType'), '.json', parameters('_artifactsLocationSasToken'))]"
                 }
             }
         },
@@ -755,6 +755,9 @@
                     "moodleCommon": {
                         "value": "[variables('moodleCommon')]"
                     },
+                    "dbFQDN": {
+                        "value": "[reference('dbTemplate').outputs.dbFQDN.value]"
+                    },
                     "subnetIdWeb": {
                         "value": "[reference('networkTemplate').outputs.subnetIdWeb.value]"
                     },
@@ -816,46 +819,46 @@
         }
     ],
     "outputs": {
-      "siteURL": {
-        "type": "string",
-        "value": "[variables('moodleCommon').siteURL]"
-      },
-      "controllerInstanceIP": {
-        "type": "string",
-        "value": "[reference('controllerTemplate').outputs.controllerIP.value]"
-      },
-      "databaseDNS": {
-        "type": "string",
-        "value": "[variables('moodleCommon').dbDNS]"
-      },
-      "databaseAdminUsername": {
-        "type": "string",
-        "value": "[variables('moodleCommon').dbUsername]"
-      },
-      "databaseAdminPassword": {
-        "type": "string",
-        "value": "[variables('moodleCommon').dbLoginPassword]"
-      },
-      "firstFrontendVmIP": {
-        "type": "string",
-        "value": "[reference('scaleSetTemplate').outputs.webvm1IP.value]"
-      },
-      "moodleAdminPassword": {
-        "type": "string",
-        "value": "[variables('moodleCommon').moodleAdminPass]"
-      },
-      "moodleDbUsername": {
-        "type": "string",
-        "value": "[variables('moodleCommon').moodleDbUserAzure]"
-      },
-      "moodleDbPassword": {
-        "type": "string",
-        "value": "[variables('moodleCommon').moodleDbPass]"
-      },
-      "loadBalancerDNS": {
-        "type": "string",
-        "value": "[variables('moodleCommon').lbDns]"
-      }
+        "siteURL": {
+            "type": "string",
+            "value": "[variables('moodleCommon').siteURL]"
+        },
+        "controllerInstanceIP": {
+            "type": "string",
+            "value": "[reference('controllerTemplate').outputs.controllerIP.value]"
+        },
+        "databaseDNS": {
+            "type": "string",
+            "value": "[reference('dbTemplate').outputs.dbFQDN.value]"
+        },
+        "databaseAdminUsername": {
+            "type": "string",
+            "value": "[variables('moodleCommon').dbUsername]"
+        },
+        "databaseAdminPassword": {
+            "type": "string",
+            "value": "[variables('moodleCommon').dbLoginPassword]"
+        },
+        "firstFrontendVmIP": {
+            "type": "string",
+            "value": "[reference('scaleSetTemplate').outputs.webvm1IP.value]"
+        },
+        "moodleAdminPassword": {
+            "type": "string",
+            "value": "[variables('moodleCommon').moodleAdminPass]"
+        },
+        "moodleDbUsername": {
+            "type": "string",
+            "value": "[variables('moodleCommon').moodleDbUserAzure]"
+        },
+        "moodleDbPassword": {
+            "type": "string",
+            "value": "[variables('moodleCommon').moodleDbPass]"
+        },
+        "loadBalancerDNS": {
+            "type": "string",
+            "value": "[variables('moodleCommon').lbDns]"
+        }
     },
     "variables": {
         "documentation01": "This main-template calls multiple sub-templates to create the moodle system",
@@ -873,7 +876,6 @@
             "baseTemplateUrl": "[concat(parameters('_artifactsLocation'), 'nested/')]",
             "scriptLocation": "[concat(parameters('_artifactsLocation'), 'scripts/')]",
             "artifactsSasToken": "[parameters('_artifactsLocationSasToken')]",
-
             "appGwBePoolName": "[concat('appgw-bepool-', variables('resourceprefix'))]",
             "appGwName": "[concat('appgw-', variables('resourceprefix'))]",
             "appGwPipName": "[concat('appgw-pubip-',variables('resourceprefix'))]",
@@ -900,7 +902,6 @@
             "dbServerType": "[parameters('dbServerType')]",
             "dbUsername": "[concat(parameters('dbLogin'), '@', parameters('dbServerType'), '-', variables('resourceprefix'))]",
             "elasticVmSku": "[parameters('elasticVmSku')]",
-            "dbDNS": "[if(equals(parameters('dbServerType'),'mssql'),concat(parameters('dbServerType'), '-',variables('resourcePrefix'), '.database.windows.net'), concat(parameters('dbServerType'), '-', variables('resourcePrefix'), '.', parameters('dbServerType'), '.database.azure.com'))]",
             "elasticAvailabilitySetName": "[concat('elastic-avset-',variables('resourceprefix'))]",
             "elasticClusterName": "[concat('es-cluster-',variables('resourceprefix'))]",
             "elasticNicName1": "[concat('elastic-vm-nic-01-',variables('resourceprefix'))]",

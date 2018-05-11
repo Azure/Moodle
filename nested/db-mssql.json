@@ -63,6 +63,12 @@
             ]
         }
     ],
+    "outputs": {
+        "dbFQDN": {
+            "type": "string",
+            "value": "[reference(parameters('moodleCommon').serverName).fullyQualifiedDomainName]"
+        }
+    },
     "variables": {
         "documentation1": "This sub-template creates a mssql server.  It expects certain values in the 'common' datastructure.",
         "documentation10": " serverName                 - Mssql server name",

@@ -23,7 +23,7 @@
     },
     "resources": [
         {
-            "type": "Microsoft.DBforPostgreSQL/servers",
+            "type": "Microsoft.DBforMySQL/servers",
             "apiVersion": "2017-12-01",
             "kind": "",
             "location": "[resourceGroup().location]",
@@ -37,7 +37,7 @@
                     "backupRetentionDays": "35",
                     "geoRedundantBackup": "Enabled"
                 },
-                "version": "[parameters('moodleCommon').postgresVersion]"
+                "version": "[parameters('moodleCommon').mysqlVersion]"
             },
             "sku": {
                 "capacity": "[parameters('moodleCommon').mysqlPgresVcores]",
@@ -49,10 +49,10 @@
                 {
                     "apiVersion": "2017-12-01",
                     "dependsOn": [
-                        "[concat('Microsoft.DBforPostgreSQL/servers/', parameters('moodleCommon').serverName)]"
+                        "[concat('Microsoft.DBforMySQL/servers/', parameters('moodleCommon').serverName)]"
                     ],
                     "location": "[resourceGroup().location]",
-                    "name": "postgres-firewall-allow-lb",
+                    "name": "mysql-firewall-allow-lb",
                     "properties": {
                         "startIpAddress": "[parameters('lbPubIp')]",
                         "endIpAddress": "[parameters('lbPubIp')]"
@@ -62,10 +62,10 @@
                 {
                     "apiVersion": "2017-12-01",
                     "dependsOn": [
-                        "[concat('Microsoft.DBforPostgreSQL/servers/', parameters('moodleCommon').serverName)]"
+                        "[concat('Microsoft.DBforMySQL/servers/', parameters('moodleCommon').serverName)]"
                     ],
                     "location": "[resourceGroup().location]",
-                    "name": "postgres-firewall-allow-ctlr",
+                    "name": "mysql-firewall-allow-ctlr",
                     "properties": {
                         "startIpAddress": "[parameters('ctlrPubIp')]",
                         "endIpAddress": "[parameters('ctlrPubIp')]"
@@ -75,17 +75,23 @@
             ]
         }
     ],
+    "outputs": {
+        "dbFQDN": {
+            "type": "string",
+            "value": "[reference(parameters('moodleCommon').serverName).fullyQualifiedDomainName]"
+        }
+    },
     "variables": {
-        "documentation1": "This sub-template creates a postgresql server.  It expects certain values in the 'common' datastructure.",
-        "documentation10": " serverName                 - Postgresql server name",
-        "documentation11": " postgresVersion            - Postgresql version",
-        "documentation2": " administratorLogin          - postgresql admin username",
-        "documentation3": " administratorLoginPassword  - postgresql admin password",
-        "documentation4": " location                    - Postgresql server location",
-        "documentation5": " mysqlPgresVcores            - Postgresql database trasaction units",
-        "documentation7": " mysqlPgresSkuName           - Postgresql sku name",
-        "documentation8": " mysqlPgresStgSizeGB         - Postgresql sku size in mb",
-        "documentation9": " mysqlPgresSkuTier           - Postgresql sku tier",
+        "documentation1": "This sub-template creates a mysql server.  It expects certain values in the 'common' datastructure.",
+        "documentation10": " serverName                 - Mysql server name",
+        "documentation11": " mysqlVersion               - Mysql version",
+        "documentation2": " administratorLogin          - mysql admin username",
+        "documentation3": " administratorLoginPassword  - mysql admin password",
+        "documentation4": " location                    - Mysql server location",
+        "documentation5": " mysqlPgresVcores            - Mysql database trasaction units",
+        "documentation7": " mysqlPgresSkuName           - Mysql sku name",
+        "documentation8": " mysqlPgresStgSizeGB         - Mysql sku size in mb",
+        "documentation9": " mysqlPgresSkuTier           - Mysql sku tier",
         "documentationA": " mysqlPgresSkuHwFamily       - Mysql sku hardware family"
     }
 }

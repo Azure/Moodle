@@ -8,6 +8,12 @@
             },
             "type": "object"
         },
+        "dbFQDN": {
+            "metadata": {
+                "description": "FQDN of the deployed SQL DB"
+            },
+            "type": "string"
+        },
         "subnetIdWeb": {
             "metadata": {
                 "description": "Azure resource ID of the subnet where this VM is to be deployed"
@@ -168,6 +174,9 @@
                 "parameters": {
                     "moodleCommon": {
                         "value": "[parameters('moodleCommon')]"
+                    },
+                    "dbFQDN": {
+                        "value": "[parameters('dbFQDN')]"
                     },
                     "redisKey": {
                         "value": "[parameters('redisKey')]"
