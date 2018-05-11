@@ -32,18 +32,24 @@ class DeploymentTester:
         """:type : ResourceManagementClient"""
 
     def run(self):
-        self.check_configuration()
-        self.login()
-        self.create_resource_group()
-        self.validate()
-        if not self.config.should_run_full_ci():
-            print('\n\nBasic CI tests successful.')
-            return
-        self.deploy()
-        self.moodle_smoke_test()
-        self.moodle_admin_login()
-        print('\n\nFull CI tests successful!')
-        self.delete_resource_group()
+        should_delete_resource_group = False
+        try:
+            self.check_configuration()
+            self.login()
+            self.create_resource_group()
+            self.validate()
+            if not self.config.should_run_full_ci():
+                print('\n\nBasic CI tests successful.')
+                should_delete_resource_group = True
+                return
+            self.deploy()
+            self.moodle_smoke_test()
+            self.moodle_admin_login()
+            print('\n\nFull CI tests successful!')
+            should_delete_resource_group = True
+        finally:
+            if should_delete_resource_group:
+                self.delete_resource_group()
 
     def check_configuration(self):
         print('\nChecking configuration...')
