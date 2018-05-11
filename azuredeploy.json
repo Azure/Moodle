@@ -664,6 +664,7 @@
             }
         },
         {
+            "condition": "[not(equals(parameters('searchType'), 'none'))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
             "dependsOn": [
@@ -682,7 +683,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl, parameters('searchType'), '-search.json', parameters('_artifactsLocationSasToken'))]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl, 'search-', parameters('searchType'), '.json', parameters('_artifactsLocationSasToken'))]"
                 }
             }
         },
