@@ -330,10 +330,11 @@ EOF
   fi # if [ "$webServerType" = "apache" ];
 
    # php config 
+   PhpVer=`/usr/bin/php -r "echo PHP_VERSION;" | /usr/bin/cut -c 1,2,3`
    if [ "$webServerType" = "apache" ]; then
-     PhpIni=/etc/php/7.0/apache2/php.ini
+     PhpIni=/etc/php/${PhpVer}/apache2/php.ini
    else
-     PhpIni=/etc/php/7.0/fpm/php.ini
+     PhpIni=/etc/php/${PhpVer}/fpm/php.ini
    fi
    sed -i "s/memory_limit.*/memory_limit = 512M/" $PhpIni
    sed -i "s/max_execution_time.*/max_execution_time = 18000/" $PhpIni
