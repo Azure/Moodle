@@ -103,6 +103,9 @@
         {
             "condition": "[not(equals(parameters('moodleCommon').httpsTermination, 'AppGw'))]",
             "type": "Microsoft.Network/publicIPAddresses",
+            "sku": {
+                "name": "[parameters('moodleCommon').lbSku]"
+            },
             "apiVersion": "2017-10-01",
             "location": "[resourceGroup().location]",
             "name": "[parameters('moodleCommon').lbPipName]",
@@ -150,6 +153,9 @@
         {
             "condition": "[not(equals(parameters('moodleCommon').httpsTermination, 'AppGw'))]",
             "type": "Microsoft.Network/loadBalancers",
+            "sku": {
+                "name": "[parameters('moodleCommon').lbSku]"
+            },
             "apiVersion": "2017-10-01",
             "dependsOn": [
                 "[concat('Microsoft.Network/publicIPAddresses/',parameters('moodleCommon').lbPipName)]"
