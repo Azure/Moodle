@@ -567,6 +567,13 @@
                 "description": "Virtual network gateway vpn type"
             },
             "type": "string"
+        },
+        "loadBalancerSku": {
+            "defaultValue": "Basic",
+            "metadata": {
+                "description": "Loadbalancer SKU"
+            },
+            "type": "string"
         }
     },
     "resources": [
@@ -858,6 +865,10 @@
         "loadBalancerDNS": {
             "type": "string",
             "value": "[variables('moodleCommon').lbDns]"
+        },
+        "loadBalancerSku": {
+            "type": "string",
+            "value": "[variables('moodleCommon').lbSku]"
         }
     },
     "variables": {
@@ -941,6 +952,7 @@
             "ctlrVmName": "[concat('controller-vm-',variables('resourceprefix'))]",
             "ctlrVmSecrets": "[take(variables('ctlrVmSecretsArray'), if(empty(parameters('keyVaultResourceId')), 0, 1))]",
             "lbDns": "[concat('lb-',variables('resourceprefix'),'.',resourceGroup().location,'.cloudapp.azure.com')]",
+            "lbSku": "[parameters('loadBalancerSku')]",
             "lbName": "[concat('lb-',variables('resourceprefix'))]",
             "lbPipName": "[concat('lb-pubip-',variables('resourceprefix'))]",
             "moodleAdminPass": "[concat(toUpper('xl'), substring(uniqueString(resourceGroup().id, deployment().name), 6, 7),',1*8')]",
