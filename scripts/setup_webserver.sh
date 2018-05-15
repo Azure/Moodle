@@ -333,7 +333,6 @@ EOF
   fi # if [ "$webServerType" = "apache" ];
 
    # php config 
-   PhpVer=$(get_php_version)
    if [ "$webServerType" = "apache" ]; then
      PhpIni=/etc/php/${PhpVer}/apache2/php.ini
    else

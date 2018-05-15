@@ -3,8 +3,11 @@
 # Common functions definitions
 
 function get_php_version {
-    local PHPVER=`/usr/bin/php -r "echo PHP_VERSION;" | /usr/bin/cut -c 1,2,3`
-    echo ${PHPVER}
+# Returns current PHP version, in the form of x.x, eg 7.0 or 7.2
+    if [ -z "$_PHPVER" ]; then
+        _PHPVER=`/usr/bin/php -r "echo PHP_VERSION;" | /usr/bin/cut -c 1,2,3`
+    fi
+    echo $_PHPVER
 }
 
 function install_php_sql_driver 
