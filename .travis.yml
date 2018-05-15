@@ -15,7 +15,7 @@ env:
 
 install:
   - npm install # Install task runners for lint checking.
-  - pip install azure keyring pycurl # Install Azure Python SDK
+  - pip install azure-mgmt-resource keyring pycurl # Install Azure Python SDK (we only need the resource manager package)
 
 before_script:
   - ssh-keygen -q -f azure_moodle_id_rsa -N "" # Generate SSH keys to send to deployment
