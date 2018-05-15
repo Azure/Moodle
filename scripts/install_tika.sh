@@ -1,6 +1,5 @@
-# Custom Script for Linux
-
 #!/bin/bash
+# Custom Script for Linux
 
 # The MIT License (MIT)
 #
