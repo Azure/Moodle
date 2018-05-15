@@ -401,7 +401,7 @@ EOF
         fastcgi_buffers 16 16k;
         fastcgi_buffer_size 32k;
         fastcgi_param   SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
-        fastcgi_pass unix:/run/php/php7.0-fpm.sock;
+        fastcgi_pass unix:/run/php/php${PhpVer}-fpm.sock;
         fastcgi_read_timeout 3600;
         fastcgi_index index.php;
         include fastcgi_params;
@@ -480,11 +480,11 @@ EOF
    sed -i "s/;opcache.max_accelerated_files.*/opcache.max_accelerated_files = 8000/" $PhpIni
 
    # fpm config - overload this 
-   cat <<EOF > /etc/php/7.0/fpm/pool.d/www.conf
+   cat <<EOF > /etc/php/${PhpVer}/fpm/pool.d/www.conf
 [www]
 user = www-data
 group = www-data
-listen = /run/php/php7.0-fpm.sock
+listen = /run/php/php${PhpVer}-fpm.sock
 listen.owner = www-data
 listen.group = www-data
 pm = dynamic
@@ -911,7 +911,7 @@ EOF
 
    # Turning off services we don't need the controller running
    service nginx stop
-   service php7.0-fpm stop
+   service php${PhpVer}-fpm stop
    service varnish stop
    service varnishncsa stop
    service varnishlog stop
