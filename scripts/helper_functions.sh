@@ -8,6 +8,7 @@ function get_php_version {
 }
 
 function install_php_sql_driver 
+{
 # Download and build php/mssql driver
     /usr/bin/curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
     /usr/bin/curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
