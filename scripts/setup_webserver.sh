@@ -88,7 +88,7 @@ check_fileServerType_param $fileServerType
   install_php_sql_driver
 
   # PHP Version
-  PhpVer=`/usr/bin/php -r "echo PHP_VERSION;" | /usr/bin/cut -c 1,2,3`
+  PhpVer=$(get_php_version)
 
   if [ $fileServerType = "gluster" ]; then
     # Mount gluster fs for /moodle
@@ -333,7 +333,7 @@ EOF
   fi # if [ "$webServerType" = "apache" ];
 
    # php config 
-   PhpVer=`/usr/bin/php -r "echo PHP_VERSION;" | /usr/bin/cut -c 1,2,3`
+   PhpVer=$(get_php_version)
    if [ "$webServerType" = "apache" ]; then
      PhpIni=/etc/php/${PhpVer}/apache2/php.ini
    else
@@ -381,7 +381,7 @@ pm.max_spare_servers = 30
 EOF
 
      # Restart fpm
-     service php${PhpVer}.0-fpm restart
+     service php${PhpVer}-fpm restart
    fi
 
    if [ "$webServerType" = "apache" ]; then
