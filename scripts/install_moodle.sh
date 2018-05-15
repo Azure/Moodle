@@ -195,6 +195,7 @@
     sudo apt-get -y update > /dev/null
     sudo apt-get install -y --force-yes graphviz aspell php-common php-soap php-json php-redis > /tmp/apt6.log
     sudo apt-get install -y --force-yes php-bcmath php-gd php-xmlrpc php-intl php-xml php-bz2 php-pear php-mbstring php-dev mcrypt >> /tmp/apt6.log
+    PhpVer=$(get_php_version)
     if [ $dbServerType = "mysql" ]; then
         sudo apt-get install -y --force-yes php-mysql
     elif [ $dbServerType = "mssql" ]; then
@@ -401,7 +402,7 @@ EOF
         fastcgi_buffers 16 16k;
         fastcgi_buffer_size 32k;
         fastcgi_param   SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
-        fastcgi_pass unix:/run/php/php7.0-fpm.sock;
+        fastcgi_pass unix:/run/php/php${PhpVer}-fpm.sock;
         fastcgi_read_timeout 3600;
         fastcgi_index index.php;
         include fastcgi_params;
@@ -463,7 +464,8 @@ EOF
     fi
 
    # php config 
-   PhpIni=/etc/php/7.0/fpm/php.ini
+   PhpVer=$(get_php_version)
+   PhpIni=/etc/php/${PhpVer}/fpm/php.ini
    sed -i "s/memory_limit.*/memory_limit = 512M/" $PhpIni
    sed -i "s/max_execution_time.*/max_execution_time = 18000/" $PhpIni
    sed -i "s/max_input_vars.*/max_input_vars = 100000/" $PhpIni
@@ -479,11 +481,11 @@ EOF
    sed -i "s/;opcache.max_accelerated_files.*/opcache.max_accelerated_files = 8000/" $PhpIni
 
    # fpm config - overload this 
-   cat <<EOF > /etc/php/7.0/fpm/pool.d/www.conf
+   cat <<EOF > /etc/php/${PhpVer}/fpm/pool.d/www.conf
 [www]
 user = www-data
 group = www-data
-listen = /run/php/php7.0-fpm.sock
+listen = /run/php/php${PhpVer}-fpm.sock
 listen.owner = www-data
 listen.group = www-data
 pm = dynamic
@@ -910,7 +912,7 @@ EOF
 
    # Turning off services we don't need the controller running
    service nginx stop
-   service php7.0-fpm stop
+   service php${PhpVer}-fpm stop
    service varnish stop
    service varnishncsa stop
    service varnishlog stop

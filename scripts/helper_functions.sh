@@ -2,6 +2,14 @@
 
 # Common functions definitions
 
+function get_php_version {
+# Returns current PHP version, in the form of x.x, eg 7.0 or 7.2
+    if [ -z "$_PHPVER" ]; then
+        _PHPVER=`/usr/bin/php -r "echo PHP_VERSION;" | /usr/bin/cut -c 1,2,3`
+    fi
+    echo $_PHPVER
+}
+
 function install_php_sql_driver 
 {
 # Download and build php/mssql driver
@@ -17,7 +25,7 @@ function install_php_sql_driver
     /usr/bin/pear config-set php_ini `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"` system
     /usr/bin/pecl install sqlsrv
     /usr/bin/pecl install pdo_sqlsrv
-    PHPVER=`/usr/bin/php -r "echo PHP_VERSION;" | /usr/bin/cut -c 1,2,3`
+    PHPVER=$(get_php_version)
     echo "extension=sqlsrv.so" >> /etc/php/$PHPVER/fpm/php.ini
     echo "extension=pdo_sqlsrv.so" >> /etc/php/$PHPVER/fpm/php.ini
     echo "extension=sqlsrv.so" >> /etc/php/$PHPVER/apache2/php.ini
