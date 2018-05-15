@@ -87,6 +87,9 @@ check_fileServerType_param $fileServerType
   sudo apt-get install -y graphviz aspell php-soap php-json php-redis php-bcmath php-gd php-pgsql php-mysql php-xmlrpc php-intl php-xml php-bz2
   install_php_sql_driver
 
+  # PHP Version
+  PhpVer=`/usr/bin/php -r "echo PHP_VERSION;" | /usr/bin/cut -c 1,2,3`
+
   if [ $fileServerType = "gluster" ]; then
     # Mount gluster fs for /moodle
     sudo mkdir -p /moodle
@@ -278,7 +281,7 @@ EOF
           fastcgi_buffers 16 16k;
           fastcgi_buffer_size 32k;
           fastcgi_param   SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
-          fastcgi_pass unix:/run/php/php7.0-fpm.sock;
+          fastcgi_pass unix:/run/php/php${PhpVer}-fpm.sock;
           fastcgi_read_timeout 3600;
           fastcgi_index index.php;
           include fastcgi_params;
@@ -363,11 +366,11 @@ EOF
 
    if [ "$webServerType" = "nginx" ]; then
      # fpm config - overload this 
-     cat <<EOF > /etc/php/7.0/fpm/pool.d/www.conf
+     cat <<EOF > /etc/php/${PhpVer}/fpm/pool.d/www.conf
 [www]
 user = www-data
 group = www-data
-listen = /run/php/php7.0-fpm.sock
+listen = /run/php/php${PhpVer}-fpm.sock
 listen.owner = www-data
 listen.group = www-data
 pm = dynamic
@@ -378,7 +381,7 @@ pm.max_spare_servers = 30
 EOF
 
      # Restart fpm
-     service php7.0-fpm restart
+     service php${PhpVer}.0-fpm restart
    fi
 
    if [ "$webServerType" = "apache" ]; then
