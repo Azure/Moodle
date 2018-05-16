@@ -81,7 +81,7 @@ following steps:
   * This will need to be done on the contoller VM with some shell command.
   * It should be followed by running the following command to propagate the change to all autoscaled web VMs:
     ```bash
-    $ sudo /usr/local/bin/update_last_modified_time_update.moodle_on_azure.sh
+    $ sudo /usr/local/bin/update_last_modified_time.moodle_on_azure.sh
     ```
   * Once this command is executed, each autoscaled web VM will pick up (sync) the changes within 1 minute, so wait for one minute.
 * Then you can start updating your Moodle code/settings, like installing/updating plugins or upgrading Moodle version or changing Moodle configurations. Again, note that this should be all done on the controller VM using some shell commands.

@@ -270,7 +270,7 @@ EOF
   chmod 644 ${CRON_DESC_FULLPATH}
 }
 
-LAST_MODIFIED_TIME_UPDATE_SCRIPT_FULLPATH="/usr/local/bin/update_last_modified_time_update.moodle_on_azure.sh"
+LAST_MODIFIED_TIME_UPDATE_SCRIPT_FULLPATH="/usr/local/bin/update_last_modified_time.moodle_on_azure.sh"
 
 # Create a script to modify the last modified timestamp file (/moodle/html/moodle/last_modified_time.moodle_on_azure)
 # Should be called by root and only on the controller VM.
