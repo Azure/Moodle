@@ -26,13 +26,13 @@
           </elementProp>
           <elementProp name="threads" elementType="Argument">
             <stringProp name="Argument.name">threads</stringProp>
-            <stringProp name="Argument.value">${__P(threads,10)}</stringProp>
+            <stringProp name="Argument.value">${__P(threads,600)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
             <stringProp name="Argument.desc">Default 10 (for a quick GUI run)</stringProp>
           </elementProp>
           <elementProp name="rampup" elementType="Argument">
             <stringProp name="Argument.name">rampup</stringProp>
-            <stringProp name="Argument.value">${__P(rampup,10)}</stringProp>
+            <stringProp name="Argument.value">${__P(rampup,600)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
             <stringProp name="Argument.desc">Default 120 - 1/15 runtime default rampup</stringProp>
           </elementProp>
@@ -364,7 +364,7 @@
                     </collectionProp>
                     <intProp name="Assertion.test_type">2</intProp>
                     <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
-                    <boolProp name="Assertion.assume_success">false</boolProp>
+                    <boolProp name="Assertion.assume_success">true</boolProp>
                     <stringProp name="Assertion.custom_message"></stringProp>
                   </ResponseAssertion>
                   <hashTree/>
@@ -627,7 +627,7 @@
                       <stringProp name="-1512513172">What is 2 \+ 2\?</stringProp>
                     </collectionProp>
                     <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
-                    <boolProp name="Assertion.assume_success">false</boolProp>
+                    <boolProp name="Assertion.assume_success">true</boolProp>
                     <intProp name="Assertion.test_type">2</intProp>
                     <stringProp name="Assertion.custom_message"></stringProp>
                   </ResponseAssertion>
