@@ -11,18 +11,26 @@
     },
     "resources": [
         {
+            "apiVersion": "2018-02-01",
+            "condition": "[parameters('moodleCommon').ddosSwitch]",
+            "location": "[resourceGroup().location]",
+            "name": "[parameters('moodleCommon').ddosPlanName]",
+            "type": "Microsoft.Network/ddosProtectionPlans"
+        },
+        {
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2018-02-01",
             "location": "[resourceGroup().location]",
             "name": "[parameters('moodleCommon').vnetName]",
             "properties": {
-                "addressSpace": {
-                    "addressPrefixes": [
-                        "[concat(parameters('moodleCommon').vNetAddressSpace,'/16')]"
-                    ]
-                }
-
-            }
+                "ddosProtectionPlan": {
+                    "id": "[resourceId('Microsoft.Network/ddosProtectionPlans', parameters('moodleCommon').ddosPlanName)]"
+                },
+                "enableDdosProtection": "[parameters('moodleCommon').ddosSwitch]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/ddosProtectionPlans', parameters('moodleCommon').ddosPlanName)]"
+            ]
         }
     ],
     "variables": {
