@@ -11,37 +11,17 @@
     },
     "resources": [
         {
-            "condition": "[parameters('moodleCommon').ddosSwitch]",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2017-05-10",
-            "name": "vnetTemplateDdos",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2018-02-01",
+            "location": "[resourceGroup().location]",
+            "name": "[parameters('moodleCommon').vnetName]",
             "properties": {
-                "mode": "Incremental",
-                "parameters": {
-                    "moodleCommon": {
-                        "value": "[parameters('moodleCommon')]"
-                    }
-                },
-                "templateLink": {
-                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'network-vnet-ddos.json',parameters('moodleCommon').artifactsSasToken)]"
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[concat(parameters('moodleCommon').vNetAddressSpace,'/16')]"
+                    ]
                 }
-            }
-        },
-        {
-            "condition": "[not(parameters('moodleCommon').ddosSwitch)]",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2017-05-10",
-            "name": "vnetTemplateNoDdos",
-            "properties": {
-                "mode": "Incremental",
-                "parameters": {
-                    "moodleCommon": {
-                        "value": "[parameters('moodleCommon')]"
-                    }
-                },
-                "templateLink": {
-                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'network-vnet-noddos.json',parameters('moodleCommon').artifactsSasToken)]"
-                }
+
             }
         }
     ],

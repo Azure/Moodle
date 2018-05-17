@@ -23,11 +23,6 @@
             "location": "[resourceGroup().location]",
             "name": "[parameters('moodleCommon').vnetName]",
             "properties": {
-                "addressSpace": {
-                    "addressPrefixes": [
-                        "[concat(parameters('moodleCommon').vNetAddressSpace,'/16')]"
-                    ]
-                },
                 "ddosProtectionPlan": {
                     "id": "[resourceId('Microsoft.Network/ddosProtectionPlans', parameters('moodleCommon').ddosPlanName)]"
                 },
