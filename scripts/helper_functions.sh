@@ -10,9 +10,9 @@ function get_php_version {
     echo $_PHPVER
 }
 
-function install_php_sql_driver 
+function install_php_mssql_driver
 {
-# Download and build php/mssql driver
+    # Download and build php/mssql driver
     /usr/bin/curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
     /usr/bin/curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
     sudo apt-get update
@@ -32,7 +32,6 @@ function install_php_sql_driver
     echo "extension=pdo_sqlsrv.so" >> /etc/php/$PHPVER/apache2/php.ini
     echo "extension=sqlsrv.so" >> /etc/php/$PHPVER/cli/php.ini
     echo "extension=pdo_sqlsrv.so" >> /etc/php/$PHPVER/cli/php.ini
-
 }
 
 function check_fileServerType_param

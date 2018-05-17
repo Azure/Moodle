@@ -85,7 +85,9 @@ check_fileServerType_param $fileServerType
 
   # Moodle requirements
   sudo apt-get install -y graphviz aspell php-soap php-json php-redis php-bcmath php-gd php-pgsql php-mysql php-xmlrpc php-intl php-xml php-bz2
-  install_php_sql_driver
+  if [ "$dbServerType" = "mssql" ]; then
+    install_php_mssql_driver
+  fi
 
   # PHP Version
   PhpVer=$(get_php_version)

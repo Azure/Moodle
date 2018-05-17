@@ -199,7 +199,7 @@
     if [ $dbServerType = "mysql" ]; then
         sudo apt-get install -y --force-yes php-mysql
     elif [ $dbServerType = "mssql" ]; then
-        install_php_sql_driver 
+        install_php_mssql_driver
     else
         sudo apt-get install -y --force-yes php-pgsql
     fi
