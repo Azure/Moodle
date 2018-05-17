@@ -1,0 +1,183 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "_artifactsLocation": {
+      "value" :  "https://raw.githubusercontent.com/Azure/Moodle/master/"
+    },
+    "applyScriptsSwitch": {
+      "value": true
+    },
+    "azureBackupSwitch": {
+      "value": false
+    },
+    "redisDeploySwitch": {
+      "value": true
+    },
+    "vnetGwDeploySwitch": {
+      "value": false
+    },
+    "installObjectFsSwitch": {
+      "value": false
+    },
+    "installO365pluginsSwitch": {
+      "value": false
+    },
+    "installGdprPluginsSwitch": {
+      "value": false
+    },
+    "htmlLocalCopySwitch": {
+      "value": true
+    },
+    "ddosSwitch": {
+      "value": true
+    },
+    "httpsTermination": {
+      "value": "VMSS"
+    },
+    "siteURL": {
+      "value": "www.example.org"
+    },
+    "moodleVersion": {
+      "value": "MOODLE_34_STABLE"
+    },
+    "sshPublicKey": {
+      "value": "<your ssh key>"
+    },
+    "sshUsername": {
+      "value": "azureadmin"
+    },
+    "controllerVmSku": {
+      "value": "Standard_DS4_v2"
+    },
+    "webServerType": {
+      "value": "apache"
+    },
+    "autoscaleVmSku": {
+      "value": "Standard_DS4_v2"
+    },
+    "autoscaleVmCount": {
+      "value": 20
+    },
+    "dbServerType": {
+      "value": "mysql"
+    },
+    "dbLogin": {
+      "value": "dbadmin"
+    },
+    "mysqlPgresVcores": {
+      "value": 32
+    },
+    "mysqlPgresStgSizeGB": {
+      "value": 1024
+    },
+    "mysqlPgresSkuTier": {
+      "value": "GeneralPurpose"
+    },
+    "mysqlPgresSkuHwFamily": {
+      "value": "Gen4"
+    },
+    "mysqlVersion": {
+      "value": "5.7"
+    },
+    "postgresVersion": {
+      "value": "9.6"
+    },
+    "sslEnforcement": {
+      "value": "Disabled"
+    },
+    "mssqlDbServiceObjectiveName": {
+      "value": "S1"
+    },
+    "mssqlDbSize": {
+      "value": "250GB"
+    },
+    "mssqlDbEdition": {
+      "value": "Standard"
+    },
+    "mssqlVersion": {
+      "value": "12.0"
+    },
+    "fileServerType": {
+      "value": "gluster"
+    },
+    "fileServerDiskSize": {
+      "value": 127
+    },
+    "fileServerDiskCount": {
+      "value": 4
+    },
+    "glusterVmSku": {
+      "value": "Standard_DS4_v2"
+    },
+    "keyVaultResourceId": {
+      "value": ""
+    },
+    "sslCertKeyVaultURL": {
+      "value": ""
+    },
+    "sslCertThumbprint": {
+      "value": ""
+    },
+    "caCertKeyVaultURL": {
+      "value": ""
+    },
+    "caCertThumbprint": {
+      "value": ""
+    },
+    "appGwSslCertKeyVaultResourceId": {
+      "value": ""
+    },
+    "appGwSslCertKeyVaultSecretName": {
+      "value": ""
+    },
+    "appGwSkuName": {
+      "value": "Standard_Medium"
+    },
+    "appGwSkuTier": {
+      "value": "Standard"
+    },
+    "appGwSkuCapacity": {
+      "value": 2
+    },
+    "storageAccountType": {
+      "value": "Standard_LRS"
+    },
+    "searchType": {
+      "value": "none"
+    },
+    "tikaService": {
+      "value": "none"
+    },
+    "azureSearchSku": {
+      "value": "basic"
+    },
+    "azureSearchReplicaCount": {
+      "value": 3
+    },
+    "azureSearchPartitionCount": {
+      "value": 1
+    },
+    "azureSearchHostingMode": {
+      "value": "default"
+    },
+    "elasticVmSku": {
+      "value": "Standard_DS2_v2"
+    },
+    "tikaVmSku": {
+      "value": "Standard_DS2_v2"
+    },
+    "customVnetId": {
+      "value": ""
+    },
+    "vNetAddressSpace": {
+      "value": "172.31.0.0"
+    },
+    "gatewayType": {
+      "value": "Vpn"
+    },
+    "vpnType": {
+      "value": "RouteBased"
+    }
+  }
+} 
