@@ -28,11 +28,12 @@ siteFQDN=${3}
 httpsTermination=${4}
 syslogserver=${5}
 webServerType=${6}
-fileServerType=${7}
-storageAccountName=${8}
-storageAccountKey=${9}
-nfsVmName=${10}
-htmlLocalCopySwitch=${11}
+dbServerType=${7}
+fileServerType=${8}
+storageAccountName=${9}
+storageAccountKey=${10}
+nfsVmName=${11}
+htmlLocalCopySwitch=${12}
 
 echo $glusterNode    >> /tmp/vars.txt
 echo $glusterVolume  >> /tmp/vars.txt
@@ -40,6 +41,7 @@ echo $siteFQDN >> /tmp/vars.txt
 echo $httpsTermination >> /tmp/vars.txt
 echo $syslogserver >> /tmp/vars.txt
 echo $webServerType >> /tmp/vars.txt
+echo $dbServerType >> /tmp/vars.txt
 echo $fileServerType >> /tmp/vars.txt
 echo $storageAccountName >> /tmp/vars.txt
 echo $storageAccountKey >> /tmp/vars.txt
