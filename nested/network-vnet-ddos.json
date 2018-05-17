@@ -3,46 +3,40 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "moodleCommon": {
-          "metadata": {
-            "description": "Common Moodle values"
-          },
-          "type": "object"
-        },
-        "ddosSwitch": {
-          "metadata": {
-            "description": "Switch to activate DDoS protection"
-          },
-          "type": "bool"
+            "metadata": {
+                "description": "Common Moodle values"
+            },
+            "type": "object"
         }
     },
     "resources": [
-      {
-        "apiVersion": "2018-02-01",
-        "condition": "[parameters('ddosSwitch')]",
-        "location": "[resourceGroup().location]",
-        "name": "[parameters('moodleCommon').ddosPlanName]",
-        "type": "Microsoft.Network/ddosProtectionPlans"
-      },
-      {
-        "type": "Microsoft.Network/virtualNetworks",
-        "apiVersion": "2018-02-01",
-        "location": "[resourceGroup().location]",
-        "name": "[parameters('moodleCommon').vnetName]",
-        "properties": {
-          "addressSpace": {
-            "addressPrefixes": [
-              "[concat(parameters('moodleCommon').vNetAddressSpace,'/16')]"
-            ]
-          },
-          "ddosProtectionPlan": {
-            "id": "[resourceId('Microsoft.Network/ddosProtectionPlans', parameters('moodleCommon').ddosPlanName)]"
-          },
-          "enableDdosProtection": "[parameters('ddosSwitch')]"
+        {
+            "apiVersion": "2018-02-01",
+            "condition": "[parameters('moodleCommon').ddosSwitch]",
+            "location": "[resourceGroup().location]",
+            "name": "[parameters('moodleCommon').ddosPlanName]",
+            "type": "Microsoft.Network/ddosProtectionPlans"
         },
-        "dependsOn": [
-          "[resourceId('Microsoft.Network/ddosProtectionPlans', parameters('moodleCommon').ddosPlanName)]"
-        ]
-      }
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2018-02-01",
+            "location": "[resourceGroup().location]",
+            "name": "[parameters('moodleCommon').vnetName]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[concat(parameters('moodleCommon').vNetAddressSpace,'/16')]"
+                    ]
+                },
+                "ddosProtectionPlan": {
+                    "id": "[resourceId('Microsoft.Network/ddosProtectionPlans', parameters('moodleCommon').ddosPlanName)]"
+                },
+                "enableDdosProtection": "[parameters('moodleCommon').ddosSwitch]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/ddosProtectionPlans', parameters('moodleCommon').ddosPlanName)]"
+            ]
+        }
     ],
     "variables": {
         "documentation01": "This sub-template creates a virtual network when no customer BYO-vnet is specified"

@@ -2,58 +2,49 @@
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-      "moodleCommon": {
-        "metadata": {
-          "description": "Common Moodle values"
-        },
-        "type": "object"
-      },
-      "ddosSwitch": {
-        "metadata": {
-          "description": "Switch to activate DDoS protection"
-        },
-        "type": "bool"
-      }
-  },
-  "resources": [
-    {
-      "condition": "[parameters('ddosSwitch')]",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2017-05-10",
-      "name": "vnetTemplateDdos",
-      "properties": {
-        "mode": "Incremental",
-        "parameters": {
-          "moodleCommon": {
-            "value": "[parameters('moodleCommon')]"
-          },
-          "ddosSwitch": {
-            "value": "[parameters('ddosSwitch')]"
-          }
-        },
-        "templateLink": {
-          "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'network-vnet-ddos.json',parameters('moodleCommon').artifactsSasToken)]"
+        "moodleCommon": {
+            "metadata": {
+                "description": "Common Moodle values"
+            },
+            "type": "object"
         }
-      }
     },
-    {
-      "condition": "[not(parameters('ddosSwitch'))]",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2017-05-10",
-      "name": "vnetTemplateNoDdos",
-      "properties": {
-        "mode": "Incremental",
-        "parameters": {
-          "moodleCommon": {
-            "value": "[parameters('moodleCommon')]"
-          }
+    "resources": [
+        {
+            "condition": "[parameters('moodleCommon').ddosSwitch]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "name": "vnetTemplateDdos",
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {
+                    "moodleCommon": {
+                        "value": "[parameters('moodleCommon')]"
+                    }
+                },
+                "templateLink": {
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'network-vnet-ddos.json',parameters('moodleCommon').artifactsSasToken)]"
+                }
+            }
         },
-        "templateLink": {
-          "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'network-vnet-noddos.json',parameters('moodleCommon').artifactsSasToken)]"
+        {
+            "condition": "[not(parameters('moodleCommon').ddosSwitch)]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "name": "vnetTemplateNoDdos",
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {
+                    "moodleCommon": {
+                        "value": "[parameters('moodleCommon')]"
+                    }
+                },
+                "templateLink": {
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'network-vnet-noddos.json',parameters('moodleCommon').artifactsSasToken)]"
+                }
+            }
         }
-      }
-    }
-  ],
+    ],
     "variables": {
         "documentation01": "This sub-template creates a virtual network when no customer BYO-vnet is specified"
     }

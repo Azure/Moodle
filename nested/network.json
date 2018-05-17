@@ -2,18 +2,12 @@
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-      "ddosSwitch": {
-        "metadata": {
-          "description": "Switch to activate DDoS protection"
-        },
-        "type": "bool"
-      },
-      "moodleCommon": {
-        "metadata": {
-          "description": "Common Moodle values"
-        },
-        "type": "object"
-      }
+        "moodleCommon": {
+            "metadata": {
+                "description": "Common Moodle values"
+            },
+            "type": "object"
+        }
     },
     "resources": [
         {
@@ -24,17 +18,17 @@
             "properties": {
                 "mode": "Incremental",
                 "parameters": {
-                  "moodleCommon": {
-                    "value": "[parameters('moodleCommon')]"
-                  },
-                  "ddosSwitch": {
-                    "value": "[parameters('ddosSwitch')]"
-                  }
-              },
+                    "moodleCommon": {
+                        "value": "[parameters('moodleCommon')]"
+                    }
+                },
                 "templateLink": {
                     "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'network-vnet.json',parameters('moodleCommon').artifactsSasToken)]"
                 }
             }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/"
         },
         {
             "type": "Microsoft.Resources/deployments",
