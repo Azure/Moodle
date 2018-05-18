@@ -581,6 +581,10 @@
         },
         "loadBalancerSku": {
             "defaultValue": "Basic",
+            "allowedValues": [
+                "Basic",
+                "Standard"
+            ],
             "metadata": {
                 "description": "Loadbalancer SKU"
             },
