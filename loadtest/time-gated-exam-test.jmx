@@ -26,19 +26,19 @@
           </elementProp>
           <elementProp name="threads" elementType="Argument">
             <stringProp name="Argument.name">threads</stringProp>
-            <stringProp name="Argument.value">${__P(threads,600)}</stringProp>
+            <stringProp name="Argument.value">${__P(threads,200)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
             <stringProp name="Argument.desc">Default 10 (for a quick GUI run)</stringProp>
           </elementProp>
           <elementProp name="rampup" elementType="Argument">
             <stringProp name="Argument.name">rampup</stringProp>
-            <stringProp name="Argument.value">${__P(rampup,600)}</stringProp>
+            <stringProp name="Argument.value">${__P(rampup,200)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
             <stringProp name="Argument.desc">Default 120 - 1/15 runtime default rampup</stringProp>
           </elementProp>
           <elementProp name="runtime" elementType="Argument">
             <stringProp name="Argument.name">runtime</stringProp>
-            <stringProp name="Argument.value">${__P(runtime,1800)}</stringProp>
+            <stringProp name="Argument.value">${__P(runtime,3600)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
             <stringProp name="Argument.desc">Default 1800 = 30 minutes = 30*60 seconds</stringProp>
           </elementProp>
@@ -164,11 +164,11 @@
                 <stringProp name="-2078389680">xx_outputFromSplit</stringProp>
               </collectionProp>
               <collectionProp name="UserParameters.thread_values">
-                <collectionProp name="1681097958">
+                <collectionProp name="2066100154">
                   <stringProp name=""></stringProp>
                   <stringProp name=""></stringProp>
                   <stringProp name="-2046088625">${__Random(1,2000,ReuseRandomNumber)}</stringProp>
-                  <stringProp name="379755733">m_azuretestuser_${RandomNumber}</stringProp>
+                  <stringProp name="-1143784099">m_azuretestuser_${__threadNum}</stringProp>
                   <stringProp name="1345253498">${RandomNumber}</stringProp>
                   <stringProp name="-352988409">${sesskey}</stringProp>
                   <stringProp name="0"></stringProp>
@@ -285,7 +285,7 @@
                 <stringProp name="RandomTimer.range">0</stringProp>
               </GaussianRandomTimer>
               <hashTree/>
-              <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="false">
+              <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
                 <boolProp name="ResultCollector.error_logging">false</boolProp>
                 <objProp>
                   <name>saveConfig</name>
@@ -627,7 +627,7 @@
                       <stringProp name="-1512513172">What is 2 \+ 2\?</stringProp>
                     </collectionProp>
                     <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
-                    <boolProp name="Assertion.assume_success">true</boolProp>
+                    <boolProp name="Assertion.assume_success">false</boolProp>
                     <intProp name="Assertion.test_type">2</intProp>
                     <stringProp name="Assertion.custom_message"></stringProp>
                   </ResponseAssertion>
@@ -841,9 +841,9 @@
                   <stringProp name="HTTPSampler.response_timeout"></stringProp>
                 </HTTPSamplerProxy>
                 <hashTree>
-                  <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assertion - Response Contains Review of attempt 1" enabled="false">
+                  <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assertion - Response Contains Summary of attempt" enabled="true">
                     <collectionProp name="Asserion.test_strings">
-                      <stringProp name="15650604">Review of attempt</stringProp>
+                      <stringProp name="-999752098">Summary of attempt</stringProp>
                     </collectionProp>
                     <intProp name="Assertion.test_type">2</intProp>
                     <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
@@ -953,9 +953,9 @@
                   <stringProp name="HTTPSampler.response_timeout"></stringProp>
                 </HTTPSamplerProxy>
                 <hashTree>
-                  <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assertion - Response Contains Review of attempt 1" enabled="false">
+                  <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assertion - Response Contains Finish review" enabled="true">
                     <collectionProp name="Asserion.test_strings">
-                      <stringProp name="15650604">Review of attempt</stringProp>
+                      <stringProp name="-1084012699">Finish review</stringProp>
                     </collectionProp>
                     <intProp name="Assertion.test_type">2</intProp>
                     <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
@@ -1037,7 +1037,7 @@
                   <stringProp name="HTTPSampler.response_timeout"></stringProp>
                 </HTTPSamplerProxy>
                 <hashTree>
-                  <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assertion - Response Contains Summary of your previous atte..." enabled="false">
+                  <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assertion - Response Contains Summary of your previous atte..." enabled="true">
                     <collectionProp name="Asserion.test_strings">
                       <stringProp name="1813422065">Summary of your previous attempts</stringProp>
                     </collectionProp>
@@ -1047,7 +1047,7 @@
                     <stringProp name="Assertion.custom_message"></stringProp>
                   </ResponseAssertion>
                   <hashTree/>
-                  <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assertion - Response Contains Highest grade" enabled="false">
+                  <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assertion - Response Contains Highest grade" enabled="true">
                     <collectionProp name="Asserion.test_strings">
                       <stringProp name="-1064949445">Highest grade</stringProp>
                     </collectionProp>
@@ -1145,6 +1145,42 @@
                 </GaussianRandomTimer>
                 <hashTree/>
               </hashTree>
+              <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
+                <boolProp name="ResultCollector.error_logging">false</boolProp>
+                <objProp>
+                  <name>saveConfig</name>
+                  <value class="SampleSaveConfiguration">
+                    <time>true</time>
+                    <latency>true</latency>
+                    <timestamp>true</timestamp>
+                    <success>true</success>
+                    <label>true</label>
+                    <code>true</code>
+                    <message>true</message>
+                    <threadName>true</threadName>
+                    <dataType>true</dataType>
+                    <encoding>false</encoding>
+                    <assertions>true</assertions>
+                    <subresults>true</subresults>
+                    <responseData>false</responseData>
+                    <samplerData>false</samplerData>
+                    <xml>false</xml>
+                    <fieldNames>true</fieldNames>
+                    <responseHeaders>false</responseHeaders>
+                    <requestHeaders>false</requestHeaders>
+                    <responseDataOnError>false</responseDataOnError>
+                    <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+                    <assertionsResultsToSave>0</assertionsResultsToSave>
+                    <bytes>true</bytes>
+                    <sentBytes>true</sentBytes>
+                    <threadCounts>true</threadCounts>
+                    <idleTime>true</idleTime>
+                    <connectTime>true</connectTime>
+                  </value>
+                </objProp>
+                <stringProp name="filename"></stringProp>
+              </ResultCollector>
+              <hashTree/>
               <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table" enabled="true">
                 <boolProp name="ResultCollector.error_logging">false</boolProp>
                 <objProp>
