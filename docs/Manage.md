@@ -173,6 +173,18 @@ files to be ready immediately:
   - /moodle/certs/nginx.key: Your certificate's private key
   - /moodle/certs/nginx.crt: Your combined signed certificate and trust chain certificate(s).
 
+## Managing Azure DDoS protection
+
+If you have set the ddosSwith to true, your vnet is protected against 
+DDoS attacks by Azure DDoS protection. You can find how to work with Azure DDoS 
+protection plan [here](https://docs.microsoft.com/en-us/azure/virtual-network/manage-ddos-protection#work-with-ddos-protection-plans).
+
+If you want to disable the Azure DDoS protection, you can follow the instruction 
+[here](https://docs.microsoft.com/en-us/azure/virtual-network/manage-ddos-protection#disable-ddos-for-a-virtual-network). 
+
+Be careful, disabling the Azure DDoS protection on your vnet will not stop the fee.
+You have to delete the Azure DDoS protection plan if you want to stop the fee.
+
 ## Next Steps
 
   1. [Retrieve configuration details using CLI](./Get-Install-Data.md)
