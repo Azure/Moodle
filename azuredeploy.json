@@ -72,6 +72,13 @@
             },
             "type": "bool"
         },
+        "ddosSwitch": {
+            "defaultValue": false,
+            "metadata": {
+                "description": "Switch to create a DDoS protection plan"
+            },
+            "type": "bool"
+        },
         "httpsTermination": {
             "allowedValues": [
                 "VMSS",
@@ -927,6 +934,8 @@
             "dbLoginPassword": "[concat(substring(uniqueString(resourceGroup().id, deployment().name), 2, 11), '*7', toUpper('pfiwb'))]",
             "dbServerType": "[parameters('dbServerType')]",
             "dbUsername": "[concat(parameters('dbLogin'), '@', parameters('dbServerType'), '-', variables('resourceprefix'))]",
+            "ddosPlanName": "[concat('ddos-plan-',variables('resourceprefix'))]",
+            "ddosSwitch": "[parameters('ddosSwitch')]",
             "elasticVmSku": "[parameters('elasticVmSku')]",
             "elasticAvailabilitySetName": "[concat('elastic-avset-',variables('resourceprefix'))]",
             "elasticClusterName": "[concat('es-cluster-',variables('resourceprefix'))]",

@@ -173,6 +173,24 @@ files to be ready immediately:
   - /moodle/certs/nginx.key: Your certificate's private key
   - /moodle/certs/nginx.crt: Your combined signed certificate and trust chain certificate(s).
 
+## Managing Azure DDoS protection
+
+By default, every plublic IP is protected by Azure DDoS protection Basic SKU. 
+You can find more information about Azure DDoS protection Basic SKU [here](https://docs.microsoft.com/en-us/azure/virtual-network/ddos-protection-overview).
+
+If you want more protection, you can activate Azure DDoS protection Standard SKU by setting 
+the ddosSwith to true. You can find how to work with Azure DDoS 
+protection plan [here](https://docs.microsoft.com/en-us/azure/virtual-network/manage-ddos-protection#work-with-ddos-protection-plans).
+
+If you want to disable the Azure DDoS protection, you can follow the instruction 
+[here](https://docs.microsoft.com/en-us/azure/virtual-network/manage-ddos-protection#disable-ddos-for-a-virtual-network). 
+
+Be careful, disabling the Azure DDoS protection on your vnet will not stop the fee.
+You have to delete the Azure DDoS protection plan if you want to stop the fee.
+
+If you have deployed your cluster without Azure DDoS protection plan, you still can activate the 
+Azure DDoS protection plan thanks to the instruction [here](https://docs.microsoft.com/en-us/azure/virtual-network/manage-ddos-protection#enable-ddos-for-an-existing-virtual-network).
+
 ## Next Steps
 
   1. [Retrieve configuration details using CLI](./Get-Install-Data.md)

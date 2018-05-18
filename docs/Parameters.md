@@ -187,6 +187,15 @@ Possible Values: ["postgres","mysql","mssql"]
 
 Default: mysql
 
+### ddosSwitch
+
+Switch to create an Azure DDoS protection plan and link it to the vnet
+
+Type: bool
+
+Possible Values: [true, false]
+
+Default: false
 
 ### elasticVmSku
 

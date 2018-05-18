@@ -28,10 +28,39 @@
             }
         },
         {
+            "apiVersion": "2018-02-01",
+            "condition": "[parameters('moodleCommon').ddosSwitch]",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/vnetTemplate"
+            ],
+            "name": "ddosTemplate",
+            "subscriptionId": "[variables('vnetSub')]",
+            "resourceGroup": "[variables('vnetRg')]",
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {
+                    "moodleCommon": {
+                        "value": "[parameters('moodleCommon')]"
+                    },
+                    "vnetName": {
+                        "value": "[variables('vnetName')]"
+                    },
+                    "vNetAddressSpace": {
+                        "value": "[if(equals(parameters('moodleCommon').customVnetId, ''), concat(parameters('moodleCommon').vNetAddressSpace,'/16'), reference(parameters('moodleCommon').customVnetId, '2017-10-01').addressSpace.addressPrefixes[0])]"
+                    }
+                },
+                "templateLink": {
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'network-vnet-ddos.json',parameters('moodleCommon').artifactsSasToken)]"
+                }
+            },
+            "type": "Microsoft.Resources/deployments"
+        },
+        {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
             "dependsOn": [
-                "Microsoft.Resources/deployments/vnetTemplate"
+                "Microsoft.Resources/deployments/vnetTemplate",
+                "Microsoft.Resources/deployments/ddosTemplate"
             ],
             "name": "subnetTemplate",
             "subscriptionId": "[variables('vnetSub')]",

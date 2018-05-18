@@ -1,0 +1,56 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "moodleCommon": {
+            "metadata": {
+                "description": "Common Moodle values"
+            },
+            "type": "object"
+        },
+        "vnetName": {
+            "metadata": {
+                "description": "The name of the vnet to which the DDoS protection plan shoud be associated"
+            },
+            "type": "string"
+        },
+        "vNetAddressSpace": {
+            "metadata": {
+                "description": "The vNet Address Space to which the DDoS protection plan shoud be associated"
+            },
+            "type": "string"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/ddosProtectionPlans",
+            "apiVersion": "2018-02-01",
+            "condition": "[parameters('moodleCommon').ddosSwitch]",
+            "location": "[resourceGroup().location]",
+            "name": "[parameters('moodleCommon').ddosPlanName]"
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2018-02-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/ddosProtectionPlans', parameters('moodleCommon').ddosPlanName)]"
+            ],
+            "location": "[resourceGroup().location]",
+            "name": "[parameters('vnetName')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('vNetAddressSpace')]"
+                    ]
+                },
+                "ddosProtectionPlan": {
+                    "id": "[resourceId('Microsoft.Network/ddosProtectionPlans', parameters('moodleCommon').ddosPlanName)]"
+                },
+                "enableDdosProtection": "[parameters('moodleCommon').ddosSwitch]"
+            }
+        }
+    ],
+    "variables": {
+        "documentation01": "This sub-template creates a Azure DDoS protection plan and link it to a vnet"
+    }
+}
