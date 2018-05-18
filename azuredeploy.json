@@ -153,6 +153,17 @@
             },
             "type": "int"
         },
+        "osDiskStorageType": {
+            "defaultValue": "Premium_LRS",
+            "allowedValues": [
+                "Premium_LRS",
+                "Standard_LRS"
+            ],
+            "metadata": {
+                "description": "Azure storage type for all VMs' OS disks. With htmlLocalCopySwith true, Premium_LRS (SSD) is strongly recommended, as PHP files will be served from OS disks."
+            },
+            "type": "string"
+        },
         "dbServerType": {
             "defaultValue": "mysql",
             "allowedValues": [
@@ -442,7 +453,7 @@
                 "Standard_ZRS"
             ],
             "metadata": {
-                "description": "Storage Account type"
+                "description": "Storage Account type. This storage account is only for the Moodle ObjectFS plugin and/or the (currently disabled) Azure Files file share option"
             },
             "type": "string"
         },
@@ -960,6 +971,7 @@
             "mysqlPgresStgSizeGB": "[parameters('mysqlPgresStgSizeGB')]",
             "mysqlPgresVcores": "[parameters('mysqlPgresVcores')]",
             "mysqlVersion": "[parameters('mysqlVersion')]",
+            "osDiskStorageType": "[parameters('osDiskStorageType')]",
             "osType": {
                 "offer": "UbuntuServer",
                 "publisher": "Canonical",

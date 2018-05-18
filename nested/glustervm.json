@@ -86,7 +86,7 @@
                     "osDisk": {
                         "createOption": "FromImage",
                         "managedDisk": {
-                            "storageAccountType": "Premium_LRS"
+                            "storageAccountType": "[parameters('moodleCommon').osDiskStorageType]"
                         },
                         "name": "[variables('vmName')]"
                     },

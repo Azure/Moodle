@@ -79,7 +79,7 @@
                     "osDisk": {
                         "createOption": "FromImage",
                         "managedDisk": {
-                            "storageAccountType": "Standard_LRS"
+                            "storageAccountType": "[parameters('moodleCommon').osDiskStorageType]"
                         },
                         "name": "[parameters('moodleCommon').elasticVmName1]"
                     }
@@ -196,7 +196,7 @@
                     "osDisk": {
                         "createOption": "FromImage",
                         "managedDisk": {
-                            "storageAccountType": "Standard_LRS"
+                            "storageAccountType": "[parameters('moodleCommon').osDiskStorageType]"
                         },
                         "name": "[parameters('moodleCommon').elasticVmName2]"
                     }
@@ -313,7 +313,7 @@
                     "osDisk": {
                         "createOption": "FromImage",
                         "managedDisk": {
-                            "storageAccountType": "Standard_LRS"
+                            "storageAccountType": "[parameters('moodleCommon').osDiskStorageType]"
                         },
                         "name": "[parameters('moodleCommon').elasticVmName3]"
                     }

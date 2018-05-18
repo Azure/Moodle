@@ -79,7 +79,7 @@
                     "osDisk": {
                         "createOption": "FromImage",
                         "managedDisk": {
-                            "storageAccountType": "Standard_LRS"
+                            "storageAccountType": "[parameters('moodleCommon').osDiskStorageType]"
                         },
                         "name": "[parameters('moodleCommon').tikaVmName]"
                     }
