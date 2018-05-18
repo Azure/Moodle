@@ -26,13 +26,13 @@
           </elementProp>
           <elementProp name="threads" elementType="Argument">
             <stringProp name="Argument.name">threads</stringProp>
-            <stringProp name="Argument.value">${__P(threads,200)}</stringProp>
+            <stringProp name="Argument.value">${__P(threads,1000)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
             <stringProp name="Argument.desc">Default 10 (for a quick GUI run)</stringProp>
           </elementProp>
           <elementProp name="rampup" elementType="Argument">
             <stringProp name="Argument.name">rampup</stringProp>
-            <stringProp name="Argument.value">${__P(rampup,200)}</stringProp>
+            <stringProp name="Argument.value">${__P(rampup,1000)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
             <stringProp name="Argument.desc">Default 120 - 1/15 runtime default rampup</stringProp>
           </elementProp>
@@ -285,7 +285,7 @@
                 <stringProp name="RandomTimer.range">0</stringProp>
               </GaussianRandomTimer>
               <hashTree/>
-              <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
+              <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="false">
                 <boolProp name="ResultCollector.error_logging">false</boolProp>
                 <objProp>
                   <name>saveConfig</name>
@@ -324,7 +324,7 @@
             </hashTree>
             <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="Loop" enabled="true">
               <boolProp name="LoopController.continue_forever">true</boolProp>
-              <intProp name="LoopController.loops">-1</intProp>
+              <stringProp name="LoopController.loops">10</stringProp>
             </LoopController>
             <hashTree>
               <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Try Quiz" enabled="true"/>
