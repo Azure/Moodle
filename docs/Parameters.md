@@ -56,7 +56,7 @@ Possible Values: null
 Default: true
 
 
-### autoscaleVmCount
+### autoscaleVmCountMax
 
 Maximum number of autoscaled web VMs
 

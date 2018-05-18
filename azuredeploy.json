@@ -153,10 +153,17 @@
             },
             "type": "string"
         },
-        "autoscaleVmCount": {
+        "autoscaleVmCountMax": {
             "defaultValue": 10,
             "metadata": {
                 "description": "Maximum number of autoscaled web VMs"
+            },
+            "type": "int"
+        },
+        "autoscaleVmCountMin": {
+            "defaultValue": 1,
+            "metadata": {
+                "description": "Minimum (also initial) number of autoscaled web VMs"
             },
             "type": "int"
         },
@@ -918,7 +925,8 @@
             "appGwSkuName": "[parameters('appGwSkuName')]",
             "appGwSkuTier": "[parameters('appGwSkuTier')]",
             "applyScriptsSwitch": "[parameters('applyScriptsSwitch')]",
-            "autoscaleVmCount": "[parameters('autoscaleVmCount')]",
+            "autoscaleVmCountMax": "[parameters('autoscaleVmCountMax')]",
+            "autoscaleVmCountMin": "[parameters('autoscaleVmCountMin')]",
             "autoscaleVmSku": "[parameters('autoscaleVmSku')]",
             "azureBackupSwitch": "[parameters('azureBackupSwitch')]",
             "azureSearchHostingMode": "[parameters('azureSearchHostingMode')]",

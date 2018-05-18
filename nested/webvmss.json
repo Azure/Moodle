@@ -134,9 +134,9 @@
                 "profiles": [
                     {
                         "capacity": {
-                            "default": "1",
-                            "maximum": "[parameters('moodleCommon').autoscaleVmCount]",
-                            "minimum": "1"
+                            "default": "[parameters('moodleCommon').autoscaleVmCountMin]",
+                            "maximum": "[parameters('moodleCommon').autoscaleVmCountMax]",
+                            "minimum": "[parameters('moodleCommon').autoscaleVmCountMin]"
                         },
                         "name": "Profile1",
                         "rules": [

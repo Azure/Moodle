@@ -35,7 +35,7 @@
                     "_artifactsLocationSasToken":   { "value": "[parameters('_artifactsLocationSasToken')]" },
                     "redisDeploySwitch":            { "value": true },
                     "sshPublicKey":                 { "value": "[parameters('sshPublicKey')]" },
-                    "autoscaleVmCount":             { "value": 20 },
+                    "autoscaleVmCountMax":          { "value": 20 },
                     "mysqlPgresVcores":             { "value": 16 },
                     "mysqlPgresStgSizeGB":          { "value": 512 },
                     "fileServerType":               { "value": "gluster" },
