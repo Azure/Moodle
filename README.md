@@ -70,26 +70,33 @@ autoscaled VMs, backups, and network cost.
 
 ## Stack Architecture
 
-This template set deploys the following infrastructure:
+This template set deploys the following infrastructure core to your Moodle instance:
 - Autoscaling web frontend layer (Nginx for https termination, Varnish for caching, Apache/php or nginx/php-fpm)
 - Private virtual network for frontend instances
 - Controller instance running cron and handling syslog for the autoscaled site
-- Load balancer to balance across the autoscaled instances
+- [Azure Load balancer](https://azure.microsoft.com/en-us/services/load-balancer/) to balance across the autoscaled instances
 - [Azure Database for MySQL](https://azure.microsoft.com/en-us/services/mysql/) or [Azure Database for PostgreSQL](https://azure.microsoft.com/en-us/services/postgresql/) or [Azure SQL Database](https://azure.microsoft.com/en-us/services/sql-database/) 
-- [Azure Redis Cache](https://azure.microsoft.com/en-us/services/cache/) instance for Moodle caching (optional)
-- ObjectFS in [Azure Blob Storage](https://azure.microsoft.com/en-us/services/storage/blobs/) (Moodle sitedata)
-- Three Elasticsearch VMs for search indexing in Moodle (optional)
-- Dual Gluster nodes for high availability access to Moodle files
+- Dual [GlusterFS](https://www.gluster.org/) nodes or NFS for high availability access to Moodle files
+
+This template set *optionally* configures the following additional infrastructure:
+- [Azure Backup](https://azure.microsoft.com/en-us/services/backup/) for Moodle site backups
+- [Azure Blob Storage](https://azure.microsoft.com/en-us/services/storage/blobs/) for ObjectFS (Moodle sitedata) 
+- [Azure Application Gateway](https://azure.microsoft.com/en-us/services/application-gateway/) for SSL offloading and WAF
+- [Azure Redis Cache](https://azure.microsoft.com/en-us/services/cache/) instance for Moodle caching
+- [Azure DDoS Protection](https://azure.microsoft.com/en-us/services/ddos-protection/) plan to secure your Moodle site from DDoS attacks
+- [Azure Key Vault](https://azure.microsoft.com/en-us/services/key-vault/) for storing your CA Cert for your Moodle site
+- [Azure Search](https://azure.microsoft.com/en-us/services/search/) instance or three Elasticsearch VMs for HA Global Search in Moodle
+- [Apache Tika](http://tika.apache.org/) VMs for search indexing in Moodle
 
 ![network_diagram](images/stack_diagram.png "Diagram of deployed stack")
 
-The template also optionally installs a handful of useful plugins that allow Moodle to be integrated with select Azure services (see below for details) and optionally allows you to configure a backup using Azure.
+The template also optionally installs plugins that allow Moodle to be integrated with select Azure services (see below for details).
 
 ## Useful Moodle plugins for integrating Moodle with Azure Services
-There below is a listing of useful plugins allow Moodle to be integrated with select Azure services: 
+There below is a listing of useful plugins allow Moodle to be integrated with select Azure services:
+- [Object File System Plugin*](https://github.com/catalyst/moodle-tool_objectfs) for [Azure Blob Storage](https://azure.microsoft.com/en-us/services/storage/blobs/)
 - [Azure Search Plugin*](https://github.com/catalyst/moodle-search_azure) for [Azure Search](https://azure.microsoft.com/en-us/services/logic-apps/)
 - [Trigger Plugin](https://github.com/catalyst/moodle-tool_trigger) and [Restful Webservice Plugin](https://github.com/catalyst/moodle-webservice_restful) for [Azure Logic Apps](https://azure.microsoft.com/en-us/services/logic-apps/) (requires use of [Moodle Connector](https://github.com/catalyst/azure-connector_moodle) now in development)
-- [Object File System Plugin*](https://github.com/catalyst/moodle-tool_objectfs) for [Azure Blob Storage](https://azure.microsoft.com/en-us/services/storage/blobs/)
 - [Office 365 and Azure Active Directory Plugins for Moodle*](https://github.com/Microsoft/o365-moodle) for [Azure Active Directory](https://azure.microsoft.com/en-us/services/active-directory/)
 - [Elasticsearch Plugin*](https://github.com/catalyst/moodle-search_elastic)
 
@@ -97,7 +104,6 @@ At the current time this template allows the optional installation of all of the
 
 ## Moodle as a Managed Application
 You can learn more about how you can offer Moodle as a Managed Application on the Azure Marketplace or on an IT Service Catalog [here](https://github.com/Azure/Moodle/tree/master/managedApplication). This is a great read if you are offering Moodle hosting services today for your customers. 
-
 
 ##  Observations about the current template
 The following sections describe observations about the current template that you will likely want to review before deploying:
@@ -108,14 +114,21 @@ The following sections describe observations about the current template that you
 
 **Caching.** While enabling Redis cache can improve performance can be improved for a large Moodle site we have not seen it be very effective for small-to-medium size sites.
 
-**Regions.** Note that not all resources types (such as databases) may be available in your region. You should check the list of [Azure Products by Region](https://azure.microsoft.com/en-us/global-infrastructure/services/) to for local availabiliy. 
+**Regions.** Note that not all resources types (such as databases) may be available in your region. You should check the list of [Azure Products by Region](https://azure.microsoft.com/en-us/global-infrastructure/services/) to for local availability. 
 
 ## Common questions about this Template
 1.  **Is this template Moodle as IaaS or PaaS?**  While the current template leverages PaaS services such as Redis, MySQL, Postgres, MS SQL etc. the current template offers Moodle as IaaS. Given limitations to Moodle our focus is IaaS for the time being however we would love to be informed of your experience running Moodle as PaaS on Azure (i.e. using [Azure Container Service](https://azure.microsoft.com/en-us/services/container-service/) or [Azure App Service](https://azure.microsoft.com/en-us/services/container-service/)). 
 
 2.  **The current template uses Ubuntu. Will other Operating Systems such as CentOS or Windows Server be supported in the future?** Unfortunately we only have plans to support Ubuntu at this time. It is highly unlikely that this will change.
 
-3.  **What configuration do you recommend for my Moodle site?** The answer is it depends.  We are still building out our load testing tools and methodologies and at this stage are not providing t-shirt sized deployment recommendations. With that being said this is an area we are investing heavily in this area and we would love your contributions (i.e. load testing scripts, tools, methodologies etc.). If you have an immediate need for guidance for a larger sized deployment, you might want to share some details around your deployment on our [issues page](https://github.com/Azure/Moodle/issues) and we will do our best to respond.
+3.  **What configuration do you recommend for my Moodle site?** The answer is it depends. At this stage we provide some rudimenatary t-shirt sized deployment recommendations and we are still building out our load testing tools and methodologies to provide more granularity. With that being said this is an area we are investing heavily in this area and we would love your contributions (i.e. load testing scripts, tools, methodologies etc.). 
+
+If you have an immediate need for guidance for a larger sized deployment, you might want to share some details around your deployment on our [issues page](https://github.com/Azure/Moodle/issues) and we will do our best to respond. Please as much information about your deployment as possible such as: 
+
+  * average number of concurrent users your site will see
+  * maximum level of concurrent/simultaenous users your site needs to support
+  * whether or not HA is needed 
+  * any other attributes specific to your deployment (i.e. load balancing across regions etc.)
 
 4. **Did Microsoft build this template alone or with the help of the Moodle community?** We did not build this template alone. We relied on the expertise and guidance of many capable Moodle partners around the world. The initial implementation of the template was done by [Catalyst IT](https://github.com/catalyst).
 
