@@ -61,7 +61,7 @@
         "installGdprPluginsSwitch": {
             "defaultValue": false,
             "metadata": {
-                "description": "Switch to install Moodle GDPR plugins. Note these require Moodle versions 3.4.2+ or 3.3.5+ and these will be included by default in Moodle 3.5"
+                "description": "(Should be used only for Moodle 3.4 & 3.3) Switch to install Moodle GDPR plugins. Note these require Moodle versions 3.4.2+ or 3.3.5+ and these are included by default in Moodle 3.5. So if you choose MOODLE_35_STABLE as your moodleVersion, do not set this to true."
             },
             "type": "bool"
         },
