@@ -54,7 +54,7 @@
         "installO365pluginsSwitch": {
             "defaultValue": false,
             "metadata": {
-                "description": "Switch to install Moodle Office 365 plugins"
+                "description": "Switch to install Moodle Office 365 plugins. As of May 22, 2018, O365 plugins for Moodle 3.5 haven't been released, so to set this true, you must set the moodleVersion to 3.4 or below."
             },
             "type": "bool"
         },
@@ -102,6 +102,7 @@
             "allowedValues": [
                 "MOODLE_35_STABLE",
                 "MOODLE_34_STABLE",
+                "v3.4.3",
                 "v3.4.2",
                 "v3.4.1",
                 "MOODLE_33_STABLE",
