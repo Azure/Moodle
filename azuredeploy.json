@@ -7,7 +7,7 @@
             "metadata": {
                 "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
             },
-            "defaultValue": "https://raw.githubusercontent.com/Azure/Moodle/master/"
+            "defaultValue": "https://raw.githubusercontent.com/Azure/Moodle/35_stable/"
         },
         "_artifactsLocationSasToken": {
             "type": "securestring",
@@ -100,6 +100,7 @@
         },
         "moodleVersion": {
             "allowedValues": [
+                "MOODLE_35_STABLE",
                 "MOODLE_34_STABLE",
                 "v3.4.2",
                 "v3.4.1",
@@ -109,7 +110,7 @@
                 "MOODLE_30_STABLE",
                 "MOODLE_29_STABLE"
             ],
-            "defaultValue": "MOODLE_34_STABLE",
+            "defaultValue": "MOODLE_35_STABLE",
             "metadata": {
                 "description": "The Moodle version you want to install."
             },
