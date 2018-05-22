@@ -33,7 +33,7 @@
         "redisDeploySwitch": {
             "defaultValue": false,
             "metadata": {
-                "description": "Switch to deploy a redis cache or not"
+                "description": "Switch to deploy a redis cache or not. Note that certain versions of Moodle (e.g., 3.1) don't work well with Redis, so use this only for known well-working Moodle versions (e.g., 3.4)."
             },
             "type": "bool"
         },
