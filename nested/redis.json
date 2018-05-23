@@ -19,7 +19,7 @@
         {
             "type": "Microsoft.Cache/Redis",
             "apiVersion": "2016-04-01",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').redisCacheName]",
             "properties": {
                 "enableNonSslPort": true,

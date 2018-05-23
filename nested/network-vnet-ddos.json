@@ -26,7 +26,7 @@
             "type": "Microsoft.Network/ddosProtectionPlans",
             "apiVersion": "2018-02-01",
             "condition": "[parameters('moodleCommon').ddosSwitch]",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').ddosPlanName]"
         },
         {
@@ -35,7 +35,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Network/ddosProtectionPlans', parameters('moodleCommon').ddosPlanName)]"
             ],
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('vnetName')]",
             "properties": {
                 "addressSpace": {

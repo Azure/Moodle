@@ -13,7 +13,7 @@
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2017-03-30",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[concat(parameters('moodleCommon').elasticVmName1,'/','install_elastic')]",
             "properties": {
                 "autoUpgradeMinorVersion": true,
@@ -36,7 +36,7 @@
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2017-03-30",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[concat(parameters('moodleCommon').elasticVmName2,'/','install_elastic')]",
             "properties": {
                 "autoUpgradeMinorVersion": true,
@@ -59,7 +59,7 @@
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2017-03-30",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[concat(parameters('moodleCommon').elasticVmName3,'/','install_elastic')]",
             "properties": {
                 "autoUpgradeMinorVersion": true,

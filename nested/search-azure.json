@@ -19,7 +19,7 @@
         {
             "type": "Microsoft.Search/searchServices",
             "apiVersion": "2015-08-19",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').azureSearchName]",
             "sku": {
                 "name": "[parameters('moodleCommon').azureSearchSku]"

@@ -19,7 +19,7 @@
         {
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2017-10-01",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').elasticNicName1]",
             "properties": {
                 "ipConfigurations": [
@@ -45,7 +45,7 @@
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', parameters('moodleCommon').elasticNicName1)]"
             ],
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').elasticVmName1]",
             "properties": {
                 "hardwareProfile": {
@@ -136,7 +136,7 @@
         {
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2017-10-01",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').elasticNicName2]",
             "properties": {
                 "ipConfigurations": [
@@ -162,7 +162,7 @@
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', parameters('moodleCommon').elasticNicName2)]"
             ],
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').elasticVmName2]",
             "properties": {
                 "hardwareProfile": {
@@ -253,7 +253,7 @@
         {
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2017-10-01",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').elasticNicName3]",
             "properties": {
                 "ipConfigurations": [
@@ -279,7 +279,7 @@
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', parameters('moodleCommon').elasticNicName3)]"
             ],
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').elasticVmName3]",
             "properties": {
                 "hardwareProfile": {

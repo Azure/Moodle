@@ -43,7 +43,7 @@
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2017-10-01",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').ctlrNsgName]",
             "properties": {
                 "securityRules": [
@@ -85,7 +85,7 @@
             "dependsOn": [
                 "[concat('Microsoft.Network/networkSecurityGroups/', parameters('moodleCommon').ctlrNsgName)]"
             ],
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').ctlrNicName]",
             "properties": {
                 "networkSecurityGroup": {
@@ -116,7 +116,7 @@
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', parameters('moodleCommon').ctlrNicName)]"
             ],
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').ctlrVmName]",
             "properties": {
                 "hardwareProfile": {

@@ -19,7 +19,7 @@
         {
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2017-10-01",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').tikaNicName]",
             "properties": {
                 "ipConfigurations": [
@@ -45,7 +45,7 @@
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', parameters('moodleCommon').tikaNicName)]"
             ],
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').tikaVmName]",
             "properties": {
                 "hardwareProfile": {

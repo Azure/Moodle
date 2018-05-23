@@ -26,7 +26,7 @@
             "type": "Microsoft.DBforMySQL/servers",
             "apiVersion": "2017-12-01",
             "kind": "",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').serverName]",
             "properties": {
                 "administratorLogin": "[parameters('moodleCommon').dbLogin]",
@@ -51,7 +51,7 @@
                     "dependsOn": [
                         "[concat('Microsoft.DBforMySQL/servers/', parameters('moodleCommon').serverName)]"
                     ],
-                    "location": "[resourceGroup().location]",
+                    "location": "[parameters('moodleCommon').location]",
                     "name": "mysql-firewall-allow-lb",
                     "properties": {
                         "startIpAddress": "[parameters('lbPubIp')]",
@@ -64,7 +64,7 @@
                     "dependsOn": [
                         "[concat('Microsoft.DBforMySQL/servers/', parameters('moodleCommon').serverName)]"
                     ],
-                    "location": "[resourceGroup().location]",
+                    "location": "[parameters('moodleCommon').location]",
                     "name": "mysql-firewall-allow-ctlr",
                     "properties": {
                         "startIpAddress": "[parameters('ctlrPubIp')]",

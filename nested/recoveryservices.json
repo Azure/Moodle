@@ -13,7 +13,7 @@
         {
             "type": "Microsoft.RecoveryServices/vaults",
             "apiVersion": "2016-06-01",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').vaultName]",
             "properties": {},
             "sku": {
@@ -27,7 +27,7 @@
             "dependsOn": [
                 "[concat('Microsoft.RecoveryServices/vaults/', parameters('moodleCommon').vaultName)]"
             ],
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[concat(parameters('moodleCommon').vaultName, '/', parameters('moodleCommon').policyName)]",
             "properties": {
                 "backupManagementType": "AzureIaasVM",

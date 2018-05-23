@@ -84,7 +84,7 @@
             "condition": "[parameters('moodleCommon').vnetGwDeploySwitch]",
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2017-10-01",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').gatewayPublicIPName]",
             "properties": {
                 "publicIPAllocationMethod": "Dynamic"
@@ -101,7 +101,7 @@
                 "[resourceId('Microsoft.Network/publicIPAddresses', parameters('moodleCommon').gatewayPublicIPName)]",
                 "Microsoft.Resources/deployments/subnetTemplate"
             ],
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').gatewayName]",
             "properties": {
                 "activeActive": false,
@@ -136,7 +136,7 @@
                 "name": "[parameters('moodleCommon').lbSku]"
             },
             "apiVersion": "2017-10-01",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').lbPipName]",
             "properties": {
                 "dnsSettings": {
@@ -152,7 +152,7 @@
             "condition": "[equals(parameters('moodleCommon').httpsTermination, 'AppGw')]",
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2017-10-01",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').appGwPipName]",
             "properties": {
                 "dnsSettings": {
@@ -167,7 +167,7 @@
         {
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2017-10-01",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').ctlrPipName]",
             "properties": {
                 "dnsSettings": {
@@ -189,7 +189,7 @@
             "dependsOn": [
                 "[concat('Microsoft.Network/publicIPAddresses/',parameters('moodleCommon').lbPipName)]"
             ],
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').lbName]",
             "properties": {
                 "backendAddressPools": [

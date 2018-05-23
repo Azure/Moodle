@@ -19,7 +19,7 @@
         {
             "type": "Microsoft.Compute/availabilitySets",
             "apiVersion": "2017-03-30",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').gfxAvailabilitySetName]",
             "properties": {
                 "platformFaultDomainCount": 2,
