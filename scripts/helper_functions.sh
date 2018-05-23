@@ -267,6 +267,13 @@ EOF
 * * * * * root ${SYNC_SCRIPT_FULLPATH}
 EOF
   chmod 644 ${CRON_DESC_FULLPATH}
+
+  # Addition of a hook for custom script run on VMSS from shared mount to allow customised configuration of the VMSS as required
+  local CRON_DESC_FULLPATH2="/etc/cron.d/update-vmss-config"
+  cat <<EOF > ${CRON_DESC_FULLPATH2}
+* * * * * root [ -f /moodle/bin/update-vmss-config ] && /bin/bash /moodle/bin/update-vmss-config
+EOF
+  chmod 644 ${CRON_DESC_FULLPATH2}
 }
 
 LAST_MODIFIED_TIME_UPDATE_SCRIPT_FULLPATH="/usr/local/bin/update_last_modified_time.moodle_on_azure.sh"
