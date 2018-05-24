@@ -34,7 +34,7 @@
                         }
                     }
                 ],
-                "enableAcceleratedNetworking": "true"
+                "enableAcceleratedNetworking": true
             },
             "tags": {
                 "displayName": "Tika NIC"
