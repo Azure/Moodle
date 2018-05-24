@@ -38,7 +38,8 @@
                             }
                         }
                     }
-                ]
+                ],
+                "enableAcceleratedNetworking": "true"
             },
             "tags": {
                 "displayName": "Gluster VM NIC"

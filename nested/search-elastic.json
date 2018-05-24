@@ -33,7 +33,8 @@
                             }
                         }
                     }
-                ]
+                ],
+                "enableAcceleratedNetworking": "true"
             },
             "tags": {
                 "displayName": "Elastic NIC 1"
@@ -150,7 +151,8 @@
                             }
                         }
                     }
-                ]
+                ],
+                "enableAcceleratedNetworking": "true"
             },
             "tags": {
                 "displayName": "Elastic NIC 2"
@@ -267,7 +269,8 @@
                             }
                         }
                     }
-                ]
+                ],
+                "enableAcceleratedNetworking": "true"
             },
             "tags": {
                 "displayName": "Elastic NIC 2"
