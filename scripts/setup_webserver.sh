@@ -99,10 +99,8 @@ check_fileServerType_param $fileServerType
     sudo mkdir -p /moodle
     sudo chown www-data /moodle
     sudo chmod 770 /moodle
-    sudo echo -e 'mount -t glusterfs '$glusterNode':/'$glusterVolume' /moodle'
-    sudo mount -t glusterfs $glusterNode:/$glusterVolume /moodle
-    sudo echo -e $glusterNode':/'$glusterVolume'   /moodle         glusterfs       defaults,_netdev,log-level=WARNING,log-file=/var/log/gluster.log 0 0' >> /etc/fstab
-    sudo mount -a
+    sudo echo -e 'Adding Gluster FS to /etc/fstab and mounting it'
+    setup_and_mount_gluster_moodle_share $glusterNode $glusterVolume
   elif [ $fileServerType = "nfs" ]; then
     configure_nfs_client_and_mount $nfsVmName /moodle /moodle
   else # "azurefiles"

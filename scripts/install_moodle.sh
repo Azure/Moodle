@@ -181,7 +181,7 @@
     if [ $fileServerType = "gluster" ]; then
         # mount gluster files system
         echo -e '\n\rInstalling GlusterFS on '$glusterNode':/'$glusterVolume '/moodle\n\r' 
-        sudo mount -t glusterfs $glusterNode:/$glusterVolume /moodle
+        setup_and_mount_gluster_moodle_share $glusterNode $glusterVolume
     fi
     
     # install pre-requisites

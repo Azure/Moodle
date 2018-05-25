@@ -56,6 +56,15 @@ function create_azure_files_moodle_share
         --fail-on-exist >> $logFilePath
 }
 
+function setup_and_mount_gluster_moodle_share
+{
+    local glusterNode=$1
+    local glusterVolume=$2
+
+    grep -q "/moodle.*glusterfs" /etc/fstab || echo -e $glusterNode':/'$glusterVolume'   /moodle         glusterfs       defaults,_netdev,log-level=WARNING,log-file=/var/log/gluster.log 0 0' >> /etc/fstab
+    mount /moodle
+}
+
 function setup_and_mount_azure_files_moodle_share
 {
     local storageAccountName=$1
