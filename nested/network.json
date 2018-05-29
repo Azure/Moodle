@@ -222,7 +222,7 @@
                             "frontendPort": 80,
                             "idleTimeoutInMinutes": 5,
                             "probe": {
-                                "id": "[variables('extProbeID')]"
+                                "id": "[variables('extProbeHTTPID')]"
                             },
                             "protocol": "Tcp"
                         }
@@ -241,7 +241,7 @@
                             "frontendPort": 443,
                             "idleTimeoutInMinutes": 5,
                             "probe": {
-                                "id": "[variables('extProbeID')]"
+                                "id": "[variables('extProbeHTTPSID')]"
                             },
                             "protocol": "Tcp"
                         }
@@ -249,11 +249,20 @@
                 ],
                 "probes": [
                     {
-                        "name": "[parameters('moodleCommon').extProbe  ]",
+                        "name": "[parameters('moodleCommon').extProbeHTTP  ]",
                         "properties": {
                             "intervalInSeconds": 5,
                             "numberOfProbes": 3,
                             "port": 80,
+                            "protocol": "Tcp"
+                        }
+                    },
+                    {
+                        "name": "[parameters('moodleCommon').extProbeHTTPS  ]",
+                        "properties": {
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 3,
+                            "port": 443,
                             "protocol": "Tcp"
                         }
                     }
@@ -298,7 +307,8 @@
         "extBeID": "[concat(variables('extLbID'),'/backendAddressPools/',parameters('moodleCommon').extBeName)]",
         "extFeID": "[concat(variables('extLbID'),'/frontendIPConfigurations/',parameters('moodleCommon').extFeName)]",
         "extLbID": "[resourceId('Microsoft.Network/loadBalancers',parameters('moodleCommon').lbName)]",
-        "extProbeID": "[concat(variables('extLbID'),'/probes/',parameters('moodleCommon').extProbe)]",
+        "extProbeHTTPID": "[concat(variables('extLbID'),'/probes/',parameters('moodleCommon').extProbeHTTP)]",
+        "extProbeHTTPSID": "[concat(variables('extLbID'),'/probes/',parameters('moodleCommon').extProbeHTTPS)]",
         "lbPipID": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('moodleCommon').lbPipName)]",
         "ctlrPipID": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('moodleCommon').ctlrPipName)]",
         "customVnetIdArr":              "[split(parameters('moodleCommon').customVnetId, '/')]",
