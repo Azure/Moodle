@@ -191,7 +191,6 @@
         "extBeID": "[concat(variables('extLbID'),'/backendAddressPools/',parameters('moodleCommon').extBeName)]",
         "extFeID": "[concat(variables('extLbID'),'/frontendIPConfigurations/',parameters('moodleCommon').extFeName)]",
         "extLbID": "[resourceId('Microsoft.Network/loadBalancers',parameters('moodleCommon').lbName)]",
-        "extProbeID": "[concat(variables('extLbID'),'/probes/',parameters('moodleCommon').extProbe  )]",
         "pipID": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('moodleCommon').lbPipName)]",
         "scriptUri": "[concat(parameters('moodleCommon').scriptLocation,parameters('moodleCommon').webServerSetupScriptFilename,parameters('moodleCommon').artifactsSasToken)]",
         "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('moodleCommon').storageAccountName)]",
