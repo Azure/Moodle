@@ -79,6 +79,20 @@
             },
             "type": "bool"
         },
+        "enableAccelNwForCtlrVmSwitch": {
+            "defaultValue": false,
+            "metadata": {
+                "description": "Switch to enable Azure Accelerated Networking on the controller VM. Default to false because currently the default controller VM SKU (D1) doesn't support AN. Change this to true if you set the controller VM SKU to eligibible ones (e.g., D2) for better performance."
+            },
+            "type": "bool"
+        },
+        "enableAccelNwForOtherVmsSwitch": {
+            "defaultValue": true,
+            "metadata": {
+                "description": "Switch to enable Azure Accelerated Networking on all other VMs. Default to true because currently the default controller VM SKU for all other VMS (D2) does support AN. Change this to false if you set the SKU of any other VMs to an ineligibible one (e.g., D1) to avoid deployment failure."
+            },
+            "type": "bool"
+        },
         "httpsTermination": {
             "allowedValues": [
                 "VMSS",
@@ -967,6 +981,8 @@
             "elasticVmName1": "[concat('elastic-vm-01-',variables('resourceprefix'))]",
             "elasticVmName2": "[concat('elastic-vm-02-',variables('resourceprefix'))]",
             "elasticVmName3": "[concat('elastic-vm-03-',variables('resourceprefix'))]",
+            "enableAccelNwForCtlrVmSwitch": "[parameters('enableAccelNwForCtlrVmSwitch')]",
+            "enableAccelNwForOtherVmsSwitch": "[parameters('enableAccelNwForOtherVmsSwitch')]",
             "extBeName": "[concat('lb-backend-',variables('resourceprefix'))]",
             "extFeName": "[concat('lb-frontend-',variables('resourceprefix'))]",
             "extNatPool": "[concat('lb-natpool-',variables('resourceprefix'))]",

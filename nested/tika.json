@@ -34,7 +34,7 @@
                         }
                     }
                 ],
-                "enableAcceleratedNetworking": true
+                "enableAcceleratedNetworking": "[parameters('moodleCommon').enableAccelNwForOtherVmsSwitch]"
             },
             "tags": {
                 "displayName": "Tika NIC"

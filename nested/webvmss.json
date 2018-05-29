@@ -80,7 +80,7 @@
                                         }
                                     ],
                                     "primary": true,
-                                    "enableAcceleratedNetworking": true
+                                    "enableAcceleratedNetworking": "[parameters('moodleCommon').enableAccelNwForOtherVmsSwitch]"
                                 }
                             }
                         ]

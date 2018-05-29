@@ -39,7 +39,7 @@
                         }
                     }
                 ],
-                "enableAcceleratedNetworking": true
+                "enableAcceleratedNetworking": "[parameters('moodleCommon').enableAccelNwForOtherVmsSwitch]"
             },
             "tags": {
                 "displayName": "Gluster VM NIC"
