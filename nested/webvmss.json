@@ -79,7 +79,8 @@
                                             }
                                         }
                                     ],
-                                    "primary": true
+                                    "primary": true,
+                                    "enableAcceleratedNetworking": true
                                 }
                             }
                         ]

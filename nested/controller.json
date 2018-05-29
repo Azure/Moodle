@@ -104,7 +104,8 @@
                             }
                         }
                     }
-                ]
+                ],
+                "enableAcceleratedNetworking": false
             },
             "tags": {
                 "displayName": "ctlrNic"
