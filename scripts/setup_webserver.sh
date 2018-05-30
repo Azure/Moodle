@@ -361,6 +361,8 @@ EOF
    fi
 
    if [ "$webServerType" = "nginx" -o "$httpsTermination" = "VMSS" ]; then
+     # update startup script to wait for certificate in /moodle mount
+     sed -i '/After=/ s/$/ moodle.mount/' /lib/systemd/system/nginx.service && systemctl daemon-reload
      # restart Nginx
      sudo service nginx restart 
    fi
