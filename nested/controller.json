@@ -134,6 +134,7 @@
                     "adminUsername": "[parameters('moodleCommon').sshUsername]",
                     "computerName": "[parameters('moodleCommon').ctlrVmName]",
                     "secrets": "[parameters('moodleCommon').ctlrVmSecrets]",
+                    "customData": "[base64(concat('#cloud-config\nwrite_files:\n- encoding: b64\n  content: ', base64(string(parameters('moodleCommon'))), '\n  owner: root:root\n  path: /var/lib/cloud/instance/moodle_on_azure_configs.json\n  permissions: ', variables('singleQuote'), '0400', variables('singleQuote')))]",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": true,
                         "ssh": {
@@ -228,6 +229,7 @@
         "documentation18": "    recoveryservicesEnlist - conditionally enlists the VM into the backup regimen",
         "nicRef": "[resourceId('Microsoft.Network/networkInterfaces', parameters('moodleCommon').ctlrNicName)]",
         "nsgRef": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('moodleCommon').ctlrNsgName)]",
+        "singleQuote": "'",
         "copy": [
             {
                 "name": "nfsDiskArray",
