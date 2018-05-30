@@ -362,7 +362,7 @@ EOF
 
    if [ "$webServerType" = "nginx" -o "$httpsTermination" = "VMSS" ]; then
      # update startup script to wait for certificate in /moodle mount
-     sed -i '/After=/ s/$/ moodle.mount/' /lib/systemd/system/nginx.service && systemctl daemon-reload
+     setup_moodle_mount_dependency_for_systemd_service nginx || exit 1
      # restart Nginx
      sudo service nginx restart 
    fi
@@ -388,7 +388,10 @@ EOF
    fi
 
    if [ "$webServerType" = "apache" ]; then
-     sudo service apache2 restart
+      if [ "$htmlLocalCopySwitch" != "True" ]; then
+        setup_moodle_mount_dependency_for_systemd_service apache2 || exit 1
+      fi
+      sudo service apache2 restart
    fi
 
    # Configure varnish startup for 16.04

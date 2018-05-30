@@ -84,6 +84,27 @@ EOF
     mount /moodle
 }
 
+function setup_moodle_mount_dependency_for_systemd_service
+{
+  local serviceName=$1 # E.g., nginx, apache2
+  if [ -z "$serviceName" ]; then
+    return 1
+  fi
+
+  local systemdSvcOverrideFileDir="/etc/systemd/system/${serviceName}.service.d"
+  local systemdSvcOverrideFilePath="${systemdSvcOverrideFileDir}/moodle_on_azure_override.conf"
+
+  grep -q "After=moodle.mount" $systemdSvcOverrideFilePath &> /dev/null
+  if [ $? != "0" ]; then
+    mkdir -p $systemdSvcOverrideFileDir
+    cat <<EOF > $systemdSvcOverrideFilePath
+[Unit]
+After=moodle.mount
+EOF
+    systemctl daemon-reload
+  fi
+}
+
 # Functions for making NFS share available
 # TODO refactor these functions with the same ones in install_gluster.sh
 function scan_for_new_disks
