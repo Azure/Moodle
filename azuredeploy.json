@@ -645,6 +645,38 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
+            "name": "networkTemplate",
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {
+                    "moodleCommon": {
+                        "value": "[variables('moodleCommon')]"
+                    }
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'network.json',parameters('_artifactsLocationSasToken'))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "name": "storageAccountTemplate",
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {
+                    "moodleCommon": {
+                        "value": "[variables('moodleCommon')]"
+                    }
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'storageAccount.json',parameters('_artifactsLocationSasToken'))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
             "dependsOn": [
                 "Microsoft.Resources/deployments/networkTemplate"
             ],
@@ -704,22 +736,6 @@
                 },
                 "templateLink": {
                     "uri": "[concat(variables('moodleCommon').baseTemplateUrl, 'redis.json', parameters('_artifactsLocationSasToken'))]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2017-05-10",
-            "name": "networkTemplate",
-            "properties": {
-                "mode": "Incremental",
-                "parameters": {
-                    "moodleCommon": {
-                        "value": "[variables('moodleCommon')]"
-                    }
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'network.json',parameters('_artifactsLocationSasToken'))]"
                 }
             }
         },
@@ -857,22 +873,6 @@
                 },
                 "templateLink": {
                     "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'webvmss.json',parameters('_artifactsLocationSasToken'))]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2017-05-10",
-            "name": "storageAccountTemplate",
-            "properties": {
-                "mode": "Incremental",
-                "parameters": {
-                    "moodleCommon": {
-                        "value": "[variables('moodleCommon')]"
-                    }
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'storageAccount.json',parameters('_artifactsLocationSasToken'))]"
                 }
             }
         }
