@@ -13,6 +13,12 @@
                 "description": "Azure resource ID of the subnet where this VMSS is to be deployed"
             },
             "type": "string"
+        },
+        "vmSetupParamsObj": {
+            "metadata": {
+                "description": "JSON-structured VM setup params that'll be injected to the VM (through cloud-init) and used by the custom script (setup_webserver.sh)"
+            },
+            "type": "object"
         }
     },
     "resources": [
@@ -88,6 +94,7 @@
                     "osProfile": {
                         "adminUsername": "[parameters('moodleCommon').sshUsername]",
                         "computerNamePrefix": "[parameters('moodleCommon').vmssName]",
+                        "customData": "[base64(concat('#cloud-config\nwrite_files:\n- encoding: b64\n  content: ', base64(string(parameters('vmSetupParamsObj'))), '\n  owner: root:root\n  path: ', parameters('moodleCommon').moodleOnAzureConfigsJsonPath, '\n  permissions: ', variables('singleQuote'), '0400', variables('singleQuote')))]",
                         "linuxConfiguration": {
                             "disablePasswordAuthentication": true,
                             "ssh": {
@@ -187,6 +194,7 @@
         }
     ],
     "variables": {
+        "singleQuote": "'",
         "dstorID": "[resourceId('Microsoft.Storage/storageAccounts',parameters('moodleCommon').vmssdStorageAccounttName)]",
         "extBeID": "[concat(variables('extLbID'),'/backendAddressPools/',parameters('moodleCommon').extBeName)]",
         "extFeID": "[concat(variables('extLbID'),'/frontendIPConfigurations/',parameters('moodleCommon').extFeName)]",

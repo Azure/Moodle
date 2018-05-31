@@ -133,7 +133,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'glustervmconfig.json',parameters('moodleCommon').artifactsSasToken)]"
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'glustervmsetup.json',parameters('moodleCommon').artifactsSasToken)]"
                 }
             }
         },

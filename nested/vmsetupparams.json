@@ -1,0 +1,89 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "moodleCommon": {
+            "metadata": {
+                "description": "Common Moodle values"
+            },
+            "type": "object"
+        },
+        "dbFQDN": {
+            "metadata": {
+                "description": "FQDN of the deployed SQL DB"
+            },
+            "type": "string"
+        },
+        "storageAccountKey": {
+            "metadata": {
+                "description": "Storage account key from the storage account deployment."
+            },
+            "type": "string"
+        },
+        "redisKey": {
+            "metadata": {
+                "description": "Redis cache key from the redis deployment ('None' if redis is not selected). This just gets passed through to the controllersetup.json."
+            },
+            "type": "string"
+        },
+        "azureSearchKey": {
+            "metadata": {
+                "description": "Azure Search primary key from the Azure Search service deployment ('None' if Azure Search service is not selected)"
+            },
+            "type": "string"
+        }
+    },
+    "resources": [],
+    "variables": {
+        "documentation01": "This sub-template doesn't create any Azure resource, but just constructs/returns a JSON object that'll be injected to controller & VMSS VMs (through cloud-init) so that VM setup custom script can read/use, instead of receiving these as a long list of cmdline args",
+        "vmSetupParamsObj": {
+            "siteProfile": {
+                "siteURL": "[parameters('moodleCommon').siteURL]",
+                "httpsTermination": "[parameters('moodleCommon').httpsTermination]",
+                "thumbprintSslCert": "[parameters('moodleCommon').thumbprintSslCert]",
+                "thumbprintCaCert": "[parameters('moodleCommon').thumbprintCaCert]"
+            },
+            "moodleProfile": {
+                "version": "[parameters('moodleCommon').moodleVersion]",
+                "dbName": "[parameters('moodleCommon').moodleDbName]",
+                "dbUser": "[parameters('moodleCommon').moodleDbUser]",
+                "dbUserAzure": "[parameters('moodleCommon').moodleDbUserAzure]",
+                "dbPassword": "[parameters('moodleCommon').moodleDbPass]",
+                "adminPassword": "[parameters('moodleCommon').moodleAdminPass]",
+                "storageAccountName": "[parameters('moodleCommon').storageAccountName]",
+                "storageAccountKey": "[parameters('storageAccountKey')]",
+                "redisDns": "[parameters('moodleCommon').redisDns]",
+                "redisKey": "[parameters('redisKey')]",
+                "elasticVm1IP": "[parameters('moodleCommon').elasticVm1IP]",
+                "installO365pluginsSwitch": "[parameters('moodleCommon').installO365pluginsSwitch]",
+                "installObjectFsSwitch": "[parameters('moodleCommon').installObjectFsSwitch]",
+                "installGdprPluginsSwitch": "[parameters('moodleCommon').installGdprPluginsSwitch]",
+                "searchType": "[parameters('moodleCommon').searchType]",
+                "azureSearchKey": "[parameters('azureSearchKey')]",
+                "azureSearchNameHost": "[parameters('moodleCommon').azureSearchNameHost]",
+                "tikaVmIP": "[parameters('moodleCommon').tikaVmIP]"
+            },
+            "dbServerProfile": {
+                "type": "[parameters('moodleCommon').dbServerType]",
+                "fqdn": "[parameters('dbFQDN')]",
+                "adminLogin": "[parameters('moodleCommon').dbLogin]",
+                "adminLoginAzure": "[concat(parameters('moodleCommon').dbLogin, '@', parameters('moodleCommon').dbServerType, '-', parameters('moodleCommon').resourcesPrefix)]",
+                "adminPassword": "[parameters('moodleCommon').dbLoginPassword]",
+                "mssqlDbServiceObjectiveName": "[parameters('moodleCommon').mssqlDbServiceObjectiveName]",
+                "mssqlDbEdition": "[parameters('moodleCommon').mssqlDbEdition]",
+                "mssqlDbSize": "[parameters('moodleCommon').mssqlDbSize]"
+            },
+            "fileServerProfile": {
+                "type": "[parameters('moodleCommon').fileServerType]",
+                "glusterVmName": "[concat(parameters('moodleCommon').gfsNameRoot, '0')]",
+                "glusterVolName": "data"
+            }
+        }
+    },
+    "outputs": {
+        "vmSetupParamsObj": {
+            "value": "[variables('vmSetupParamsObj')]",
+            "type": "object"
+        }
+    }
+}

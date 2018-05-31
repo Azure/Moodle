@@ -28,7 +28,7 @@
         },
         "redisKey": {
             "metadata": {
-                "description": "Redis cache key from the redis deployment ('None' if redis is not selected). This just gets passed through to the controllerconfig.json."
+                "description": "Redis cache key from the redis deployment ('None' if redis is not selected). This just gets passed through to the controllersetup.json."
             },
             "type": "string"
         },
@@ -37,6 +37,12 @@
                 "description": "Azure Search primary key from the Azure Search service deployment ('None' if Azure Search service is not selected)"
             },
             "type": "string"
+        },
+        "vmSetupParamsObj": {
+            "metadata": {
+                "description": "JSON-structured VM setup params that'll be injected to the VM (through cloud-init) and used by the custom script (install_moodle.sh)"
+            },
+            "type": "object"
         }
     },
     "resources": [
@@ -134,7 +140,7 @@
                     "adminUsername": "[parameters('moodleCommon').sshUsername]",
                     "computerName": "[parameters('moodleCommon').ctlrVmName]",
                     "secrets": "[parameters('moodleCommon').ctlrVmSecrets]",
-                    "customData": "[base64(concat('#cloud-config\nwrite_files:\n- encoding: b64\n  content: ', base64(string(parameters('moodleCommon'))), '\n  owner: root:root\n  path: /var/lib/cloud/instance/moodle_on_azure_configs.json\n  permissions: ', variables('singleQuote'), '0400', variables('singleQuote')))]",
+                    "customData": "[base64(concat('#cloud-config\nwrite_files:\n- encoding: b64\n  content: ', base64(string(parameters('vmSetupParamsObj'))), '\n  owner: root:root\n  path: ', parameters('moodleCommon').moodleOnAzureConfigsJsonPath, '\n  permissions: ', variables('singleQuote'), '0400', variables('singleQuote')))]",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": true,
                         "ssh": {
@@ -188,7 +194,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl, 'controllerconfig.json', parameters('moodleCommon').artifactsSasToken)]"
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl, 'controllersetup.json', parameters('moodleCommon').artifactsSasToken)]"
                 }
             }
         },

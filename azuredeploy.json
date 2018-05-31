@@ -815,6 +815,42 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
             "dependsOn": [
+                "Microsoft.Resources/deployments/networkTemplate",
+                "Microsoft.Resources/deployments/dbTemplate",
+                "Microsoft.Resources/deployments/redisTemplate",
+                "Microsoft.Resources/deployments/searchTemplate",
+                "Microsoft.Resources/deployments/storageAccountTemplate"
+            ],
+            "name": "vmSetupParamsTemplate",
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {
+                    "moodleCommon": {
+                        "value": "[variables('moodleCommon')]"
+                    },
+                    "dbFQDN": {
+                        "value": "[reference('dbTemplate').outputs.dbFQDN.value]"
+                    },
+                    "storageAccountKey": {
+                        "value": "[reference('storageAccountTemplate').outputs.storageAccountKey.value]"
+                    },
+                    "redisKey": {
+                        "value": "[if(parameters('redisDeploySwitch'), reference('redisTemplate').outputs.redisKey.value, 'None')]"
+                    },
+                    "azureSearchKey": {
+                        "value": "[if(equals(parameters('searchType'), 'azure'), reference('searchTemplate').outputs.azureSearchKey.value, 'None')]"
+                    }
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'vmsetupparams.json',parameters('_artifactsLocationSasToken'))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/vmSetupParamsTemplate",
                 "Microsoft.Resources/deployments/glusterTemplate",
                 "Microsoft.Resources/deployments/recoveryTemplate",
                 "Microsoft.Resources/deployments/networkTemplate",
@@ -844,6 +880,9 @@
                     },
                     "azureSearchKey": {
                         "value": "[if(equals(parameters('searchType'), 'azure'), reference('searchTemplate').outputs.azureSearchKey.value, 'None')]"
+                    },
+                    "vmSetupParamsObj": {
+                        "value": "[reference('vmSetupParamsTemplate').outputs.vmSetupParamsObj.value]"
                     }
                 },
                 "templateLink": {
@@ -855,6 +894,7 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
             "dependsOn": [
+                "Microsoft.Resources/deployments/vmSetupParamsTemplate",
                 "Microsoft.Resources/deployments/controllerTemplate",
                 "Microsoft.Resources/deployments/networkTemplate",
                 "Microsoft.Resources/deployments/redisTemplate",
@@ -869,6 +909,9 @@
                     },
                     "subnetIdWeb": {
                         "value": "[reference('networkTemplate').outputs.subnetIdWeb.value]"
+                    },
+                    "vmSetupParamsObj": {
+                        "value": "[reference('vmSetupParamsTemplate').outputs.vmSetupParamsObj.value]"
                     }
                 },
                 "templateLink": {
@@ -1020,6 +1063,7 @@
             "moodleDbUser": "moodle",
             "moodleDbUserAzure": "[concat('moodle', '@', parameters('dbServerType'), '-', variables('resourceprefix'))]",
             "moodleInstallScriptFilename": "install_moodle.sh",
+            "moodleOnAzureConfigsJsonPath": "/var/lib/cloud/instance/moodle_on_azure_configs.json",
             "moodleVersion": "[parameters('moodleVersion')]",
             "mssqlDbServiceObjectiveName": "[parameters('mssqlDbServiceObjectiveName')]",
             "mssqlDbSize": "[parameters('mssqlDbSize')]",
