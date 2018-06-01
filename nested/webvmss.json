@@ -60,7 +60,7 @@
                                         ]
                                     },
                                     "protectedSettings":{
-                                        "commandToExecute": "[concat('bash ', parameters('moodleCommon').webServerSetupScriptFilename, ' ', concat(parameters('moodleCommon').gfsNameRoot, '0'), ' data ', parameters('moodleCommon').siteURL, ' ', parameters('moodleCommon').httpsTermination, ' ', concat('controller-vm-',parameters('moodleCommon').resourcesPrefix), ' ', parameters('moodleCommon').webServerType, ' ', parameters('moodleCommon').dbServerType, ' ', parameters('moodleCommon').fileServerType, ' ', parameters('moodleCommon').storageAccountName, ' ', listKeys(variables('storageAccountId'), '2017-06-01').keys[0].value, ' ', parameters('moodleCommon').ctlrVmName, ' ', parameters('moodleCommon').htmlLocalCopySwitch)]"
+                                        "commandToExecute": "[concat('bash ', parameters('moodleCommon').webServerSetupScriptFilename, ' ', parameters('moodleCommon').moodleOnAzureConfigsJsonPath)]"
                                     },
                                     "type": "CustomScript",
                                     "typeHandlerVersion": "2.0"

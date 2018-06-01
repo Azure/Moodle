@@ -2,6 +2,62 @@
 
 # Common functions definitions
 
+function get_setup_params_from_configs_json
+{
+    local configs_json_path=${1}    # E.g., /var/lib/cloud/instance/moodle_on_azure_configs.json
+
+    (dpkg -l jq &> /dev/null) || (apt -y update; apt -y install jq)
+
+    # Wait for the cloud-init write-files user data file to be generated (just in case)
+    local wait_time_sec=0
+    while [ ! -f "$configs_json_path" ]; do
+        sleep 15
+        let "wait_time_sec += 15"
+        if [ "$wait_time_sec" -ge "1800" ]; then
+            echo "Error: Cloud-init write-files didn't complete in 30 minutes!"
+            return 1
+        fi
+    done
+
+    local json=$(cat $configs_json_path)
+    export moodleVersion=$(echo $json | jq -r .moodleProfile.version)
+    export glusterNode=$(echo $json | jq -r .fileServerProfile.glusterVmName)
+    export glusterVolume=$(echo $json | jq -r .fileServerProfile.glusterVolName)
+    export siteFQDN=$(echo $json | jq -r .siteProfile.siteURL)
+    export httpsTermination=$(echo $json | jq -r .siteProfile.httpsTermination)
+    export dbIP=$(echo $json | jq -r .dbServerProfile.fqdn)
+    export moodledbname=$(echo $json | jq -r .moodleProfile.dbName)
+    export moodledbuser=$(echo $json | jq -r .moodleProfile.dbUser)
+    export moodledbpass=$(echo $json | jq -r .moodleProfile.dbPassword)
+    export adminpass=$(echo $json | jq -r .moodleProfile.adminPassword)
+    export dbadminlogin=$(echo $json | jq -r .dbServerProfile.adminLogin)
+    export dbadminpass=$(echo $json | jq -r .dbServerProfile.adminPassword)
+    export storageAccountName=$(echo $json | jq -r .moodleProfile.storageAccountName)
+    export storageAccountKey=$(echo $json | jq -r .moodleProfile.storageAccountKey)
+    export azuremoodledbuser=$(echo $json | jq -r .moodleProfile.dbUserAzure)
+    export redisDns=$(echo $json | jq -r .moodleProfile.redisDns)
+    export redisAuth=$(echo $json | jq -r .moodleProfile.redisKey)
+    export elasticVm1IP=$(echo $json | jq -r .moodleProfile.elasticVm1IP)
+    export installO365pluginsSwitch=$(echo $json | jq -r .moodleProfile.installO365pluginsSwitch)
+    export dbServerType=$(echo $json | jq -r .dbServerProfile.type)
+    export fileServerType=$(echo $json | jq -r .fileServerProfile.type)
+    export mssqlDbServiceObjectiveName=$(echo $json | jq -r .dbServerProfile.mssqlDbServiceObjectiveName)
+    export mssqlDbEdition=$(echo $json | jq -r .dbServerProfile.mssqlDbEdition)
+    export mssqlDbSize=$(echo $json | jq -r .dbServerProfile.mssqlDbSize)
+    export installObjectFsSwitch=$(echo $json | jq -r .moodleProfile.installObjectFsSwitch)
+    export installGdprPluginsSwitch=$(echo $json | jq -r .moodleProfile.installGdprPluginsSwitch)
+    export thumbprintSslCert=$(echo $json | jq -r .siteProfile.thumbprintSslCert)
+    export thumbprintCaCert=$(echo $json | jq -r .siteProfile.thumbprintCaCert)
+    export searchType=$(echo $json | jq -r .moodleProfile.searchType)
+    export azureSearchKey=$(echo $json | jq -r .moodleProfile.azureSearchKey)
+    export azureSearchNameHost=$(echo $json | jq -r .moodleProfile.azureSearchNameHost)
+    export tikaVmIP=$(echo $json | jq -r .moodleProfile.tikaVmIP)
+    export syslogServer=$(echo $json | jq -r .moodleProfile.syslogServer)
+    export webServerType=$(echo $json | jq -r .moodleProfile.webServerType)
+    export htmlLocalCopySwitch=$(echo $json | jq -r .moodleProfile.htmlLocalCopySwitch)
+    export nfsVmName=$(echo $json | jq -r .fileServerProfile.nfsVmName)
+}
+
 function get_php_version {
 # Returns current PHP version, in the form of x.x, eg 7.0 or 7.2
     if [ -z "$_PHPVER" ]; then

@@ -22,38 +22,11 @@
 
 #parameters 
 {
-    moodleVersion=${1}
-    glusterNode=${2}
-    glusterVolume=${3}
-    siteFQDN=${4}
-    httpsTermination=${5}
-    dbIP=${6}
-    moodledbname=${7}
-    moodledbuser=${8}
-    moodledbpass=${9}
-    adminpass=${10}
-    dbadminlogin=${11}
-    dbadminpass=${12}
-    wabsacctname=${13}
-    wabsacctkey=${14}
-    azuremoodledbuser=${15}
-    redisDns=${16}
-    redisAuth=${17}
-    elasticVm1IP=${18}
-    installO365pluginsSwitch=${19}
-    dbServerType=${20}
-    fileServerType=${21}
-    mssqlDbServiceObjectiveName=${22}
-    mssqlDbEdition=${23}
-    mssqlDbSize=${24}
-    installObjectFsSwitch=${25}
-    installGdprPluginsSwitch=${26}
-    thumbprintSslCert=${27}
-    thumbprintCaCert=${28}
-    searchType=${29}
-    azureSearchKey=${30}
-    azureSearchNameHost=${31}
-    tikaVmIP=${32}
+    moodle_on_azure_configs_json_path=${1}
+
+    . ./helper_functions.sh
+
+    get_setup_params_from_configs_json $moodle_on_azure_configs_json_path || exit 99
 
     echo $moodleVersion        >> /tmp/vars.txt
     echo $glusterNode          >> /tmp/vars.txt
@@ -67,8 +40,8 @@
     echo $adminpass            >> /tmp/vars.txt
     echo $dbadminlogin         >> /tmp/vars.txt
     echo $dbadminpass          >> /tmp/vars.txt
-    echo $wabsacctname         >> /tmp/vars.txt
-    echo $wabsacctkey          >> /tmp/vars.txt
+    echo $storageAccountName   >> /tmp/vars.txt
+    echo $storageAccountKey    >> /tmp/vars.txt
     echo $azuremoodledbuser    >> /tmp/vars.txt
     echo $redisDns             >> /tmp/vars.txt
     echo $redisAuth            >> /tmp/vars.txt
@@ -88,7 +61,6 @@
     echo $azureSearchNameHost >> /tmp/vars.txt
     echo $tikaVmIP >> /tmp/vars.txt
 
-    . ./helper_functions.sh
     check_fileServerType_param $fileServerType
 
     if [ "$dbServerType" = "mysql" ]; then
@@ -144,7 +116,7 @@
         sudo apt-get -y --force-yes install postgresql-client >> /tmp/apt3.log
     fi
 
-    if [ "$installObjectFsSwitch" = "True" -o "$fileServerType" = "azurefiles" ]; then
+    if [ "$installObjectFsSwitch" = "true" -o "$fileServerType" = "azurefiles" ]; then
         # install azure cli & setup container
         echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ wheezy main" | \
             sudo tee /etc/apt/sources.list.d/azure-cli.list
@@ -156,14 +128,14 @@
 
         az storage container create \
             --name objectfs \
-            --account-name $wabsacctname \
-            --account-key $wabsacctkey \
+            --account-name $storageAccountName \
+            --account-key $storageAccountKey \
             --public-access off \
             --fail-on-exist >> /tmp/wabs.log
 
         az storage container policy create \
-            --account-name $wabsacctname \
-            --account-key $wabsacctkey \
+            --account-name $storageAccountName \
+            --account-key $storageAccountKey \
             --container-name objectfs \
             --name readwrite \
             --start $(date --date="1 day ago" +%F) \
@@ -171,8 +143,8 @@
             --permissions rw >> /tmp/wabs.log
 
         sas=$(az storage container generate-sas \
-            --account-name $wabsacctname \
-            --account-key $wabsacctkey \
+            --account-name $storageAccountName \
+            --account-key $storageAccountKey \
             --name objectfs \
             --policy readwrite \
             --output tsv)
@@ -223,7 +195,7 @@
     /usr/bin/unzip -q moodle.zip
     /bin/mv -v '$moodleUnzipDir' /moodle/html/moodle
 
-    if [ "'$installGdprPluginsSwitch'" = "True" ]; then
+    if [ "'$installGdprPluginsSwitch'" = "true" ]; then
         # install Moodle GDPR plugins (Note: This is only for Moodle versions 3.4.2+ or 3.3.5+ and will be included in Moodle 3.5, so no need for 3.5)
         curl -k --max-redirs 10 https://github.com/moodlehq/moodle-tool_policy/archive/'$moodleStableVersion'.zip -L -o plugin-policy.zip
         unzip -q plugin-policy.zip
@@ -238,7 +210,7 @@
         rm -rf moodle-tool_dataprivacy-'$moodleStableVersion'
     fi
 
-    if [ "'$installO365pluginsSwitch'" = "True" ]; then
+    if [ "'$installO365pluginsSwitch'" = "true" ]; then
         # install Office 365 plugins
         curl -k --max-redirs 10 https://github.com/Microsoft/o365-moodle/archive/'$o365pluginVersion'.zip -L -o o365.zip
         unzip -q o365.zip
@@ -269,7 +241,7 @@
         /bin/rm -rf moodle-search_azure-master
     fi
 
-    if [ "'$installObjectFsSwitch'" = "True" ]; then
+    if [ "'$installObjectFsSwitch'" = "true" ]; then
         # Install the ObjectFS plugin
         /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-tool_objectfs/archive/master.zip -L -o plugin-objectfs.zip
         /usr/bin/unzip -q plugin-objectfs.zip
@@ -799,20 +771,20 @@ EOF
         echo -e "cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot="$siteProtocol"://"$siteFQDN" --dataroot=/moodle/moodledata --dbhost="$mysqlIP" --dbname="$moodledbname" --dbuser="$azuremoodledbuser" --dbpass="$moodledbpass" --dbtype=mysqli --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass="$adminpass" --adminemail=admin@"$siteFQDN" --non-interactive --agree-license --allow-unstable || true "
         cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot=$siteProtocol://$siteFQDN   --dataroot=/moodle/moodledata --dbhost=$mysqlIP   --dbname=$moodledbname   --dbuser=$azuremoodledbuser   --dbpass=$moodledbpass   --dbtype=mysqli --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass=$adminpass   --adminemail=admin@$siteFQDN   --non-interactive --agree-license --allow-unstable || true
 
-        if [ "$installObjectFsSwitch" = "True" ]; then
+        if [ "$installObjectFsSwitch" = "true" ]; then
             mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'enabletasks', 1);" 
             mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'filesystem', '\\\tool_objectfs\\\azure_file_system');"
-            mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_accountname', '${wabsacctname}');"
+            mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_accountname', '${storageAccountName}');"
             mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_container', 'objectfs');"
             mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_sastoken', '${sas}');"
         fi
     elif [ $dbServerType = "mssql" ]; then
         cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot=$siteProtocol://$siteFQDN   --dataroot=/moodle/moodledata --dbhost=$mssqlIP   --dbname=$moodledbname   --dbuser=$azuremoodledbuser   --dbpass=$moodledbpass   --dbtype=sqlsrv --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass=$adminpass   --adminemail=admin@$siteFQDN   --non-interactive --agree-license --allow-unstable || true
 
-        if [ "$installObjectFsSwitch" = "True" ]; then
+        if [ "$installObjectFsSwitch" = "true" ]; then
             /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d ${moodledbname} -Q "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'enabletasks', 1)" 
             /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d ${moodledbname} -Q "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'filesystem', '\\\tool_objectfs\\\azure_file_system')"
-            /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d ${moodledbname} -Q "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_accountname', '${wabsacctname}')"
+            /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d ${moodledbname} -Q "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_accountname', '${storageAccountName}')"
             /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d ${moodledbname} -Q "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_container', 'objectfs')"
             /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d${moodledbname} -Q "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_sastoken', '${sas}')"
         fi
@@ -820,13 +792,13 @@ EOF
         echo -e "cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot="$siteProtocol"://"$siteFQDN" --dataroot=/moodle/moodledata --dbhost="$postgresIP" --dbname="$moodledbname" --dbuser="$azuremoodledbuser" --dbpass="$moodledbpass" --dbtype=pgsql --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass="$adminpass" --adminemail=admin@"$siteFQDN" --non-interactive --agree-license --allow-unstable || true "
         cd /tmp; sudo -u www-data /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot=$siteProtocol://$siteFQDN   --dataroot=/moodle/moodledata --dbhost=$postgresIP   --dbname=$moodledbname   --dbuser=$azuremoodledbuser   --dbpass=$moodledbpass   --dbtype=pgsql --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass=$adminpass   --adminemail=admin@$siteFQDN   --non-interactive --agree-license --allow-unstable || true
 
-        if [ "$installObjectFsSwitch" = "True" ]; then
+        if [ "$installObjectFsSwitch" = "true" ]; then
             # Add the ObjectFS configuration to Moodle.
             echo "${postgresIP}:5432:${moodledbname}:${azuremoodledbuser}:${moodledbpass}" > /root/.pgpass
             chmod 600 /root/.pgpass
             psql -h $postgresIP -U $azuremoodledbuser -c "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'enabletasks', 1);" $moodledbname
             psql -h $postgresIP -U $azuremoodledbuser -c "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'filesystem', '\tool_objectfs\azure_file_system');" $moodledbname
-            psql -h $postgresIP -U $azuremoodledbuser -c "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_accountname', '$wabsacctname');" $moodledbname
+            psql -h $postgresIP -U $azuremoodledbuser -c "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_accountname', '$storageAccountName');" $moodledbname
             psql -h $postgresIP -U $azuremoodledbuser -c "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_container', 'objectfs');" $moodledbname
             psql -h $postgresIP -U $azuremoodledbuser -c "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_sastoken', '$sas');" $moodledbname
         fi
@@ -881,7 +853,7 @@ EOF
 
     fi
 
-    if [ "$installObjectFsSwitch" = "True" ]; then
+    if [ "$installObjectFsSwitch" = "true" ]; then
         # Set the ObjectFS alternate filesystem
         sed -i "23 a \$CFG->alternative_file_system_class = '\\\tool_objectfs\\\azure_file_system';" /moodle/html/moodle/config.php
     fi
@@ -931,10 +903,10 @@ EOF
       mv /moodle /moodle_old_delete_me
       # Then create the moodle share
       echo -e '\n\rCreating an Azure Files share for moodle'
-      create_azure_files_moodle_share $wabsacctname $wabsacctkey /tmp/wabs.log
+      create_azure_files_moodle_share $storageAccountName $storageAccountKey /tmp/wabs.log
       # Set up and mount Azure Files share. Must be done after nginx is installed because of www-data user/group
-      echo -e '\n\rSetting up and mounting Azure Files share on //'$wabsacctname'.file.core.windows.net/moodle on /moodle\n\r'
-      setup_and_mount_azure_files_moodle_share $wabsacctname $wabsacctkey
+      echo -e '\n\rSetting up and mounting Azure Files share on //'$storageAccountName'.file.core.windows.net/moodle on /moodle\n\r'
+      setup_and_mount_azure_files_moodle_share $storageAccountName $storageAccountKey
       # Move the local installation over to the Azure Files
       echo -e '\n\rMoving locally installed moodle over to Azure Files'
       cp -a /moodle_old_delete_me/* /moodle || true # Ignore case sensitive directory copy failure

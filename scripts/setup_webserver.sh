@@ -22,24 +22,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-glusterNode=${1}
-glusterVolume=${2}
-siteFQDN=${3}
-httpsTermination=${4}
-syslogserver=${5}
-webServerType=${6}
-dbServerType=${7}
-fileServerType=${8}
-storageAccountName=${9}
-storageAccountKey=${10}
-nfsVmName=${11}
-htmlLocalCopySwitch=${12}
+moodle_on_azure_configs_json_path=${1}
+
+. ./helper_functions.sh
+
+get_setup_params_from_configs_json $moodle_on_azure_configs_json_path || exit 99
 
 echo $glusterNode    >> /tmp/vars.txt
 echo $glusterVolume  >> /tmp/vars.txt
 echo $siteFQDN >> /tmp/vars.txt
 echo $httpsTermination >> /tmp/vars.txt
-echo $syslogserver >> /tmp/vars.txt
+echo $syslogServer >> /tmp/vars.txt
 echo $webServerType >> /tmp/vars.txt
 echo $dbServerType >> /tmp/vars.txt
 echo $fileServerType >> /tmp/vars.txt
@@ -48,7 +41,6 @@ echo $storageAccountKey >> /tmp/vars.txt
 echo $nfsVmName >> /tmp/vars.txt
 echo $htmlLocalCopySwitch >> /tmp/vars.txt
 
-. ./helper_functions.sh
 check_fileServerType_param $fileServerType
 
 {
@@ -113,8 +105,8 @@ check_fileServerType_param $fileServerType
 \$UDPServerRun 514
 EOF
   cat <<EOF >> /etc/rsyslog.d/40-remote.conf
-local1.*   @${syslogserver}:514
-local2.*   @${syslogserver}:514
+local1.*   @${syslogServer}:514
+local2.*   @${syslogServer}:514
 EOF
   service syslog restart
 
@@ -186,7 +178,7 @@ EOF
 
   # Set up html dir local copy if specified
   htmlRootDir="/moodle/html/moodle"
-  if [ "$htmlLocalCopySwitch" = "True" ]; then
+  if [ "$htmlLocalCopySwitch" = "true" ]; then
     mkdir -p /var/www/html
     rsync -av --delete /moodle/html/moodle /var/www/html
     htmlRootDir="/var/www/html/moodle"
@@ -388,7 +380,7 @@ EOF
    fi
 
    if [ "$webServerType" = "apache" ]; then
-      if [ "$htmlLocalCopySwitch" != "True" ]; then
+      if [ "$htmlLocalCopySwitch" != "true" ]; then
         setup_moodle_mount_dependency_for_systemd_service apache2 || exit 1
       fi
       sudo service apache2 restart

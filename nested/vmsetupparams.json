@@ -61,7 +61,10 @@
                 "searchType": "[parameters('moodleCommon').searchType]",
                 "azureSearchKey": "[parameters('azureSearchKey')]",
                 "azureSearchNameHost": "[parameters('moodleCommon').azureSearchNameHost]",
-                "tikaVmIP": "[parameters('moodleCommon').tikaVmIP]"
+                "tikaVmIP": "[parameters('moodleCommon').tikaVmIP]",
+                "syslogServer": "[parameters('moodleCommon').ctlrVmName]",
+                "webServerType": "[parameters('moodleCommon').webServerType]",
+                "htmlLocalCopySwitch": "[parameters('moodleCommon').htmlLocalCopySwitch]"
             },
             "dbServerProfile": {
                 "type": "[parameters('moodleCommon').dbServerType]",
@@ -75,6 +78,7 @@
             },
             "fileServerProfile": {
                 "type": "[parameters('moodleCommon').fileServerType]",
+                "nfsVmName": "[parameters('moodleCommon').ctlrVmName]",
                 "glusterVmName": "[concat(parameters('moodleCommon').gfsNameRoot, '0')]",
                 "glusterVolName": "data"
             }
