@@ -866,20 +866,11 @@
                     "moodleCommon": {
                         "value": "[variables('moodleCommon')]"
                     },
-                    "dbFQDN": {
-                        "value": "[reference('dbTemplate').outputs.dbFQDN.value]"
-                    },
                     "subnetIdWeb": {
                         "value": "[reference('networkTemplate').outputs.subnetIdWeb.value]"
                     },
                     "ctlrPubIpId": {
                         "value": "[reference('networkTemplate').outputs.ctlrPubIpId.value]"
-                    },
-                    "redisKey": {
-                        "value": "[if(parameters('redisDeploySwitch'), reference('redisTemplate').outputs.redisKey.value, 'None')]"
-                    },
-                    "azureSearchKey": {
-                        "value": "[if(equals(parameters('searchType'), 'azure'), reference('searchTemplate').outputs.azureSearchKey.value, 'None')]"
                     },
                     "vmSetupParamsObj": {
                         "value": "[reference('vmSetupParamsTemplate').outputs.vmSetupParamsObj.value]"

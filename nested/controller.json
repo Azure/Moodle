@@ -8,12 +8,6 @@
             },
             "type": "object"
         },
-        "dbFQDN": {
-            "metadata": {
-                "description": "FQDN of the deployed SQL DB"
-            },
-            "type": "string"
-        },
         "subnetIdWeb": {
             "metadata": {
                 "description": "Azure resource ID of the subnet where this VM is to be deployed"
@@ -23,18 +17,6 @@
         "ctlrPubIpId": {
             "metadata": {
                 "description": "Resource ID of the controller VM public IP address"
-            },
-            "type": "string"
-        },
-        "redisKey": {
-            "metadata": {
-                "description": "Redis cache key from the redis deployment ('None' if redis is not selected). This just gets passed through to the controllersetup.json."
-            },
-            "type": "string"
-        },
-        "azureSearchKey": {
-            "metadata": {
-                "description": "Azure Search primary key from the Azure Search service deployment ('None' if Azure Search service is not selected)"
             },
             "type": "string"
         },
@@ -182,15 +164,6 @@
                 "parameters": {
                     "moodleCommon": {
                         "value": "[parameters('moodleCommon')]"
-                    },
-                    "dbFQDN": {
-                        "value": "[parameters('dbFQDN')]"
-                    },
-                    "redisKey": {
-                        "value": "[parameters('redisKey')]"
-                    },
-                    "azureSearchKey": {
-                        "value": "[parameters('azureSearchKey')]"
                     }
                 },
                 "templateLink": {

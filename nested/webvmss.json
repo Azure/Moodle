@@ -201,7 +201,6 @@
         "extLbID": "[resourceId('Microsoft.Network/loadBalancers',parameters('moodleCommon').lbName)]",
         "pipID": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('moodleCommon').lbPipName)]",
         "scriptUri": "[concat(parameters('moodleCommon').scriptLocation,parameters('moodleCommon').webServerSetupScriptFilename,parameters('moodleCommon').artifactsSasToken)]",
-        "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('moodleCommon').storageAccountName)]",
         "vmssID": "[resourceId('Microsoft.Compute/virtualMachineScaleSets',parameters('moodleCommon').vmssName)]",
         "webvmss1NIC": "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('moodleCommon').vmssName, '/virtualMachines/0/networkInterfaces/vmssnic')]",
         "appGwID": "[resourceId('Microsoft.Network/applicationGateways', parameters('moodleCommon').appGwName)]",

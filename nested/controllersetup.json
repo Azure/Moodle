@@ -7,24 +7,6 @@
                 "description": "Common Moodle values"
             },
             "type": "object"
-        },
-        "dbFQDN": {
-            "metadata": {
-                "description": "FQDN of the deployed SQL DB"
-            },
-            "type": "string"
-        },
-        "redisKey": {
-            "metadata": {
-                "description": "Redis cache key from the redis deployment ('None' if redis is not selected)"
-            },
-            "type": "string"
-        },
-        "azureSearchKey": {
-            "metadata": {
-                "description": "Azure Search primary key from the Azure Search service deployment ('None' if Azure Search service is not selected)"
-            },
-            "type": "string"
         }
     },
     "resources": [
@@ -70,7 +52,6 @@
         "documentation14": "    mssqlDbEdition              - MS SQL edition tier",
         "documentation15": "    mssqlDbSize                 - MS SQL database size",
 
-        "scriptUri": "[concat(parameters('moodleCommon').scriptLocation,parameters('moodleCommon').moodleInstallScriptFilename,parameters('moodleCommon').artifactsSasToken)]",
-        "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('moodleCommon').storageAccountName)]"
+        "scriptUri": "[concat(parameters('moodleCommon').scriptLocation,parameters('moodleCommon').moodleInstallScriptFilename,parameters('moodleCommon').artifactsSasToken)]"
     }
 }
