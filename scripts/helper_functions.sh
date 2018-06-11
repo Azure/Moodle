@@ -31,6 +31,7 @@ function get_setup_params_from_configs_json
     export moodledbpass=$(echo $json | jq -r .moodleProfile.dbPassword)
     export adminpass=$(echo $json | jq -r .moodleProfile.adminPassword)
     export dbadminlogin=$(echo $json | jq -r .dbServerProfile.adminLogin)
+    export dbadminloginazure=$(echo $json | jq -r .dbServerProfile.adminLoginAzure)
     export dbadminpass=$(echo $json | jq -r .dbServerProfile.adminPassword)
     export storageAccountName=$(echo $json | jq -r .moodleProfile.storageAccountName)
     export storageAccountKey=$(echo $json | jq -r .moodleProfile.storageAccountKey)

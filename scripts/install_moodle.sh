@@ -39,6 +39,7 @@
     echo $moodledbpass         >> /tmp/vars.txt
     echo $adminpass            >> /tmp/vars.txt
     echo $dbadminlogin         >> /tmp/vars.txt
+    echo $dbadminloginazure    >> /tmp/vars.txt
     echo $dbadminpass          >> /tmp/vars.txt
     echo $storageAccountName   >> /tmp/vars.txt
     echo $storageAccountKey    >> /tmp/vars.txt
@@ -65,16 +66,16 @@
 
     if [ "$dbServerType" = "mysql" ]; then
       mysqlIP=$dbIP
-      mysqladminlogin=$dbadminlogin
+      mysqladminlogin=$dbadminloginazure
       mysqladminpass=$dbadminpass
     elif [ "$dbServerType" = "mssql" ]; then
       mssqlIP=$dbIP
-      mssqladminlogin=$dbadminlogin
+      mssqladminlogin=$dbadminloginazure
       mssqladminpass=$dbadminpass
 
     elif [ "$dbServerType" = "postgres" ]; then
       postgresIP=$dbIP
-      pgadminlogin=$dbadminlogin
+      pgadminlogin=$dbadminloginazure
       pgadminpass=$dbadminpass
     else
       echo "Invalid dbServerType ($dbServerType) given. Only 'mysql' or 'postgres' or 'mssql' is allowed. Exiting"
