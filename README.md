@@ -16,57 +16,15 @@ typical scenarios follow this.
 
 [![Deploy to Azure Fully Configurable](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy.json)  [![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.png)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy.json)
 
-## Minimal deployment
+## Predefined deployment options
+Below are a list of pre-defined/restricted deployment options based on typical deployment scenarios (i.e. dev/test, production etc.) All configurations are fixed and you just need to pass your ssh public key to the template for logging in to the deployed VMs. Please note that the actual cost will be bigger with potentially autoscaled VMs, backups and network cost.
 
-Try the following button if you'd like to deploy our templates with minimal resources.
-All configurations are fixed and you just need to pass your ssh public key to the template
-for logging in to the deployed VMs. This deployment will use NFS, Microsoft SQL, and
-smaller autoscale web frontend VM sku (1 core) that'll give faster deployment time (less than
-30 minutes) and requires only 2 VM cores currently that'll fit even in a free trial Azure subscription. The cost of this deployment can be estimated at
-[this Azure Pricing Calculator link](https://azure.com/e/5f9752c934ab41799ae3264dd2ee57d1). Note the displayed cost in
-in the calculator is the minimum cost. The actual cost will be bigger with potentially
-autoscaled VMs and network cost.
-
-[![Deploy to Azure Minimally](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy-minimal.json)
-
-## Small-to-mid size deployment (without high availability)
-
-Try the following button if you'd like to deploy our templates for small-to-mid-size workload (about up to 1000 concurrent users).
-All configurations are fixed and you just need to pass your ssh public key to the template
-for logging in to the deployed VMs. This deployment will use NFS (no high availability) and MySQL (8 vCores),
-without other options like elastic search or redis cache. The cost of this deployment can be estimated at
-[this Azure Pricing Calculator link](https://azure.com/e/fd794268d0bf421aa17c626fb88f25bc). Note the displayed cost in
-in the calculator is the minimum cost. The actual cost will be bigger with potentially
-autoscaled VMs and network cost.
-
-[![Deploy to Azure Minimally](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy-small2mid-noha.json)
-
-## Large size deployment (with high availability)
-
-Try the following button if you'd like to deploy our templates for large workload (more than 2000 concurrent users).
-All configurations are fixed and you just need to pass your ssh public key to the template
-for logging in to the deployed VMs. This deployment will use Gluster (for high availability, requiring 2 VMs), MySQL (16 vCores) and redis cache,
-without other options like elastic search. The cost of this deployment can be estimated at
-[this Azure Pricing Calculator link](https://azure.com/e/078f7294ab6544e8911ddc2ee28850d7). Note the displayed cost in
-in the calculator is the minimum cost. The actual cost will be bigger with potentially
-autoscaled VMs and network cost.
-
-[![Deploy to Azure Minimally](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy-large-ha.json)
-
-## Maximal deployment
-
-Try the following button if you'd like to deploy our templates with maximal resources
-for best performance. Note that this deployment will incur significant cost.
-All configurations are fixed and you just need to pass your ssh public key to the template
-for logging in to the deployed VMs. This maximal deployment will use Gluster (for
-high availability, adding 2 VMs for a Gluster cluster), MySQL with highest SKU,
-redis cache, elastic search (3 VMs), and pretty large storage sizes (both data
-disks and DB). The cost of this deployment can be estimated
-at [this Azure Pricing Calculator link](https://azure.com/e/e0f959b93ed84eb891dcc44f7883f5b5). Note the displayed cost in
-in the calculator is the minimum cost of this deployment. The actual cost will be bigger with potentially
-autoscaled VMs, backups, and network cost.
-
-[![Deploy to Azure Maximally](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy-maximal.json)
+| Deployment Type | Description | Estimated Cost | Launch |
+| --- | --- | --- | ---
+| Minimal  | This deployment will use NFS, Microsoft SQL, and smaller autoscale web frontend VM sku (1 core) that'll give faster deployment time (less than 30 minutes) and requires only 2 VM cores currently that'll fit even in a free trial Azure subscription.|[link](https://azure.com/e/5f9752c934ab41799ae3264dd2ee57d1)|[![Deploy to Azure Minimally](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy-minimal.json)
+| Small to Mid-Size | Supporting up to 1000 concurrent users.  This deployment will use NFS (no high availability) and MySQL (8 vCores), without other options like elastic search or redis cache.|[link](https://azure.com/e/fd794268d0bf421aa17c626fb88f25bc)|[![Deploy to Azure Minimally](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy-small2mid-noha.json)
+|Large size deployment (with high availability)| Supporting more than 2000 concurrent users. This deployment will use Gluster (for high availability, requiring 2 VMs), MySQL (16 vCores) and redis cache, without other options like elastic search. |[link](https://azure.com/e/078f7294ab6544e8911ddc2ee28850d7)|[![Deploy to Azure Minimally](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy-large-ha.json)
+| Maximum |This maximal deployment will use Gluster (for high availability, adding 2 VMs for a Gluster cluster), MySQL with highest SKU, redis cache, elastic search (3 VMs), and pretty large storage sizes (both data disks and DB).|[link](https://azure.com/e/e0f959b93ed84eb891dcc44f7883f5b5)|[![Deploy to Azure Maximally](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy-maximal.json)
 
 ## Stack Architecture
 
