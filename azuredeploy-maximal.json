@@ -35,7 +35,7 @@
                     "_artifactsLocationSasToken":   { "value": "[parameters('_artifactsLocationSasToken')]" },
                     "redisDeploySwitch":            { "value": true },
                     "azureBackupSwitch":            { "value": true },
-                    "installElasticSearchSwitch":   { "value": true },
+                    "searchType":                   { "value": "elastic" },
                     "sshPublicKey":                 { "value": "[parameters('sshPublicKey')]" },
                     "mysqlPgresVcores":             { "value": 16 },
                     "mysqlPgresStgSizeGB":          { "value": 512 },
