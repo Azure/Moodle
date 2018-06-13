@@ -883,6 +883,9 @@ EOF
    #else # mssql. TODO It's missed earlier! Complete this!
    fi
 
+   # setting user sessions to DB
+   sed -i "23 a \$CFG->session_handler_class = '\\\core\\session\\\database';" /moodle/html/moodle/config.php
+
    # Turning off services we don't need the controller running
    service nginx stop
    service php${PhpVer}-fpm stop
