@@ -883,6 +883,9 @@ EOF
    #else # mssql. TODO It's missed earlier! Complete this!
    fi
 
+   # setting the local cache file directory
+   sed -i "23 a \$CFG->localcachedir = '/tmp/moodle';" /moodle/html/moodle/config.php
+
    # Turning off services we don't need the controller running
    service nginx stop
    service php${PhpVer}-fpm stop
