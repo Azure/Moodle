@@ -110,14 +110,6 @@ that is inexpensive but probably too low spec to use beyond simple
 testing scenarios. This section includes an overview of how to size
 the database and VM instances for your use case.
 
-It should be noted that as of the time of this writing both Postgres
-and MySQL databases are in preview at Azure. In the future larger DB
-sizes or different VM sizes will be available. The templates will
-allow you to select whatever size you want, but there are restrictions
-in place (VMs with certain storage types, disk size for database
-tiers, etc) that may prevent certains selections from working
-together.
-
 ### Database Sizing
 
 As of the time of this writing, Azure supports "Basic", "General Purpose" and "Memory Optimized"
