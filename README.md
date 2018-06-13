@@ -5,16 +5,17 @@ This repo contains guides and [Azure Resource Manager](https://docs.microsoft.co
 [Moodle](https://moodle.com) cluster on Azure. In addition, the repo contains other useful information relevant to running Moodle on Azure such as a listing of Azure-relevant Moodle plugins and information on how to offer Moodle as a Managed Application on the Azure Marketplace or on an IT Service Catalog. 
 
 If you have Azure account you can deploy Moodle via the [Azure portal](https://portal.azure.com) using the button below, or you can [deploy Moodle via the
-CLI](docs/Deploy.md). Please note that while you can use an [Azure free account](https://azure.microsoft.com/en-us/free/) to get started depending on which template configuration you choose you will likely be required to upgrade to a paid account.
+CLI](docs/Deploy.md). Please note that while you can use an [Azure free account](https://azure.microsoft.com/en-us/free/) to get started depending on which template configuration you choose you will likely be required to upgrade to a paid account. 
 
 ## Fully configurable deployment
 
 The following button will allow you to specify various configurations for your Moodle cluster
-deployment. The number of configuration options might be overwhelming, and we'll add more
-detailed sizing guidelines in the future. Some pre-defined/restricted deployment options for
-typical scenarios follow this.
+deployment. The number of configuration options might be overwhelming, so some pre-defined/restricted deployment options for
+typical Moodle scenarios follow this.
 
 [![Deploy to Azure Fully Configurable](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy.json)  [![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.png)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy.json)
+
+NOTE:  All of the deployment options require you to provide a valid SSH key. If you are unfamiliar with SSH then you should read this [article](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/mac-create-ssh-keys) which will explain how to generate a key. If on Windows you can also use a tool like PuTTY to generate a key.  If you are new to SSH, remember SSH is a key pair solution. What this means is you have a public key and a private key, and the one you will be using at deploy is the public key.
 
 ## Predefined deployment options
 Below are a list of pre-defined/restricted deployment options based on typical deployment scenarios (i.e. dev/test, production etc.) All configurations are fixed and you just need to pass your ssh public key to the template for logging in to the deployed VMs. Please note that the actual cost will be bigger with potentially autoscaled VMs, backups and network cost.
