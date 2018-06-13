@@ -883,6 +883,9 @@ EOF
    #else # mssql. TODO It's missed earlier! Complete this!
    fi
 
+   # setting file locking to false
+   sed -i "23 a \$CFG->preventfilelocking = false;" /moodle/html/moodle/config.php
+
    # Turning off services we don't need the controller running
    service nginx stop
    service php${PhpVer}-fpm stop
