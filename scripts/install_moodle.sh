@@ -181,7 +181,8 @@
     mkdir -p /moodle/html
     mkdir -p /moodle/certs
     mkdir -p /moodle/moodledata
-    chown -R www-data.www-data /moodle
+    mkdir -p /var/run/moodle/localcache
+    chown -R www-data.www-data /moodle /var/run/moodle/localcache
 
     o365pluginVersion=$(get_o365plugin_version_from_moodle_version $moodleVersion)
     moodleStableVersion=$o365pluginVersion  # Need Moodle stable version for GDPR plugins, and o365pluginVersion is just Moodle stable version, so reuse it.
@@ -884,7 +885,7 @@ EOF
    fi
 
    # setting the local cache file directory
-   sed -i "23 a \$CFG->localcachedir = '/tmp/moodle';" /moodle/html/moodle/config.php
+   sed -i "23 a \$CFG->localcachedir = '/var/run/moodle/localcache';" /moodle/html/moodle/config.php
 
    # Turning off services we don't need the controller running
    service nginx stop
