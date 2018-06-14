@@ -53,6 +53,10 @@ check_fileServerType_param $fileServerType
 
   sudo apt-get -y install postgresql-client mysql-client git
 
+  # set up initial moodle directory for local cache
+  sudo mkdir -p /var/run/moodle/localcache
+  sudo chown -R www-data.www-data /var/run/moodle/localcache
+
   if [ $fileServerType = "gluster" ]; then
     #configure gluster repository & install gluster client
     sudo add-apt-repository ppa:gluster/glusterfs-3.8 -y
