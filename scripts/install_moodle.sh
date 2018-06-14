@@ -883,8 +883,10 @@ EOF
    #else # mssql. TODO It's missed earlier! Complete this!
    fi
 
-   # setting file locking to false
-   sed -i "23 a \$CFG->preventfilelocking = false;" /moodle/html/moodle/config.php
+   # setting file locking to false if fileServerType is set to nfs
+   if [ $fileServerType = "nfs" ]; then
+      sed -i "23 a \$CFG->preventfilelocking = false;" /moodle/html/moodle/config.php
+   fi
 
    # Turning off services we don't need the controller running
    service nginx stop
