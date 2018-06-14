@@ -819,6 +819,9 @@ EOF
         sed -i "23 a \$CFG->session_redis_host = '$redisDns';" /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->session_redis_auth = '$redisAuth';" /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->session_handler_class = '\\\core\\\session\\\redis';" /moodle/html/moodle/config.php
+    else
+        # configure user session handler to use database when the template is not using redis
+        sed -i "23 a \$CFG->session_handler_class = '\\\core\\\session\\\database';" /moodle/html/moodle/config.php
     fi
 
     if [ "$httpsTermination" != "None" ]; then
@@ -882,9 +885,6 @@ EOF
 EOF
    #else # mssql. TODO It's missed earlier! Complete this!
    fi
-
-   # setting user sessions to DB
-   sed -i "23 a \$CFG->session_handler_class = '\\\core\\session\\\database';" /moodle/html/moodle/config.php
 
    # Turning off services we don't need the controller running
    service nginx stop
