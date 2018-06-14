@@ -859,6 +859,11 @@ EOF
         sed -i "23 a \$CFG->alternative_file_system_class = '\\\tool_objectfs\\\azure_file_system';" /moodle/html/moodle/config.php
     fi
 
+   # setting file locking to false if fileServerType is set to nfs
+   if [ $fileServerType = "nfs" ]; then
+      sed -i "23 a \$CFG->preventfilelocking = false;" /moodle/html/moodle/config.php
+   fi
+
    if [ "$dbServerType" = "postgres" ]; then
      # Get a new version of Postgres to match Azure version
      add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main"
@@ -881,11 +886,6 @@ EOF
 22 02 * * * root /usr/bin/pg_dump -Fc -h $postgresIP -U ${azuremoodledbuser} ${moodledbname} > /moodle/db-backup.sql
 EOF
    #else # mssql. TODO It's missed earlier! Complete this!
-   fi
-
-   # setting file locking to false if fileServerType is set to nfs
-   if [ $fileServerType = "nfs" ]; then
-      sed -i "23 a \$CFG->preventfilelocking = false;" /moodle/html/moodle/config.php
    fi
 
    # Turning off services we don't need the controller running
