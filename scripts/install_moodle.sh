@@ -861,6 +861,8 @@ EOF
 
    # setting file locking to false if fileServerType is set to nfs
    if [ $fileServerType = "nfs" ]; then
+      sed -i "23 a \$CFG->preventfilelocking = true;" /moodle/html/moodle/config.php
+   else
       sed -i "23 a \$CFG->preventfilelocking = false;" /moodle/html/moodle/config.php
    fi
 
