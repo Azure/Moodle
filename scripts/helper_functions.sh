@@ -237,39 +237,48 @@ function add_local_filesystem_to_fstab {
     fi
 }
 
-function create_filesystem_with_raid {
+function setup_raid_disk_and_filesystem {
     local MOUNTPOINT=${1}     # E.g., /moodle
     local RAIDDISK=${2}       # E.g., /dev/md1
     local RAIDPARTITION=${3}  # E.g., /dev/md1p1
-
-    mkdir -p $MOUNTPOINT
+    local CREATE_FILESYSTEM=${4}  # E.g., "" (true) or any non-empty string (false)
 
     local DISKS=$(scan_for_new_disks "/dev/sda|/dev/sdb")
     echo "Disks are ${DISKS}"
     declare -i DISKCOUNT
     local DISKCOUNT=$(echo "$DISKS" | wc -w) 
     echo "Disk count is $DISKCOUNT"
-    if [ $DISKCOUNT = "0" ];
-    then
-        echo "No new (unpartitioned) disks available... Returning..."
-        return
-    elif [ $DISKCOUNT -gt 1 ];
-    then
-        create_raid0_ubuntu /dev/md1 128 $DISKCOUNT $DISKS
-        do_partition ${RAIDDISK}
-        local PARTITION="${RAIDPARTITION}"
-    else
-        do_partition ${DISKS}
-        local PARTITION=$(fdisk -l ${DISKS}|grep -A 1 Device|tail -n 1|awk '{print $1}')
+    if [ $DISKCOUNT = "0" ]; then
+        echo "No new (unpartitioned) disks available... Returning non-zero..."
+        return 1
     fi
 
-    echo "Creating filesystem on ${PARTITION}."
-    mkfs -t ext4 ${PARTITION}
-    mkdir -p "${MOUNTPOINT}"
-    local UUID=$(blkid -u filesystem ${PARTITION}|awk -F "[= ]" '{print $3}'|tr -d "\"")
-    add_local_filesystem_to_fstab "${UUID}" "${MOUNTPOINT}"
-    echo "Mounting disk ${PARTITION} on ${MOUNTPOINT}"
-    mount "${MOUNTPOINT}"
+    if [ $DISKCOUNT -gt 1 ]; then
+        create_raid0_ubuntu ${RAIDDISK} 128 $DISKCOUNT $DISKS
+        AZMDL_DISK=$RAIDDISK
+        if [ -z "$CREATE_FILESYSTEM" ]; then
+          do_partition ${RAIDDISK}
+          local PARTITION="${RAIDPARTITION}"
+        fi
+    else # Just one unpartitioned disk
+        AZMDL_DISK=$DISKS
+        if [ -z "$CREATE_FILESYSTEM" ]; then
+          do_partition ${DISKS}
+          local PARTITION=$(fdisk -l ${DISKS}|grep -A 1 Device|tail -n 1|awk '{print $1}')
+        fi
+    fi
+
+    echo "Disk (RAID if multiple unpartitioned disks, or as is if only one unpartitioned disk) is set up, and env var AZMDL_DISK is set to '$AZMDL_DISK' for later reference"
+
+    if [ -z "$CREATE_FILESYSTEM" ]; then
+      echo "Creating filesystem on ${PARTITION}."
+      mkfs -t ext4 ${PARTITION}
+      mkdir -p "${MOUNTPOINT}"
+      local UUID=$(blkid -u filesystem ${PARTITION}|awk -F "[= ]" '{print $3}'|tr -d "\"")
+      add_local_filesystem_to_fstab "${UUID}" "${MOUNTPOINT}"
+      echo "Mounting disk ${PARTITION} on ${MOUNTPOINT}"
+      mount "${MOUNTPOINT}"
+    fi
 }
 
 function configure_nfs_server_and_export {

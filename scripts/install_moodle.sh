@@ -98,7 +98,7 @@
         sudo add-apt-repository ppa:gluster/glusterfs-3.8 -y                 >> /tmp/apt1.log
     elif [ $fileServerType = "nfs" ]; then
         # configure NFS server and export
-        create_filesystem_with_raid /moodle /dev/md1 /dev/md1p1
+        setup_raid_disk_and_filesystem /moodle /dev/md1 /dev/md1p1
         configure_nfs_server_and_export /moodle
     fi
 

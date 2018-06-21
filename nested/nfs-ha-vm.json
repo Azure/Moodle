@@ -2,6 +2,19 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "_artifactsLocation": {
+            "type": "string",
+            "metadata": {
+                "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
+            }
+        },
+        "_artifactsLocationSasToken": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+            },
+            "defaultValue": ""
+        },
         "vmIndex": {
             "metadata": {
                 "description": "Index of the VM"
@@ -21,9 +34,15 @@
             },
             "type": "string"
         },
-        "ipAddr": {
+        "ipAddrs": {
             "metadata": {
-                "description": "Statically assigned private IP that should be assigned to the VM's NIC to be deployed. Must belong to the IP range of the specified subnet"
+                "description": "Statically assigned private IP addresses that should be assigned to the two VMs' NICs to be deployed. Must belong to the IP range of the specified subnet"
+            },
+            "type": "array"
+        },
+        "nfsClientsIPRange": {
+            "metadata": {
+                "description": "IP range of the allowed NFS clients. E.g., 10.0.0.0/24"
             },
             "type": "string"
         },
@@ -79,17 +98,17 @@
         },
         "dataDiskCountPerVM": {
             "metadata": {
-                "description": "Number of data disks per VM"
+                "description": "Number of data disks per VM. 2 or more disks will be configured as RAID0"
             },
-            "defaultValue": 2,
-            "minValue": 2,
+            "defaultValue": 1,
+            "minValue": 1,
             "maxValue": 8,
             "type": "int"
         },
         "dataDiskSizeInGB": {
             "defaultValue": 32,
             "metadata": {
-                "description": "Size per disk in an NFS server"
+                "description": "Size of each disk in an NFS server"
             },
             "type": "int"
         },
@@ -119,7 +138,7 @@
                         "name": "[variables('ipcfgName')]",
                         "properties": {
                             "privateIPAllocationMethod": "Static",
-                            "privateIPAddress": "[parameters('ipAddr')]",
+                            "privateIPAddress": "[parameters('ipAddrs')[parameters('vmIndex')]]",
                             "subnet": {
                                 "id": "[parameters('subnetId')]"
                             },
@@ -199,8 +218,36 @@
                     ]
                 }
             },
+            "resources": [
+                {
+                    "type": "extensions",
+                    "apiVersion": "2017-03-30",
+                    "dependsOn": [
+                        "[concat('Microsoft.Compute/virtualMachines/', variables('vmResourceName'))]"
+                    ],
+                    "location": "[parameters('location')]",
+                    "name": "setup_nfs_ha",
+                    "properties": {
+                        "publisher": "Microsoft.Azure.Extensions",
+                        "settings": {
+                            "fileUris": [
+                                "[variables('scriptUri')]",
+                                "[variables('commonFunctionsScriptUri')]"
+                            ]
+                        },
+                        "protectedSettings":{
+                            "commandToExecute": "[variables('cmdExec')]"
+                        },
+                        "type": "CustomScript",
+                        "typeHandlerVersion": "2.0"
+                    },
+                    "tags": {
+                        "displayName": "NFS-HA VM setup CustomScript extension"
+                    }
+                }
+                    ],
             "tags": {
-                "displayName": "[concat('NFS-HA Virtual Machine', variables('vmName'))]"
+                "displayName": "[concat('NFS-HA Virtual Machine ', variables('vmName'))]"
             }
         }
     ],
@@ -208,12 +255,9 @@
         "nicName": "[concat('nfs-ha-nic', parameters('vmIndex'), '-', parameters('resourcesUniqueString'))]",
         "ipCfgName": "[concat('nfs-ha-ipcfg', parameters('vmIndex'))]",
         "vmResourceName": "[concat('nfs-ha-vm', parameters('vmIndex'), '-', parameters('resourcesUniqueString'))]",
-        "vmName": "[concat('nfsnode', parameters('vmIndex'), '-', parameters('resourcesUniqueString'))]"
-    },
-    "outputs": {
-        "ipCfgId": {
-            "value": "[resourceId('Microsoft.Network/networkInterfaces/ipConfigurations', variables('nicName'), variables('ipCfgName'))]",
-            "type": "string"
-        }
+        "vmName": "[concat('hanode', parameters('vmIndex'), '-', parameters('resourcesUniqueString'))]",
+        "scriptUri": "[concat(parameters('_artifactsLocation'), 'scripts/setup_nfs_ha.sh', parameters('_artifactsLocationSasToken'))]",
+        "commonFunctionsScriptUri": "[concat(parameters('_artifactsLocation'), 'scripts/helper_functions.sh', parameters('_artifactsLocationSasToken'))]",
+        "cmdExec": "[concat('bash -x setup_nfs_ha.sh hanode0-', parameters('resourcesUniqueString'), ' ', parameters('ipAddrs')[0], ' hanode1-', parameters('resourcesUniqueString'), ' ', parameters('ipAddrs')[1], ' ', parameters('nfsClientsIPRange'))]"
     }
 }
