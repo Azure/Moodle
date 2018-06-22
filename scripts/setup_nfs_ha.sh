@@ -27,6 +27,13 @@ function setup_required_packages
     systemctl stop nfs-kernel-server
     systemctl disable nfs-kernel-server
 
+    # Setup static port assignments for mountd, nlm (tcp), and nlm (udp) respectively:
+	sed -i 's/^\(RPCMOUNTDOPTS="--manage-gids\)"/\1 -p 2000"/g' /etc/default/nfs-kernel-server
+	cat <<EOF > /etc/sysctl.d/30-nfs-ports.conf
+fs.nfs.nlm_tcpport = 2001
+fs.nfs.nlm_udpport = 2002
+EOF
+
     # We need to install the "azure-lb" command separately if the resource-agents package didn't have it.
     pushd /usr/lib/ocf/resource.d/heartbeat
     if [ ! -e azure-lb ]; then
