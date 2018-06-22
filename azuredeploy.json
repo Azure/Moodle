@@ -362,10 +362,11 @@
             "defaultValue": "nfs",
             "allowedValues": [
                 "gluster",
-                "nfs"
+                "nfs",
+                "nfs-ha"
             ],
             "metadata": {
-                "description": "File server type: GlusterFS, NFS--not yet highly available"
+                "description": "File server type: GlusterFS, NFS, and NFS-HA (2-VM highly available NFS cluster)"
             },
             "type": "string"
         },
@@ -385,10 +386,10 @@
             },
             "type": "int"
         },
-        "glusterVmSku": {
+        "fileServerVmSku": {
             "defaultValue": "Standard_DS2_v2",
             "metadata": {
-                "description": "VM size for the gluster nodes"
+                "description": "VM size for the gluster or NFS-HA nodes"
             },
             "type": "string"
         },
@@ -812,6 +813,75 @@
             }
         },
         {
+            "condition": "[equals(parameters('fileServerType'),'nfs-ha')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/networkTemplate",
+                "Microsoft.Resources/deployments/recoveryTemplate"
+            ],
+            "name": "nfsHaTemplate",
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {
+                    "_artifactsLocation": {
+                        "value": "[parameters('_artifactsLocation')]"
+                    },
+                    "_artifactsLocationSasToken": {
+                        "value": "[parameters('_artifactsLocationSasToken')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "subnetId": {
+                        "value": "[reference('networkTemplate').outputs.subnetIdSan.value]"
+                    },
+                    "node0IPAddr": {
+                        "value": "[variables('moodleCommon').nfsHaNode0IP]"
+                    },
+                    "node1IPAddr": {
+                        "value": "[variables('moodleCommon').nfsHaNode1IP]"
+                    },
+                    "nfsClientsIPRange": {
+                        "value": "[variables('moodleCommon').nfsHaClientsIPRange]"
+                    },
+                    "lbFrontEndIpAddr": {
+                        "value": "[variables('moodleCommon').nfsHaLbIP]"
+                    },
+                    "enableAccelNwSwitch": {
+                        "value": "[parameters('enableAccelNwForOtherVmsSwitch')]"
+                    },
+                    "vmSku": {
+                        "value": "[variables('moodleCommon').fileServerVmSku]"
+                    },
+                    "adminUserName": {
+                        "value": "[parameters('sshUsername')]"
+                    },
+                    "sshPublicKey": {
+                        "value": "[parameters('sshPublicKey')]"
+                    },
+                    "osType": {
+                        "value": "[variables('moodleCommon').osType]"
+                    },
+                    "osDiskStorageType": {
+                        "value": "[parameters('osDiskStorageType')]"
+                    },
+                    "dataDiskCountPerVM": {
+                        "value": "[parameters('fileServerDiskCount')]"
+                    },
+                    "dataDiskSizeInGB": {
+                        "value": "[parameters('fileServerDiskSize')]"
+                    },
+                    "resourcesUniqueString": {
+                        "value": "[variables('resourceprefix')]"
+                    }
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl, 'nfs-ha.json', parameters('_artifactsLocationSasToken'))]"
+                }
+            }
+        },
+        {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
             "dependsOn": [
@@ -852,6 +922,7 @@
             "dependsOn": [
                 "Microsoft.Resources/deployments/vmSetupParamsTemplate",
                 "Microsoft.Resources/deployments/glusterTemplate",
+                "Microsoft.Resources/deployments/nfsHaTemplate",
                 "Microsoft.Resources/deployments/recoveryTemplate",
                 "Microsoft.Resources/deployments/networkTemplate",
                 "Microsoft.Resources/deployments/dbTemplate",
@@ -995,6 +1066,11 @@
             "commonFunctionsScriptUri": "[concat(parameters('_artifactsLocation'),'scripts/helper_functions.sh',parameters('_artifactsLocationSasToken'))]",
             "controllerVmSku": "[parameters('controllerVmSku')]",
             "customVnetId": "[parameters('customVnetId')]",
+            "ctlrNicName": "[concat('controller-vm-nic-',variables('resourceprefix'))]",
+            "ctlrNsgName": "[concat('controller-nsg-',variables('resourceprefix'))]",
+            "ctlrPipName": "[concat('controller-pubip-',variables('resourceprefix'))]",
+            "ctlrVmName": "[concat('controller-vm-',variables('resourceprefix'))]",
+            "ctlrVmSecrets": "[take(variables('ctlrVmSecretsArray'), if(empty(parameters('keyVaultResourceId')), 0, 1))]",
             "dbLogin": "[parameters('dbLogin')]",
             "dbLoginPassword": "[concat(substring(uniqueString(resourceGroup().id, deployment().name), 2, 11), '*7', toUpper('pfiwb'))]",
             "dbServerType": "[parameters('dbServerType')]",
@@ -1025,24 +1101,19 @@
             "fileServerDiskCount": "[parameters('fileServerDiskCount')]",
             "fileServerDiskSize": "[parameters('fileServerDiskSize')]",
             "fileServerType": "[parameters('fileServerType')]",
+            "fileServerVmCount": 2,
+            "fileServerVmSku": "[parameters('fileServerVmSku')]",
             "gatewayName": "[concat('vnet-gateway-',variables('resourceprefix'))]",
             "gatewayPublicIPName": "[concat('vnet-gw-ip-',variables('resourceprefix'))]",
             "gatewayType": "[parameters('gatewayType')]",
             "gfsNameRoot": "[concat('gluster-vm-',variables('resourceprefix'))]",
             "gfxAvailabilitySetName": "[concat('gluster-avset-',variables('resourceprefix'))]",
             "glusterScriptFilename": "install_gluster.sh",
-            "glusterVmCount": 2,
-            "glusterVmSku": "[parameters('glusterVmSku')]",
             "htmlLocalCopySwitch": "[parameters('htmlLocalCopySwitch')]",
             "httpsTermination": "[parameters('httpsTermination')]",
             "installGdprPluginsSwitch": "[parameters('installGdprPluginsSwitch')]",
             "installO365pluginsSwitch": "[parameters('installO365pluginsSwitch')]",
             "installObjectFsSwitch": "[parameters('installObjectFsSwitch')]",
-            "ctlrNicName": "[concat('controller-vm-nic-',variables('resourceprefix'))]",
-            "ctlrNsgName": "[concat('controller-nsg-',variables('resourceprefix'))]",
-            "ctlrPipName": "[concat('controller-pubip-',variables('resourceprefix'))]",
-            "ctlrVmName": "[concat('controller-vm-',variables('resourceprefix'))]",
-            "ctlrVmSecrets": "[take(variables('ctlrVmSecretsArray'), if(empty(parameters('keyVaultResourceId')), 0, 1))]",
             "lbDns": "[concat('lb-',variables('resourceprefix'),'.',parameters('location'),'.cloudapp.azure.com')]",
             "lbSku": "[parameters('loadBalancerSku')]",
             "lbName": "[concat('lb-',variables('resourceprefix'))]",
@@ -1066,6 +1137,11 @@
             "mysqlPgresStgSizeGB": "[parameters('mysqlPgresStgSizeGB')]",
             "mysqlPgresVcores": "[parameters('mysqlPgresVcores')]",
             "mysqlVersion": "[parameters('mysqlVersion')]",
+            "nfsHaClientsIPRange": "[variables('subnetWebRange')]",
+            "nfsHaExportPath": "/drbd/data",
+            "nfsHaLbIP": "[concat(variables('subnetSanPrefix'), '.100')]",
+            "nfsHaNode0IP": "[concat(variables('subnetSanPrefix'), '.110')]",
+            "nfsHaNode1IP": "[concat(variables('subnetSanPrefix'), '.120')]",
             "osDiskStorageType": "[parameters('osDiskStorageType')]",
             "osType": {
                 "offer": "UbuntuServer",
@@ -1100,14 +1176,14 @@
             "subnetRedisPrefix": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),3)))]",
             "subnetRedisRange": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),3)), '.0/24')]",
             "subnetSan": "[concat('san-subnet-',variables('resourceprefix'))]",
-            "subnetSanPrefix": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),2)))]",
+            "subnetSanPrefix": "[variables('subnetSanPrefix')]",
             "subnetSanRange": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),2)), '.0/24')]",
             "subnetTika": "[concat('tika-subnet-',variables('resourceprefix'))]",
             "subnetTikaPrefix": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),1)))]",
             "subnetTikaRange": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),1)), '.0/24')]",
             "subnetWeb": "[concat('web-subnet-',variables('resourceprefix'))]",
             "subnetWebPrefix": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),0)))]",
-            "subnetWebRange": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),0)), '.0/24')]",
+            "subnetWebRange": "[variables('subnetWebRange')]",
             "thumbprintSslCert": "[if(or(empty(parameters('keyVaultResourceId')), empty(parameters('sslCertThumbprint'))), 'None', parameters('sslCertThumbprint'))]",
             "thumbprintCaCert": "[if(or(empty(parameters('keyVaultResourceId')), empty(parameters('caCertThumbprint'))), 'None', parameters('caCertThumbprint'))]",
             "tikaNicName": "[concat('tika-vm-nic-',variables('resourceprefix'))]",
@@ -1143,6 +1219,8 @@
             }
         ],
         "octets": "[split(parameters('vNetAddressSpace'), '.')]",
-        "resourceprefix": "[substring(uniqueString(resourceGroup().id, deployment().name), 3, 6)]"
+        "resourceprefix": "[substring(uniqueString(resourceGroup().id, deployment().name), 3, 6)]",
+        "subnetSanPrefix": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),2)))]",
+        "subnetWebRange": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),0)), '.0/24')]"
     }
 }

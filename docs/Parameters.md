@@ -263,7 +263,7 @@ Possible Values: ["Vpn","ER"]
 Default: Vpn
 
 
-### glusterVmSku
+### fileServerVmSku
 
 VM size for the gluster nodes
 

@@ -155,6 +155,10 @@
         # mount gluster files system
         echo -e '\n\rInstalling GlusterFS on '$glusterNode':/'$glusterVolume '/moodle\n\r' 
         setup_and_mount_gluster_moodle_share $glusterNode $glusterVolume
+    elif [ $fileServerType = "nfs-ha" ]; then
+        # mount NFS-HA export
+        echo -e '\n\rMounting NFS export from '$nfsHaLbIP' on /moodle\n\r'
+        configure_nfs_client_and_mount $nfsHaLbIP $nfsHaExportPath /moodle
     fi
     
     # install pre-requisites
@@ -890,7 +894,7 @@ EOF
    service varnishncsa stop
    service varnishlog stop
 
-   if [ $fileServerType = "gluster" -o $fileServerType = "nfs" ]; then
+   if [ $fileServerType = "gluster" -o $fileServerType = "nfs" -o $fileServerType = "nfs-ha" ]; then
       # make sure Moodle can read its code directory but not write
       sudo chown -R root.root /moodle/html/moodle
       sudo find /moodle/html/moodle -type f -exec chmod 644 '{}' \;

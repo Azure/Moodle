@@ -235,13 +235,13 @@ setup_drbd_module_and_tools
 # AZMDL_DISK env var is set by the function as the discovered/initialized disk
 setup_raid_disk_and_filesystem None /dev/md0 None False
 
-DRBD_RESOURCE_NAME=azmdlr0
+DRBD_RESOURCE_NAME=azmdlr0   # TODO Avoid hard-coded value
 DRBD_DEVICE_PATH=/dev/drbd0
-DRBD_MOUNT_POINT=/drbd
+DRBD_MOUNT_POINT=/drbd       # TODO Avoid hard-coded value
 
 setup_drbd_with_disk $AZMDL_DISK $NODE1NAME $NODE1IP $NODE2NAME $NODE2IP $DRBD_RESOURCE_NAME $DRBD_DEVICE_PATH $DRBD_MOUNT_POINT
 
-NFS_EXPORT_PATH=${DRBD_MOUNT_POINT}/moodle  # TODO Allow different export dir name
+NFS_EXPORT_PATH=${DRBD_MOUNT_POINT}/data  # TODO Allow different export dir name -- This requires changes all along the pipeline, from the top-level template to this script...
 
 setup_corosync_and_pacemaker_for_nfs $NODE1IP $NODE2IP $DRBD_RESOURCE_NAME $DRBD_DEVICE_PATH $DRBD_MOUNT_POINT $NFS_EXPORT_PATH "$NFS_CLIENTS_IP_RANGE"
 

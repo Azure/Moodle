@@ -94,7 +94,13 @@ check_fileServerType_param $fileServerType
     sudo echo -e 'Adding Gluster FS to /etc/fstab and mounting it'
     setup_and_mount_gluster_moodle_share $glusterNode $glusterVolume
   elif [ $fileServerType = "nfs" ]; then
+    # mount NFS export (set up on controller VM--No HA)
+    echo -e '\n\rMounting NFS export from '$nfsVmName':/moodle on /moodle and adding it to /etc/fstab\n\r'
     configure_nfs_client_and_mount $nfsVmName /moodle /moodle
+  elif [ $fileServerType = "nfs-ha" ]; then
+    # mount NFS-HA export
+    echo -e '\n\rMounting NFS export from '$nfsHaLbIP':'$nfsHaExportPath' on /moodle and adding it to /etc/fstab\n\r'
+    configure_nfs_client_and_mount $nfsHaLbIP $nfsHaExportPath /moodle
   else # "azurefiles"
     setup_and_mount_azure_files_moodle_share $storageAccountName $storageAccountKey
   fi
