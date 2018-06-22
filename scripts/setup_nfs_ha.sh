@@ -246,3 +246,7 @@ NFS_EXPORT_PATH=${DRBD_MOUNT_POINT}/moodle  # TODO Allow different export dir na
 setup_corosync_and_pacemaker_for_nfs $NODE1IP $NODE2IP $DRBD_RESOURCE_NAME $DRBD_DEVICE_PATH $DRBD_MOUNT_POINT $NFS_EXPORT_PATH "$NFS_CLIENTS_IP_RANGE"
 
 echo "NFS-HA setup succeeded. NFS_EXPORT_PATH=${NFS_EXPORT_PATH}, NFS_CLIENT_SPEC=${NFS_CLIENT_SPEC}"
+
+# TODO The persistent NFS port assignments don't work until rebooted for unknown reasons. Fix this later.
+echo "Restarting the machine in 1 minute to work around the persistent NFS port assignments problem..."
+shutdown -r +1
