@@ -195,7 +195,7 @@ primitive p_nfsserver ocf:heartbeat:nfsserver \
     op monitor interval=10s timeout=20s
 primitive p_exportfs ocf:heartbeat:exportfs \
     params clientspec="${nfs_client_spec}" directory="${nfs_export_path}" fsid=1 \
-    unlock_on_stop=1 options=rw,sync \
+    unlock_on_stop=1 options=rw,sync,no_root_squash \
     op start interval=0s timeout=40s \
     op stop interval=0s timeout=120s \
     op monitor interval=10s timeout=20s
