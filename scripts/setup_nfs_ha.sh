@@ -96,6 +96,14 @@ resource $drbd_resource_name {
     device      ${drbd_device_path};
     disk        /dev/${vgname}/${lvname};
     meta-disk   internal;
+    disk {
+        c-fill-target 1M;
+        c-max-rate 110M;
+        c-min-rate 120K;
+    }
+    net {
+        max-buffers 20k;
+    }
     on ${node1name} {
         address ${node1ip}:7789;
     }
