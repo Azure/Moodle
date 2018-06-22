@@ -171,7 +171,7 @@
                 ],
                 "loadBalancingRules": [
                     {
-                        "name": "[concat(variables('nfsHaLbRuleName'), 'nfsd-tcp')]",
+                        "name": "[concat(variables('nfsHaLbRuleName'), '-nfsd-tcp')]",
                         "properties": {
                             "frontendIPConfiguration": {
                                 "id": "[variables('nfsHaLbFeId')]"
@@ -190,7 +190,26 @@
                         }
                     },
                     {
-                        "name": "[concat(variables('nfsHaLbRuleName'), 'rpcbind-tcp')]",
+                        "name": "[concat(variables('nfsHaLbRuleName'), '-nfsd-udp')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[variables('nfsHaLbFeId')]"
+                            },
+                            "frontendPort": 2049,
+                            "backendAddressPool": {
+                                "id": "[variables('nfsHaLbBeId')]"
+                            },
+                            "backendPort": 2049,
+                            "protocol": "Udp",
+                            "probe": {
+                                "id": "[variables('nfsHaLbProbeId')]"
+                            },
+                            "enableFloatingIP": false,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(variables('nfsHaLbRuleName'), '-rpcbind-tcp')]",
                         "properties": {
                             "frontendIPConfiguration": {
                                 "id": "[variables('nfsHaLbFeId')]"
@@ -209,73 +228,16 @@
                         }
                     },
                     {
-                        "name": "[concat(variables('nfsHaLbRuleName'), 'mountd-tcp')]",
+                        "name": "[concat(variables('nfsHaLbRuleName'), '-rpcbind-udp')]",
                         "properties": {
                             "frontendIPConfiguration": {
                                 "id": "[variables('nfsHaLbFeId')]"
                             },
-                            "frontendPort": 4002,
+                            "frontendPort": 111,
                             "backendAddressPool": {
                                 "id": "[variables('nfsHaLbBeId')]"
                             },
-                            "backendPort": 4002,
-                            "protocol": "Tcp",
-                            "probe": {
-                                "id": "[variables('nfsHaLbProbeId')]"
-                            },
-                            "enableFloatingIP": false,
-                            "idleTimeoutInMinutes": 4
-                        }
-                    },
-                    {
-                        "name": "[concat(variables('nfsHaLbRuleName'), 'statd-tcp')]",
-                        "properties": {
-                            "frontendIPConfiguration": {
-                                "id": "[variables('nfsHaLbFeId')]"
-                            },
-                            "frontendPort": 4003,
-                            "backendAddressPool": {
-                                "id": "[variables('nfsHaLbBeId')]"
-                            },
-                            "backendPort": 4003,
-                            "protocol": "Tcp",
-                            "probe": {
-                                "id": "[variables('nfsHaLbProbeId')]"
-                            },
-                            "enableFloatingIP": false,
-                            "idleTimeoutInMinutes": 4
-                        }
-                    },
-                    {
-                        "name": "[concat(variables('nfsHaLbRuleName'), 'lockd-tcp')]",
-                        "properties": {
-                            "frontendIPConfiguration": {
-                                "id": "[variables('nfsHaLbFeId')]"
-                            },
-                            "frontendPort": 4004,
-                            "backendAddressPool": {
-                                "id": "[variables('nfsHaLbBeId')]"
-                            },
-                            "backendPort": 4004,
-                            "protocol": "Tcp",
-                            "probe": {
-                                "id": "[variables('nfsHaLbProbeId')]"
-                            },
-                            "enableFloatingIP": false,
-                            "idleTimeoutInMinutes": 4
-                        }
-                    },
-                    {
-                        "name": "[concat(variables('nfsHaLbRuleName'), 'lockd-udp')]",
-                        "properties": {
-                            "frontendIPConfiguration": {
-                                "id": "[variables('nfsHaLbFeId')]"
-                            },
-                            "frontendPort": 4004,
-                            "backendAddressPool": {
-                                "id": "[variables('nfsHaLbBeId')]"
-                            },
-                            "backendPort": 4004,
+                            "backendPort": 111,
                             "protocol": "Udp",
                             "probe": {
                                 "id": "[variables('nfsHaLbProbeId')]"
@@ -285,17 +247,226 @@
                         }
                     },
                     {
-                        "name": "[concat(variables('nfsHaLbRuleName'), 'rquotad-tcp')]",
+                        "name": "[concat(variables('nfsHaLbRuleName'), '-mountd-tcp')]",
                         "properties": {
                             "frontendIPConfiguration": {
                                 "id": "[variables('nfsHaLbFeId')]"
                             },
-                            "frontendPort": 4005,
+                            "frontendPort": 2000,
                             "backendAddressPool": {
                                 "id": "[variables('nfsHaLbBeId')]"
                             },
-                            "backendPort": 4005,
+                            "backendPort": 2000,
                             "protocol": "Tcp",
+                            "probe": {
+                                "id": "[variables('nfsHaLbProbeId')]"
+                            },
+                            "enableFloatingIP": false,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(variables('nfsHaLbRuleName'), '-mountd-udp')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[variables('nfsHaLbFeId')]"
+                            },
+                            "frontendPort": 2000,
+                            "backendAddressPool": {
+                                "id": "[variables('nfsHaLbBeId')]"
+                            },
+                            "backendPort": 2000,
+                            "protocol": "Udp",
+                            "probe": {
+                                "id": "[variables('nfsHaLbProbeId')]"
+                            },
+                            "enableFloatingIP": false,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(variables('nfsHaLbRuleName'), '-statd-tcp')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[variables('nfsHaLbFeId')]"
+                            },
+                            "frontendPort": 2001,
+                            "backendAddressPool": {
+                                "id": "[variables('nfsHaLbBeId')]"
+                            },
+                            "backendPort": 2001,
+                            "protocol": "Tcp",
+                            "probe": {
+                                "id": "[variables('nfsHaLbProbeId')]"
+                            },
+                            "enableFloatingIP": false,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(variables('nfsHaLbRuleName'), '-statd-udp')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[variables('nfsHaLbFeId')]"
+                            },
+                            "frontendPort": 2001,
+                            "backendAddressPool": {
+                                "id": "[variables('nfsHaLbBeId')]"
+                            },
+                            "backendPort": 2001,
+                            "protocol": "Udp",
+                            "probe": {
+                                "id": "[variables('nfsHaLbProbeId')]"
+                            },
+                            "enableFloatingIP": false,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(variables('nfsHaLbRuleName'), '-statd-outgoing-tcp')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[variables('nfsHaLbFeId')]"
+                            },
+                            "frontendPort": 2002,
+                            "backendAddressPool": {
+                                "id": "[variables('nfsHaLbBeId')]"
+                            },
+                            "backendPort": 2002,
+                            "protocol": "Tcp",
+                            "probe": {
+                                "id": "[variables('nfsHaLbProbeId')]"
+                            },
+                            "enableFloatingIP": false,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(variables('nfsHaLbRuleName'), '-statd-outgoing-udp')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[variables('nfsHaLbFeId')]"
+                            },
+                            "frontendPort": 2002,
+                            "backendAddressPool": {
+                                "id": "[variables('nfsHaLbBeId')]"
+                            },
+                            "backendPort": 2002,
+                            "protocol": "Udp",
+                            "probe": {
+                                "id": "[variables('nfsHaLbProbeId')]"
+                            },
+                            "enableFloatingIP": false,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(variables('nfsHaLbRuleName'), '-quotad-tcp')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[variables('nfsHaLbFeId')]"
+                            },
+                            "frontendPort": 2003,
+                            "backendAddressPool": {
+                                "id": "[variables('nfsHaLbBeId')]"
+                            },
+                            "backendPort": 2003,
+                            "protocol": "Tcp",
+                            "probe": {
+                                "id": "[variables('nfsHaLbProbeId')]"
+                            },
+                            "enableFloatingIP": false,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(variables('nfsHaLbRuleName'), '-quotad-udp')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[variables('nfsHaLbFeId')]"
+                            },
+                            "frontendPort": 2003,
+                            "backendAddressPool": {
+                                "id": "[variables('nfsHaLbBeId')]"
+                            },
+                            "backendPort": 2003,
+                            "protocol": "Udp",
+                            "probe": {
+                                "id": "[variables('nfsHaLbProbeId')]"
+                            },
+                            "enableFloatingIP": false,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(variables('nfsHaLbRuleName'), '-lockd-tcp')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[variables('nfsHaLbFeId')]"
+                            },
+                            "frontendPort": 2004,
+                            "backendAddressPool": {
+                                "id": "[variables('nfsHaLbBeId')]"
+                            },
+                            "backendPort": 2004,
+                            "protocol": "Tcp",
+                            "probe": {
+                                "id": "[variables('nfsHaLbProbeId')]"
+                            },
+                            "enableFloatingIP": false,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(variables('nfsHaLbRuleName'), '-lockd-udp')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[variables('nfsHaLbFeId')]"
+                            },
+                            "frontendPort": 2004,
+                            "backendAddressPool": {
+                                "id": "[variables('nfsHaLbBeId')]"
+                            },
+                            "backendPort": 2004,
+                            "protocol": "Udp",
+                            "probe": {
+                                "id": "[variables('nfsHaLbProbeId')]"
+                            },
+                            "enableFloatingIP": false,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(variables('nfsHaLbRuleName'), '-nfs-callback-tcp')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[variables('nfsHaLbFeId')]"
+                            },
+                            "frontendPort": 2005,
+                            "backendAddressPool": {
+                                "id": "[variables('nfsHaLbBeId')]"
+                            },
+                            "backendPort": 2005,
+                            "protocol": "Tcp",
+                            "probe": {
+                                "id": "[variables('nfsHaLbProbeId')]"
+                            },
+                            "enableFloatingIP": false,
+                            "idleTimeoutInMinutes": 4
+                        }
+                    },
+                    {
+                        "name": "[concat(variables('nfsHaLbRuleName'), '-nfs-callback-udp')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[variables('nfsHaLbFeId')]"
+                            },
+                            "frontendPort": 2005,
+                            "backendAddressPool": {
+                                "id": "[variables('nfsHaLbBeId')]"
+                            },
+                            "backendPort": 2005,
+                            "protocol": "Udp",
                             "probe": {
                                 "id": "[variables('nfsHaLbProbeId')]"
                             },

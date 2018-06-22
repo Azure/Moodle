@@ -27,11 +27,15 @@ function setup_required_packages
     systemctl stop nfs-kernel-server
     systemctl disable nfs-kernel-server
 
-    # Setup static port assignments for mountd, nlm (tcp), and nlm (udp) respectively:
+    # Setup static port assignments for mountd, statd, quotad, nlm (tcp), and nlm (udp) respectively:
 	sed -i 's/^\(RPCMOUNTDOPTS="--manage-gids\)"/\1 -p 2000"/g' /etc/default/nfs-kernel-server
-	cat <<EOF > /etc/sysctl.d/30-nfs-ports.conf
-fs.nfs.nlm_tcpport = 2001
-fs.nfs.nlm_udpport = 2002
+    sed -i 's/^STATDOPTS=.*$/STATDOPTS="--port 2001 --outgoing-port 2002"/' /etc/default/nfs-common
+    if [ -f /etc/default/quota ]; then
+        sed -i 's/^RPCQUOTADOPTS=.*$/RPCQUOTADOPTS="-p 2003"/' /etc/default/quota
+    fi
+	cat <<EOF > /etc/modprobe.d/azmdl-nfs-ports.conf
+options lockd nlm_udpport=2004 nlm_tcpport=2004
+options nfs callback_tcpport=2005
 EOF
 
     # We need to install the "azure-lb" command separately if the resource-agents package didn't have it.
@@ -156,11 +160,9 @@ logging {
 EOF
 
     systemctl enable corosync pacemaker
-    systemctl start corosync pacemaker
+    systemctl restart corosync pacemaker
 
-    # Work around the issue of corosync bound to loopback address (127.0.0.1) by restarting it (suggested in DRBD HA Azure guide)
-    sleep 5 && systemctl restart corosync
-    # TODO Should confirm if 'corosync-cfgtool -s' gives a non-loopback IP address, e.g.:
+    # TODO Should confirm if 'corosync-cfgtool -s' gives a non-loopback IP address (not 127.0.0.1), e.g.:
     # $ corosync-cfgtool -s
     # Printing ring status.
     # Local node ID 2
@@ -210,7 +212,7 @@ EOF
     fi
     # TODO STONITH is disabled for now (two lines above). Should enable it soon.
 
-    # TODO 'crm_mon -r' should show the correctly configured/started cluster resources.
+    # TODO 'crm status' should show the correctly configured/started cluster resources.
 }
 
 # Main
