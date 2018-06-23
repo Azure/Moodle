@@ -80,7 +80,9 @@
                 "type": "[parameters('moodleCommon').fileServerType]",
                 "nfsVmName": "[parameters('moodleCommon').ctlrVmName]",
                 "glusterVmName": "[concat(parameters('moodleCommon').gfsNameRoot, '0')]",
-                "glusterVolName": "data"
+                "glusterVolName": "data",
+                "nfsHaLbIP": "[parameters('moodleCommon').nfsHaLbIP]",
+                "nfsHaExportPath": "[parameters('moodleCommon').nfsHaExportPath]"
             }
         }
     },

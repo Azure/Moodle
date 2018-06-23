@@ -58,7 +58,7 @@
                     "id": "[variables('asRef')]"
                 },
                 "hardwareProfile": {
-                    "vmSize": "[parameters('moodleCommon').glusterVmSku]"
+                    "vmSize": "[parameters('moodleCommon').fileServerVmSku]"
                 },
                 "networkProfile": {
                     "networkInterfaces": [
@@ -169,7 +169,7 @@
         "documentation05": " vnetName                - name of virtual network",
         "documentation06": " subnetSan               - name of subnet for gluster",
         "documentation07": " gfsNameRoot             - nameroot for the gluster nodes - combined with counter to get actual name of each node - disk and nic follow the naming scheme",
-        "documentation08": " glusterVmSku           - VM instance size for gluster nodes",
+        "documentation08": " fileServerVmSku           - VM instance size for gluster nodes",
         "documentation09": " sshUsername           - OS accountusername",
         "documentation10": " osType                  - an array of value that specifies the type of VM",
         "documentation15": "This sub-template calls other sub-templates",
