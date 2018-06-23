@@ -193,26 +193,23 @@
 
     # install Moodle 
     echo '#!/bin/bash
-    cd /tmp
+    mkdir -p /moodle/tmp
+    cd /moodle/tmp
 
     # downloading moodle 
     /usr/bin/curl -k --max-redirs 10 https://github.com/moodle/moodle/archive/'$moodleVersion'.zip -L -o moodle.zip
     /usr/bin/unzip -q moodle.zip
-    /bin/mv -v '$moodleUnzipDir' /moodle/html/moodle
+    /bin/mv '$moodleUnzipDir' /moodle/html/moodle
 
     if [ "'$installGdprPluginsSwitch'" = "true" ]; then
         # install Moodle GDPR plugins (Note: This is only for Moodle versions 3.4.2+ or 3.3.5+ and will be included in Moodle 3.5, so no need for 3.5)
         curl -k --max-redirs 10 https://github.com/moodlehq/moodle-tool_policy/archive/'$moodleStableVersion'.zip -L -o plugin-policy.zip
         unzip -q plugin-policy.zip
-        mkdir -p /moodle/html/moodle/admin/tool/policy
-        cp -r moodle-tool_policy-'$moodleStableVersion'/* /moodle/html/moodle/admin/tool/policy
-        rm -rf moodle-tool_policy-'$moodleStableVersion'
+        mv moodle-tool_policy-'$moodleStableVersion' /moodle/html/moodle/admin/tool/policy
 
         curl -k --max-redirs 10 https://github.com/moodlehq/moodle-tool_dataprivacy/archive/'$moodleStableVersion'.zip -L -o plugin-dataprivacy.zip
         unzip -q plugin-dataprivacy.zip
-        mkdir -p /moodle/html/moodle/admin/tool/dataprivacy
-        cp -r moodle-tool_dataprivacy-'$moodleStableVersion'/* /moodle/html/moodle/admin/tool/dataprivacy
-        rm -rf moodle-tool_dataprivacy-'$moodleStableVersion'
+        mv moodle-tool_dataprivacy-'$moodleStableVersion' /moodle/html/moodle/admin/tool/dataprivacy
     fi
 
     if [ "'$installO365pluginsSwitch'" = "true" ]; then
@@ -227,40 +224,33 @@
         # Install ElasticSearch plugin
         /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-search_elastic/archive/master.zip -L -o plugin-elastic.zip
         /usr/bin/unzip -q plugin-elastic.zip
-        /bin/mkdir -p /moodle/html/moodle/search/engine/elastic
-        /bin/cp -r moodle-search_elastic-master/* /moodle/html/moodle/search/engine/elastic
-        /bin/rm -rf moodle-search_elastic-master
+        /bin/mv moodle-search_elastic-master /moodle/html/moodle/search/engine/elastic
 
         # Install ElasticSearch plugin dependency
         /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-local_aws/archive/master.zip -L -o local-aws.zip
         /usr/bin/unzip -q local-aws.zip
-        /bin/mkdir -p /moodle/html/moodle/local/aws
-        /bin/cp -r moodle-local_aws-master/* /moodle/html/moodle/local/aws
+        /bin/mv moodle-local_aws-master /moodle/html/moodle/local/aws
 
     elif [ "'$searchType'" = "azure" ]; then
         # Install Azure Search service plugin
         /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-search_azure/archive/master.zip -L -o plugin-azure-search.zip
         /usr/bin/unzip -q plugin-azure-search.zip
-        /bin/mkdir -p /moodle/html/moodle/search/engine/azure
-        /bin/cp -r moodle-search_azure-master/* /moodle/html/moodle/search/engine/azure
-        /bin/rm -rf moodle-search_azure-master
+        /bin/mv moodle-search_azure-master /moodle/html/moodle/search/engine/azure
     fi
 
     if [ "'$installObjectFsSwitch'" = "true" ]; then
         # Install the ObjectFS plugin
         /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-tool_objectfs/archive/master.zip -L -o plugin-objectfs.zip
         /usr/bin/unzip -q plugin-objectfs.zip
-        /bin/mkdir -p /moodle/html/moodle/admin/tool/objectfs
-        /bin/cp -r moodle-tool_objectfs-master/* /moodle/html/moodle/admin/tool/objectfs
-        /bin/rm -rf moodle-tool_objectfs-master
+        /bin/mv moodle-tool_objectfs-master /moodle/html/moodle/admin/tool/objectfs
 
         # Install the ObjectFS Azure library
         /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-local_azure_storage/archive/master.zip -L -o plugin-azurelibrary.zip
         /usr/bin/unzip -q plugin-azurelibrary.zip
-        /bin/mkdir -p /moodle/html/moodle/local/azure_storage
-        /bin/cp -r moodle-local_azure_storage-master/* /moodle/html/moodle/local/azure_storage
-        /bin/rm -rf moodle-local_azure_storage-master
+        /bin/mv moodle-local_azure_storage-master /moodle/html/moodle/local/azure_storage
     fi
+    cd /moodle
+    rm -rf /moodle/tmp
     ' > /tmp/setup-moodle.sh 
 
     chmod 755 /tmp/setup-moodle.sh
