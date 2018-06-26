@@ -254,9 +254,9 @@
                 "Gen4",
                 "Gen5"
             ],
-            "defaultValue": "Gen4",
+            "defaultValue": "Gen5",
             "metadata": {
-                "description": "MySql/Postgresql sku hardware family"
+                "description": "MySql/Postgresql sku hardware family. Central US is Gen4 only, so make sure to change this parameter to Gen4 if your deployment is on Central US."
             },
             "type": "string"
         },
