@@ -130,7 +130,7 @@
             }
         },
         {
-            "condition": "[not(equals(parameters('moodleCommon').httpsTermination, 'AppGw'))]",
+            "condition": "[and(equals(parameters('moodleCommon').webClusterType, 'VMSS'), not(equals(parameters('moodleCommon').httpsTermination, 'AppGw')))]",
             "type": "Microsoft.Network/publicIPAddresses",
             "sku": {
                 "name": "[parameters('moodleCommon').lbSku]"
@@ -149,7 +149,7 @@
             }
         },
         {
-            "condition": "[equals(parameters('moodleCommon').httpsTermination, 'AppGw')]",
+            "condition": "[and(equals(parameters('moodleCommon').webClusterType, 'VMSS'), equals(parameters('moodleCommon').httpsTermination, 'AppGw'))]",
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2017-10-01",
             "location": "[parameters('moodleCommon').location]",
@@ -180,7 +180,7 @@
             }
         },
         {
-            "condition": "[not(equals(parameters('moodleCommon').httpsTermination, 'AppGw'))]",
+            "condition": "[and(equals(parameters('moodleCommon').webClusterType, 'VMSS'), not(equals(parameters('moodleCommon').httpsTermination, 'AppGw')))]",
             "type": "Microsoft.Network/loadBalancers",
             "sku": {
                 "name": "[parameters('moodleCommon').lbSku]"
@@ -270,7 +270,7 @@
             }
         },
         {
-            "condition": "[equals(parameters('moodleCommon').httpsTermination, 'AppGw')]",
+            "condition": "[and(equals(parameters('moodleCommon').webClusterType, 'VMSS'), equals(parameters('moodleCommon').httpsTermination, 'AppGw'))]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
             "dependsOn": [
@@ -332,7 +332,7 @@
     },
     "outputs": {
         "lbPubIp": {
-            "value": "[if(equals(parameters('moodleCommon').httpsTermination, 'AppGw'), '0.0.0.0', reference(parameters('moodleCommon').lbPipName, '2017-10-01').ipAddress)]",
+            "value": "[if(or(equals(parameters('moodleCommon').webClusterType, 'AKS'), equals(parameters('moodleCommon').httpsTermination, 'AppGw')), '0.0.0.0', reference(parameters('moodleCommon').lbPipName, '2017-10-01').ipAddress)]",
             "type": "string"
         },
         "ctlrPubIp": {

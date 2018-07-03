@@ -93,6 +93,17 @@
             },
             "type": "bool"
         },
+        "webClusterType": {
+            "defaultValue": "VMSS",
+            "allowedValues": [
+                "VMSS",
+                "AKS"
+            ],
+            "metadata": {
+                "description": "Type of the Azure clustering technology for the web backend. AKS (Azure Kubernetes Service) is not available in all Azure regions, so do make sure that you are deploying AKS to one of the regions specified in https://docs.microsoft.com/en-us/azure/aks/container-service-quotas#region-availability"
+            },
+            "type": "string"
+        },
         "httpsTermination": {
             "allowedValues": [
                 "VMSS",
@@ -101,7 +112,7 @@
             ],
             "defaultValue": "VMSS",
             "metadata": {
-                "description": "Indicates where https termination occurs. 'VMSS' is for https termination at the VMSS instance VMs (using nginx https proxy). 'AppGw' is for https termination with an Azure Application Gateway. When selecting this, you need to specify all appGw* parameters. 'None' is for testing only with no https. 'None' may not be used with a separately configured https termination layer. If you want to use the 'None' option with your separately configured https termination layer, you'll need to update your Moodle config.php manually for $cfg->wwwroot and $cfg->sslproxy."
+                "description": "(Applies only to VMSS webClusterType. AKS webClusterType currently doesn't support AppGw or None httpsTermination) Indicates where https termination occurs. 'VMSS' is for https termination at the VMSS instance VMs (using nginx https proxy). 'AppGw' is for https termination with an Azure Application Gateway. When selecting this, you need to specify all appGw* parameters. 'None' is for testing only with no https. 'None' may not be used with a separately configured https termination layer. If you want to use the 'None' option with your separately configured https termination layer, you'll need to update your Moodle config.php manually for $cfg->wwwroot and $cfg->sslproxy."
             },
             "type": "string"
         },
@@ -165,21 +176,21 @@
         "autoscaleVmSku": {
             "defaultValue": "Standard_DS2_v2",
             "metadata": {
-                "description": "VM size for autoscaled web VMs"
+                "description": "VM size for autoscaled web VMs (applies only to VMSS webClusterType)"
             },
             "type": "string"
         },
         "autoscaleVmCountMax": {
             "defaultValue": 10,
             "metadata": {
-                "description": "Maximum number of autoscaled web VMs"
+                "description": "Maximum number of autoscaled web VMs (applies only to VMSS webClusterType)"
             },
             "type": "int"
         },
         "autoscaleVmCountMin": {
             "defaultValue": 1,
             "metadata": {
-                "description": "Minimum (also initial) number of autoscaled web VMs"
+                "description": "Minimum (also initial) number of autoscaled web VMs (applies only to VMSS webClusterType)"
             },
             "type": "int"
         },
@@ -582,9 +593,9 @@
             "type": "string"
         },
         "vNetAddressSpace": {
-            "defaultValue": "172.31.0.0",
+            "defaultValue": "172.16.0.0",
             "metadata": {
-                "description": "Address range for the Moodle virtual network and various subnets - presumed /16 for a newly created vnet in case customVnetId is blank. Further subneting (a number of */24 subnets starting from the xxx.yyy.zzz.0/24 will be created on a newly created vnet or your BYO-vnet (specified in customVnetId parameter)."
+                "description": "Address range for the Moodle virtual network and various subnets - presumed /16 for a newly created vnet in case customVnetId is blank. Further subnets (a number of */24 subnets starting from the xxx.yyy.zzz.0/24) will be created on a newly created vnet or your BYO-vnet (specified in customVnetId parameter). Avoid 192.168.0.1/24 and 172.17.0.0/16 if you are choosing AKS webClusterType (these are used by AKS for the k8s service IPs and docker bridge IPs)."
             },
             "type": "string"
         },
@@ -620,6 +631,43 @@
                 "description": "Loadbalancer SKU"
             },
             "type": "string"
+        },
+        "aksAgentVMSize": {
+            "defaultValue": "Standard_DS2_v2",
+            "type": "string",
+            "metadata": {
+                "description": "The size of the VMs for AKS agents (applies only to AKS webClusterType)"
+            }
+        },
+        "aksAgentCount": {
+            "defaultValue": 1,
+            "minValue": 1,
+            "maxValue": 50,
+            "type": "int",
+            "metadata": {
+                "description": "The number of the AKS agent VMs (applies only to AKS webClusterType)"
+            }
+        },
+        "aksKubernetesVersion": {
+            "defaultValue": "1.10.3",
+            "type": "string",
+            "metadata": {
+                "description": "The version of Kubernetes that'll be deployed to the AKS cluster (applies only to AKS webClusterType)"
+            }
+        },
+        "aksServicePrincipalClientId": {
+            "defaultValue": "",
+            "type": "securestring",
+            "metadata": {
+                "description": "The Azure Active Directory app IP that'll be used to deploy dynamic AKS resources (applies only to AKS webClusterType). Must be pre-created (on the Azure Portal or through Azure CLI) and provided here manually."
+            }
+        },
+        "aksServicePrincipalClientSecret": {
+            "defaultValue": "",
+            "type": "securestring",
+            "metadata": {
+                "description": "The secret (password) corresponding to the aksServicePrincipalClientId above (applies only to AKS webClusterType). Must be pre-created (on the Azure Portal or through Azure CLI) together with the aksServicePrincipalClientId and provided here manually."
+            }
         },
         "location": {
             "type": "string",
@@ -953,6 +1001,7 @@
             }
         },
         {
+            "condition": "[equals(parameters('webClusterType'), 'VMSS')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
             "dependsOn": [
@@ -980,6 +1029,77 @@
                     "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'webvmss.json',parameters('_artifactsLocationSasToken'))]"
                 }
             }
+        },
+        {
+            "condition": "[equals(parameters('webClusterType'), 'AKS')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/networkTemplate"
+            ],
+            "name": "aksTemplate",
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {
+                    "resourceName": {
+                        "value": "[variables('moodleCommon').aks.resourceName]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "dnsPrefix": {
+                        "value": "[variables('moodleCommon').aks.dnsPrefix]"
+                    },
+                    "agentCount": {
+                        "value": "[variables('moodleCommon').aks.agentCount]"
+                    },
+                    "agentVMSize": {
+                        "value": "[variables('moodleCommon').aks.agentVMSize]"
+                    },
+                    "adminUsername": {
+                        "value": "[variables('moodleCommon').sshUsername]"
+                    },
+                    "sshKey": {
+                        "value": "[variables('moodleCommon').sshPublicKey]"
+                    },
+                    "servicePrincipalClientId": {
+                        "value": "[variables('moodleCommon').aks.servicePrincipalClientId]"
+                    },
+                    "servicePrincipalClientSecret": {
+                        "value": "[variables('moodleCommon').aks.servicePrincipalClientSecret]"
+                    },
+                    "kubernetesVersion": {
+                        "value": "[variables('moodleCommon').aks.kubernetesVersion]"
+                    },
+                    "enableOmsAgent": {
+                        "value": false
+                    },
+                    "workspaceName": {
+                        "value": ""
+                    },
+                    "omsWorkspaceId": {
+                        "value": ""
+                    },
+                    "networkPlugin": {
+                        "value": "azure"
+                    },
+                    "vnetSubnetID": {
+                        "value": "[reference('networkTemplate').outputs.subnetIdWeb.value]"
+                    },
+                    "serviceCidr": {
+                        "value": "192.168.0.0/24"
+                    },
+                    "dnsServiceIP": {
+                        "value": "192.168.0.2"
+                    },
+                    "dockerBridgeCidr": {
+                        "value": "172.17.0.1/16"
+                    }
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'aks.json',parameters('_artifactsLocationSasToken'))]"
+                }
+            }
         }
     ],
     "outputs": {
@@ -1005,7 +1125,7 @@
         },
         "firstFrontendVmIP": {
             "type": "string",
-            "value": "[reference('scaleSetTemplate').outputs.webvm1IP.value]"
+            "value": "[if(equals(parameters('webClusterType'), 'AKS'), 'N/A for AKS webClusterType', reference('scaleSetTemplate', '2017-05-10').outputs.webvm1IP.value)]"
         },
         "moodleAdminPassword": {
             "type": "string",
@@ -1044,6 +1164,15 @@
             "baseTemplateUrl": "[concat(parameters('_artifactsLocation'), 'nested/')]",
             "scriptLocation": "[concat(parameters('_artifactsLocation'), 'scripts/')]",
             "artifactsSasToken": "[parameters('_artifactsLocationSasToken')]",
+            "aks": {
+                "resourceName": "[concat('aks-', variables('resourceprefix'))]",
+                "dnsPrefix": "[concat('aks-', variables('resourceprefix'))]",
+                "agentCount": "[parameters('aksAgentCount')]",
+                "agentVMSize": "[parameters('aksAgentVMSize')]",
+                "kubernetesVersion": "[parameters('aksKubernetesVersion')]",
+                "servicePrincipalClientId": "[parameters('aksServicePrincipalClientId')]",
+                "servicePrincipalClientSecret": "[parameters('aksServicePrincipalClientSecret')]"
+            },
             "appGwBePoolName": "[concat('appgw-bepool-', variables('resourceprefix'))]",
             "appGwName": "[concat('appgw-', variables('resourceprefix'))]",
             "appGwPipName": "[concat('appgw-pubip-',variables('resourceprefix'))]",
@@ -1157,7 +1286,7 @@
             "resourcesPrefix": "[variables('resourceprefix')]",
             "searchType": "[parameters('searchType')]",
             "serverName": "[concat(parameters('dbServerType'), '-',variables('resourceprefix'))]",
-            "siteURL": "[if(or(empty(parameters('siteURL')), equals(parameters('siteURL'), 'www.example.org')), concat(if(equals(parameters('httpsTermination'), 'AppGw'),'appgw-','lb-'),variables('resourceprefix'),'.',parameters('location'),'.cloudapp.azure.com'), parameters('siteURL'))]",
+            "siteURL": "[if(or(empty(parameters('siteURL')), equals(parameters('siteURL'), 'www.example.org')), concat(if(equals(parameters('webClusterType'), 'AKS'), 'aks-', if(equals(parameters('httpsTermination'), 'AppGw'), 'appgw-', 'lb-')),variables('resourceprefix'),'.',parameters('location'),'.cloudapp.azure.com'), parameters('siteURL'))]",
             "sshPublicKey": "[parameters('sshPublicKey')]",
             "sshUsername": "[parameters('sshUsername')]",
             "sslEnforcement": "[parameters('sslEnforcement')]",
@@ -1199,6 +1328,7 @@
             "vnetGwDeploySwitch": "[parameters('vnetGwDeploySwitch')]",
             "vnetName": "[concat('vnet-',variables('resourceprefix'))]",
             "vpnType": "[parameters('vpnType')]",
+            "webClusterType": "[parameters('webClusterType')]",
             "webServerSetupScriptFilename": "setup_webserver.sh",
             "webServerType": "[parameters('webServerType')]"
         },
