@@ -1,0 +1,11 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: azlamp-web-service
+spec:
+  ports:
+    - port: 443
+      targetPort: 443
+  selector:
+    role: azlamp-web-frontend
+  type: LoadBalancer

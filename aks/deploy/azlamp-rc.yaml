@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: azlamp-web
+spec:
+  replicas: 2
+  selector:
+    role: azlamp-web-frontend
+  template:
+    metadata:
+      labels:
+        role: azlamp-web-frontend
+    spec:
+      containers:
+      - name: web
+        image: hosungsmsft/azlamp:0.9
+        ports:
+          - name: web
+            containerPort: 443
+        readinessProbe:
+          tcpSocket:
+            port: 443
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 443
+          initialDelaySeconds: 15
+          periodSeconds: 20 
+        volumeMounts:
+            # name must match the volume name below
+            - name: nfs
+              mountPath: "/data"
+        command: ["/usr/local/bin/init_container.sh"]
+        args: ["/moodle", "/data", "aks-zefs4q.westus2.cloudapp.azure.com", "/moodle/html/moodle", "/moodle/certs/nginx.crt", "/moodle/certs/nginx.key"]
+      volumes:
+      - name: nfs
+        persistentVolumeClaim:
+          claimName: nfs
