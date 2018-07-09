@@ -7,7 +7,7 @@
             "metadata": {
                 "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
             },
-            "defaultValue": "https://raw.githubusercontent.com/Azure/Moodle/master/"
+            "defaultValue": "https://raw.githubusercontent.com/Azure/Moodle/azfiles/"
         },
         "_artifactsLocationSasToken": {
             "type": "securestring",
@@ -359,11 +359,12 @@
             "type": "string"
         },
         "fileServerType": {
-            "defaultValue": "nfs",
+            "defaultValue": "azurefiles",
             "allowedValues": [
                 "gluster",
                 "nfs",
-                "nfs-ha"
+                "nfs-ha",
+                "azurefiles"
             ],
             "metadata": {
                 "description": "File server type: GlusterFS, NFS, and NFS-HA (2-VM highly available NFS cluster)"
