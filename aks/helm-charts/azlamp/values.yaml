@@ -1,4 +1,4 @@
-replicaCount: 2
+replicaCount: 2     # FIXME
 image: hosungsmsft/azlamp:0.10
 mountPath: "/moodle"
 azlampRootPath: "/moodle"
