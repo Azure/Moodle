@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: azlamp-web
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    role: azlamp-web-frontend
+  template:
+    metadata:
+      labels:
+        role: azlamp-web-frontend
+    spec:
+      containers:
+      - name: web
+        image: {{ .Values.image }}
+        ports:
+          - name: web
+            containerPort: 443
+        readinessProbe:
+          tcpSocket:
+            port: 443
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 443
+          initialDelaySeconds: 15
+          periodSeconds: 20 
+        volumeMounts:
+          # name must match the volume name below
+          - name: nfs
+            mountPath: {{ .Values.mountPath }}
+        command: 
+        - "/usr/local/bin/init_container.sh"
+        args:
+        - {{ .Values.azlampRootPath }}
+        - {{ .Values.mountPath }}
+        - {{ .Values.siteURL }}
+        - {{ .Values.htmlSrcPath }}
+        - {{ .Values.sslCertPath }}
+        - {{ .Values.sslKeyPath }}
+      volumes:
+      - name: nfs
+        persistentVolumeClaim:
+          claimName: azlamp-nfs-pvc

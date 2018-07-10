@@ -1,7 +1,7 @@
 #!/bin/bash
 
 LINK_PATH=$1        # E.g, /moodle
-LINK_DEST=$2        # E.g,./data/moodle
+LINK_DEST=$2        # E.g,./data
 SERVER_NAME=$3      # E.g., aks-test.westus2.cloudapp.azure.com
 HTML_SRC_ROOT=$4    # E.g. /moodle/html/moodle
 SSL_CERT_PATH=$5    # E.g., /moodle/certs/nginx.crt
@@ -13,7 +13,10 @@ a2enmod php
 
 rm -f /etc/apache2/sites-enabled/000-default.conf
 
-ln -s $LINK_DEST $LINK_PATH
+if [ "$LINK_DEST" != "$LINK_PATH" ]; then
+    ln -s $LINK_DEST $LINK_PATH
+fi
+
 sleep $(($RANDOM%30))   # Randomization to reduce contention
 rsync -av --delete $HTML_SRC_ROOT /var/www/html
 

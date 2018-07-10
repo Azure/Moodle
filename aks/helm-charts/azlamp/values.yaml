@@ -1,0 +1,11 @@
+replicaCount: 2
+image: hosungsmsft/azlamp:0.10
+mountPath: "/moodle"
+azlampRootPath: "/moodle"
+siteURL: "aks-zefs4q.westus2.cloudapp.azure.com"    # FIXME
+htmlSrcPath: "/moodle/html/moodle"
+sslCertPath: "/moodle/certs/nginx.crt"
+sslKeyPath: "/moodle/certs/nginx.key"
+nfsStorageCapacity: 20Gi    # FIXME
+nfsHost: controller-vm-zefs4q    # FIXME
+nfsExportPath: "/moodle"
