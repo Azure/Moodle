@@ -27,7 +27,7 @@ DEPLOYMENTS=$(az group deployment list --resource-group $RESOURCE_GROUP --query 
 
 if (echo $DEPLOYMENTS | grep azuredeploy &> /dev/null); then
     DEPLOYMENT=azuredeploy
-elif (echo $DEPLOYMENTS | grep Microsoft.Template &> /dev/enull); then
+elif (echo $DEPLOYMENTS | grep Microsoft.Template &> /dev/null); then
     DEPLOYMENT=Microsoft.Template
 else
     echo "Neither 'azuredeploy' nor 'Microsoft.Template' deployment exists in the resource group $RESOURCE_GROUP. Make sure to provide a valid resource group where https://github.com/Azure/Moodle/ templates were deployed. Exiting..."
@@ -81,7 +81,7 @@ AKS_NAME=$(echo $AKS_INFO | jq -r .name)
 az aks get-credentials --resource-group $RESOURCE_GROUP --name $AKS_NAME
 kubectl config use-context $AKS_NAME
 
-helm init
+helm init --wait
 cd helm-charts
 helm install azlamp --set siteURL=$SITE_URL,nfsStorageCapacity=$FILE_SERVER_DISK_CAPACITY,nfsHost=$NFS_HOST,replicaCount=$REPLICA_COUNT
 
