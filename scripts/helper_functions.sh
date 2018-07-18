@@ -59,6 +59,7 @@ function get_setup_params_from_configs_json
     export nfsVmName=$(echo $json | jq -r .fileServerProfile.nfsVmName)
     export nfsHaLbIP=$(echo $json | jq -r .fileServerProfile.nfsHaLbIP)
     export nfsHaExportPath=$(echo $json | jq -r .fileServerProfile.nfsHaExportPath)
+    export nfsByoIpExportPath=$(echo $json | jq -r .fileServerProfile.nfsByoIpExportPath)
 }
 
 function get_php_version {
@@ -96,8 +97,8 @@ function install_php_mssql_driver
 function check_fileServerType_param
 {
     local fileServerType=$1
-    if [ "$fileServerType" != "gluster" -a "$fileServerType" != "azurefiles" -a "$fileServerType" != "nfs" -a "$fileServerType" != "nfs-ha" ]; then
-        echo "Invalid fileServerType ($fileServerType) given. Only 'gluster', 'azurefiles', 'nfs' or 'nfs-ha' are allowed. Exiting"
+    if [ "$fileServerType" != "gluster" -a "$fileServerType" != "azurefiles" -a "$fileServerType" != "nfs" -a "$fileServerType" != "nfs-ha" -a "$fileServerType" != "nfs-byo" ]; then
+        echo "Invalid fileServerType ($fileServerType) given. Only 'gluster', 'azurefiles', 'nfs', 'nfs-ha' or 'nfs-byo' are allowed. Exiting"
         exit 1
     fi
 }
@@ -299,21 +300,28 @@ function configure_nfs_server_and_export {
     fi
 }
 
+function configure_nfs_client_and_mount0 {
+    local NFS_HOST_EXPORT_PATH=${1}   # E.g., controller-vm-ab12cd:/moodle or 172.16.3.100:/drbd/data
+    local MOUNTPOINT=${2}             # E.g., /moodle
+
+    apt install -y nfs-common
+    mkdir -p ${MOUNTPOINT}
+
+    grep "^${NFS_HOST_EXPORT_PATH}" /etc/fstab > /dev/null 2>&1
+    if [ $? = "0" ]; then
+        echo "${NFS_HOST_EXPORT_PATH} already in /etc/fstab... skipping to add"
+    else
+        echo -e "\n${NFS_HOST_EXPORT_PATH}    ${MOUNTPOINT}    nfs    auto    0    0" >> /etc/fstab
+    fi
+    mount ${MOUNTPOINT}
+}
+
 function configure_nfs_client_and_mount {
     local NFS_SERVER=${1}     # E.g., controller-vm-ab12cd or IP (NFS-HA LB)
     local NFS_DIR=${2}        # E.g., /moodle or /drbd/data
     local MOUNTPOINT=${3}     # E.g., /moodle
 
-    apt install -y nfs-common
-    mkdir -p ${MOUNTPOINT}
-
-    grep "^${NFS_SERVER}:${NFS_DIR}" /etc/fstab > /dev/null 2>&1
-    if [ $? = "0" ]; then
-        echo "${NFS_SERVER}:${NFS_DIR} already in /etc/fstab... skipping to add"
-    else
-        echo -e "\n${NFS_SERVER}:${NFS_DIR}    ${MOUNTPOINT}    nfs    auto    0    0" >> /etc/fstab
-    fi
-    mount ${MOUNTPOINT}
+    configure_nfs_client_and_mount0 "${NFS_SERVER}:${NFS_DIR}" ${MOUNTPOINT}
 }
 
 SERVER_TIMESTAMP_FULLPATH="/moodle/html/moodle/.last_modified_time.moodle_on_azure"
