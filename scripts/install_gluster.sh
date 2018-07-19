@@ -40,8 +40,8 @@ sudo apt-get -y install unattended-upgrades
 
 {
         check_os() {
-            grep ubuntu /proc/version > /dev/null 2>&1
-            isubuntu=${?}
+            grep -q -s ubuntu /proc/version && _RET=$? || _RET=$?
+            isubuntu=$_RET
         }
 
         scan_for_new_disks() {
@@ -70,8 +70,8 @@ sudo apt-get -y install unattended-upgrades
         }
 
         create_raid0_ubuntu() {
-            dpkg -s mdadm 
-            if [ ${?} -eq 1 ];
+            dpkg -s mdadm && _RET=$? || _RET=$?
+            if [ $_RET -eq 1 ];
             then 
                 echo "installing mdadm"
                 sudo apt-get -y -q install mdadm
@@ -106,8 +106,8 @@ sudo apt-get -y install unattended-upgrades
         add_to_fstab() {
             UUID=${1}
             MOUNTPOINT=${2}
-            grep "${UUID}" /etc/fstab >/dev/null 2>&1
-            if [ ${?} -eq 0 ];
+            grep -q -s "${UUID}" /etc/fstab && _RET=$? || _RET=$?
+            if [ $_RET -eq 0 ];
             then
                 echo "Not adding ${UUID} to fstab again (it's already there!)"
             else
@@ -117,8 +117,8 @@ sudo apt-get -y install unattended-upgrades
         }
 
         configure_disks() {
-            ls "${MOUNTPOINT}"
-            if [ ${?} -eq 0 ]
+            ls "${MOUNTPOINT}" && _RET=$? || _RET=$?
+            if [ $_RET -eq 0 ]
             then 
                 return
             fi
@@ -178,8 +178,8 @@ sudo apt-get -y install unattended-upgrades
         }
 
         install_glusterfs_ubuntu() {
-            dpkg -l | grep glusterfs
-            if [ ${?} -eq 0 ];
+            dpkg -l | grep glusterfs && _RET=$? || _RET=$?
+            if [ $_RET -eq 0 ];
             then
                 return
             fi
@@ -203,8 +203,8 @@ sudo apt-get -y install unattended-upgrades
 
             if [ $isubuntu -eq 0 ];
             then
-                /etc/init.d/glusterfs-server status
-                if [ ${?} -ne 0 ];
+                /etc/init.d/glusterfs-server status && _RET=$? || _RET=$?
+                if [ $_RET -ne 0 ];
                 then
                     install_glusterfs_ubuntu
                 fi
@@ -213,9 +213,9 @@ sudo apt-get -y install unattended-upgrades
 
 			echo "gluster step2"
             GLUSTERDIR="${MOUNTPOINT}/brick"
-            ls "${GLUSTERDIR}"
+            ls "${GLUSTERDIR}" && _RET=$? || _RET=$?
 
-            if [ ${?} -ne 0 ];
+            if [ $_RET -ne 0 ];
             then
                 mkdir "${GLUSTERDIR}"
             fi
@@ -240,17 +240,17 @@ sudo apt-get -y install unattended-upgrades
 					echo $glustervm
 
                     ping -c 3 $glustervm
-                    gluster peer probe $glustervm
-                    if [ ${?} -ne 0 ];
+                    gluster peer probe $glustervm && _RET=$? || _RET=$?
+                    if [ $_RET -ne 0 ];
                     then
                         failed=1
                         echo "gluster peer probe $glustervm failed"
                     fi
 
                     gluster peer status
-                    gluster peer status | grep $glustervm
+                    gluster peer status | grep $glustervm && _RET=$? || _RET=$?
                     
-					if [ ${?} -ne 0 ];
+                    if [ $_RET -ne 0 ];
                     then
                         failed=1
                         echo "gluster peer status $glustervm failed"

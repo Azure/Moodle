@@ -136,8 +136,8 @@ password=$storageAccountKey
 EOF
     chmod 600 /etc/moodle_azure_files.credential
     
-    grep "^//$storageAccountName.file.core.windows.net/moodle\s\s*/moodle\s\s*cifs" /etc/fstab
-    if [ $? != "0" ]; then
+    grep -q -s "^//$storageAccountName.file.core.windows.net/moodle\s\s*/moodle\s\s*cifs" /etc/fstab && _RET=$? || _RET=$?
+    if [ $_RET != "0" ]; then
         echo -e "\n//$storageAccountName.file.core.windows.net/moodle   /moodle cifs    credentials=/etc/moodle_azure_files.credential,uid=www-data,gid=www-data,nofail,vers=3.0,dir_mode=0770,file_mode=0660,serverino,mfsymlinks" >> /etc/fstab
     fi
     mkdir -p /moodle
@@ -154,8 +154,8 @@ function setup_moodle_mount_dependency_for_systemd_service
   local systemdSvcOverrideFileDir="/etc/systemd/system/${serviceName}.service.d"
   local systemdSvcOverrideFilePath="${systemdSvcOverrideFileDir}/moodle_on_azure_override.conf"
 
-  grep -q "After=moodle.mount" $systemdSvcOverrideFilePath &> /dev/null
-  if [ $? != "0" ]; then
+  grep -q -s "After=moodle.mount" $systemdSvcOverrideFilePath && _RET=$? || _RET=$?
+  if [ $_RET != "0" ]; then
     mkdir -p $systemdSvcOverrideFileDir
     cat <<EOF > $systemdSvcOverrideFilePath
 [Unit]
@@ -193,8 +193,8 @@ function create_raid0_ubuntu {
     shift
     local DISKS="$@"
 
-    dpkg -s mdadm 
-    if [ ${?} -eq 1 ];
+    dpkg -s mdadm && _RET=$? || _RET=$?
+    if [ $_RET -eq 1 ];
     then 
         echo "installing mdadm"
         sudo apt-get -y -q install mdadm
@@ -230,8 +230,8 @@ function add_local_filesystem_to_fstab {
     local UUID=${1}
     local MOUNTPOINT=${2}   # E.g., /moodle
 
-    grep "${UUID}" /etc/fstab >/dev/null 2>&1
-    if [ ${?} -eq 0 ];
+    grep -q -s "${UUID}" /etc/fstab && _RET=$? || _RET=$?
+    if [ $_RET -eq 0 ];
     then
         echo "Not adding ${UUID} to fstab again (it's already there!)"
     else
@@ -291,8 +291,8 @@ function configure_nfs_server_and_export {
     apt install -y nfs-kernel-server
 
     echo "Exporting ${MOUNTPOINT}..."
-    grep "^${MOUNTPOINT}" /etc/exports > /dev/null 2>&1
-    if [ $? = "0" ]; then
+    grep -q -s "^${MOUNTPOINT}" /etc/exports && _RET=$? || _RET=$?
+    if [ $_RET = "0" ]; then
         echo "${MOUNTPOINT} is already exported. Returning..."
     else
         echo -e "\n${MOUNTPOINT}   *(rw,sync,no_root_squash)" >> /etc/exports
@@ -307,8 +307,8 @@ function configure_nfs_client_and_mount0 {
     apt install -y nfs-common
     mkdir -p ${MOUNTPOINT}
 
-    grep "^${NFS_HOST_EXPORT_PATH}" /etc/fstab > /dev/null 2>&1
-    if [ $? = "0" ]; then
+    grep -q -s "^${NFS_HOST_EXPORT_PATH}" /etc/fstab && _RET=$? || _RET=$?
+    if [ $_RET = "0" ]; then
         echo "${NFS_HOST_EXPORT_PATH} already in /etc/fstab... skipping to add"
     else
         echo -e "\n${NFS_HOST_EXPORT_PATH}    ${MOUNTPOINT}    nfs    auto    0    0" >> /etc/fstab

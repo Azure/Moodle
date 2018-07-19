@@ -22,7 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-#set -ex
+set -ex
 
 moodle_on_azure_configs_json_path=${1}
 
