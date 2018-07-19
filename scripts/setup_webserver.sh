@@ -22,6 +22,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+set -ex
+
 moodle_on_azure_configs_json_path=${1}
 
 . ./helper_functions.sh
@@ -39,6 +41,7 @@ echo $fileServerType >> /tmp/vars.txt
 echo $storageAccountName >> /tmp/vars.txt
 echo $storageAccountKey >> /tmp/vars.txt
 echo $nfsVmName >> /tmp/vars.txt
+echo $nfsByoIpExportPath >> /tmp/vars.txt
 echo $htmlLocalCopySwitch >> /tmp/vars.txt
 
 check_fileServerType_param $fileServerType
@@ -101,6 +104,10 @@ check_fileServerType_param $fileServerType
     # mount NFS-HA export
     echo -e '\n\rMounting NFS export from '$nfsHaLbIP':'$nfsHaExportPath' on /moodle and adding it to /etc/fstab\n\r'
     configure_nfs_client_and_mount $nfsHaLbIP $nfsHaExportPath /moodle
+  elif [ $fileServerType = "nfs-byo" ]; then
+    # mount NFS-BYO export
+    echo -e '\n\rMounting NFS export from '$nfsByoIpExportPath' on /moodle and adding it to /etc/fstab\n\r'
+    configure_nfs_client_and_mount0 $nfsByoIpExportPath /moodle
   else # "azurefiles"
     setup_and_mount_azure_files_moodle_share $storageAccountName $storageAccountKey
   fi

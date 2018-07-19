@@ -11,7 +11,7 @@ class Configuration:
         self.client_id = os.getenv('SPNAME')
         self.secret = os.getenv('SPPASSWORD')
         self.tenant_id = os.getenv('SPTENANT')
-        self.location = os.getenv('LOCATION', 'southcentralus')
+        self.location = os.getenv('LOCATION', 'westus2')
         self.source_branch = self.identify_source_branch()
         self.fullci_branches = os.getenv('FULLCI_BRANCHES', 'master').split(':')
         self.commit_message = os.getenv('TRAVIS_COMMIT_MESSAGE', None)

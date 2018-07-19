@@ -59,6 +59,7 @@ function get_setup_params_from_configs_json
     export nfsVmName=$(echo $json | jq -r .fileServerProfile.nfsVmName)
     export nfsHaLbIP=$(echo $json | jq -r .fileServerProfile.nfsHaLbIP)
     export nfsHaExportPath=$(echo $json | jq -r .fileServerProfile.nfsHaExportPath)
+    export nfsByoIpExportPath=$(echo $json | jq -r .fileServerProfile.nfsByoIpExportPath)
 }
 
 function get_php_version {
@@ -96,8 +97,8 @@ function install_php_mssql_driver
 function check_fileServerType_param
 {
     local fileServerType=$1
-    if [ "$fileServerType" != "gluster" -a "$fileServerType" != "azurefiles" -a "$fileServerType" != "nfs" -a "$fileServerType" != "nfs-ha" ]; then
-        echo "Invalid fileServerType ($fileServerType) given. Only 'gluster', 'azurefiles', 'nfs' or 'nfs-ha' are allowed. Exiting"
+    if [ "$fileServerType" != "gluster" -a "$fileServerType" != "azurefiles" -a "$fileServerType" != "nfs" -a "$fileServerType" != "nfs-ha" -a "$fileServerType" != "nfs-byo" ]; then
+        echo "Invalid fileServerType ($fileServerType) given. Only 'gluster', 'azurefiles', 'nfs', 'nfs-ha' or 'nfs-byo' are allowed. Exiting"
         exit 1
     fi
 }
@@ -135,8 +136,8 @@ password=$storageAccountKey
 EOF
     chmod 600 /etc/moodle_azure_files.credential
     
-    grep "^//$storageAccountName.file.core.windows.net/moodle\s\s*/moodle\s\s*cifs" /etc/fstab
-    if [ $? != "0" ]; then
+    grep -q -s "^//$storageAccountName.file.core.windows.net/moodle\s\s*/moodle\s\s*cifs" /etc/fstab && _RET=$? || _RET=$?
+    if [ $_RET != "0" ]; then
         echo -e "\n//$storageAccountName.file.core.windows.net/moodle   /moodle cifs    credentials=/etc/moodle_azure_files.credential,uid=www-data,gid=www-data,nofail,vers=3.0,dir_mode=0770,file_mode=0660,serverino,mfsymlinks" >> /etc/fstab
     fi
     mkdir -p /moodle
@@ -153,8 +154,8 @@ function setup_moodle_mount_dependency_for_systemd_service
   local systemdSvcOverrideFileDir="/etc/systemd/system/${serviceName}.service.d"
   local systemdSvcOverrideFilePath="${systemdSvcOverrideFileDir}/moodle_on_azure_override.conf"
 
-  grep -q "After=moodle.mount" $systemdSvcOverrideFilePath &> /dev/null
-  if [ $? != "0" ]; then
+  grep -q -s "After=moodle.mount" $systemdSvcOverrideFilePath && _RET=$? || _RET=$?
+  if [ $_RET != "0" ]; then
     mkdir -p $systemdSvcOverrideFileDir
     cat <<EOF > $systemdSvcOverrideFilePath
 [Unit]
@@ -192,8 +193,8 @@ function create_raid0_ubuntu {
     shift
     local DISKS="$@"
 
-    dpkg -s mdadm 
-    if [ ${?} -eq 1 ];
+    dpkg -s mdadm && _RET=$? || _RET=$?
+    if [ $_RET -eq 1 ];
     then 
         echo "installing mdadm"
         sudo apt-get -y -q install mdadm
@@ -229,8 +230,8 @@ function add_local_filesystem_to_fstab {
     local UUID=${1}
     local MOUNTPOINT=${2}   # E.g., /moodle
 
-    grep "${UUID}" /etc/fstab >/dev/null 2>&1
-    if [ ${?} -eq 0 ];
+    grep -q -s "${UUID}" /etc/fstab && _RET=$? || _RET=$?
+    if [ $_RET -eq 0 ];
     then
         echo "Not adding ${UUID} to fstab again (it's already there!)"
     else
@@ -290,8 +291,8 @@ function configure_nfs_server_and_export {
     apt install -y nfs-kernel-server
 
     echo "Exporting ${MOUNTPOINT}..."
-    grep "^${MOUNTPOINT}" /etc/exports > /dev/null 2>&1
-    if [ $? = "0" ]; then
+    grep -q -s "^${MOUNTPOINT}" /etc/exports && _RET=$? || _RET=$?
+    if [ $_RET = "0" ]; then
         echo "${MOUNTPOINT} is already exported. Returning..."
     else
         echo -e "\n${MOUNTPOINT}   *(rw,sync,no_root_squash)" >> /etc/exports
@@ -299,21 +300,28 @@ function configure_nfs_server_and_export {
     fi
 }
 
+function configure_nfs_client_and_mount0 {
+    local NFS_HOST_EXPORT_PATH=${1}   # E.g., controller-vm-ab12cd:/moodle or 172.16.3.100:/drbd/data
+    local MOUNTPOINT=${2}             # E.g., /moodle
+
+    apt install -y nfs-common
+    mkdir -p ${MOUNTPOINT}
+
+    grep -q -s "^${NFS_HOST_EXPORT_PATH}" /etc/fstab && _RET=$? || _RET=$?
+    if [ $_RET = "0" ]; then
+        echo "${NFS_HOST_EXPORT_PATH} already in /etc/fstab... skipping to add"
+    else
+        echo -e "\n${NFS_HOST_EXPORT_PATH}    ${MOUNTPOINT}    nfs    auto    0    0" >> /etc/fstab
+    fi
+    mount ${MOUNTPOINT}
+}
+
 function configure_nfs_client_and_mount {
     local NFS_SERVER=${1}     # E.g., controller-vm-ab12cd or IP (NFS-HA LB)
     local NFS_DIR=${2}        # E.g., /moodle or /drbd/data
     local MOUNTPOINT=${3}     # E.g., /moodle
 
-    apt install -y nfs-common
-    mkdir -p ${MOUNTPOINT}
-
-    grep "^${NFS_SERVER}:${NFS_DIR}" /etc/fstab > /dev/null 2>&1
-    if [ $? = "0" ]; then
-        echo "${NFS_SERVER}:${NFS_DIR} already in /etc/fstab... skipping to add"
-    else
-        echo -e "\n${NFS_SERVER}:${NFS_DIR}    ${MOUNTPOINT}    nfs    auto    0    0" >> /etc/fstab
-    fi
-    mount ${MOUNTPOINT}
+    configure_nfs_client_and_mount0 "${NFS_SERVER}:${NFS_DIR}" ${MOUNTPOINT}
 }
 
 SERVER_TIMESTAMP_FULLPATH="/moodle/html/moodle/.last_modified_time.moodle_on_azure"

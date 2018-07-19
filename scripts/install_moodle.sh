@@ -20,6 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+set -ex
+
 #parameters 
 {
     moodle_on_azure_configs_json_path=${1}
@@ -61,6 +63,7 @@
     echo $azureSearchKey >> /tmp/vars.txt
     echo $azureSearchNameHost >> /tmp/vars.txt
     echo $tikaVmIP >> /tmp/vars.txt
+    echo $nfsByoIpExportPath >> /tmp/vars.txt
 
     check_fileServerType_param $fileServerType
 
@@ -159,6 +162,10 @@
         # mount NFS-HA export
         echo -e '\n\rMounting NFS export from '$nfsHaLbIP' on /moodle\n\r'
         configure_nfs_client_and_mount $nfsHaLbIP $nfsHaExportPath /moodle
+    elif [ $fileServerType = "nfs-byo" ]; then
+        # mount NFS-BYO export
+        echo -e '\n\rMounting NFS export from '$nfsByoIpExportPath' on /moodle\n\r'
+        configure_nfs_client_and_mount0 $nfsByoIpExportPath /moodle
     fi
     
     # install pre-requisites
@@ -185,7 +192,6 @@
     mkdir -p /moodle/html
     mkdir -p /moodle/certs
     mkdir -p /moodle/moodledata
-    chown -R www-data.www-data /moodle
 
     o365pluginVersion=$(get_o365plugin_version_from_moodle_version $moodleVersion)
     moodleStableVersion=$o365pluginVersion  # Need Moodle stable version for GDPR plugins, and o365pluginVersion is just Moodle stable version, so reuse it.
@@ -196,10 +202,12 @@
     mkdir -p /moodle/tmp
     cd /moodle/tmp
 
-    # downloading moodle 
-    /usr/bin/curl -k --max-redirs 10 https://github.com/moodle/moodle/archive/'$moodleVersion'.zip -L -o moodle.zip
-    /usr/bin/unzip -q moodle.zip
-    /bin/mv '$moodleUnzipDir' /moodle/html/moodle
+    if [ ! -d /moodle/html/moodle ]; then
+        # downloading moodle only if /moodle/html/moodle does not exist -- if it exists, user should populate it in advance correctly as below. This is to reduce template deployment time.
+        /usr/bin/curl -k --max-redirs 10 https://github.com/moodle/moodle/archive/'$moodleVersion'.zip -L -o moodle.zip
+        /usr/bin/unzip -q moodle.zip
+        /bin/mv '$moodleUnzipDir' /moodle/html/moodle
+    fi
 
     if [ "'$installGdprPluginsSwitch'" = "true" ]; then
         # install Moodle GDPR plugins (Note: This is only for Moodle versions 3.4.2+ or 3.3.5+ and will be included in Moodle 3.5, so no need for 3.5)
@@ -892,8 +900,8 @@ EOF
 #       sudo find /moodle/html/moodle -type f -exec chmod 644 '{}' \;
 #       sudo find /moodle/html/moodle -type d -exec chmod 755 '{}' \;
 #    fi
-    # But now we need to adjust the moodledata directory ownership, and the permission for the generated config.php
-    sudo chown -R www-data.www-data /moodle/moodledata
+    # But now we need to adjust the moodledata and the certs directory ownerships, and the permission for the generated config.php
+    sudo chown -R www-data.www-data /moodle/moodledata /moodle/certs
     sudo chmod +r /moodle/html/moodle/config.php
 
    if [ $fileServerType = "azurefiles" ]; then
