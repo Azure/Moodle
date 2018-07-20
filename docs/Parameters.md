@@ -31,7 +31,7 @@ Type: string
 
 Possible Values: null
 
-Default: https://raw.githubusercontent.com/Azure/Moodle/master/
+Default: https://raw.githubusercontent.com/Azure/Moodle/hs-aks/
 
 
 ### _artifactsLocationSasToken
@@ -166,9 +166,20 @@ Possible Values: null
 Default: true
 
 
+### webClusterType
+
+Type of the Azure clustering technology for the web backend. AKS (Azure Kubernetes Service) is not available in all Azure regions, so do make sure that you are deploying AKS to one of the regions specified in https://docs.microsoft.com/en-us/azure/aks/container-service-quotas#region-availability
+
+Type: string
+
+Possible Values: ["VMSS","AKS"]
+
+Default: VMSS
+
+
 ### httpsTermination
 
-Indicates where https termination occurs. 'VMSS' is for https termination at the VMSS instance VMs (using nginx https proxy). 'AppGw' is for https termination with an Azure Application Gateway. When selecting this, you need to specify all appGw* parameters. 'None' is for testing only with no https. 'None' may not be used with a separately configured https termination layer. If you want to use the 'None' option with your separately configured https termination layer, you'll need to update your Moodle config.php manually for $cfg->wwwroot and $cfg->sslproxy.
+(Applies only to VMSS webClusterType. AKS webClusterType currently doesn't support AppGw or None httpsTermination) Indicates where https termination occurs. 'VMSS' is for https termination at the VMSS instance VMs (using nginx https proxy). 'AppGw' is for https termination with an Azure Application Gateway. When selecting this, you need to specify all appGw* parameters. 'None' is for testing only with no https. 'None' may not be used with a separately configured https termination layer. If you want to use the 'None' option with your separately configured https termination layer, you'll need to update your Moodle config.php manually for $cfg->wwwroot and $cfg->sslproxy.
 
 Type: string
 
@@ -245,7 +256,7 @@ Default: apache
 
 ### autoscaleVmSku
 
-VM size for autoscaled web VMs
+VM size for autoscaled web VMs (applies only to VMSS webClusterType)
 
 Type: string
 
@@ -256,7 +267,7 @@ Default: Standard_DS2_v2
 
 ### autoscaleVmCountMax
 
-Maximum number of autoscaled web VMs
+Maximum number of autoscaled web VMs (applies only to VMSS webClusterType)
 
 Type: int
 
@@ -267,7 +278,7 @@ Default: 10
 
 ### autoscaleVmCountMin
 
-Minimum (also initial) number of autoscaled web VMs
+Minimum (also initial) number of autoscaled web VMs (applies only to VMSS webClusterType)
 
 Type: int
 
@@ -707,13 +718,13 @@ Default:
 
 ### vNetAddressSpace
 
-Address range for the Moodle virtual network and various subnets - presumed /16 for a newly created vnet in case customVnetId is blank. Further subneting (a number of */24 subnets starting from the xxx.yyy.zzz.0/24 will be created on a newly created vnet or your BYO-vnet (specified in customVnetId parameter).
+Address range for the Moodle virtual network and various subnets - presumed /16 for a newly created vnet in case customVnetId is blank. Further subnets (a number of */24 subnets starting from the xxx.yyy.zzz.0/24) will be created on a newly created vnet or your BYO-vnet (specified in customVnetId parameter). Avoid 192.168.0.1/24 and 172.17.0.0/16 if you are choosing AKS webClusterType (these are used by AKS for the k8s service IPs and docker bridge IPs).
 
 Type: string
 
 Possible Values: null
 
-Default: 172.31.0.0
+Default: 172.16.0.0
 
 
 ### gatewayType
@@ -747,6 +758,61 @@ Type: string
 Possible Values: ["Basic","Standard"]
 
 Default: Basic
+
+
+### aksAgentVMSize
+
+The size of the VMs for AKS agents (applies only to AKS webClusterType)
+
+Type: string
+
+Possible Values: null
+
+Default: Standard_DS2_v2
+
+
+### aksAgentCount
+
+The number of the AKS agent VMs (applies only to AKS webClusterType)
+
+Type: int
+
+Possible Values: null
+
+Default: 1
+
+
+### aksKubernetesVersion
+
+The version of Kubernetes that'll be deployed to the AKS cluster (applies only to AKS webClusterType)
+
+Type: string
+
+Possible Values: null
+
+Default: 1.10.3
+
+
+### aksServicePrincipalClientId
+
+The Azure Active Directory app ID that'll be used to deploy dynamic AKS resources (applies only to AKS webClusterType). Must be pre-created (on the Azure Portal or through Azure CLI) and provided here manually.
+
+Type: securestring
+
+Possible Values: null
+
+Default: 
+
+
+### aksServicePrincipalClientSecret
+
+The secret (password) corresponding to the aksServicePrincipalClientId above (applies only to AKS webClusterType). Must be pre-created (on the Azure Portal or through Azure CLI) together with the aksServicePrincipalClientId and provided here manually.
+
+Type: securestring
+
+Possible Values: null
+
+Default: 
 
 
 ### location

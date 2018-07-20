@@ -7,7 +7,7 @@
             "metadata": {
                 "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
             },
-            "defaultValue": "https://raw.githubusercontent.com/Azure/Moodle/hs-aks/"
+            "defaultValue": "https://raw.githubusercontent.com/Azure/Moodle/aks/"
         },
         "_artifactsLocationSasToken": {
             "type": "securestring",
@@ -667,7 +667,7 @@
             "defaultValue": "",
             "type": "securestring",
             "metadata": {
-                "description": "The Azure Active Directory app IP that'll be used to deploy dynamic AKS resources (applies only to AKS webClusterType). Must be pre-created (on the Azure Portal or through Azure CLI) and provided here manually."
+                "description": "The Azure Active Directory app ID that'll be used to deploy dynamic AKS resources (applies only to AKS webClusterType). Must be pre-created (on the Azure Portal or through Azure CLI) and provided here manually."
             }
         },
         "aksServicePrincipalClientSecret": {
