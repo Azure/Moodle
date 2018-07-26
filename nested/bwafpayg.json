@@ -1,0 +1,282 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "moodleCommon": {
+        "metadata": {
+                "description": "Common Moodle values"
+            },
+        "type": "object"
+        },
+        "subnetIdWaf": {
+            "metadata": {
+                "description": "Azure resource ID of the subnet where the WAFs should be deployed"
+            },
+            "type": "string"
+        }
+    },
+    "variables": {
+        "wafvmssID": "[resourceId('Microsoft.Compute/virtualMachineScaleSets',parameters('moodleCommon').wafvmssName)]",
+        "waflbBePoolArray": [
+            {
+                "id": "[variables('wafextBeID')]"
+            }
+        ],
+        "wafnamingInfix": "[toLower(substring(concat(parameters('moodleCommon').wafvmssName, uniqueString(resourceGroup().location)), 0, 9))]",
+        "wafnatPoolName": "[concat(variables('wafnamingInfix'), 'natpool')]",
+        "wafnatPoolNameHttps": "[concat(variables('wafnamingInfix'), 'natpoolHttps')]",
+        "waflbBePoolArrayTakeCount": "[if(equals(parameters('moodleCommon').httpsTermination, 'AppGw'), 0, 1)]",
+        "wafextBeID": "[concat(variables('wafextLbID'),'/backendAddressPools/',parameters('moodleCommon').wafextBeName)]",
+        "wafextFeID": "[concat(variables('wafextLbID'),'/frontendIPConfigurations/',parameters('moodleCommon').wafextFeName)]",
+        "wafextLbID": "[resourceId('Microsoft.Network/loadBalancers',parameters('moodleCommon').waflbName)]",
+        "wafextProbeID": "[concat(variables('wafextLbID'),'/probes/',parameters('moodleCommon').wafextProbe  )]",
+        "wafClusteringMode": "[if(parameters('moodleCommon').wafazureOverprovisioning, 'ALL_PEER_METHOD', 'MASTER_SLAVE_METHOD')]",
+        "wafuserData": {
+            "vmss_instance": true,
+            "az_resource_group": "[resourceGroup().name]",
+            "az_subscription_id": "[subscription().subscriptionId]",
+            "az_vmss_name": "[parameters('moodleCommon').wafvmssName]",
+            "waf_auth_method": "[parameters('moodleCommon').wafazureAuthenticationMethod]",
+            "az_user_id": "[parameters('moodleCommon').wafazureUserId]",
+            "az_user_password": "[parameters('moodleCommon').wafazureUserPassword]",
+            "az_secret_key": "[parameters('moodleCommon').wafazureSecretKey]",
+            "az_client_id": "[parameters('moodleCommon').wafazureClientId]",
+            "az_tenant_id": "[parameters('moodleCommon').wafazureTenantId]",
+            "waf_clustering_mode": "[variables('wafClusteringMode')]",
+            "waf_allow_product_patches": "No",
+            "waf_bootstrap_method": "[parameters('moodleCommon').wafBootstrapMethod]",
+            "waf_shared_secret": "[parameters('moodleCommon').wafSharedSecret]",
+            "az_storage_account_name": "[parameters('moodleCommon').wafazureStorageAccountName]",
+            "az_storage_account_key": "[parameters('moodleCommon').wafazureStorageAccountKey]",
+            "az_storage_blob_name": "[parameters('moodleCommon').wafazureStorageBlobName]",
+            "az_bootstrap_backup_filename": "[parameters('moodleCommon').wafazureBootstrapBackupFilename]",
+            "service_name": "[parameters('moodleCommon').wafServiceName]",
+            "service_port": "[parameters('moodleCommon').wafServicePort]",
+            "servers": "[parameters('moodleCommon').wafServers]",
+            "waf_oms_primary_key": "[parameters('moodleCommon').wafOmsPrimaryKey]",
+            "waf_oms_workspace_id": "[parameters('moodleCommon').wafOmsWorkspaceId]"
+      },
+        "wafcustomData": "[string(variables('wafuserData'))]"
+    },
+
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2017-06-01",
+            "location": "[resourceGroup().location]",
+            "name": "[parameters('moodleCommon').wafvmssdStorageAccounttName]",
+            "kind": "Storage",
+            "sku": {
+                "name": "Standard_LRS"
+            }
+        },      
+      {
+        "type": "Microsoft.Compute/virtualMachineScaleSets",
+        "apiVersion": "2017-03-30",
+        "dependsOn": [
+            "[concat('Microsoft.Storage/storageAccounts/', parameters('moodleCommon').wafvmssdStorageAccounttName)]"
+        ],
+        "location": "[resourceGroup().location]",
+        "name": "[parameters('moodleCommon').wafvmssName]",
+        "plan": "[parameters('moodleCommon').wafimagePlan]",
+        "sku": {
+            "capacity": 1,
+            "name": "[parameters('moodleCommon').wafautoscaleVmSku]",
+            "tier": "Standard"
+        },
+        "properties": {
+          "overprovision": true,
+          "upgradePolicy": {
+                "mode": "Manual"
+            },
+          "virtualMachineProfile": {
+            "storageProfile": {
+              "osDisk": {
+                "createOption": "FromImage",
+                "caching": "ReadWrite",
+                "managedDisk": {
+                    "storageAccountType": "[parameters('moodleCommon').osDiskStorageType]"
+                }
+              },
+              "imageReference": "[parameters('moodleCommon').wafosType]"
+            },
+            "osProfile": {
+              "computerNamePrefix": "[parameters('moodleCommon').wafvmssName]",
+              "adminUsername": "[parameters('moodleCommon').wafUsername]",
+              "adminPassword": "[parameters('moodleCommon').wafpasswd]",
+              "customData": "[base64(variables('wafcustomData'))]"
+            },
+            "networkProfile": {
+              "networkInterfaceConfigurations": [
+                {
+                  "name": "wafvmssnic",
+                  "properties": {
+                    "primary": true,
+                    "ipConfigurations": [
+                      {
+                        "name": "ipcfg_waflb",
+                        "properties": {
+                          "subnet": {
+                            "id": "[parameters('subnetIdWaf')]"
+                          },
+                          "loadBalancerBackendAddressPools": "[take(variables('waflbBePoolArray'), variables('waflbBePoolArrayTakeCount'))]",
+                          "loadBalancerInboundNatPools": [
+                            {
+                              "id": "[concat(variables('wafextLbID'), '/inboundNatPools/', variables('wafnatPoolName'))]"
+                            },
+                            {
+                              "id": "[concat(variables('wafextLbID'), '/inboundNatPools/', variables('wafnatPoolNameHttps'))]"
+                            }
+                          ]
+                        }
+                      }
+                    ]                }
+                }
+              ]
+
+            }
+          }
+        }
+      },
+      {
+        "type": "Microsoft.Insights/autoscaleSettings",
+          "apiVersion": "2015-04-01",
+          "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('moodleCommon').wafvmssName)]"
+            ],
+          "location": "[resourceGroup().location]",
+          "name": "autoscalewaf",
+        "properties": {
+          "name": "autoscalewaf",
+          "targetResourceUri": "[variables('wafvmssID')]",
+          "enabled": true,
+          "profiles": [
+            {
+              "name": "BWAF_default_profile",
+              "capacity": {
+                "default": "[parameters('moodleCommon').wafautoscaleVmCountMin]",
+                "maximum": "[parameters('moodleCommon').wafautoscaleVmCountMax]",
+                "minimum": "[parameters('moodleCommon').wafautoscaleVmCountMin]"
+              },
+              "rules": [
+                {
+                  "metricTrigger": {
+                    "metricName": "Percentage CPU",
+                    "metricNamespace": "",
+                    "metricResourceUri": "[variables('wafvmssID')]",
+                    "timeGrain": "PT1M",
+                    "statistic": "Average",
+                    "timeWindow": "PT15M",
+                    "timeAggregation": "Average",
+                    "operator": "GreaterThan",
+                    "threshold": 60
+                  },
+                  "scaleAction": {
+                    "direction": "Increase",
+                    "type": "ChangeCount",
+                    "value": "1",
+                    "cooldown": "PT10M"
+                  }
+                },
+                {
+                  "metricTrigger": {
+                    "metricName": "Percentage CPU",
+                    "metricNamespace": "",
+                    "metricResourceUri": "[variables('wafvmssID')]",
+                    "timeGrain": "PT1M",
+                    "statistic": "Average",
+                    "timeWindow": "PT60M",
+                    "timeAggregation": "Average",
+                    "operator": "LessThan",
+                    "threshold": 30
+                  },
+                  "scaleAction": {
+                    "direction": "Decrease",
+                    "type": "ChangeCount",
+                    "value": "1",
+                    "cooldown": "PT10M"
+                  }
+                },
+                {
+                  "metricTrigger": {
+                    "metricName": "Network In",
+                    "metricNamespace": "",
+                    "metricResourceUri": "[variables('wafvmssID')]",
+                    "timeGrain": "PT1M",
+                    "statistic": "Average",
+                    "timeWindow": "PT15M",
+                    "timeAggregation": "Average",
+                    "operator": "GreaterThan",
+                    "threshold": 9175040
+                  },
+                  "scaleAction": {
+                    "direction": "Increase",
+                    "type": "ChangeCount",
+                    "value": "1",
+                    "cooldown": "PT10M"
+                  }
+                },
+                {
+                  "metricTrigger": {
+                    "metricName": "Network In",
+                    "metricNamespace": "",
+                    "metricResourceUri": "[variables('wafvmssID')]",
+                    "timeGrain": "PT1M",
+                    "statistic": "Average",
+                    "timeWindow": "PT60M",
+                    "timeAggregation": "Average",
+                    "operator": "LessThan",
+                    "threshold": 5242880
+                  },
+                  "scaleAction": {
+                    "direction": "Decrease",
+                    "type": "ChangeCount",
+                    "value": "1",
+                    "cooldown": "PT10M"
+                  }
+                },
+                {
+                  "metricTrigger": {
+                    "metricName": "Network Out",
+                    "metricNamespace": "",
+                    "metricResourceUri": "[variables('wafvmssID')]",
+                    "timeGrain": "PT1M",
+                    "statistic": "Average",
+                    "timeWindow": "PT15M",
+                    "timeAggregation": "Average",
+                    "operator": "GreaterThan",
+                    "threshold": 9175040
+                  },
+                  "scaleAction": {
+                    "direction": "Increase",
+                    "type": "ChangeCount",
+                    "value": "1",
+                    "cooldown": "PT10M"
+                  }
+                },
+                {
+                  "metricTrigger": {
+                    "metricName": "Network Out",
+                    "metricNamespace": "",
+                    "metricResourceUri": "[variables('wafvmssID')]",
+                    "timeGrain": "PT1M",
+                    "statistic": "Average",
+                    "timeWindow": "PT60M",
+                    "timeAggregation": "Average",
+                    "operator": "LessThan",
+                    "threshold": 5242880
+                  },
+                  "scaleAction": {
+                    "direction": "Decrease",
+                    "type": "ChangeCount",
+                    "value": "1",
+                    "cooldown": "PT10M"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
