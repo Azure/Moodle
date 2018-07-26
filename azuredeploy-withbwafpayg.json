@@ -1292,6 +1292,7 @@
             "wafautoscaleVmCountMax": "[parameters('wafautoscaleVmCountMax')]",
             "wafautoscaleVmCountMin": "[parameters('wafautoscaleVmCountMin')]",
             "wafautoscaleVmSku": "[parameters('wafautoscaleVmSku')]",
+            "wafextBeName": "[concat('waf-lb-backend-',variables('resourceprefix'))]",
             "wafextFeName": "[concat('waf-lb-frontend-',variables('resourceprefix'))]",
             "waflbDns": "[concat('waflb-',variables('resourceprefix'),'.',resourceGroup().location,'.cloudapp.azure.com')]",
             "waflbSku": "[parameters('wafloadBalancerSku')]",
