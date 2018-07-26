@@ -8,7 +8,7 @@ This deployment will add the Barracuda Web Application Firewall to the moodle in
 The following button will allow you to specify various configurations for your Moodle cluster
 deployment.
 
-[![Deploy to Azure Fully Configurable](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Faravindan-barracuda%2Fwaf_with_moodle%2Fmaster%2Fazuredeploy-withbwafpayg.json)
+[![Deploy to Azure Fully Configurable](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Faravindan-barracuda%2FMoodle%2Fmaster%2Fazuredeploy-withbwafpayg.json)
 
 # CLI based deployment
 

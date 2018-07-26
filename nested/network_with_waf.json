@@ -76,7 +76,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'network-subnets.json',parameters('moodleCommon').artifactsSasToken)]"
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'network-subnets_with_waf.json',parameters('moodleCommon').artifactsSasToken)]"
                 }
             }
         },
