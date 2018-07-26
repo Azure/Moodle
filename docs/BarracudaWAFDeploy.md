@@ -24,7 +24,7 @@ WAFPASSWD=<waf password> #for example @Testing123456
 
 ## Deployment Steps
 
-The following snippet of bash commands will help to set up the environment variables to the point where you      can execute ```az group create```
+The following snippet of bash commands will help to set up the environment variables to the point where you      can execute ```az group deployment create```
 
 1. Moodle specific variables
 
