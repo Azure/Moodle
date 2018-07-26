@@ -490,7 +490,7 @@
         "subnetIdWaf":      "[if(equals(parameters('moodleCommon').customVnetId, ''), resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), parameters('moodleCommon').subnetWaf), variables('customVnetSubnetIdWaf'))]",
         "wafextLbID": "[resourceId('Microsoft.Network/loadBalancers',parameters('moodleCommon').waflbName)]",
         "wafextProbeID": "[concat(variables('wafextLbID'),'/probes/',parameters('moodleCommon').wafextProbe)]",
-        "waflbPipID": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('moodleCommon').waflbPip)]",
+        "waflbPipID": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('moodleCommon').waflbPipName)]",
         "customVnetSubnetIdWaf":        "[concat(parameters('moodleCommon').customVnetId, '/subnets/', parameters('moodleCommon').subnetWaf)]",
 
         "documentation01": "This sub-template creates a virtual network with a number of subnets and then creates the moodle load-balancer (or an Azure Application Gateway) with public IP/dns",
