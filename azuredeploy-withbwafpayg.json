@@ -2,6 +2,13 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Azure Location for all resources."
+            }
+        },
         "_artifactsLocation": {
             "type": "string",
             "metadata": {
@@ -1135,6 +1142,7 @@
         "documentation11": "    controller          - creates a controller VM and deploys code",
         "documentation12": "GlusterFS Sizing guidance",
         "moodleCommon": {
+            "location": "[parameters('location')]",
             "wafSharedSecret": "[parameters('wafSharedSecret')]",
             "wafazureAuthenticationMethod": "[parameters('wafazureAuthenticationMethod')]",
             "wafazureUserId": "[parameters('wafazureUserId')]",
