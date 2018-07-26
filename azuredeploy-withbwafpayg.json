@@ -7,7 +7,7 @@
             "metadata": {
                 "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
             },
-            "defaultValue": "https://raw.githubusercontent.com/Azure/Moodle/master/"
+            "defaultValue": "https://raw.githubusercontent.com/aravindan-barracuda/Moodle/master/"
         },
         "_artifactsLocationSasToken": {
             "type": "securestring",
@@ -1315,7 +1315,7 @@
             "subnetWafRange": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),7)), '.0/24')]",
             "wafvmssName": "[concat('wafvmss-',variables('resourceprefix'))]",
             "wafvmssdStorageAccounttName": "[concat('wafvmss',uniqueString(resourceGroup().id))]",
-            
+
 
             "baseTemplateUrl": "[concat(parameters('_artifactsLocation'), 'nested/')]",
             "scriptLocation": "[concat(parameters('_artifactsLocation'), 'scripts/')]",
