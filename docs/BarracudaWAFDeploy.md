@@ -54,7 +54,7 @@ The following snippet of bash commands will help to set up the environment varia
     echo "----> Generating the SSH Key"
     sleep 5
     if [ ! -f "$MOODLE_SSH_KEY_FILENAME" ]; then ssh-keygen -t rsa -N "" -f $MOODLE_SSH_KEY_FILENAME; fi
-    git clone https://github.com/aravindan-barracuda/waf_with_moodle.git $MOODLE_AZURE_WORKSPACE/arm_template
+    git clone https://github.com/aravindan-barracuda/Moodle.git $MOODLE_AZURE_WORKSPACE/arm_template
     ls $MOODLE_AZURE_WORKSPACE/arm_template
 }
 ```
