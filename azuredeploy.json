@@ -37,6 +37,13 @@
             },
             "type": "bool"
         },
+        "CudaWafDeploySwitch": {
+            "defaultValue": false,
+            "metadata": {
+                "description": "Switch to deploy a Barracuda WAF VMSS or not."
+            },
+            "type": "bool"
+        },
         "vnetGwDeploySwitch": {
             "defaultValue": false,
             "metadata": {
@@ -635,7 +642,241 @@
             "metadata": {
                 "description": "Azure Location for all resources."
             }
-        }
+        },
+        "wafpasswd": {
+            "defaultValue": "WAF-PASSWORD",
+            "metadata": {
+                "description": "waf login password"
+            },
+            "type": "securestring"
+        },
+        "wafautoscaleVmSku": {
+            "defaultValue": "Standard_DS2_v2",
+            "metadata": {
+                "description": "VM size for autoscaled web VMs"
+            },
+            "type": "string"
+        },
+        "wafautoscaleVmCountMax": {
+            "defaultValue": 10,
+            "metadata": {
+                "description": "Maximum number of autoscaled waf VMs"
+            },
+            "type": "int"
+        },
+        "wafautoscaleVmCountMin": {
+            "defaultValue": 2,
+            "metadata": {
+                "description": "Minimum (also initial) number of autoscaled waf VMs"
+            },
+            "type": "int"
+        },
+        "wafloadBalancerSku": {
+            "defaultValue": "Basic",
+            "allowedValues": [
+                "Basic",
+                "Standard"
+            ],
+            "metadata": {
+                "description": "WAF Loadbalancer SKU"
+            },
+            "type": "string"
+        },
+        "wafazureOverprovisioning": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+              "description": "overprovisioning is true or false."
+            }
+          },
+        "wafSharedSecret": {
+            "type": "string",
+            "defaultValue": "secret",
+            "metadata": {
+              "description": "Shared secret to be used when clustering barracuda waf instances."
+            }
+          },
+          "wafazureAuthenticationMethod": {
+            "type": "string",
+            "allowedValues": [
+              "AZURE_USER_PASSWORD",
+              "AZURE_SERVICE_PRINCIPAL"
+            ],
+            "defaultValue": "AZURE_SERVICE_PRINCIPAL",
+            "metadata": {
+              "description": "Choose authentication method which WAF will use make API calls. If you choose AZURE_USER_PASSWORD provide values for (azureUserId and azureUserPassword). For AZURE_SERVICE_PRINCIPAL please provide details for (azureClientId, azureTenantId and azureTenantId)."
+            }
+          },
+          "wafazureUserId": {
+            "type": "string",
+            "defaultValue": " ",
+            "metadata": {
+              "description": "Azure AD user name."
+            }
+          },
+          "wafazureUserPassword": {
+            "type": "securestring",
+            "defaultValue": "",
+            "metadata": {
+              "description": "Azure AD user password."
+            }
+          },
+          "wafazureClientId": {
+            "type": "string",
+            "defaultValue": " ",
+            "metadata": {
+              "description": "Azure client id for Azure API calls.Refer https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal for more details."
+            }
+          },
+          "wafazureTenantId": {
+            "type": "string",
+            "defaultValue": " ",
+            "metadata": {
+              "description": "Azure tenant id for Azure API calls."
+            }
+          },
+          "wafazureSecretKey": {
+            "type": "securestring",
+            "defaultValue": "",
+            "metadata": {
+              "description": "Azure secret key for Azure API calls."
+            }
+          },
+          "wafBootstrapMethod": {
+            "type": "string",
+            "allowedValues": [
+              "NO_BOOTSTRAPING",
+              "BASIC_SERVICE_BOOTSTRAP",
+              "BACKUP_BASED_BOOTSTRAP"
+            ],
+            "defaultValue": "BACKUP_BASED_BOOTSTRAP",
+            "metadata": {
+              "description": "Choose bootstapping method to be used when Barracuda WAF gets launched.If you choose BACKUP_BASED_BOOTSTRAP please provide (azureStorageAccountName, azureStorageAccountKey, azureStorageBlobName and azureBootstrapBackupFilename). This will be used to download the backup file from blob storage and restore during first bootup. For option BASIC_SERVICE_BOOTSTRAP please provide (wafServiceName, wafServicePort, wafServerIp, wafServerHostName)."
+            }
+          },
+          "wafazureStorageAccountName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+              "description": "Azure storage account where bootstrap backup file is uploaded."
+            }
+          },
+          "wafazureStorageAccountKey": {
+            "type": "securestring",
+            "defaultValue": "",
+            "metadata": {
+              "description": "Azure storage key associated with azure storage account."
+            }
+          },
+          "wafazureStorageBlobName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+              "description": "Azure blob name where backup file is uploaded."
+            }
+          },
+          "wafazureBootstrapBackupFilename": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+              "description": "Backup filename which needs to be bootstrapped.If backup bootstrap details are configured, basic service bootstrap parameters will be ignored."
+            }
+          },
+          "wafServiceName": {
+            "type": "string",
+            "defaultValue": "waf_service_1",
+            "metadata": {
+              "description": "WAF service name. Service bootstrapping parameters will be used only if backup bootstrap details are not provided."
+            }
+          },
+          "wafServicePort": {
+            "type": "string",
+            "defaultValue": "80",
+            "metadata": {
+              "description": "WAF service port. HTTP(s) service type not supported.Use WAF UI/Rest API to create any service type that requires a certificate to be uploaded."
+            }
+          },
+          "wafServers": {
+            "type": "string",
+            "defaultValue": "serverip",
+            "metadata": {
+              "description": "Comma separated list of server:port with identifier being IP or hostname. Example 10.0.1.70:80,10.0.1.71:80,www.abc.com:80,www.xyz:80"
+            }
+          },
+          "wafOmsPrimaryKey": {
+            "type": "string",
+            "defaultValue": "NONE",
+            "metadata": {
+              "description": "Enter the Primary Key of the Microsoft Azure OMS portal. (Primary Key is available in the Microsoft Operations Management Suite portal, Settings > Connected Sources > Linux Servers page)."
+            }
+          },
+          "wafOmsWorkspaceId": {
+            "type": "string",
+            "defaultValue": "NONE",
+            "metadata": {
+              "description": "Enter the Workspace ID of the Microsoft Azure OMS portal. (Workspace ID is available in the Microsoft Operations Management Suite portal, Settings > Connected Sources > Linux Servers page)."
+            }
+          },
+          "wafNotifyEmail": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+              "description": "Comma-delimited email addresses where the alerts are also sent"
+            }
+          },
+          "wafclientVmSku": {
+            "defaultValue": "Standard_DS2_v2",
+            "metadata": {
+                "description": "VM size for the WAF VM node"
+            },
+            "type": "string"
+        },
+        "wafapplyScriptsSwitch": {
+            "defaultValue": true,
+            "metadata": {
+                "description": "Switch to process or bypass all scripts/extensions"
+            },
+            "type": "bool"
+        },
+        "wafdefaultDomainName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+              "description": "Domain Name"
+            }
+          },
+          "wafeulaUserName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+              "description": "Name of the user accepting EULA."
+            }
+          },
+          "wafeulaUserEmail": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+              "description": "Email ID of the user accepting the EULA."
+            }
+          },
+          "wafeulaUserCompany": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+              "description": "Compnay Name of the user accepting EULA."
+            }
+          },
+          "wafbillingMethod": {
+            "type": "string",
+            "allowedValues": [
+              "byol",
+              "hourly"
+            ],
+            "defaultValue": "hourly",
+            "metadata": {
+              "description": "Type of Deployment"
+            }
+          }
     },
     "resources": [
         {
@@ -648,6 +889,23 @@
                     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
                     "contentVersion": "1.0.0.0",
                     "resources": []
+                }
+            }
+        },
+        {
+            "condition": "[parameters('CudaWafDeploySwitch')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "name": "WAFTemplate",
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {
+                    "moodleCommon": {
+                        "value": "[variables('moodleCommon')]"
+                    }
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl, 'bwafpayg_network.json', parameters('_artifactsLocationSasToken'))]"
                 }
             }
         },
@@ -897,6 +1155,7 @@
                 "Microsoft.Resources/deployments/dbTemplate",
                 "Microsoft.Resources/deployments/redisTemplate",
                 "Microsoft.Resources/deployments/searchTemplate",
+                "Microsoft.Resources/deployments/WAFTemplate",
                 "Microsoft.Resources/deployments/storageAccountTemplate"
             ],
             "name": "vmSetupParamsTemplate",
@@ -988,6 +1247,58 @@
                     "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'webvmss.json',parameters('_artifactsLocationSasToken'))]"
                 }
             }
+        },
+        {
+            "condition": "[parameters('CudaWafDeploySwitch')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/WAFTemplate",
+                "Microsoft.Resources/deployments/networkTemplate"
+            ],
+            "name": "CudaVMSSTemplate",
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {
+                    "moodleCommon": {
+                        "value": "[variables('moodleCommon')]"
+                    },
+                    "subnetIdWaf": {
+                        "value": "[reference('networkTemplate').outputs.subnetIdWaf.value]"
+                    }
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'bwafpayg.json',parameters('_artifactsLocationSasToken'))]"
+                }
+            }
+        },
+        {
+            "condition": "[parameters('CudaWafDeploySwitch')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/networkTemplate",
+                "Microsoft.Resources/deployments/WAFTemplate",
+                "Microsoft.Resources/deployments/CudaVMSSTemplate"
+            ],
+            "name": "wafconfigTemplate",
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {
+                    "moodleCommon": {
+                        "value": "[variables('moodleCommon')]"
+                    },
+                    "subnetIdWaf": {
+                        "value": "[reference('networkTemplate').outputs.subnetIdWaf.value]"
+                    },
+                    "vmSetupParamsObj": {
+                        "value": "[reference('vmSetupParamsTemplate').outputs.vmSetupParamsObj.value]"
+                    }
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl, 'wafclient.json', parameters('_artifactsLocationSasToken'))]"
+                }
+            }
         }
     ],
     "outputs": {
@@ -1034,6 +1345,14 @@
         "loadBalancerSku": {
             "type": "string",
             "value": "[variables('moodleCommon').lbSku]"
+        },
+        "wafloadBalancerDNS": {
+            "type": "string",
+            "value": "[variables('moodleCommon').waflbDns]"
+        },
+        "wafloadBalancerSku": {
+            "type": "string",
+            "value": "[variables('moodleCommon').waflbSku]"
         }
     },
     "variables": {
@@ -1049,6 +1368,60 @@
         "documentation10": "    controller          - creates a controller VM and deploys code",
         "documentation11": "GlusterFS Sizing guidance",
         "moodleCommon": {
+            "wafSharedSecret": "[parameters('wafSharedSecret')]",
+            "wafazureAuthenticationMethod": "[parameters('wafazureAuthenticationMethod')]",
+            "wafazureUserId": "[parameters('wafazureUserId')]",
+            "wafazureUserPassword": "[parameters('wafazureUserPassword')]",
+            "wafazureClientId": "[parameters('wafazureClientId')]",
+            "wafazureTenantId": "[parameters('wafazureTenantId')]",
+            "wafazureSecretKey": "[parameters('wafazureSecretKey')]",
+            "wafBootstrapMethod": "[parameters('wafBootstrapMethod')]",
+            "wafazureStorageAccountName": "[parameters('wafazureStorageAccountName')]",
+            "wafazureStorageAccountKey": "[parameters('wafazureStorageAccountKey')]",
+            "wafazureStorageBlobName": "[parameters('wafazureStorageBlobName')]",
+            "wafazureBootstrapBackupFilename": "[parameters('wafazureBootstrapBackupFilename')]",
+            "wafServiceName": "[parameters('wafServiceName')]",
+            "wafServicePort": "[parameters('wafServicePort')]",
+            "wafServers": "[parameters('wafServers')]",
+            "wafOmsPrimaryKey": "[parameters('wafOmsPrimaryKey')]",
+            "wafOmsWorkspaceId": "[parameters('wafOmsWorkspaceId')]",
+            "wafNotifyEmail": "[parameters('wafNotifyEmail')]",
+            "wafazureOverprovisioning": "[parameters('wafazureOverprovisioning')]",
+            "wafautoscaleVmCountMax": "[parameters('wafautoscaleVmCountMax')]",
+            "wafautoscaleVmCountMin": "[parameters('wafautoscaleVmCountMin')]",
+            "wafautoscaleVmSku": "[parameters('wafautoscaleVmSku')]",
+            "wafextBeName": "[concat('waf-lb-backend-',variables('resourceprefix'))]",
+            "wafextFeName": "[concat('waf-lb-frontend-',variables('resourceprefix'))]",
+            "waflbDns": "[concat('waflb-',variables('resourceprefix'),'.',resourceGroup().location,'.cloudapp.azure.com')]",
+            "waflbSku": "[parameters('wafloadBalancerSku')]",
+            "waflbName": "[concat('waflb-',variables('resourceprefix'))]",
+            "waflbPipName": "[concat('waflb-pubip-',variables('resourceprefix'))]",
+            "wafosType": {
+                "publisher": "barracudanetworks",
+                "offer": "waf",
+                "sku": "[variables('wafimageSKU')]",
+                "version": "latest"
+              },
+            "wafimagePlan": {
+                "name": "[variables('wafimageSKU')]",
+                "product": "waf",
+                "publisher": "barracudanetworks"
+              },
+            "wafpasswd": "[parameters('wafpasswd')]",
+            "subnetWaf": "[concat('waf-subnet-',variables('resourceprefix'))]",
+            "subnetWafPrefix": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),7)))]",
+            "subnetWafRange": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),7)), '.0/24')]",
+            "wafvmssName": "[concat('wafvmss-',variables('resourceprefix'))]",
+            "wafnsgName": "[concat('wafnsg-',variables('resourceprefix'))]",
+            "wafvmssdStorageAccounttName": "[concat('wafvmss',uniqueString(resourceGroup().id))]",
+            "wafextProbe": "[concat('waf-lb-probe-',variables('resourceprefix'))]",
+            "wafapplyScriptsSwitch": "[parameters('wafapplyScriptsSwitch')]",
+            "wafdefaultDomainName": "[parameters('wafdefaultDomainName')]",
+            "wafeulaUserName": "[parameters('wafeulaUserName')]",
+            "wafeulaUserEmail": "[parameters('wafeulaUserEmail')]",
+            "wafeulaUserCompany": "[parameters('wafeulaUserCompany')]",
+            
+
             "baseTemplateUrl": "[concat(parameters('_artifactsLocation'), 'nested/')]",
             "scriptLocation": "[concat(parameters('_artifactsLocation'), 'scripts/')]",
             "artifactsSasToken": "[parameters('_artifactsLocationSasToken')]",
@@ -1209,7 +1582,12 @@
             "vnetName": "[concat('vnet-',variables('resourceprefix'))]",
             "vpnType": "[parameters('vpnType')]",
             "webServerSetupScriptFilename": "setup_webserver.sh",
-            "webServerType": "[parameters('webServerType')]"
+            "webServerType": "[parameters('webServerType')]",
+            "WafRestClientNicName":"[concat('wafclient-vm-nic-',variables('resourceprefix'))]",
+            "wafScriptFilename": "install_waf.sh",
+            "wafclientVmIP": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),7)), '.200')]",
+            "wafclientVmName": "[concat('waf-client-vm-',variables('resourceprefix'))]",
+            "wafclientVmSku": "[parameters('wafclientVmSku')]"
         },
         "certUrlArray": [
             {
@@ -1228,6 +1606,7 @@
             }
         ],
         "octets": "[split(parameters('vNetAddressSpace'), '.')]",
+        "wafimageSKU": "[parameters('wafbillingMethod')]",
         "resourceprefix": "[substring(uniqueString(resourceGroup().id, deployment().name), 3, 6)]",
         "subnetSanPrefix": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),2)))]",
         "subnetWebRange": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),0)), '.0/24')]"
