@@ -54,7 +54,12 @@
             "service_port": "[parameters('moodleCommon').wafServicePort]",
             "servers": "[parameters('moodleCommon').wafServers]",
             "waf_oms_primary_key": "[parameters('moodleCommon').wafOmsPrimaryKey]",
-            "waf_oms_workspace_id": "[parameters('moodleCommon').wafOmsWorkspaceId]"
+            "waf_oms_workspace_id": "[parameters('moodleCommon').wafOmsWorkspaceId]",
+            "default_domain": "[parameters('moodleCommon').wafdefaultDomainName]",
+            "signature": "[parameters('moodleCommon').wafeulaUserName]",
+            "email": "[parameters('moodleCommon').wafeulaUserEmail]",
+            "organization": "[parameters('moodleCommon').wafeulaUserCompany]"
+
       },
         "wafcustomData": "[string(variables('wafuserData'))]"
     },
@@ -102,7 +107,7 @@
             },
             "osProfile": {
               "computerNamePrefix": "[parameters('moodleCommon').wafvmssName]",
-              "adminUsername": "[parameters('moodleCommon').wafUsername]",
+              "adminUsername": "will-be-replaced-by-admin",
               "adminPassword": "[parameters('moodleCommon').wafpasswd]",
               "customData": "[base64(variables('wafcustomData'))]"
             },
