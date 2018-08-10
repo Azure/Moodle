@@ -76,6 +76,11 @@
                 "mssqlDbEdition": "[parameters('moodleCommon').mssqlDbEdition]",
                 "mssqlDbSize": "[parameters('moodleCommon').mssqlDbSize]"
             },
+            "wafProfile": {
+                "lbdns": "[parameters('moodleCommon').lbdns]",
+                "waflbdns": "[parameters('moodleCommon').waflbdns]",
+                "wafpasswd": "[parameters('moodleCommon').wafpasswd]"
+            },
             "fileServerProfile": {
                 "type": "[parameters('moodleCommon').fileServerType]",
                 "nfsVmName": "[parameters('moodleCommon').ctlrVmName]",
