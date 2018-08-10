@@ -832,7 +832,7 @@
             "type": "string"
         },
         "wafapplyScriptsSwitch": {
-            "defaultValue": true,
+            "defaultValue": false,
             "metadata": {
                 "description": "Switch to process or bypass all scripts/extensions"
             },
