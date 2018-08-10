@@ -1,0 +1,20 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+        "parameters": {
+                "sshPublicKey":                { "value": "GEN-SSH-PUB-KEY" },
+                "fileServerDiskCount":         { "value": 2 },
+                "fileServerDiskSize":          { "value": 32 },
+                "wafpasswd":                   { "value":"WAF-PASSWORD"},
+                "CudaWafDeploySwitch":         { "value": true},
+                "wafazureClientId":            {"value":"CLIENT-ID"},
+                "wafazureTenantId":            {"value":"TENANT-ID"},
+                "wafazureSecretKey":           {"value":"CLIENT-SECRET"},
+                "wafapplyScriptsSwitch":       {"value": true},
+                "wafdefaultDomainName":       {"value": "cuda.local"},
+                "wafeulaUserName":       {"value": "aravindan anandan"},
+                "wafeulaUserEmail":       {"value": "aravindan@barracuda.com"},
+                "wafeulaUserCompany":       {"value": "barracuda networks"}
+
+        }
+}
