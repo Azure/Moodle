@@ -1,38 +1,48 @@
 # Deploying Barracuda WAF in the Moodle setup
 
-The instructions will enable you to deploy the Barracuda WAF in a scale set along with the fully configurable moodle deployment
+The instructions will enable you to deploy the Barracuda WAF in a scale set along with the fully configurable moodle deployment. 
+
+## Important Note:
+
+The template is optimized for a deployment where the "httpsTermination" parameter is set to VMSS (this is the default setting in the template) for the Moodle stack.
+
+The template can be launched from the Azure management console or through the commandline on a linux machine.
 
 ## Fully configurable deployment with Barracuda WAF (Pay-As-You-Go License)
 
 This deployment will add the Barracuda Web Application Firewall to the moodle infrastructure.
-The following button will allow you to specify various configurations for your Moodle cluster
-deployment.
+The link below will redirect you to the Azure management console allowing you to specify various launch parameters for your Moodle cluster deployment.
 
-[![Deploy to Azure Fully Configurable](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Faravindan-barracuda%2FMoodle%2Fmaster%2Fazuredeploy-withbwafpayg.json)
 
-# CLI based deployment
+## CLI based deployment
 
-## Prerequisites
+### Prerequisites
 
 First we need to ensure our environment variables are correctly configured.
+
+Optional (Required if the [azure-credentials](https://github.com/pendrica/azure-credentials) gem is used to auto-generate the SPN): 
 
 ```
 AZUREUSERNAME=<azure user account>
 AZUREPASSWD=<azure account password>
+```
+Required:
+
+```
 WAFPASSWD=<waf password> #for example @Testing123456
+MOODLE_RG_LOCATION=<location/region> #for example "eastus"
 ```
 
-## Deployment Steps
+### Deployment Steps
 
 The following snippet of bash commands will help to set up the environment variables to the point where you      can execute ```az group deployment create```
 
-1. Moodle specific variables
+1. Environment variables
 
 ```
 {
     if [ -z "$MOODLE_RG_NAME" ]; then MOODLE_RG_NAME=moodle_$(date +%Y-%m-%d-%H); fi
     echo "----> Resource Group for deployment: $MOODLE_RG_NAME"
-    MOODLE_RG_LOCATION=eastus
     echo "----> Deployment location: $MOODLE_RG_LOCATION"
     MOODLE_DEPLOYMENT_NAME=MasterDeploy
     echo "----> Deployment name: $MOODLE_DEPLOYMENT_NAME"
@@ -54,17 +64,18 @@ The following snippet of bash commands will help to set up the environment varia
     echo "----> Generating the SSH Key"
     sleep 5
     if [ ! -f "$MOODLE_SSH_KEY_FILENAME" ]; then ssh-keygen -t rsa -N "" -f $MOODLE_SSH_KEY_FILENAME; fi
-    git clone https://github.com/aravindan-barracuda/Moodle.git $MOODLE_AZURE_WORKSPACE/arm_template
+    git clone https://github.com/Azure/Moodle.git $MOODLE_AZURE_WORKSPACE/arm_template
     ls $MOODLE_AZURE_WORKSPACE/arm_template
 }
 ```
-2. Creating the Azure Service Principal credentials
+2. Creating Azure Service Principal credentials
 
-    Note: We use a gem called ```azure-credentials``` to create a the SPN credentials that will be used in the WAF for azure configuration. 
+    Follow the instructions in the article [Azure SPN instructions](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal) for creating Azure Service Principal credentials.
+
+    Alternatively, in the code snippet below, a helper gem called ```azure-credentials``` is used to create SPN credentials that will be used in the WAF to enable access to the WAF system to the Azure fabric. This is required in cases where a multi-ip/multi-NIC configuration is choosen for the deployment of the scaleset. This requires  ruby to be installed on the client machine on which the code is executed.
 
 ```
 {
-    if hash jq 2>/dev/null; then echo "jq is already installed";else sudo apt-get install -y jq;fi
     if hash jq 2>/dev/null; then echo "jq is already installed";else sudo apt-get install -y jq;fi
     if hash azure-credentials 2>/dev/null;then echo "azure-credentials gem is already installed";else gem install azure-credentials;fi
     echo "fetching azure SPN credentials..."
@@ -87,6 +98,8 @@ The following snippet of bash commands will help to set up the environment varia
 ```
 3. Generating the Parameters JSON file.
 
+The following code snippet will update the parameters json file with the appropriate JSON keys and values to deploy the WAF scale set.
+
 ```
 {
     echo "Now creating the new parameters json file..." && sleep 2
@@ -100,7 +113,7 @@ The following snippet of bash commands will help to set up the environment varia
 ```
 4. Deploying the application with Barracuda WAF
 
-    Finally, use the following command to deploy the Barracuda WAF with the Moodle fully configurable setup.
+Finally, use the following command to deploy the Barracuda WAF with the Moodle fully configurable setup.
 
 ```
 az group deployment create --name $MOODLE_DEPLOYMENT_NAME \
