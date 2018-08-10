@@ -60,6 +60,10 @@ function get_setup_params_from_configs_json
     export nfsHaLbIP=$(echo $json | jq -r .fileServerProfile.nfsHaLbIP)
     export nfsHaExportPath=$(echo $json | jq -r .fileServerProfile.nfsHaExportPath)
     export nfsByoIpExportPath=$(echo $json | jq -r .fileServerProfile.nfsByoIpExportPath)
+    export lbdns=$(echo $json | jq -r .wafProfile.lbdns)
+    export wafpasswd=$(echo $json | jq -r .wafProfile.wafpasswd)
+    export waflbdns=$(echo $json | jq -r .wafProfile.waflbdns)
+    export siteFQDN=$(echo $json | jq -r .siteProfile.siteURL)
 }
 
 function get_php_version {
