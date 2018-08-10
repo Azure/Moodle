@@ -1,0 +1,135 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "moodleCommon": {
+            "metadata": {
+                "description": "Common Moodle values"
+            },
+            "type": "object"
+        },
+        "subnetIdWaf": {
+            "metadata": {
+                "description": "Azure resource ID of the subnet where this VM is to be deployed"
+            },
+            "type": "string"
+        },
+        "vmSetupParamsObj": {
+            "metadata": {
+                "description": "JSON-structured VM setup params that'll be injected to the VM (through cloud-init) and used by the custom script (setup_webserver.sh)"
+            },
+            "type": "object"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2017-10-01",
+            "location": "[parameters('moodleCommon').location]",
+            "name": "[parameters('moodleCommon').WafRestClientNicName]",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipcfg-waf-client",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "privateIPAddress": "[parameters('moodleCommon').wafclientVmIP]",
+                            "subnet": {
+                                "id": "[parameters('subnetIdWaf')]"
+                            }
+                        }
+                    }
+                ]
+            },
+            "tags": {
+                "displayName": "WAF REST CLIENT NIC"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2017-03-30",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', parameters('moodleCommon').WafRestClientNicName)]"
+            ],
+            "location": "[parameters('moodleCommon').location]",
+            "name": "[parameters('moodleCommon').wafclientVmName]",
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('moodleCommon').wafclientVmSku]"
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[variables('wafnicRef')]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "adminUsername": "[parameters('moodleCommon').sshUsername]",
+                    "computerName": "[parameters('moodleCommon').wafclientVmName]",
+                    "customData": "[base64(concat('#cloud-config\nwrite_files:\n- encoding: b64\n  content: ', base64(string(parameters('vmSetupParamsObj'))), '\n  owner: root:root\n  path: ', parameters('moodleCommon').moodleOnAzureConfigsJsonPath, '\n  permissions: ', variables('singleQuote'), '0400', variables('singleQuote')))]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": true,
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[concat('/home/', parameters('moodleCommon').sshUsername, '/.ssh/authorized_keys')]",
+                                    "keyData": "[parameters('moodleCommon').sshPublicKey]"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "storageProfile": {
+                    "dataDisks": [],
+                    "imageReference": "[parameters('moodleCommon').osType]",
+                    "osDisk": {
+                        "createOption": "FromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[parameters('moodleCommon').osDiskStorageType]"
+                        },
+                        "name": "[parameters('moodleCommon').wafclientVmName]"
+                    }
+                }
+            },
+            "tags": {
+                "displayName": "WAF client Virtual Machine"
+            }
+        },
+        {
+            "condition": "[parameters('moodleCommon').wafapplyScriptsSwitch]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('moodleCommon').wafclientVmName)]"
+            ],
+            "name": "[concat(parameters('moodleCommon').wafclientVmName,'-ScriptProcessor')]",
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {
+                    "moodleCommon": {
+                        "value": "[parameters('moodleCommon')]"
+                    }
+
+                },
+                "templateLink": {
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'wafconfig.json',parameters('moodleCommon').artifactsSasToken)]"
+                }
+            }
+        }
+        
+    ],
+    "variables": {
+        "documentation01": "This sub-template sets up the waf configuration as per the moodle deployment",
+        "documentation02": "It expects certain values in the 'common' datastructure.",
+        "documentation03": "    vnetName               - name of the virtual network",
+        "documentation06": "    WafRestClientNicName            - name of the WAF Client vm network interface",
+        "documentation11": "    WafclientVmName             - name of the waf client vm",
+        "documentation12": "    WafclientVmIP               - IP of the waf vm",
+        "documentation16": "    wafclientconfig             - conditionally applies post-deployment script on the VM",
+        "singleQuote": "'",
+        "wafnicRef": "[resourceId('Microsoft.Network/networkInterfaces', parameters('moodleCommon').WafRestClientNicName)]",
+        "wafcmdExec": "[concat('bash ', parameters('moodleCommon').wafScriptFilename, ' ', parameters('moodleCommon').wafclientVmIP)]",
+        "wafscriptUri": "[concat(parameters('moodleCommon').scriptLocation,parameters('moodleCommon').wafScriptFilename,parameters('moodleCommon').artifactsSasToken)]"
+    }
+}
