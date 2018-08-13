@@ -904,6 +904,9 @@ EOF
     sudo chown -R www-data.www-data /moodle/moodledata /moodle/certs
     sudo chmod +r /moodle/html/moodle/config.php
 
+    # chmod /moodle for Azure NetApp Files (its default is 770!)
+    sudo chmod +rx /moodle
+
    if [ $fileServerType = "azurefiles" ]; then
       # Delayed copy of moodle installation to the Azure Files share
 
