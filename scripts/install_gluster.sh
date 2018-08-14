@@ -188,7 +188,7 @@ sudo apt-get -y install unattended-upgrades
             then
                 echo "adding gluster ppa"
                 apt-get  -y install python-software-properties
-                apt-add-repository -y ppa:gluster/glusterfs-3.8
+                apt-add-repository -y ppa:gluster/glusterfs-3.12
                 apt-get -y update
             fi
             
