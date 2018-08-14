@@ -105,6 +105,19 @@ single copy.
 It'd be also great if we add a download operation step in the test plan,
 and it's left as a future work item.
 
+### Latency-Sensitive Stress Testing [time-gated-exam-test.jmx](./time-gated-exam-test.jmx)
+
+This test stresses the deployed Moodle cluster with 1000 emulated students
+trying to get in an exam (quiz) that's initially closed and will be opened
+at the designated exam start time (have to be manually set on the test course's
+corresponding quiz's Settings). Once the exam start time passes, each emulated
+student continues taking the exam for 10 times.
+
+This test has been used to find out how responsive
+a deployed Moodle cluster can be on very latency-sensitive workloads. We've been
+using this test with different file server types to find out which file server
+type offers best response times.
+
 ## Please contribute
 
 It'd be great if we have more test plans, and make other parameters configurable (for
