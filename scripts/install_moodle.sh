@@ -98,7 +98,7 @@ set -ex
 
     if [ $fileServerType = "gluster" ]; then
         # configure gluster repository & install gluster client
-        sudo add-apt-repository ppa:gluster/glusterfs-3.12 -y                 >> /tmp/apt1.log
+        sudo add-apt-repository ppa:gluster/glusterfs-3.10 -y                 >> /tmp/apt1.log
     elif [ $fileServerType = "nfs" ]; then
         # configure NFS server and export
         setup_raid_disk_and_filesystem /moodle /dev/md1 /dev/md1p1
