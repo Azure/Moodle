@@ -64,6 +64,8 @@ set -ex
     echo $azureSearchNameHost >> /tmp/vars.txt
     echo $tikaVmIP >> /tmp/vars.txt
     echo $nfsByoIpExportPath >> /tmp/vars.txt
+    echo $azureFilesStorageAccountName >> /tmp/vars.txt
+    echo $azureFilesStorageAccountKey >> /tmp/vars.txt
 
     check_fileServerType_param $fileServerType
 
@@ -130,28 +132,30 @@ set -ex
         sudo apt-get -y update > /dev/null
         sudo apt-get -y install azure-cli >> /tmp/apt4.log
 
-        az storage container create \
-            --name objectfs \
-            --account-name $storageAccountName \
-            --account-key $storageAccountKey \
-            --public-access off \
-            --fail-on-exist >> /tmp/wabs.log
+        if [ "$installObjectFsSwitch" = "true" ]; then
+            az storage container create \
+                --name objectfs \
+                --account-name $storageAccountName \
+                --account-key $storageAccountKey \
+                --public-access off \
+                --fail-on-exist >> /tmp/wabs.log
 
-        az storage container policy create \
-            --account-name $storageAccountName \
-            --account-key $storageAccountKey \
-            --container-name objectfs \
-            --name readwrite \
-            --start $(date --date="1 day ago" +%F) \
-            --expiry $(date --date="2199-01-01" +%F) \
-            --permissions rw >> /tmp/wabs.log
+            az storage container policy create \
+                --account-name $storageAccountName \
+                --account-key $storageAccountKey \
+                --container-name objectfs \
+                --name readwrite \
+                --start $(date --date="1 day ago" +%F) \
+                --expiry $(date --date="2199-01-01" +%F) \
+                --permissions rw >> /tmp/wabs.log
 
-        sas=$(az storage container generate-sas \
-            --account-name $storageAccountName \
-            --account-key $storageAccountKey \
-            --name objectfs \
-            --policy readwrite \
-            --output tsv)
+            sas=$(az storage container generate-sas \
+                --account-name $storageAccountName \
+                --account-key $storageAccountKey \
+                --name objectfs \
+                --policy readwrite \
+                --output tsv)
+        fi
     fi
 
     if [ $fileServerType = "gluster" ]; then
@@ -916,10 +920,10 @@ EOF
       mv /moodle /moodle_old_delete_me
       # Then create the moodle share
       echo -e '\n\rCreating an Azure Files share for moodle'
-      create_azure_files_moodle_share $storageAccountName $storageAccountKey /tmp/wabs.log
+      create_azure_files_moodle_share $azureFilesStorageAccountName $azureFilesStorageAccountKey /tmp/wabs.log
       # Set up and mount Azure Files share. Must be done after nginx is installed because of www-data user/group
-      echo -e '\n\rSetting up and mounting Azure Files share on //'$storageAccountName'.file.core.windows.net/moodle on /moodle\n\r'
-      setup_and_mount_azure_files_moodle_share $storageAccountName $storageAccountKey
+      echo -e '\n\rSetting up and mounting Azure Files share on //'$azureFilesStorageAccountName'.file.core.windows.net/moodle on /moodle\n\r'
+      setup_and_mount_azure_files_moodle_share $azureFilesStorageAccountName $azureFilesStorageAccountKey
       # Move the local installation over to the Azure Files
       echo -e '\n\rMoving locally installed moodle over to Azure Files'
       cp -a /moodle_old_delete_me/* /moodle || true # Ignore case sensitive directory copy failure

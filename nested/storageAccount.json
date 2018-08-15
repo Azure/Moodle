@@ -11,6 +11,7 @@
     },
     "resources": [
         {
+            "condition": "[parameters('moodleCommon').installObjectFsSwitch]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2017-06-01",
             "location": "[parameters('moodleCommon').location]",
@@ -39,17 +40,50 @@
                 },
                 "supportsHttpsTrafficOnly": true
             }
+        },
+        {
+            "condition": "[equals(parameters('moodleCommon').fileServerType, 'azurefiles')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2018-02-01",
+            "location": "[parameters('moodleCommon').location]",
+            "name": "[parameters('moodleCommon').azureFilesStorageAccountName]",
+            "kind": "[if(parameters('moodleCommon').azureFilesPremiumSwitch, 'FileStorage', 'Storage')]",
+            "sku": {
+                "name": "[if(parameters('moodleCommon').azureFilesPremiumSwitch, 'Premium_LRS', parameters('moodleCommon').storageAccountType)]"
+            },
+            "properties": {
+                "encryption": {
+                    "keySource": "Microsoft.Storage",
+                    "services": {
+                        "file": {
+                            "enabled": true
+                        }
+                    }
+                },
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "defaultAction": "Allow",
+                    "ipRules": [],
+                    "virtualNetworkRules": []
+                },
+                "supportsHttpsTrafficOnly": true
+            }
         }
     ],
     "variables": {
         "documentation1": "This sub-template creates a storage account.  It expects certain values in the 'common' datastructure.",
         "documentation2": " storageAccountName - name of storage account",
         "documentation3": " storageAccountType - type of storage account",
-        "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('moodleCommon').storageAccountName)]"
+        "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('moodleCommon').storageAccountName)]",
+        "azureFilesStorageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('moodleCommon').azureFilesStorageAccountName)]"
     },
     "outputs": {
         "storageAccountKey": {
-            "value": "[listKeys(variables('storageAccountId'), '2017-06-01').keys[0].value]",
+            "value": "[if(parameters('moodleCommon').installObjectFsSwitch, listKeys(variables('storageAccountId'), '2017-06-01').keys[0].value, 'None')]",
+            "type": "string"
+        },
+        "azureFilesStorageAccountKey": {
+            "value": "[if(equals(parameters('moodleCommon').fileServerType, 'azurefiles'), listKeys(variables('azureFilesStorageAccountId'), '2018-02-01').keys[0].value, 'None')]",
             "type": "string"
         }
     }

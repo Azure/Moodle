@@ -60,6 +60,8 @@ function get_setup_params_from_configs_json
     export nfsHaLbIP=$(echo $json | jq -r .fileServerProfile.nfsHaLbIP)
     export nfsHaExportPath=$(echo $json | jq -r .fileServerProfile.nfsHaExportPath)
     export nfsByoIpExportPath=$(echo $json | jq -r .fileServerProfile.nfsByoIpExportPath)
+    export azureFilesStorageAccountName=$(echo $json | jq -r .fileServerProfile.azureFilesStorageAccountName)
+    export azureFilesStorageAccountKey=$(echo $json | jq -r .fileServerProfile.azureFilesStorageAccountKey)
 }
 
 function get_php_version {

@@ -38,8 +38,8 @@ echo $syslogServer >> /tmp/vars.txt
 echo $webServerType >> /tmp/vars.txt
 echo $dbServerType >> /tmp/vars.txt
 echo $fileServerType >> /tmp/vars.txt
-echo $storageAccountName >> /tmp/vars.txt
-echo $storageAccountKey >> /tmp/vars.txt
+echo $azureFilesStorageAccountName >> /tmp/vars.txt
+echo $azureFilesStorageAccountKey >> /tmp/vars.txt
 echo $nfsVmName >> /tmp/vars.txt
 echo $nfsByoIpExportPath >> /tmp/vars.txt
 echo $htmlLocalCopySwitch >> /tmp/vars.txt
@@ -109,7 +109,7 @@ check_fileServerType_param $fileServerType
     echo -e '\n\rMounting NFS export from '$nfsByoIpExportPath' on /moodle and adding it to /etc/fstab\n\r'
     configure_nfs_client_and_mount0 $nfsByoIpExportPath /moodle
   else # "azurefiles"
-    setup_and_mount_azure_files_moodle_share $storageAccountName $storageAccountKey
+    setup_and_mount_azure_files_moodle_share $azureFilesStorageAccountName $azureFilesStorageAccountKey
   fi
 
   # Configure syslog to forward

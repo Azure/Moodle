@@ -372,6 +372,13 @@
             },
             "type": "string"
         },
+        "azureFilesPremiumSwitch": {
+            "defaultValue": false,
+            "metadata": {
+                "description": "Switch to choose Azure Files Premium. Currently available only on westeurope and on whitelisted subscriptions"
+            },
+            "type": "bool"
+        },
         "nfsByoIpExportPath": {
             "defaultValue": "",
             "metadata": {
@@ -913,6 +920,9 @@
                     "storageAccountKey": {
                         "value": "[reference('storageAccountTemplate').outputs.storageAccountKey.value]"
                     },
+                    "azureFilesStorageAccountKey": {
+                        "value": "[reference('storageAccountTemplate').outputs.azureFilesStorageAccountKey.value]"
+                    },
                     "redisKey": {
                         "value": "[if(parameters('redisDeploySwitch'), reference('redisTemplate').outputs.redisKey.value, 'None')]"
                     },
@@ -1066,6 +1076,8 @@
             "autoscaleVmCountMin": "[parameters('autoscaleVmCountMin')]",
             "autoscaleVmSku": "[parameters('autoscaleVmSku')]",
             "azureBackupSwitch": "[parameters('azureBackupSwitch')]",
+            "azureFilesPremiumSwitch": "[parameters('azureFilesPremiumSwitch')]",
+            "azureFilesStorageAccountName": "[tolower(concat('mdlsmb',variables('resourceprefix')))]",
             "azureSearchHostingMode": "[parameters('azureSearchHostingMode')]",
             "azureSearchName": "[concat('azure-search-',variables('resourceprefix'))]",
             "azureSearchNameHost": "[concat('azure-search-',variables('resourceprefix'),'.search.windows.net')]",

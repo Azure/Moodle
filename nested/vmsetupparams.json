@@ -20,6 +20,12 @@
             },
             "type": "string"
         },
+        "azureFilesStorageAccountKey": {
+            "metadata": {
+                "description": "Azure Files Storage account key from the storage account deployment."
+            },
+            "type": "string"
+        },
         "redisKey": {
             "metadata": {
                 "description": "Redis cache key from the redis deployment ('None' if redis is not selected). This just gets passed through to the controllersetup.json."
@@ -78,6 +84,8 @@
             },
             "fileServerProfile": {
                 "type": "[parameters('moodleCommon').fileServerType]",
+                "azureFilesStorageAccountName": "[parameters('moodleCommon').azureFilesStorageAccountName]",
+                "azureFilesStorageAccountKey": "[parameters('azureFilesStorageAccountKey')]",
                 "nfsVmName": "[parameters('moodleCommon').ctlrVmName]",
                 "glusterVmName": "[concat(parameters('moodleCommon').gfsNameRoot, '0')]",
                 "glusterVolName": "data",
