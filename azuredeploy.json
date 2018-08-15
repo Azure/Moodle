@@ -364,10 +364,18 @@
                 "gluster",
                 "nfs",
                 "nfs-ha",
+                "nfs-byo",
                 "azurefiles"
             ],
             "metadata": {
                 "description": "File server type: GlusterFS, NFS, and NFS-HA (2-VM highly available NFS cluster)"
+            },
+            "type": "string"
+        },
+        "nfsByoIpExportPath": {
+            "defaultValue": "",
+            "metadata": {
+                "description": "IP address and export path of the BYO-NFS share when fileServerType == nfs-byo. E.g., 172.16.1.8:/msazure"
             },
             "type": "string"
         },
@@ -1138,6 +1146,7 @@
             "mysqlPgresStgSizeGB": "[parameters('mysqlPgresStgSizeGB')]",
             "mysqlPgresVcores": "[parameters('mysqlPgresVcores')]",
             "mysqlVersion": "[parameters('mysqlVersion')]",
+            "nfsByoIpExportPath": "[parameters('nfsByoIpExportPath')]",
             "nfsHaClientsIPRange": "[variables('subnetWebRange')]",
             "nfsHaExportPath": "/drbd/data",
             "nfsHaLbIP": "[concat(variables('subnetSanPrefix'), '.100')]",
