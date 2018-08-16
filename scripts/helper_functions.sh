@@ -113,6 +113,7 @@ function create_azure_files_moodle_share
 
     az storage share create \
         --name moodle \
+        --quota 5120 \
         --account-name $storageAccountName \
         --account-key $storageAccountKey \
         --fail-on-exist >> $logFilePath
