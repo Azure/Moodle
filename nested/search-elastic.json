@@ -107,7 +107,7 @@
 
                 },
                 "templateLink": {
-                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'elasticconfig.json',parameters('moodleCommon').artifactsSasToken)]"
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'search-elastic-config.json',parameters('moodleCommon').artifactsSasToken)]"
                 }
             }
         },
@@ -343,7 +343,7 @@
 
                 },
                 "templateLink": {
-                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'elasticconfig.json',parameters('moodleCommon').artifactsSasToken)]"
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl,'search-elastic-config.json',parameters('moodleCommon').artifactsSasToken)]"
                 }
             }
         },
