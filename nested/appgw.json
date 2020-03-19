@@ -55,11 +55,17 @@
                 ],
                 "frontendPorts": [
                     {
-                        "name": "appGwFrontendPort",
+                        "name": "httpsFrontendPort",
                         "properties": {
                             "port": 443
                         }
-                    }
+                    },
+                    {
+                        "name": "httpFrontendPort",
+                        "properties": {
+                            "port": 80
+                        }
+                    }                    
                 ],
                 "backendAddressPools": [
                     {
@@ -92,7 +98,7 @@
                                 "Id": "[concat(variables('appGwID'), '/frontendIPConfigurations/appGwFrontendIP')]"
                             },
                             "frontendPort": {
-                                "Id": "[concat(variables('appGwID'), '/frontendPorts/appGwFrontendPort')]"
+                                "Id": "[concat(variables('appGwID'), '/frontendPorts/httpsFrontendPort')]"
                             },
                             "protocol": "Https",
                             "sslCertificate": {
