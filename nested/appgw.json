@@ -134,17 +134,29 @@
                 ],                
                 "requestRoutingRules": [
                     {
-                        "Name": "rule1",
+                        "Name": "httpsRule",
                         "properties": {
                             "ruleType": "Basic",
                             "httpListener": {
-                                "id": "[concat(variables('appGwID'), '/httpListeners/appGwHttpListener')]"
+                                "id": "[concat(variables('appGwID'), '/httpListeners/appGwHttpsListener')]"
                             },
                             "backendAddressPool": {
                                 "id": "[concat(variables('appGwID'), '/backendAddressPools/', variables('appGwBePoolName'))]"
                             },
                             "backendHttpSettings": {
                                 "id": "[concat(variables('appGwID'), '/backendHttpSettingsCollection/appGwBackendHttpSettings')]"
+                            }
+                        }
+                    },
+                    {
+                        "Name": "httpRedirectRule",
+                        "properties": {
+                            "ruleType": "Basic",
+                            "httpListener": {
+                                "id": "[concat(variables('appGwID'), '/httpListeners/appGwHttpListener')]"
+                            },
+                            "redirectConfiguration": {
+                                "id": "[concat(variables('appGwID'), '/redirectConfigurations/httpToHttps')]"
                             }
                         }
                     }
