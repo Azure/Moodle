@@ -119,6 +119,19 @@
                         }
                     }
                 ],
+                "redirectConfigurations": [
+                    {
+                        "name": "httpToHttps",
+                        "properties": {
+                            "redirectType":"Permanent",
+                            "includePath" : true,
+                            "includeQueryString" : true,
+                            "targetListener": {
+                                "id": "[concat(variables('appGwID'), '/httpListeners/appGwHttpsListener')]"
+                            }
+                        }
+                    }
+                ],                
                 "requestRoutingRules": [
                     {
                         "Name": "rule1",
