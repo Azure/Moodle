@@ -92,7 +92,7 @@
                 ],
                 "httpListeners": [
                     {
-                        "name": "appGwHttpListener",
+                        "name": "appGwHttpsListener",
                         "properties": {
                             "frontendIPConfiguration": {
                                 "Id": "[concat(variables('appGwID'), '/frontendIPConfigurations/appGwFrontendIP')]"
@@ -104,6 +104,18 @@
                             "sslCertificate": {
                                 "Id": "[concat(variables('appGwID'), '/sslCertificates/appGatewaySslCert')]"
                             }
+                        }
+                    },
+                    {
+                        "name": "appGwHttpListener",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "Id": "[concat(variables('appGwID'), '/frontendIPConfigurations/appGwFrontendIP')]"
+                            },
+                            "frontendPort": {
+                                "Id": "[concat(variables('appGwID'), '/frontendPorts/httpFrontendPort')]"
+                            },
+                            "protocol": "Http"
                         }
                     }
                 ],
