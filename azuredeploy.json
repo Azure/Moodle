@@ -451,13 +451,15 @@
             "type": "string"
         },
         "appGwSkuName": {
-            "defaultValue": "Standard_Medium",
+            "defaultValue": "Standard_v2",
             "allowedValues": [
                 "Standard_Small",
                 "Standard_Medium",
                 "Standard_Large",
+                "Standard_v2",
                 "WAF_Medium",
-                "WAF_Large"
+                "WAF_Large",
+                "WAF_v2"
             ],
             "metadata": {
                 "description": "(App Gateway https termination only) Name of the Applicate Gateway SKU"
@@ -465,10 +467,12 @@
             "type": "string"
         },
         "appGwSkuTier": {
-            "defaultValue": "Standard",
+            "defaultValue": "Standard_v2",
             "allowedValues": [
                 "Standard",
-                "WAF"
+                "Standard_v2",
+                "WAF",
+                "WAF_v2"
             ],
             "metadata": {
                 "description": "(App Gateway https termination only) Tier of the Applicate Gateway"
