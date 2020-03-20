@@ -154,11 +154,12 @@
             "apiVersion": "2019-11-01",
             "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').appGwPipName]",
-            "properties": {
+            "sku" : "[if(endswith(parameters('moodleCommon').appGwSkuName,'v2'),'Standard','Basic')]",
+            "properties": {                
                 "dnsSettings": {
                     "domainNameLabel": "[parameters('moodleCommon').appGwName]"
                 },
-                "publicIPAllocationMethod": "Dynamic"
+                "publicIPAllocationMethod": "[if(endswith(parameters('moodleCommon').appGwSkuName,'v2'),'Static','Dynamic')]"
             },
             "tags": {
                 "displayName": "App Gateway Public IP (must be dynamic)"
