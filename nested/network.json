@@ -83,7 +83,7 @@
         {
             "condition": "[parameters('moodleCommon').vnetGwDeploySwitch]",
             "type": "Microsoft.Network/publicIPAddresses",
-            "apiVersion": "2017-10-01",
+            "apiVersion": "2019-11-01",
             "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').gatewayPublicIPName]",
             "properties": {
@@ -135,7 +135,7 @@
             "sku": {
                 "name": "[parameters('moodleCommon').lbSku]"
             },
-            "apiVersion": "2017-10-01",
+            "apiVersion": "2019-11-01",
             "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').lbPipName]",
             "properties": {
@@ -151,7 +151,7 @@
         {
             "condition": "[equals(parameters('moodleCommon').httpsTermination, 'AppGw')]",
             "type": "Microsoft.Network/publicIPAddresses",
-            "apiVersion": "2017-10-01",
+            "apiVersion": "2019-11-01",
             "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').appGwPipName]",
             "properties": {
@@ -166,7 +166,7 @@
         },
         {
             "type": "Microsoft.Network/publicIPAddresses",
-            "apiVersion": "2017-10-01",
+            "apiVersion": "2019-11-01",
             "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').ctlrPipName]",
             "properties": {
