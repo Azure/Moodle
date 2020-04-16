@@ -600,6 +600,69 @@
             },
             "type": "string"
         },
+        "customSubnets": {
+            "metadata" : {
+                "description": "This is an object Parameter where you define custom subnet settings"
+            },
+            "defaultvalue": {
+                 "subnets": [
+                    {
+                        "name": "",
+                        "addressPrefix": "",
+                        "metadata": {
+                            "description": "Web Subnet [0]"
+                        }
+                    },
+                    {
+                        "name": "",
+                        "addressPrefix": "",
+                        "nfsHaLbIP": "",
+                        "nfsHaNode0IP": "",
+                        "nfsHaNode1IP": "",
+                        "metadata": {
+                            "description": "San Subnet and Required IPs for NFS-HA deployment [1]"
+                        }
+                    },
+                     {
+                        "name": "",
+                        "addressPrefix": "",
+                        "metadata": {
+                            "description": "Redis Subnet [2]"
+                        }
+                    },
+                    {
+                        "name": "",
+                        "addressPrefix": "",
+                        "metadata": {
+                            "description": "Elastic Subnet [3]"
+                        }
+                    },
+                    {
+                        "name": "",
+                        "addressPrefix": "",
+                        "metadata": {
+                            "description": "Tika Subnet [4]"
+                        }
+                    },
+                    {
+                        "name": "",
+                        "addressPrefix": "",
+                        "metadata": {
+                            "description": "VNet Gateway Subnet [5]"
+                        }
+                    },
+                    {
+                        "name": "",
+                        "addressPrefix": "",
+                        "metadata": {
+                            "description": "Application Gateway Subnet [6]"
+                        }
+                    }
+
+            ]
+            },           
+            "type": "object"
+        },
         "gatewayType": {
             "allowedValues": [
                 "Vpn",
@@ -849,16 +912,16 @@
                         "value": "[reference('networkTemplate').outputs.subnetIdSan.value]"
                     },
                     "node0IPAddr": {
-                        "value": "[variables('moodleCommon').nfsHaNode0IP]"
+                        "value": "[if(equals(parameters('customSubnets').subnets[1].nfsHaNode0IP, ''), variables('moodleCommon').nfsHaNode0IP , parameters('customSubnets').subnets[1].nfsHaNode0IP )]"
                     },
                     "node1IPAddr": {
-                        "value": "[variables('moodleCommon').nfsHaNode1IP]"
+                        "value": "[if(equals(parameters('customSubnets').subnets[1].nfsHaNode1IP, ''), variables('moodleCommon').nfsHaNode1IP , parameters('customSubnets').subnets[1].nfsHaNode1IP )]"
                     },
                     "nfsClientsIPRange": {
                         "value": "[variables('moodleCommon').nfsHaClientsIPRange]"
                     },
                     "lbFrontEndIpAddr": {
-                        "value": "[variables('moodleCommon').nfsHaLbIP]"
+                        "value": "[if(equals(parameters('customSubnets').subnets[1].nfsHaLbIP, ''), variables('moodleCommon').nfsHaLbIP , parameters('customSubnets').subnets[1].nfsHaLbIP )]"                        
                     },
                     "enableAccelNwSwitch": {
                         "value": "[parameters('enableAccelNwForOtherVmsSwitch')]"
