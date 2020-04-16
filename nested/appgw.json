@@ -26,7 +26,7 @@
             "type": "Microsoft.Network/applicationGateways",
             "name": "[parameters('moodleCommon').appGwName]",
             "location": "[parameters('moodleCommon').location]",
-            "apiVersion": "2018-02-01",
+            "apiVersion": "2019-11-01",
             "properties": {
                 "sku": {
                     "name": "[parameters('moodleCommon').appGwSkuName]",
