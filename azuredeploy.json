@@ -763,6 +763,9 @@
                     "moodleCommon": {
                         "value": "[variables('moodleCommon')]"
                     },
+                    "customSubnets": {
+                        "value": "[parameters('customSubnets')]"
+                    },
                     "lbPubIp": {
                         "value": "[reference('networkTemplate').outputs.lbPubIp.value]"
                     },
