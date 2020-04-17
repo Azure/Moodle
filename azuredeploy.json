@@ -602,7 +602,7 @@
         },
         "customSubnets": {
             "metadata" : {
-                "description": "This is an object Parameter where you define custom subnet settings"
+                "description": "This is an object Parameter where you define custom subnet settings. Copy the whole object to your parameters, even if you do not intend to use all the subnets"
             },
             "defaultvalue": {
                  "subnets": [
