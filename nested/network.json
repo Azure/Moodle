@@ -7,6 +7,12 @@
                 "description": "Common Moodle values"
             },
             "type": "object"
+        },
+        "customSubnets": {
+            "metadata": {
+                "description": "Byo subnet values"
+            },
+            "type": "object"
         }
     },
     "resources": [
@@ -70,6 +76,9 @@
                 "parameters": {
                     "moodleCommon": {
                         "value": "[parameters('moodleCommon')]"
+                    },
+                    "customSubnets": {
+                        "value": "[parameters('customSubnets')]"
                     },
                     "vnetName": {
                         "value": "[variables('vnetName')]"
