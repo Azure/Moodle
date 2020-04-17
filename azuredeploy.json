@@ -1257,7 +1257,7 @@
             "subnetTika": "[concat('tika-subnet-',variables('resourceprefix'))]",
             "subnetTikaPrefix": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),1)))]",
             "subnetTikaRange": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),1)), '.0/24')]",
-            "subnetWeb": "[concat('web-subnet-',variables('resourceprefix'))]",
+            "subnetWeb": "[if(equals(parameters('customSubnets').subnets[0].name, ''), concat('web-subnet-',variables('resourceprefix')), parameters('customSubnets').subnets[0].name )]",
             "subnetWebPrefix": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),0)))]",
             "subnetWebRange": "[variables('subnetWebRange')]",
             "thumbprintSslCert": "[if(or(empty(parameters('keyVaultResourceId')), empty(parameters('sslCertThumbprint'))), 'None', parameters('sslCertThumbprint'))]",
@@ -1297,6 +1297,7 @@
         "octets": "[split(parameters('vNetAddressSpace'), '.')]",
         "resourceprefix": "[substring(uniqueString(resourceGroup().id, deployment().name), 3, 6)]",
         "subnetSanPrefix": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),2)))]",
-        "subnetWebRange": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),0)), '.0/24')]"
+        "subnetWebRange": "[if(equals(parameters('customSubnets').subnets[0].addressPrefix, ''), concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),0)), '.0/24') , parameters('customSubnets').subnets[0].addressPrefix )]"
+        
     }
 }
