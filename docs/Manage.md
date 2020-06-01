@@ -57,7 +57,7 @@ It is important to realize that the `-o StrictHostKeyChecking=no`
 option in the above SSH command presents a security risk. It is
 included here to facilitate automated validation of these commands. It
 is not recommended to use this option in production environments,
-instead run the command mannually and validate the host key.
+instead run the command manually and validate the host key.
 Subsequent executions of an SSH command will not require this
 validation step. For more information there is an excellent
 [superuser.com
