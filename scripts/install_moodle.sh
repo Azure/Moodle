@@ -120,16 +120,36 @@ set -ex
         sudo apt-get -y --force-yes install postgresql-client >> /tmp/apt3.log
     fi
 
+    # install azure cli & setup container
+    echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ wheezy main" | \
+        sudo tee /etc/apt/sources.list.d/azure-cli.list
+
+    curl -L https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - >> /tmp/apt4.log
+    sudo apt-get -y install apt-transport-https >> /tmp/apt4.log
+    sudo apt-get -y update > /dev/null
+    sudo apt-get -y install azure-cli >> /tmp/apt4.log
+
+
+    if [ $fileServerType = "azurefiles" ]; then
+      # Delayed copy of moodle installation to the Azure Files share
+
+      # First rename moodle directory to something else
+      mv /moodle /moodle_old_delete_me
+      # Then create the moodle share
+      echo -e '\n\rCreating an Azure Files share for moodle'
+      # Commented below line -- creating azure file share from json template
+      # create_azure_files_moodle_share $storageAccountName $storageAccountKey /tmp/wabs.log
+      # Set up and mount Azure Files share. Must be done after nginx is installed because of www-data user/group
+      echo -e '\n\rSetting up and mounting Azure Files share on //'$storageAccountName'.file.core.windows.net/moodle on /moodle\n\r'
+      setup_and_mount_azure_files_moodle_share $storageAccountName $storageAccountKey
+      # Move the local installation over to the Azure Files
+      echo -e '\n\rMoving locally installed moodle over to Azure Files'
+      cp -a /moodle_old_delete_me/* /moodle || true # Ignore case sensitive directory copy failure
+      # rm -rf /moodle_old_delete_me || true # Keep the files just in case
+    fi
+
     if [ "$installObjectFsSwitch" = "true" -o "$fileServerType" = "azurefiles" ]; then
-        # install azure cli & setup container
-        echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ wheezy main" | \
-            sudo tee /etc/apt/sources.list.d/azure-cli.list
-
-        curl -L https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - >> /tmp/apt4.log
-        sudo apt-get -y install apt-transport-https >> /tmp/apt4.log
-        sudo apt-get -y update > /dev/null
-        sudo apt-get -y install azure-cli >> /tmp/apt4.log
-
+        
         az storage container create \
             --name objectfs \
             --account-name $storageAccountName \
@@ -914,22 +934,7 @@ EOF
         sudo chmod +rx /moodle
     fi
 
-   if [ $fileServerType = "azurefiles" ]; then
-      # Delayed copy of moodle installation to the Azure Files share
-
-      # First rename moodle directory to something else
-      mv /moodle /moodle_old_delete_me
-      # Then create the moodle share
-      echo -e '\n\rCreating an Azure Files share for moodle'
-      create_azure_files_moodle_share $storageAccountName $storageAccountKey /tmp/wabs.log
-      # Set up and mount Azure Files share. Must be done after nginx is installed because of www-data user/group
-      echo -e '\n\rSetting up and mounting Azure Files share on //'$storageAccountName'.file.core.windows.net/moodle on /moodle\n\r'
-      setup_and_mount_azure_files_moodle_share $storageAccountName $storageAccountKey
-      # Move the local installation over to the Azure Files
-      echo -e '\n\rMoving locally installed moodle over to Azure Files'
-      cp -a /moodle_old_delete_me/* /moodle || true # Ignore case sensitive directory copy failure
-      # rm -rf /moodle_old_delete_me || true # Keep the files just in case
-   fi
+   
 
    create_last_modified_time_update_script
    run_once_last_modified_time_update_script
