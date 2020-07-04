@@ -38,7 +38,7 @@
                     "autoscaleVmCountMax":          { "value": 20 },
                     "mysqlPgresVcores":             { "value": 16 },
                     "mysqlPgresStgSizeGB":          { "value": 512 },
-                    "fileServerType":               { "value": "gluster" },
+                    "fileServerType":               { "value": "azurefiles" },
                     "fileServerDiskSize":           { "value": 512 }
                 },
                 "templateLink": {
