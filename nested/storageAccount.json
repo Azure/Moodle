@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "moodleCommon": {
@@ -11,8 +11,9 @@
     },
     "resources": [
         {
+            "condition": "[not(equals(parameters('moodleCommon').fileServerType, 'azurefiles'))]",
             "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2017-06-01",
+            "apiVersion": "2019-06-01",
             "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').storageAccountName]",
             "kind": "Storage",
@@ -39,6 +40,70 @@
                 },
                 "supportsHttpsTrafficOnly": true
             }
+        },
+        {
+            "condition": "[equals(parameters('moodleCommon').fileServerType, 'azurefiles')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "location": "[parameters('moodleCommon').location]",
+            "name": "[parameters('moodleCommon').storageAccountName]",
+            "kind": "[if(equals(parameters('moodleCommon').storageAccountType, 'Premium_LRS'), 'FileStorage', 'Storage')]",
+            "sku": {
+                "name": "[parameters('moodleCommon').storageAccountType]"
+            },
+            "properties": {
+                "largeFileSharesState": "Enabled",
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "virtualNetworkRules": [],
+                    "ipRules": [],
+                    "defaultAction": "Allow"
+                },
+                "supportsHttpsTrafficOnly": true,
+                "encryption": {
+                    "services": {
+                        "file": {
+                            "keyType": "Account",
+                            "enabled": true
+                        },
+                        "blob": {
+                            "keyType": "Account",
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                }
+            }
+        },
+        {
+            "condition": "[equals(parameters('moodleCommon').fileServerType, 'azurefiles')]",
+            "type": "Microsoft.Storage/storageAccounts/fileServices",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('moodleCommon').storageAccountName, '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('moodleCommon').storageAccountName)]"
+            ],
+            "sku": {
+                "name": "[parameters('moodleCommon').storageAccountType]"
+            },
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                }
+            }
+        },
+        {
+            "condition": "[equals(parameters('moodleCommon').fileServerType, 'azurefiles')]",
+            "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('moodleCommon').storageAccountName, '/default/moodle')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/fileServices', parameters('moodleCommon').storageAccountName, 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('moodleCommon').storageAccountName)]"
+            ],
+            "properties": {
+                "shareQuota": 1024
+            }
         }
     ],
     "variables": {
@@ -49,7 +114,7 @@
     },
     "outputs": {
         "storageAccountKey": {
-            "value": "[listKeys(variables('storageAccountId'), '2017-06-01').keys[0].value]",
+            "value": "[listKeys(variables('storageAccountId'), '2019-06-01').keys[0].value]",
             "type": "string"
         }
     }
