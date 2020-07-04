@@ -364,7 +364,8 @@
                 "gluster",
                 "nfs",
                 "nfs-ha",
-                "nfs-byo"
+                "nfs-byo",
+                "azurefiles"
             ],
             "metadata": {
                 "description": "File server type: GlusterFS, NFS, and NFS-HA (2-VM highly available NFS cluster)"
