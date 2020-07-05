@@ -15,7 +15,7 @@
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-06-01",
             "location": "[parameters('moodleCommon').location]",
-            "name": "[parameters('moodleCommon').storageAccountName]",
+            "name": "[concat(parameters('moodleCommon').storageAccountName,'abs')]",
             "kind": "Storage",
             "sku": {
                 "name": "[parameters('moodleCommon').storageAccountType]"
