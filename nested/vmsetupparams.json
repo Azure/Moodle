@@ -58,6 +58,7 @@
                 "adminPassword": "[parameters('moodleCommon').moodleAdminPass]",
                 "storageAccountName": "[parameters('storageAccountName')]",
                 "storageAccountKey": "[parameters('storageAccountKey')]",
+                "storageAccountType": "[parameters('moodleCommon').storageAccountType]",
                 "redisDns": "[parameters('moodleCommon').redisDns]",
                 "redisKey": "[parameters('redisKey')]",
                 "elasticVm1IP": "[parameters('moodleCommon').elasticVm1IP]",
