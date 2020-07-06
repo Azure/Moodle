@@ -15,7 +15,7 @@
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-06-01",
             "location": "[parameters('moodleCommon').location]",
-            "name": "[concat(parameters('moodleCommon').storageAccountName,'-naf')]",
+            "name": "[concat(parameters('moodleCommon').storageAccountName,'naf')]",
             "kind": "Storage",
             "sku": {
                 "name": "[parameters('moodleCommon').storageAccountType]"
@@ -46,7 +46,7 @@
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-06-01",
             "location": "[parameters('moodleCommon').location]",
-            "name": "[concat(parameters('moodleCommon').storageAccountName,'-af')]",
+            "name": "[concat(parameters('moodleCommon').storageAccountName,'af')]",
             "kind": "[if(equals(parameters('moodleCommon').storageAccountType, 'Premium_LRS'), 'FileStorage', 'Storage')]",
             "sku": {
                 "name": "[parameters('moodleCommon').storageAccountType]"
@@ -80,7 +80,7 @@
         "documentation1": "This sub-template creates a storage account.  It expects certain values in the 'common' datastructure.",
         "documentation2": " storageAccountName - name of storage account",
         "documentation3": " storageAccountType - type of storage account",
-        "storageName": "[concat(parameters('moodleCommon').storageAccountName,if(equals(parameters('moodleCommon').fileServerType, 'azurefiles'), '-af', '-naf'))]",
+        "storageName": "[concat(parameters('moodleCommon').storageAccountName,if(equals(parameters('moodleCommon').fileServerType, 'azurefiles'), 'af', 'naf'))]",
         "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
     },
     "outputs": {
