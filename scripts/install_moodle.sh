@@ -137,8 +137,7 @@ set -ex
       mv /moodle /moodle_old_delete_me
       # Then create the moodle share
       echo -e '\n\rCreating an Azure Files share for moodle'
-      # Commented below line -- creating azure file share from json template
-      # create_azure_files_moodle_share $storageAccountName $storageAccountKey /tmp/wabs.log
+      create_azure_files_moodle_share $storageAccountName $storageAccountKey /tmp/wabs.log
       # Set up and mount Azure Files share. Must be done after nginx is installed because of www-data user/group
       echo -e '\n\rSetting up and mounting Azure Files share on //'$storageAccountName'.file.core.windows.net/moodle on /moodle\n\r'
       setup_and_mount_azure_files_moodle_share $storageAccountName $storageAccountKey
