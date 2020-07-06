@@ -14,6 +14,12 @@
             },
             "type": "string"
         },
+        "storageAccountName": {
+            "metadata": {
+                "description": "Storage account name from the storage account deployment."
+            },
+            "type": "string"
+        },
         "storageAccountKey": {
             "metadata": {
                 "description": "Storage account key from the storage account deployment."
@@ -50,7 +56,7 @@
                 "dbUserAzure": "[parameters('moodleCommon').moodleDbUserAzure]",
                 "dbPassword": "[parameters('moodleCommon').moodleDbPass]",
                 "adminPassword": "[parameters('moodleCommon').moodleAdminPass]",
-                "storageAccountName": "[parameters('moodleCommon').storageAccountName]",
+                "storageAccountName": "[parameters('storageAccountName')]",
                 "storageAccountKey": "[parameters('storageAccountKey')]",
                 "redisDns": "[parameters('moodleCommon').redisDns]",
                 "redisKey": "[parameters('redisKey')]",

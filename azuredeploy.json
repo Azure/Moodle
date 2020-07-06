@@ -910,6 +910,9 @@
                     "dbFQDN": {
                         "value": "[reference('dbTemplate').outputs.dbFQDN.value]"
                     },
+                    "storageAccountName": {
+                        "value": "[reference('storageAccountTemplate').outputs.storageAccountName.value]"
+                    },
                     "storageAccountKey": {
                         "value": "[reference('storageAccountTemplate').outputs.storageAccountKey.value]"
                     },
