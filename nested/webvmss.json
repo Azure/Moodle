@@ -24,12 +24,12 @@
     "resources": [
         {
             "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2017-06-01",
+            "apiVersion": "2019-06-01",
             "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').vmssdStorageAccounttName]",
-            "kind": "Storage",
+            "kind": "FileStorage",
             "sku": {
-                "name": "Standard_LRS"
+                "name": "Premium_LRS"
             }
         },
         {
