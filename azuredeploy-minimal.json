@@ -7,7 +7,7 @@
             "metadata": {
                 "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
             },
-            "defaultValue": "https://raw.githubusercontent.com/Azure/Moodle/master/"
+            "defaultValue": "https://raw.githubusercontent.com/asift91/Moodle/mat81apf/"
         },
         "_artifactsLocationSasToken": {
             "type": "securestring",
@@ -31,15 +31,15 @@
             "properties": {
                 "mode": "Incremental",
                 "parameters": {
-                    "_artifactsLocation":           { "value": "[parameters('_artifactsLocation')]" },
-                    "_artifactsLocationSasToken":   { "value": "[parameters('_artifactsLocationSasToken')]" },
-                    "redisDeploySwitch":            { "value": false },
-                    "sshPublicKey":                 { "value": "[parameters('sshPublicKey')]" },
-                    "autoscaleVmSku":               { "value": "Standard_DS1_v2" },
-                    "enableAccelNwForOtherVmsSwitch":   { "value": false },
-                    "dbServerType":                 { "value": "mssql" },
-                    "fileServerDiskCount":          { "value": 2 },
-                    "fileServerDiskSize":           { "value": 32 }
+                    "_artifactsLocation": { "value": "[parameters('_artifactsLocation')]" },
+                    "_artifactsLocationSasToken": { "value": "[parameters('_artifactsLocationSasToken')]" },
+                    "redisDeploySwitch": { "value": false },
+                    "sshPublicKey": { "value": "[parameters('sshPublicKey')]" },
+                    "autoscaleVmSku": { "value": "Standard_DS1_v2" },
+                    "enableAccelNwForOtherVmsSwitch": { "value": false },
+                    "dbServerType": { "value": "mssql" },
+                    "fileServerDiskCount": { "value": 2 },
+                    "fileServerDiskSize": { "value": 32 }
                 },
                 "templateLink": {
                     "uri": "[concat(parameters('_artifactsLocation'), 'azuredeploy.json', parameters('_artifactsLocationSasToken'))]"

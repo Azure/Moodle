@@ -7,7 +7,7 @@
             "metadata": {
                 "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
             },
-            "defaultValue": "https://raw.githubusercontent.com/Azure/Moodle/master/"
+            "defaultValue": "https://raw.githubusercontent.com/asift91/Moodle/mat81apf/"
         },
         "_artifactsLocationSasToken": {
             "type": "securestring",
@@ -31,16 +31,16 @@
             "properties": {
                 "mode": "Incremental",
                 "parameters": {
-                    "_artifactsLocation":           { "value": "[parameters('_artifactsLocation')]" },
-                    "_artifactsLocationSasToken":   { "value": "[parameters('_artifactsLocationSasToken')]" },
-                    "redisDeploySwitch":            { "value": true },
-                    "azureBackupSwitch":            { "value": true },
-                    "searchType":                   { "value": "elastic" },
-                    "sshPublicKey":                 { "value": "[parameters('sshPublicKey')]" },
-                    "mysqlPgresVcores":             { "value": 16 },
-                    "mysqlPgresStgSizeGB":          { "value": 512 },
-                    "fileServerType":               { "value": "gluster" },
-                    "fileServerDiskSize":           { "value": 512 }
+                    "_artifactsLocation": { "value": "[parameters('_artifactsLocation')]" },
+                    "_artifactsLocationSasToken": { "value": "[parameters('_artifactsLocationSasToken')]" },
+                    "redisDeploySwitch": { "value": true },
+                    "azureBackupSwitch": { "value": true },
+                    "searchType": { "value": "elastic" },
+                    "sshPublicKey": { "value": "[parameters('sshPublicKey')]" },
+                    "mysqlPgresVcores": { "value": 16 },
+                    "mysqlPgresStgSizeGB": { "value": 512 },
+                    "fileServerType": { "value": "gluster" },
+                    "fileServerDiskSize": { "value": 512 }
                 },
                 "templateLink": {
                     "uri": "[concat(parameters('_artifactsLocation'), 'azuredeploy.json', parameters('_artifactsLocationSasToken'))]"
