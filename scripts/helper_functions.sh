@@ -113,7 +113,8 @@ function create_azure_files_moodle_share() {
   --name moodle \
   --account-name $storageAccountName \
   --account-key $storageAccountKey \
-  --fail-on-exist >>$logFilePath
+  --fail-on-exist >>$logFilePath \
+  --quota 1024
 }
 
 function setup_and_mount_gluster_moodle_share() {
