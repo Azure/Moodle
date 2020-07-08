@@ -27,9 +27,9 @@
             "apiVersion": "2019-06-01",
             "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').vmssdStorageAccounttName]",
-            "kind": "FileStorage",
+            "kind": "Storage",
             "sku": {
-                "name": "Premium_LRS"
+                "name": "Standard_LRS"
             }
         },
         {
@@ -59,7 +59,7 @@
                                             "[parameters('moodleCommon').commonFunctionsScriptUri]"
                                         ]
                                     },
-                                    "protectedSettings":{
+                                    "protectedSettings": {
                                         "commandToExecute": "[concat('bash ', parameters('moodleCommon').webServerSetupScriptFilename, ' ', parameters('moodleCommon').moodleOnAzureConfigsJsonPath)]"
                                     },
                                     "type": "CustomScript",
