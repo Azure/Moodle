@@ -120,7 +120,8 @@ set -ex
     elif [ "$dbServerType" = "postgres" ]; then
         sudo apt-get -y --force-yes install postgresql-client >> /tmp/apt3.log
     fi
-
+	
+    if [ "$installObjectFsSwitch" = "true" -o "$fileServerType" = "azurefiles" ]; then
 	# install azure cli & setup container
         echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ wheezy main" | \
             sudo tee /etc/apt/sources.list.d/azure-cli.list
@@ -129,7 +130,6 @@ set -ex
         sudo apt-get -y update > /dev/null
         sudo apt-get -y install azure-cli >> /tmp/apt4.log
 	
-    if [ "$installObjectFsSwitch" = "true" -o "$fileServerType" = "azurefiles" ]; then
         # FileStorage accounts can only be used to store Azure file shares;
         # Premium_LRS will support FileStorage kind
         # No other storage resources (blob containers, queues, tables, etc.) can be deployed in a FileStorage account.
