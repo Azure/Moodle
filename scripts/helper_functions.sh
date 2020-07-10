@@ -2,21 +2,21 @@
 
 # Common functions definitions
 
-function get_setup_params_from_configs_json() 
+function get_setup_params_from_configs_json
 {
-    local configs_json_path=${1} # E.g., /var/lib/cloud/instance/moodle_on_azure_configs.json
+    local configs_json_path=${1}    # E.g., /var/lib/cloud/instance/moodle_on_azure_configs.json
 
     (dpkg -l jq &> /dev/null) || (apt -y update; apt -y install jq)
 
     # Wait for the cloud-init write-files user data file to be generated (just in case)
     local wait_time_sec=0
     while [ ! -f "$configs_json_path" ]; do
-      sleep 15
-      let "wait_time_sec += 15"
-      if [ "$wait_time_sec" -ge "1800" ]; then
-        echo "Error: Cloud-init write-files didn't complete in 30 minutes!"
-        return 1
-      fi
+        sleep 15
+        let "wait_time_sec += 15"
+        if [ "$wait_time_sec" -ge "1800" ]; then
+           echo "Error: Cloud-init write-files didn't complete in 30 minutes!"
+           return 1
+        fi
     done
 
     local json=$(cat $configs_json_path)
@@ -66,7 +66,7 @@ function get_setup_params_from_configs_json()
 function get_php_version {
 # Returns current PHP version, in the form of x.x, eg 7.0 or 7.2
     if [ -z "$_PHPVER" ]; then
-      _PHPVER=$(/usr/bin/php -r "echo PHP_VERSION;" | /usr/bin/cut -c 1,2,3)
+       _PHPVER=`/usr/bin/php -r "echo PHP_VERSION;" | /usr/bin/cut -c 1,2,3`
     fi
     echo $_PHPVER
 }
@@ -75,32 +75,32 @@ function install_php_mssql_driver
 {
     # Download and build php/mssql driver
     /usr/bin/curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
-    /usr/bin/curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list >/etc/apt/sources.list.d/mssql-release.list
+    /usr/bin/curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
     sudo apt-get update
     sudo ACCEPT_EULA=Y apt-get install msodbcsql mssql-tools unixodbc-dev -y
-    echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >>~/.bash_profile
-    echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >>~/.bashrc
+    echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
+    echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
     source ~/.bashrc
 
     #Build mssql driver
-    /usr/bin/pear config-set php_ini $(php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||") system
+    /usr/bin/pear config-set php_ini `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"` system
     /usr/bin/pecl install sqlsrv
     /usr/bin/pecl install pdo_sqlsrv
     PHPVER=$(get_php_version)
-    echo "extension=sqlsrv.so" >>/etc/php/$PHPVER/fpm/php.ini
-    echo "extension=pdo_sqlsrv.so" >>/etc/php/$PHPVER/fpm/php.ini
-    echo "extension=sqlsrv.so" >>/etc/php/$PHPVER/apache2/php.ini
-    echo "extension=pdo_sqlsrv.so" >>/etc/php/$PHPVER/apache2/php.ini
-    echo "extension=sqlsrv.so" >>/etc/php/$PHPVER/cli/php.ini
-    echo "extension=pdo_sqlsrv.so" >>/etc/php/$PHPVER/cli/php.ini
+    echo "extension=sqlsrv.so" >> /etc/php/$PHPVER/fpm/php.ini
+    echo "extension=pdo_sqlsrv.so" >> /etc/php/$PHPVER/fpm/php.ini
+    echo "extension=sqlsrv.so" >> /etc/php/$PHPVER/apache2/php.ini
+    echo "extension=pdo_sqlsrv.so" >> /etc/php/$PHPVER/apache2/php.ini
+    echo "extension=sqlsrv.so" >> /etc/php/$PHPVER/cli/php.ini
+    echo "extension=pdo_sqlsrv.so" >> /etc/php/$PHPVER/cli/php.ini
 }
 
 function check_fileServerType_param
 {
     local fileServerType=$1
     if [ "$fileServerType" != "gluster" -a "$fileServerType" != "azurefiles" -a "$fileServerType" != "nfs" -a "$fileServerType" != "nfs-ha" -a "$fileServerType" != "nfs-byo" ]; then
-      echo "Invalid fileServerType ($fileServerType) given. Only 'gluster', 'azurefiles', 'nfs', 'nfs-ha' or 'nfs-byo' are allowed. Exiting"
-      exit 1
+        echo "Invalid fileServerType ($fileServerType) given. Only 'gluster', 'azurefiles', 'nfs', 'nfs-ha' or 'nfs-byo' are allowed. Exiting"
+        exit 1
     fi
 }
 
@@ -123,7 +123,7 @@ function setup_and_mount_gluster_moodle_share
     local glusterNode=$1
     local glusterVolume=$2
 
-    grep -q "/moodle.*glusterfs" /etc/fstab || echo -e $glusterNode':/'$glusterVolume'   /moodle         glusterfs       defaults,_netdev,log-level=WARNING,log-file=/var/log/gluster.log 0 0' >>/etc/fstab
+    grep -q "/moodle.*glusterfs" /etc/fstab || echo -e $glusterNode':/'$glusterVolume'   /moodle         glusterfs       defaults,_netdev,log-level=WARNING,log-file=/var/log/gluster.log 0 0' >> /etc/fstab
     mount /moodle
 }
 
@@ -132,15 +132,14 @@ function setup_and_mount_azure_files_moodle_share
     local storageAccountName=$1
     local storageAccountKey=$2
 
-    cat <<EOF >/etc/moodle_azure_files.credential
+    cat <<EOF > /etc/moodle_azure_files.credential
 username=$storageAccountName
 password=$storageAccountKey
 EOF
     chmod 600 /etc/moodle_azure_files.credential
-
     grep -q -s "^//$storageAccountName.file.core.windows.net/moodle\s\s*/moodle\s\s*cifs" /etc/fstab && _RET=$? || _RET=$?
     if [ $_RET != "0" ]; then
-      echo -e "\n//$storageAccountName.file.core.windows.net/moodle   /moodle cifs    credentials=/etc/moodle_azure_files.credential,uid=www-data,gid=www-data,nofail,vers=3.0,dir_mode=0770,file_mode=0660,serverino,mfsymlinks" >>/etc/fstab
+        echo -e "\n//$storageAccountName.file.core.windows.net/moodle   /moodle cifs    credentials=/etc/moodle_azure_files.credential,uid=www-data,gid=www-data,nofail,vers=3.0,dir_mode=0770,file_mode=0660,serverino,mfsymlinks" >>/etc/fstab
     fi
     mkdir -p /moodle
     mount /moodle
@@ -148,18 +147,18 @@ EOF
 
 function setup_moodle_mount_dependency_for_systemd_service
 {
-    local serviceName=$1 # E.g., nginx, apache2
-    if [ -z "$serviceName" ]; then
-      return 1
-    fi
+  local serviceName=$1 # E.g., nginx, apache2
+  if [ -z "$serviceName" ]; then
+    return 1
+  fi
 
-    local systemdSvcOverrideFileDir="/etc/systemd/system/${serviceName}.service.d"
-    local systemdSvcOverrideFilePath="${systemdSvcOverrideFileDir}/moodle_on_azure_override.conf"
+  local systemdSvcOverrideFileDir="/etc/systemd/system/${serviceName}.service.d"
+  local systemdSvcOverrideFilePath="${systemdSvcOverrideFileDir}/moodle_on_azure_override.conf"
 
-    grep -q -s "After=moodle.mount" $systemdSvcOverrideFilePath && _RET=$? || _RET=$?
-    if [ $_RET != "0" ]; then
-      mkdir -p $systemdSvcOverrideFileDir
-      cat <<EOF >$systemdSvcOverrideFilePath
+  grep -q -s "After=moodle.mount" $systemdSvcOverrideFilePath && _RET=$? || _RET=$?
+  if [ $_RET != "0" ]; then
+    mkdir -p $systemdSvcOverrideFileDir
+    cat <<EOF >$systemdSvcOverrideFilePath
 [Unit]
 After=moodle.mount
 EOF
@@ -171,38 +170,41 @@ EOF
 # TODO refactor these functions with the same ones in install_gluster.sh
 function scan_for_new_disks
 {
-    local BLACKLIST=${1} # E.g., /dev/sda|/dev/sdb
+    local BLACKLIST=${1}   # E.g., /dev/sda|/dev/sdb
     declare -a RET
-    local DEVS=$(ls -1 /dev/sd* | egrep -v "${BLACKLIST}" | egrep -v "[0-9]$")
-    for DEV in ${DEVS}; do
-      # Check each device if there is a "1" partition.  If not,
-      # "assume" it is not partitioned.
-      if [ ! -b ${DEV}1 ]; then
-        RET+="${DEV} "
-      fi
+    local DEVS=$(ls -1 /dev/sd*|egrep -v "${BLACKLIST}"|egrep -v "[0-9]$")
+    for DEV in ${DEVS};
+    do
+        # Check each device if there is a "1" partition.  If not,
+        # "assume" it is not partitioned.
+        if [ ! -b ${DEV}1 ];
+        then
+            RET+="${DEV} "
+        fi
     done
     echo "${RET}"
 }
 
 function create_raid0_ubuntu {
-    local RAIDDISK=${1}      # E.g., /dev/md1
-    local RAIDCHUNKSIZE=${2} # E.g., 128
-    local DISKCOUNT=${3}     # E.g., 4
+    local RAIDDISK=${1}       # E.g., /dev/md1
+    local RAIDCHUNKSIZE=${2}  # E.g., 128
+    local DISKCOUNT=${3}      # E.g., 4
     shift
     shift
     shift
     local DISKS="$@"
 
     dpkg -s mdadm && _RET=$? || _RET=$?
-    if [ $_RET -eq 1 ]; then
-      echo "installing mdadm"
-      sudo apt-get -y -q install mdadm
+    if [ $_RET -eq 1 ]; 
+    then
+        echo "installing mdadm"
+        sudo apt-get -y -q install mdadm
     fi
     echo "Creating raid0"
     udevadm control --stop-exec-queue
     echo "yes" | mdadm --create $RAIDDISK --name=data --level=0 --chunk=$RAIDCHUNKSIZE --raid-devices=$DISKCOUNT $DISKS
     udevadm control --start-exec-queue
-    mdadm --detail --verbose --scan >/etc/mdadm/mdadm.conf
+    mdadm --detail --verbose --scan > /etc/mdadm/mdadm.conf
 }
 
 function do_partition {
@@ -211,61 +213,63 @@ function do_partition {
     local DISK=${1} # E.g., /dev/sdc
 
     echo "Partitioning disk $DISK"
-    echo -ne "n\np\n1\n\n\nw\n" | fdisk "${DISK}"
+    echo -ne "n\np\n1\n\n\nw\n" | fdisk "${DISK}" 
     #> /dev/null 2>&1
 
     #
     # Use the bash-specific $PIPESTATUS to ensure we get the correct exit code
     # from fdisk and not from echo
-    if [ ${PIPESTATUS[1]} -ne 0 ]; then
-      echo "An error occurred partitioning ${DISK}" >&2
-      echo "I cannot continue" >&2
-      exit 2
+    if [ ${PIPESTATUS[1]} -ne 0 ]; 
+    then
+        echo "An error occurred partitioning ${DISK}" >&2
+        echo "I cannot continue" >&2
+        exit 2
     fi
 }
 
 function add_local_filesystem_to_fstab {
     local UUID=${1}
-    local MOUNTPOINT=${2} # E.g., /moodle
+    local MOUNTPOINT=${2}   # E.g., /moodle
 
     grep -q -s "${UUID}" /etc/fstab && _RET=$? || _RET=$?
-    if [ $_RET -eq 0 ]; then
-      echo "Not adding ${UUID} to fstab again (it's already there!)"
+    if [ $_RET -eq 0 ]; 
+    then
+        echo "Not adding ${UUID} to fstab again (it's already there!)"
     else
-      LINE="\nUUID=${UUID} ${MOUNTPOINT} ext4 defaults,noatime 0 0"
-      echo -e "${LINE}" >>/etc/fstab
+        LINE="\nUUID=${UUID} ${MOUNTPOINT} ext4 defaults,noatime 0 0"
+        echo -e "${LINE}" >>/etc/fstab
     fi
 }
 
 function setup_raid_disk_and_filesystem {
-    local MOUNTPOINT=${1}        # E.g., /moodle
-    local RAIDDISK=${2}          # E.g., /dev/md1
-    local RAIDPARTITION=${3}     # E.g., /dev/md1p1
-    local CREATE_FILESYSTEM=${4} # E.g., "" (true) or any non-empty string (false)
+    local MOUNTPOINT=${1}     # E.g., /moodle
+    local RAIDDISK=${2}       # E.g., /dev/md1
+    local RAIDPARTITION=${3}  # E.g., /dev/md1p1
+    local CREATE_FILESYSTEM=${4}  # E.g., "" (true) or any non-empty string (false)
 
     local DISKS=$(scan_for_new_disks "/dev/sda|/dev/sdb")
     echo "Disks are ${DISKS}"
     declare -i DISKCOUNT
-    local DISKCOUNT=$(echo "$DISKS" | wc -w)
+    local DISKCOUNT=$(echo "$DISKS" | wc -w) 
     echo "Disk count is $DISKCOUNT"
     if [ $DISKCOUNT = "0" ]; then
-      echo "No new (unpartitioned) disks available... Returning non-zero..."
-      return 1
+        echo "No new (unpartitioned) disks available... Returning non-zero..."
+        return 1
     fi
 
     if [ $DISKCOUNT -gt 1 ]; then
-      create_raid0_ubuntu ${RAIDDISK} 128 $DISKCOUNT $DISKS
-      AZMDL_DISK=$RAIDDISK
-      if [ -z "$CREATE_FILESYSTEM" ]; then
-        do_partition ${RAIDDISK}
-        local PARTITION="${RAIDPARTITION}"
-      fi
+        create_raid0_ubuntu ${RAIDDISK} 128 $DISKCOUNT $DISKS
+        AZMDL_DISK=$RAIDDISK
+        if [ -z "$CREATE_FILESYSTEM" ]; then
+          do_partition ${RAIDDISK}
+          local PARTITION="${RAIDPARTITION}"
+        fi
     else # Just one unpartitioned disk
-      AZMDL_DISK=$DISKS
-      if [ -z "$CREATE_FILESYSTEM" ]; then
-        do_partition ${DISKS}
-        local PARTITION=$(fdisk -l ${DISKS} | grep -A 1 Device | tail -n 1 | awk '{print $1}')
-      fi
+        AZMDL_DISK=$DISKS
+        if [ -z "$CREATE_FILESYSTEM" ]; then
+          do_partition ${DISKS}
+          local PARTITION=$(fdisk -l ${DISKS} | grep -A 1 Device | tail -n 1 | awk '{print $1}')
+        fi
     fi
 
     echo "Disk (RAID if multiple unpartitioned disks, or as is if only one unpartitioned disk) is set up, and env var AZMDL_DISK is set to '$AZMDL_DISK' for later reference"
@@ -274,7 +278,7 @@ function setup_raid_disk_and_filesystem {
       echo "Creating filesystem on ${PARTITION}."
       mkfs -t ext4 ${PARTITION}
       mkdir -p "${MOUNTPOINT}"
-      local UUID=$(blkid -u filesystem ${PARTITION} | awk -F "[= ]" '{print $3}' | tr -d "\"")
+      local UUID=$(blkid -u filesystem ${PARTITION}|awk -F "[= ]" '{print $3}'|tr -d "\"")
       add_local_filesystem_to_fstab "${UUID}" "${MOUNTPOINT}"
       echo "Mounting disk ${PARTITION} on ${MOUNTPOINT}"
       mount "${MOUNTPOINT}"
@@ -282,7 +286,7 @@ function setup_raid_disk_and_filesystem {
 }
 
 function configure_nfs_server_and_export {
-    local MOUNTPOINT=${1} # E.g., /moodle
+    local MOUNTPOINT=${1}     # E.g., /moodle
 
     echo "Installing nfs server..."
     apt install -y nfs-kernel-server
@@ -290,33 +294,33 @@ function configure_nfs_server_and_export {
     echo "Exporting ${MOUNTPOINT}..."
     grep -q -s "^${MOUNTPOINT}" /etc/exports && _RET=$? || _RET=$?
     if [ $_RET = "0" ]; then
-      echo "${MOUNTPOINT} is already exported. Returning..."
+        echo "${MOUNTPOINT} is already exported. Returning..."
     else
-      echo -e "\n${MOUNTPOINT}   *(rw,sync,no_root_squash)" >>/etc/exports
-      systemctl restart nfs-kernel-server.service
+        echo -e "\n${MOUNTPOINT}   *(rw,sync,no_root_squash)" >>/etc/exports
+        systemctl restart nfs-kernel-server.service
     fi
 }
 
 function configure_nfs_client_and_mount0 {
-    local NFS_HOST_EXPORT_PATH=${1} # E.g., controller-vm-ab12cd:/moodle or 172.16.3.100:/drbd/data
-    local MOUNTPOINT=${2}           # E.g., /moodle
+    local NFS_HOST_EXPORT_PATH=${1}   # E.g., controller-vm-ab12cd:/moodle or 172.16.3.100:/drbd/data
+    local MOUNTPOINT=${2}             # E.g., /moodle
 
     apt install -y nfs-common
     mkdir -p ${MOUNTPOINT}
 
     grep -q -s "^${NFS_HOST_EXPORT_PATH}" /etc/fstab && _RET=$? || _RET=$?
     if [ $_RET = "0" ]; then
-      echo "${NFS_HOST_EXPORT_PATH} already in /etc/fstab... skipping to add"
+        echo "${NFS_HOST_EXPORT_PATH} already in /etc/fstab... skipping to add"
     else
-      echo -e "\n${NFS_HOST_EXPORT_PATH}    ${MOUNTPOINT}    nfs    auto    0    0" >>/etc/fstab
+        echo -e "\n${NFS_HOST_EXPORT_PATH}    ${MOUNTPOINT}    nfs    auto    0    0" >>/etc/fstab
     fi
     mount ${MOUNTPOINT}
 }
 
 function configure_nfs_client_and_mount {
-    local NFS_SERVER=${1} # E.g., controller-vm-ab12cd or IP (NFS-HA LB)
-    local NFS_DIR=${2}    # E.g., /moodle or /drbd/data
-    local MOUNTPOINT=${3} # E.g., /moodle
+    local NFS_SERVER=${1}     # E.g., controller-vm-ab12cd or IP (NFS-HA LB)
+    local NFS_DIR=${2}        # E.g., /moodle or /drbd/data
+    local MOUNTPOINT=${3}     # E.g., /moodle
 
     configure_nfs_client_and_mount0 "${NFS_SERVER}:${NFS_DIR}" ${MOUNTPOINT}
 }
@@ -337,7 +341,7 @@ function setup_html_local_copy_cron_job {
 
   local SYNC_LOG_FULLPATH="/var/log/moodle-html-sync.log"
 
-  cat <<EOF >${SYNC_SCRIPT_FULLPATH}
+  cat <<EOF > ${SYNC_SCRIPT_FULLPATH}
 #!/bin/bash
 
 sleep \$((\$RANDOM%30))
@@ -366,14 +370,14 @@ EOF
   chmod 500 ${SYNC_SCRIPT_FULLPATH}
 
   local CRON_DESC_FULLPATH="/etc/cron.d/sync-moodle-html-local-copy"
-  cat <<EOF >${CRON_DESC_FULLPATH}
+  cat <<EOF > ${CRON_DESC_FULLPATH}
 * * * * * root ${SYNC_SCRIPT_FULLPATH}
 EOF
   chmod 644 ${CRON_DESC_FULLPATH}
 
   # Addition of a hook for custom script run on VMSS from shared mount to allow customised configuration of the VMSS as required
   local CRON_DESC_FULLPATH2="/etc/cron.d/update-vmss-config"
-  cat <<EOF >${CRON_DESC_FULLPATH2}
+  cat <<EOF > ${CRON_DESC_FULLPATH2}
 * * * * * root [ -f /moodle/bin/update-vmss-config ] && /bin/bash /moodle/bin/update-vmss-config
 EOF
   chmod 644 ${CRON_DESC_FULLPATH2}
@@ -391,7 +395,7 @@ function create_last_modified_time_update_script {
   fi
 
   mkdir -p $(dirname $LAST_MODIFIED_TIME_UPDATE_SCRIPT_FULLPATH)
-  cat <<EOF >$LAST_MODIFIED_TIME_UPDATE_SCRIPT_FULLPATH
+  cat <<EOF > $LAST_MODIFIED_TIME_UPDATE_SCRIPT_FULLPATH
 #!/bin/bash
 echo \$(date +%Y%m%d%H%M%S) > $SERVER_TIMESTAMP_FULLPATH
 EOF
@@ -433,7 +437,7 @@ function get_moodle_unzip_dir_from_moodle_version {
 function create_redis_configuration_in_moodledata_muc_config_php
 {
     # create redis configuration in /moodle/moodledata/muc/config.php
-    cat <<EOF >/moodle/moodledata/muc/config.php
+    cat <<EOF > /moodle/moodledata/muc/config.php
 <?php defined('MOODLE_INTERNAL') || die();
  \$configuration = array (
   'siteidentifier' => '7a142be09ea65699e4a6f6ef91c0773c',
@@ -1376,7 +1380,7 @@ EOF
 # Long fail2ban config command moved here
 function config_fail2ban
 {
-    cat <<EOF >/etc/fail2ban/jail.conf
+    cat <<EOF > /etc/fail2ban/jail.conf
 # Fail2Ban configuration file.
 #
 # This file was composed for Debian systems from the original one
