@@ -31,13 +31,13 @@
             "properties": {
                 "mode": "Incremental",
                 "parameters": {
-                    "_artifactsLocation": { "value": "[parameters('_artifactsLocation')]" },
-                    "_artifactsLocationSasToken": { "value": "[parameters('_artifactsLocationSasToken')]" },
-                    "redisDeploySwitch": { "value": false },
-                    "sshPublicKey": { "value": "[parameters('sshPublicKey')]" },
-                    "mysqlPgresVcores": { "value": 8 },
-                    "mysqlPgresStgSizeGB": { "value": 128 },
-                    "fileServerDiskSize": { "value": 128 }
+                    "_artifactsLocation":           { "value": "[parameters('_artifactsLocation')]" },
+                    "_artifactsLocationSasToken":   { "value": "[parameters('_artifactsLocationSasToken')]" },
+                    "redisDeploySwitch":            { "value": false },
+                    "sshPublicKey":                 { "value": "[parameters('sshPublicKey')]" },
+                    "mysqlPgresVcores":             { "value": 8 },
+                    "mysqlPgresStgSizeGB":          { "value": 128 },
+                    "fileServerDiskSize":           { "value": 128 }
                 },
                 "templateLink": {
                     "uri": "[concat(parameters('_artifactsLocation'), 'azuredeploy.json', parameters('_artifactsLocationSasToken'))]"
