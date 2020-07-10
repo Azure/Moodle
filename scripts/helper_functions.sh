@@ -14,8 +14,8 @@ function get_setup_params_from_configs_json
         sleep 15
         let "wait_time_sec += 15"
         if [ "$wait_time_sec" -ge "1800" ]; then
-           echo "Error: Cloud-init write-files didn't complete in 30 minutes!"
-           return 1
+            echo "Error: Cloud-init write-files didn't complete in 30 minutes!"
+            return 1
         fi
     done
 
@@ -66,7 +66,7 @@ function get_setup_params_from_configs_json
 function get_php_version {
 # Returns current PHP version, in the form of x.x, eg 7.0 or 7.2
     if [ -z "$_PHPVER" ]; then
-       _PHPVER=`/usr/bin/php -r "echo PHP_VERSION;" | /usr/bin/cut -c 1,2,3`
+        _PHPVER=`/usr/bin/php -r "echo PHP_VERSION;" | /usr/bin/cut -c 1,2,3`
     fi
     echo $_PHPVER
 }
@@ -137,9 +137,10 @@ username=$storageAccountName
 password=$storageAccountKey
 EOF
     chmod 600 /etc/moodle_azure_files.credential
+    
     grep -q -s "^//$storageAccountName.file.core.windows.net/moodle\s\s*/moodle\s\s*cifs" /etc/fstab && _RET=$? || _RET=$?
     if [ $_RET != "0" ]; then
-        echo -e "\n//$storageAccountName.file.core.windows.net/moodle   /moodle cifs    credentials=/etc/moodle_azure_files.credential,uid=www-data,gid=www-data,nofail,vers=3.0,dir_mode=0770,file_mode=0660,serverino,mfsymlinks" >>/etc/fstab
+        echo -e "\n//$storageAccountName.file.core.windows.net/moodle   /moodle cifs    credentials=/etc/moodle_azure_files.credential,uid=www-data,gid=www-data,nofail,vers=3.0,dir_mode=0770,file_mode=0660,serverino,mfsymlinks" >> /etc/fstab
     fi
     mkdir -p /moodle
     mount /moodle
@@ -158,7 +159,7 @@ function setup_moodle_mount_dependency_for_systemd_service
   grep -q -s "After=moodle.mount" $systemdSvcOverrideFilePath && _RET=$? || _RET=$?
   if [ $_RET != "0" ]; then
     mkdir -p $systemdSvcOverrideFileDir
-    cat <<EOF >$systemdSvcOverrideFilePath
+    cat <<EOF > $systemdSvcOverrideFilePath
 [Unit]
 After=moodle.mount
 EOF
@@ -170,7 +171,7 @@ EOF
 # TODO refactor these functions with the same ones in install_gluster.sh
 function scan_for_new_disks
 {
-    local BLACKLIST=${1}   # E.g., /dev/sda|/dev/sdb
+    local BLACKLIST=${1}    # E.g., /dev/sda|/dev/sdb
     declare -a RET
     local DEVS=$(ls -1 /dev/sd*|egrep -v "${BLACKLIST}"|egrep -v "[0-9]$")
     for DEV in ${DEVS};
@@ -195,8 +196,8 @@ function create_raid0_ubuntu {
     local DISKS="$@"
 
     dpkg -s mdadm && _RET=$? || _RET=$?
-    if [ $_RET -eq 1 ]; 
-    then
+    if [ $_RET -eq 1 ];
+    then 
         echo "installing mdadm"
         sudo apt-get -y -q install mdadm
     fi
@@ -210,7 +211,7 @@ function create_raid0_ubuntu {
 function do_partition {
     # This function creates one (1) primary partition on the
     # disk device, using all available space
-    local DISK=${1} # E.g., /dev/sdc
+    local DISK=${1}   # E.g., /dev/sdc
 
     echo "Partitioning disk $DISK"
     echo -ne "n\np\n1\n\n\nw\n" | fdisk "${DISK}" 
@@ -219,7 +220,7 @@ function do_partition {
     #
     # Use the bash-specific $PIPESTATUS to ensure we get the correct exit code
     # from fdisk and not from echo
-    if [ ${PIPESTATUS[1]} -ne 0 ]; 
+    if [ ${PIPESTATUS[1]} -ne 0 ];
     then
         echo "An error occurred partitioning ${DISK}" >&2
         echo "I cannot continue" >&2
@@ -232,12 +233,12 @@ function add_local_filesystem_to_fstab {
     local MOUNTPOINT=${2}   # E.g., /moodle
 
     grep -q -s "${UUID}" /etc/fstab && _RET=$? || _RET=$?
-    if [ $_RET -eq 0 ]; 
+    if [ $_RET -eq 0 ];
     then
         echo "Not adding ${UUID} to fstab again (it's already there!)"
     else
         LINE="\nUUID=${UUID} ${MOUNTPOINT} ext4 defaults,noatime 0 0"
-        echo -e "${LINE}" >>/etc/fstab
+        echo -e "${LINE}" >> /etc/fstab
     fi
 }
 
@@ -268,7 +269,7 @@ function setup_raid_disk_and_filesystem {
         AZMDL_DISK=$DISKS
         if [ -z "$CREATE_FILESYSTEM" ]; then
           do_partition ${DISKS}
-          local PARTITION=$(fdisk -l ${DISKS} | grep -A 1 Device | tail -n 1 | awk '{print $1}')
+          local PARTITION=$(fdisk -l ${DISKS}|grep -A 1 Device|tail -n 1|awk '{print $1}')
         fi
     fi
 
@@ -296,7 +297,7 @@ function configure_nfs_server_and_export {
     if [ $_RET = "0" ]; then
         echo "${MOUNTPOINT} is already exported. Returning..."
     else
-        echo -e "\n${MOUNTPOINT}   *(rw,sync,no_root_squash)" >>/etc/exports
+        echo -e "\n${MOUNTPOINT}   *(rw,sync,no_root_squash)" >> /etc/exports
         systemctl restart nfs-kernel-server.service
     fi
 }
@@ -312,7 +313,7 @@ function configure_nfs_client_and_mount0 {
     if [ $_RET = "0" ]; then
         echo "${NFS_HOST_EXPORT_PATH} already in /etc/fstab... skipping to add"
     else
-        echo -e "\n${NFS_HOST_EXPORT_PATH}    ${MOUNTPOINT}    nfs    auto    0    0" >>/etc/fstab
+        echo -e "\n${NFS_HOST_EXPORT_PATH}    ${MOUNTPOINT}    nfs    auto    0    0" >> /etc/fstab
     fi
     mount ${MOUNTPOINT}
 }
