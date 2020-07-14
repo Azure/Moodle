@@ -40,7 +40,7 @@
                     "mysqlPgresVcores":             { "value": 16 },
                     "mysqlPgresStgSizeGB":          { "value": 512 },
                     "fileServerType":               { "value": "azurefiles" },
-                    "fileServerDiskSize":           { "value": 512 },
+                    "fileServerDiskSize":           { "value": 1024 },
                     "storageAccountType":           { "value": "Premium_LRS" }
                 },
                 "templateLink": {
