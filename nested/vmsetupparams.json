@@ -90,7 +90,8 @@
                 "glusterVolName": "data",
                 "nfsByoIpExportPath": "[parameters('moodleCommon').nfsByoIpExportPath]",
                 "nfsHaLbIP": "[parameters('moodleCommon').nfsHaLbIP]",
-                "nfsHaExportPath": "[parameters('moodleCommon').nfsHaExportPath]"
+                "nfsHaExportPath": "[parameters('moodleCommon').nfsHaExportPath]",
+                "fileServerDiskSize": "[parameters('moodleCommon').fileServerDiskSize]"
             }
         }
     },
