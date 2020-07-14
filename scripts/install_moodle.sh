@@ -64,6 +64,8 @@ set -ex
     echo $azureSearchNameHost >> /tmp/vars.txt
     echo $tikaVmIP >> /tmp/vars.txt
     echo $nfsByoIpExportPath >> /tmp/vars.txt
+    echo $storageAccountType >>/tmp/vars.txt
+    echo $fileServerDiskSize >>/tmp/vars.txt
 
     check_fileServerType_param $fileServerType
 
@@ -119,39 +121,43 @@ set -ex
     elif [ "$dbServerType" = "postgres" ]; then
         sudo apt-get -y --force-yes install postgresql-client >> /tmp/apt3.log
     fi
-
+	
     if [ "$installObjectFsSwitch" = "true" -o "$fileServerType" = "azurefiles" ]; then
-        # install azure cli & setup container
+	# install azure cli & setup container
         echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ wheezy main" | \
             sudo tee /etc/apt/sources.list.d/azure-cli.list
-
         curl -L https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - >> /tmp/apt4.log
         sudo apt-get -y install apt-transport-https >> /tmp/apt4.log
         sudo apt-get -y update > /dev/null
         sudo apt-get -y install azure-cli >> /tmp/apt4.log
+	
+        # FileStorage accounts can only be used to store Azure file shares;
+        # Premium_LRS will support FileStorage kind
+        # No other storage resources (blob containers, queues, tables, etc.) can be deployed in a FileStorage account.
+        if [ $storageAccountType != "Premium_LRS" ]; then
+		az storage container create \
+		    --name objectfs \
+		    --account-name $storageAccountName \
+		    --account-key $storageAccountKey \
+		    --public-access off \
+		    --fail-on-exist >> /tmp/wabs.log
 
-        az storage container create \
-            --name objectfs \
-            --account-name $storageAccountName \
-            --account-key $storageAccountKey \
-            --public-access off \
-            --fail-on-exist >> /tmp/wabs.log
+		az storage container policy create \
+		    --account-name $storageAccountName \
+		    --account-key $storageAccountKey \
+		    --container-name objectfs \
+		    --name readwrite \
+		    --start $(date --date="1 day ago" +%F) \
+		    --expiry $(date --date="2199-01-01" +%F) \
+		    --permissions rw >> /tmp/wabs.log
 
-        az storage container policy create \
-            --account-name $storageAccountName \
-            --account-key $storageAccountKey \
-            --container-name objectfs \
-            --name readwrite \
-            --start $(date --date="1 day ago" +%F) \
-            --expiry $(date --date="2199-01-01" +%F) \
-            --permissions rw >> /tmp/wabs.log
-
-        sas=$(az storage container generate-sas \
-            --account-name $storageAccountName \
-            --account-key $storageAccountKey \
-            --name objectfs \
-            --policy readwrite \
-            --output tsv)
+		sas=$(az storage container generate-sas \
+		    --account-name $storageAccountName \
+		    --account-key $storageAccountKey \
+		    --name objectfs \
+		    --policy readwrite \
+		    --output tsv)
+	fi
     fi
 
     if [ $fileServerType = "gluster" ]; then
@@ -921,7 +927,7 @@ EOF
       mv /moodle /moodle_old_delete_me
       # Then create the moodle share
       echo -e '\n\rCreating an Azure Files share for moodle'
-      create_azure_files_moodle_share $storageAccountName $storageAccountKey /tmp/wabs.log
+      create_azure_files_moodle_share $storageAccountName $storageAccountKey /tmp/wabs.log $fileServerDiskSize
       # Set up and mount Azure Files share. Must be done after nginx is installed because of www-data user/group
       echo -e '\n\rSetting up and mounting Azure Files share on //'$storageAccountName'.file.core.windows.net/moodle on /moodle\n\r'
       setup_and_mount_azure_files_moodle_share $storageAccountName $storageAccountKey

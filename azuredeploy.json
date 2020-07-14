@@ -364,7 +364,8 @@
                 "gluster",
                 "nfs",
                 "nfs-ha",
-                "nfs-byo"
+                "nfs-byo",
+                "azurefiles"
             ],
             "metadata": {
                 "description": "File server type: GlusterFS, NFS, and NFS-HA (2-VM highly available NFS cluster)"
@@ -489,7 +490,8 @@
             "allowedValues": [
                 "Standard_LRS",
                 "Standard_GRS",
-                "Standard_ZRS"
+                "Standard_ZRS",
+                "Premium_LRS"
             ],
             "metadata": {
                 "description": "Storage Account type. This storage account is only for the Moodle ObjectFS plugin and/or the (currently disabled) Azure Files file share option"
@@ -908,6 +910,9 @@
                     },
                     "dbFQDN": {
                         "value": "[reference('dbTemplate').outputs.dbFQDN.value]"
+                    },
+                    "storageAccountName": {
+                        "value": "[reference('storageAccountTemplate').outputs.storageAccountName.value]"
                     },
                     "storageAccountKey": {
                         "value": "[reference('storageAccountTemplate').outputs.storageAccountKey.value]"
