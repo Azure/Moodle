@@ -7,7 +7,7 @@
             "metadata": {
                 "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
             },
-            "defaultValue": "https://raw.githubusercontent.com/Azure/Moodle/master/"
+            "defaultValue": "https://raw.githubusercontent.com/migel0/Moodle/edit/appgwfileshare/"
         },
         "_artifactsLocationSasToken": {
             "type": "securestring",
@@ -30,7 +30,7 @@
             "name": "mainTemplate",
             "properties": {
                 "mode": "Incremental",
-                "parameters": {
+                  "parameters": {
                     "_artifactsLocation":           { "value": "[parameters('_artifactsLocation')]" },
                     "_artifactsLocationSasToken":   { "value": "[parameters('_artifactsLocationSasToken')]" },
                     "redisDeploySwitch":            { "value": true },
@@ -39,8 +39,11 @@
                     "mysqlPgresVcores":             { "value": 16 },
                     "mysqlPgresStgSizeGB":          { "value": 512 },
                     "fileServerType":               { "value": "azurefiles" },
-                    "fileServerDiskSize":           { "value": 1024 },
-                    "storageAccountType":           { "value": "Premium_LRS" }
+                    "fileServerDiskSize":           { "value": 512 },
+                    "storageAccountType":           { "value": "Premium_LRS" },
+                    "httpsTermination":             { "value": "AppGw" },
+                    "sslCertKeyVaultURL":           { "value": "https://kvmoodlepoc.vault.azure.net/secrets/SECRETCERT2/439f06bc3e884df88c9343af851fe154" },
+                    "sslCertThumbprint":           { "value": "4C851A4DE6245A39B29F1E67DB7F0739F96A0D00"}
                 },
                 "templateLink": {
                     "uri": "[concat(parameters('_artifactsLocation'), 'azuredeploy.json', parameters('_artifactsLocationSasToken'))]"
