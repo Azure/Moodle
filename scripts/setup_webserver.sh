@@ -43,6 +43,11 @@ echo $storageAccountKey >> /tmp/vars.txt
 echo $nfsVmName >> /tmp/vars.txt
 echo $nfsByoIpExportPath >> /tmp/vars.txt
 echo $htmlLocalCopySwitch >> /tmp/vars.txt
+echo $phpVersion          >> /tmp/vars.txt
+
+# downloading and updating php packages from the repository 
+  sudo add-apt-repository ppa:ondrej/php -y
+  sudo apt-get update
 
 check_fileServerType_param $fileServerType
 
@@ -66,7 +71,8 @@ check_fileServerType_param $fileServerType
   fi
 
   # install the base stack
-  sudo apt-get -y install varnish php php-cli php-curl php-zip php-pear php-mbstring php-dev mcrypt
+  # passing php versions $phpVersion
+  sudo apt-get -y install varnish php$phpVersion php$phpVersion-cli php$phpVersion-curl php$phpVersion-zip php-pear php$phpVersion-mbstring php$phpVersion-dev mcrypt
 
   if [ "$webServerType" = "nginx" -o "$httpsTermination" = "VMSS" ]; then
     sudo apt-get -y install nginx
@@ -77,11 +83,11 @@ check_fileServerType_param $fileServerType
     sudo apt-get -y install apache2 libapache2-mod-php
   else
     # for nginx-only option
-    sudo apt-get -y install php-fpm
+    sudo apt-get -y install php$phpVersion-fpm
   fi
 
   # Moodle requirements
-  sudo apt-get install -y graphviz aspell php-soap php-json php-redis php-bcmath php-gd php-pgsql php-mysql php-xmlrpc php-intl php-xml php-bz2
+  sudo apt-get install -y graphviz aspell php$phpVersion-soap php$phpVersion-json php$phpVersion-redis php$phpVersion-bcmath php$phpVersion-gd php$phpVersion-pgsql php$phpVersion-mysql php$phpVersion-xmlrpc php$phpVersion-intl php$phpVersion-xml php$phpVersion-bz2
   if [ "$dbServerType" = "mssql" ]; then
     install_php_mssql_driver
   fi
