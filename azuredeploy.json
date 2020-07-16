@@ -194,6 +194,18 @@
             },
             "type": "string"
         },
+        "phpVersion": {
+            "allowedValues": [
+                "7.2",
+                "7.3",
+                "7.4"
+            ],
+            "defaultValue": "7.4",
+            "metadata": {
+                "description": "php version"
+            },
+            "type": "string"
+        },
         "dbServerType": {
             "defaultValue": "mysql",
             "allowedValues": [
@@ -1163,6 +1175,7 @@
                 "sku": "16.04-LTS",
                 "version": "latest"
             },
+            "phpVersion": "[parameters('phpVersion')]",
             "policyName": "[concat('policy-',variables('resourceprefix'))]",
             "postgresVersion": "[parameters('postgresVersion')]",
             "redisCacheName": "[concat('redis-',variables('resourceprefix'))]",
