@@ -114,6 +114,8 @@
         },
         "moodleVersion": {
             "allowedValues": [
+                "MOODLE_39_STABLE",
+                "MOODLE_38_STABLE",
                 "MOODLE_35_STABLE",
                 "MOODLE_34_STABLE",
                 "v3.4.3",
@@ -125,7 +127,7 @@
                 "MOODLE_30_STABLE",
                 "MOODLE_29_STABLE"
             ],
-            "defaultValue": "MOODLE_35_STABLE",
+            "defaultValue": "MOODLE_39_STABLE",
             "metadata": {
                 "description": "The Moodle version you want to install."
             },
