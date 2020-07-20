@@ -46,7 +46,7 @@ echo $htmlLocalCopySwitch >> /tmp/vars.txt
 echo $phpVersion          >> /tmp/vars.txt
 
 # downloading and updating php packages from the repository 
- sudo dpkg ––configure –a
+ sudo apt-get --configure –a
  sudo add-apt-repository ppa:ondrej/php -y > /dev/null 2>&1
  sudo apt-get update > /dev/null 2>&1
 echo "line52*****"
