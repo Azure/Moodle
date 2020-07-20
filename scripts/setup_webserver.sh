@@ -91,7 +91,7 @@ check_fileServerType_param $fileServerType
   sudo apt-get install -y graphviz aspell php$phpVersion-soap php$phpVersion-json php$phpVersion-redis php$phpVersion-bcmath php$phpVersion-gd php$phpVersion-pgsql php$phpVersion-mysql php$phpVersion-xmlrpc php$phpVersion-intl php$phpVersion-xml php$phpVersion-bz2
   if [ "$dbServerType" = "mssql" ]; then
     install_php_mssql_driver
-    
+    echo "line94#######"
   fi
    echo "line 96*******"
   # PHP Version
