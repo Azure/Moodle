@@ -202,7 +202,7 @@
                 "7.3",
                 "7.4"
             ],
-            "defaultValue": "7.4",
+            "defaultValue": "7.2",
             "metadata": {
                 "description": "php version"
             },
