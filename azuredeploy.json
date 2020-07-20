@@ -154,7 +154,7 @@
             "type": "string"
         },
         "webServerType": {
-            "defaultValue": "apache",
+            "defaultValue": "nginx",
             "allowedValues": [
                 "apache",
                 "nginx"
