@@ -48,6 +48,8 @@ echo $phpVersion          >> /tmp/vars.txt
 # downloading and updating php packages from the repository 
  sudo add-apt-repository ppa:ondrej/php -y
  sudo apt-get update
+ sudo apt-get install -f
+
 
 check_fileServerType_param $fileServerType
 
