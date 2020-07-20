@@ -48,8 +48,7 @@ echo $phpVersion          >> /tmp/vars.txt
 # downloading and updating php packages from the repository 
  sudo add-apt-repository ppa:ondrej/php -y
  sudo apt-get update
- sudo apt-get install -f
-
+echo "line51*****"
 
 check_fileServerType_param $fileServerType
 
@@ -71,15 +70,15 @@ check_fileServerType_param $fileServerType
   elif [ "$fileServerType" = "azurefiles" ]; then
     sudo apt-get -y install cifs-utils
   fi
-
+  echo "line73********"
   # install the base stack
   # passing php versions $phpVersion
   sudo apt-get -y install varnish php$phpVersion php$phpVersion-cli php$phpVersion-curl php$phpVersion-zip php-pear php$phpVersion-mbstring php$phpVersion-dev mcrypt
-
+  echo "line77............"
   if [ "$webServerType" = "nginx" -o "$httpsTermination" = "VMSS" ]; then
     sudo apt-get -y install nginx
   fi
-
+   echo "line81...."
   if [ "$webServerType" = "apache" ]; then
     # install apache pacakges
     sudo apt-get -y install apache2 libapache2-mod-php
@@ -87,13 +86,14 @@ check_fileServerType_param $fileServerType
     # for nginx-only option
     sudo apt-get -y install php$phpVersion-fpm
   fi
-
+   echo "line89&&&&&&"
   # Moodle requirements
   sudo apt-get install -y graphviz aspell php$phpVersion-soap php$phpVersion-json php$phpVersion-redis php$phpVersion-bcmath php$phpVersion-gd php$phpVersion-pgsql php$phpVersion-mysql php$phpVersion-xmlrpc php$phpVersion-intl php$phpVersion-xml php$phpVersion-bz2
   if [ "$dbServerType" = "mssql" ]; then
     install_php_mssql_driver
+    
   fi
-
+   echo "line 96*******"
   # PHP Version
   PhpVer=$(get_php_version)
 
