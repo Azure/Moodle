@@ -180,6 +180,8 @@ set -ex
     fi
     
     # install pre-requisites
+    sudo add-apt-repository ppa:ubuntu-toolchain-r/ppa
+    sudo apt-get update > /dev/null 2>&1
     sudo apt-get install -y --fix-missing python-software-properties unzip
 
     # install the entire stack
