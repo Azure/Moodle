@@ -21,7 +21,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-export DEBIAN_FRONTEND=noninteractive
+#export DEBIAN_FRONTEND=noninteractive
 set -ex
 
 moodle_on_azure_configs_json_path=${1}
@@ -46,7 +46,7 @@ echo $htmlLocalCopySwitch >> /tmp/vars.txt
 echo $phpVersion          >> /tmp/vars.txt
 
 # downloading and updating php packages from the repository 
- sudo dpkg --configure –a
+# sudo dpkg --configure –a
  sudo add-apt-repository ppa:ondrej/php -y > /dev/null 2>&1
  sudo apt-get update > /dev/null 2>&1
 echo "line52*****"
