@@ -912,7 +912,7 @@ EOF
    service php${PhpVer}-fpm stop
    service varnish stop
    service varnishncsa stop
-   service varnishlog stop
+   #service varnishlog stop
 
     # No need to run the commands below any more, as permissions & modes are already as such (no more "sudo -u www-data ...")
     # Leaving this code as a remark that we are explicitly leaving the ownership to root:root
