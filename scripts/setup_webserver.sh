@@ -75,15 +75,15 @@ check_fileServerType_param $fileServerType
   elif [ "$fileServerType" = "azurefiles" ]; then
     sudo apt-get -y install cifs-utils
   fi
-  echo "line74********"
+  
   # install the base stack
   # passing php versions $phpVersion
   sudo apt-get -y install varnish php$phpVersion php$phpVersion-cli php$phpVersion-curl php$phpVersion-zip php-pear php$phpVersion-mbstring php$phpVersion-dev mcrypt
-  echo "line78............"
+  
   if [ "$webServerType" = "nginx" -o "$httpsTermination" = "VMSS" ]; then
     sudo apt-get -y install nginx
   fi
-   echo "line82...."
+   
   if [ "$webServerType" = "apache" ]; then
     # install apache pacakges
     sudo apt-get -y install apache2 libapache2-mod-php
@@ -91,14 +91,14 @@ check_fileServerType_param $fileServerType
     # for nginx-only option
     sudo apt-get -y install php$phpVersion-fpm
   fi
-   echo "line90&&&&&&"
+   
   # Moodle requirements
   sudo apt-get install -y graphviz aspell php$phpVersion-soap php$phpVersion-json php$phpVersion-redis php$phpVersion-bcmath php$phpVersion-gd php$phpVersion-pgsql php$phpVersion-mysql php$phpVersion-xmlrpc php$phpVersion-intl php$phpVersion-xml php$phpVersion-bz2
   if [ "$dbServerType" = "mssql" ]; then
     install_php_mssql_driver
-    echo "line94#######"
+    
   fi
-   echo "line 97*******"
+   
   # PHP Version
   PhpVer=$(get_php_version)
 
