@@ -58,7 +58,9 @@ check_fileServerType_param $fileServerType
 
   # install pre-requisites
   #sudo apt-get -y install python-software-properties unzip rsyslog
-  sudo apt-get install software-properties-common unzip rsyslog
+  sudo apt-get install software-properties-common
+  sudo apt-get install unzip
+  sudo apt-get install rsyslog
   sudo apt-get -y install postgresql-client mysql-client git
 
   if [ $fileServerType = "gluster" ]; then
