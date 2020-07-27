@@ -59,9 +59,6 @@ check_fileServerType_param $fileServerType
   # install pre-requisites
   #sudo apt-get -y install python-software-properties unzip rsyslog
   sudo apt-get install software-properties-common unzip rsyslog
-  
-
-
   sudo apt-get -y install postgresql-client mysql-client git
 
   if [ $fileServerType = "gluster" ]; then
@@ -663,8 +660,8 @@ EOF
 service=apache2
 if [ "$webServerType" = "nginx" ]; then
   if [ $(ps -ef | grep -v grep | grep $service | wc -l) > 0 ]; then
-echo “Stop the $service!!!”
-sudo systemctl stop $service
+       echo “Stop the $service!!!”
+       sudo systemctl stop $service
   fi
 fi
   # Restart Varnish
