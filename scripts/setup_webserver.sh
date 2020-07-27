@@ -21,7 +21,6 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-#export DEBIAN_FRONTEND=noninteractive
 set -ex
 
 moodle_on_azure_configs_json_path=${1}
@@ -49,7 +48,6 @@ echo $phpVersion          >> /tmp/vars.txt
 # sudo dpkg --configure –a
  sudo add-apt-repository ppa:ondrej/php -y > /dev/null 2>&1
  sudo apt-get update > /dev/null 2>&1
-echo "line52*****"
 
 check_fileServerType_param $fileServerType
 
@@ -60,9 +58,8 @@ check_fileServerType_param $fileServerType
 
   # install pre-requisites
   #sudo apt-get -y install python-software-properties unzip rsyslog
-  sudo apt-get install software-properties-common
-  sudo apt-get install unzip
-  sudo apt-get install rsyslog
+  sudo apt-get install software-properties-common unzip rsyslog
+  
 
 
   sudo apt-get -y install postgresql-client mysql-client git
@@ -665,10 +662,10 @@ EOF
 
 service=apache2
 if [ "$webServerType" = "nginx" ]; then
-if [ $(ps -ef | grep -v grep | grep $service | wc -l) > 0 ]; then
+  if [ $(ps -ef | grep -v grep | grep $service | wc -l) > 0 ]; then
 echo “Stop the $service!!!”
 sudo systemctl stop $service
-fi
+  fi
 fi
   # Restart Varnish
   systemctl daemon-reload
