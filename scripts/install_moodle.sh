@@ -935,7 +935,7 @@ EOF
       # Delayed copy of moodle installation to the Azure Files share
 
       # First rename moodle directory to something else
-      mv /moodle /moodle_old_delete_me
+      #mv /moodle /moodle_old_delete_me
       # Then create the moodle share
       echo -e '\n\rCreating an Azure Files share for moodle'
       create_azure_files_moodle_share $storageAccountName $storageAccountKey /tmp/wabs.log $fileServerDiskSize
@@ -944,7 +944,7 @@ EOF
       setup_and_mount_azure_files_moodle_share $storageAccountName $storageAccountKey
       # Move the local installation over to the Azure Files
       echo -e '\n\rMoving locally installed moodle over to Azure Files'
-      cp -a /moodle_old_delete_me/* /moodle || true # Ignore case sensitive directory copy failure
+      #cp -a /moodle_old_delete_me/* /moodle || true # Ignore case sensitive directory copy failure
       # rm -rf /moodle_old_delete_me || true # Keep the files just in case
    fi
 
