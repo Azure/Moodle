@@ -21,7 +21,6 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
 set -ex
 
 moodle_on_azure_configs_json_path=${1}
@@ -43,6 +42,12 @@ echo $storageAccountKey >> /tmp/vars.txt
 echo $nfsVmName >> /tmp/vars.txt
 echo $nfsByoIpExportPath >> /tmp/vars.txt
 echo $htmlLocalCopySwitch >> /tmp/vars.txt
+echo $phpVersion          >> /tmp/vars.txt
+
+# downloading and updating php packages from the repository 
+# sudo dpkg --configure –a
+ sudo add-apt-repository ppa:ondrej/php -y > /dev/null 2>&1
+ sudo apt-get update > /dev/null 2>&1
 
 check_fileServerType_param $fileServerType
 
@@ -52,8 +57,10 @@ check_fileServerType_param $fileServerType
   sudo apt-get -y install unattended-upgrades
 
   # install pre-requisites
-  sudo apt-get -y install python-software-properties unzip rsyslog
-
+  #sudo apt-get -y install python-software-properties unzip rsyslog
+  sudo apt-get install software-properties-common
+  sudo apt-get install unzip
+  sudo apt-get install rsyslog
   sudo apt-get -y install postgresql-client mysql-client git
 
   if [ $fileServerType = "gluster" ]; then
@@ -64,28 +71,30 @@ check_fileServerType_param $fileServerType
   elif [ "$fileServerType" = "azurefiles" ]; then
     sudo apt-get -y install cifs-utils
   fi
-
+  
   # install the base stack
-  sudo apt-get -y install varnish php php-cli php-curl php-zip php-pear php-mbstring php-dev mcrypt
-
+  # passing php versions $phpVersion
+  sudo apt-get -y install varnish php$phpVersion php$phpVersion-cli php$phpVersion-curl php$phpVersion-zip php-pear php$phpVersion-mbstring php$phpVersion-dev mcrypt
+  
   if [ "$webServerType" = "nginx" -o "$httpsTermination" = "VMSS" ]; then
     sudo apt-get -y install nginx
   fi
-
+   
   if [ "$webServerType" = "apache" ]; then
     # install apache pacakges
     sudo apt-get -y install apache2 libapache2-mod-php
   else
     # for nginx-only option
-    sudo apt-get -y install php-fpm
+    sudo apt-get -y install php$phpVersion-fpm
   fi
-
+   
   # Moodle requirements
-  sudo apt-get install -y graphviz aspell php-soap php-json php-redis php-bcmath php-gd php-pgsql php-mysql php-xmlrpc php-intl php-xml php-bz2
+  sudo apt-get install -y graphviz aspell php$phpVersion-soap php$phpVersion-json php$phpVersion-redis php$phpVersion-bcmath php$phpVersion-gd php$phpVersion-pgsql php$phpVersion-mysql php$phpVersion-xmlrpc php$phpVersion-intl php$phpVersion-xml php$phpVersion-bz2
   if [ "$dbServerType" = "mssql" ]; then
     install_php_mssql_driver
+    
   fi
-
+   
   # PHP Version
   PhpVer=$(get_php_version)
 
@@ -650,6 +659,13 @@ sub vcl_synth {
 }
 EOF
 
+service=apache2
+if [ "$webServerType" = "nginx" ]; then
+  if [ $(ps -ef | grep -v grep | grep $service | wc -l) > 0 ]; then
+       echo “Stop the $service!!!”
+       sudo systemctl stop $service
+  fi
+fi
   # Restart Varnish
   systemctl daemon-reload
   service varnish restart

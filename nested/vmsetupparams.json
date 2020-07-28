@@ -92,6 +92,9 @@
                 "nfsHaLbIP": "[parameters('moodleCommon').nfsHaLbIP]",
                 "nfsHaExportPath": "[parameters('moodleCommon').nfsHaExportPath]",
                 "fileServerDiskSize": "[parameters('moodleCommon').fileServerDiskSize]"
+            },
+            "phpProfile": {
+                "phpVersion": "[parameters('moodleCommon').phpVersion]"
             }
         }
     },

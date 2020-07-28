@@ -34,7 +34,7 @@
         },
         {
             "type": "Microsoft.Compute/virtualMachineScaleSets",
-            "apiVersion": "2017-03-30",
+            "apiVersion": "2019-07-01",
             "dependsOn": [
                 "[concat('Microsoft.Storage/storageAccounts/', parameters('moodleCommon').vmssdStorageAccounttName)]"
             ],

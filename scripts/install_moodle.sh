@@ -66,8 +66,13 @@ set -ex
     echo $nfsByoIpExportPath >> /tmp/vars.txt
     echo $storageAccountType >>/tmp/vars.txt
     echo $fileServerDiskSize >>/tmp/vars.txt
+    echo $phpVersion         >> /tmp/vars.txt
 
     check_fileServerType_param $fileServerType
+
+    #Updating php sources
+   sudo add-apt-repository ppa:ondrej/php -y
+   sudo apt-get update
 
     if [ "$dbServerType" = "mysql" ]; then
       mysqlIP=$dbIP
@@ -175,19 +180,25 @@ set -ex
     fi
     
     # install pre-requisites
-    sudo apt-get install -y --fix-missing python-software-properties unzip
+    sudo add-apt-repository ppa:ubuntu-toolchain-r/ppa
+    sudo apt-get update > /dev/null 2>&1
+    #sudo apt-get install -y --fix-missing python-software-properties unzip
+    sudo apt-get install software-properties-common
+    sudo apt-get install unzip
+
 
     # install the entire stack
-    sudo apt-get -y  --force-yes install nginx php-fpm varnish >> /tmp/apt5a.log
-    sudo apt-get -y  --force-yes install php php-cli php-curl php-zip >> /tmp/apt5b.log
+    # passing php versions $phpVersion
+    sudo apt-get -y  --force-yes install nginx php$phpVersion-fpm varnish >> /tmp/apt5a.log
+    sudo apt-get -y  --force-yes install php$phpVersion php$phpVersion-cli php$phpVersion-curl php$phpVersion-zip >> /tmp/apt5b.log
 
     # Moodle requirements
     sudo apt-get -y update > /dev/null
-    sudo apt-get install -y --force-yes graphviz aspell php-common php-soap php-json php-redis > /tmp/apt6.log
-    sudo apt-get install -y --force-yes php-bcmath php-gd php-xmlrpc php-intl php-xml php-bz2 php-pear php-mbstring php-dev mcrypt >> /tmp/apt6.log
+    sudo apt-get install -y --force-yes graphviz aspell php$phpVersion-common php$phpVersion-soap php$phpVersion-json php$phpVersion-redis > /tmp/apt6.log
+    sudo apt-get install -y --force-yes php$phpVersion-bcmath php$phpVersion-gd php$phpVersion-xmlrpc php$phpVersion-intl php$phpVersion-xml php$phpVersion-bz2 php-pear php$phpVersion-mbstring php$phpVersion-dev mcrypt >> /tmp/apt6.log
     PhpVer=$(get_php_version)
     if [ $dbServerType = "mysql" ]; then
-        sudo apt-get install -y --force-yes php-mysql
+        sudo apt-get install -y --force-yes php$phpVersion-mysql
     elif [ $dbServerType = "mssql" ]; then
         sudo apt-get install -y libapache2-mod-php  # Need this because install_php_mssql_driver tries to update apache2-mod-php settings always (which will fail without this)
         install_php_mssql_driver
@@ -901,7 +912,7 @@ EOF
    service php${PhpVer}-fpm stop
    service varnish stop
    service varnishncsa stop
-   service varnishlog stop
+   #service varnishlog stop
 
     # No need to run the commands below any more, as permissions & modes are already as such (no more "sudo -u www-data ...")
     # Leaving this code as a remark that we are explicitly leaving the ownership to root:root
@@ -934,7 +945,7 @@ EOF
       # Move the local installation over to the Azure Files
       echo -e '\n\rMoving locally installed moodle over to Azure Files'
       cp -a /moodle_old_delete_me/* /moodle || true # Ignore case sensitive directory copy failure
-      # rm -rf /moodle_old_delete_me || true # Keep the files just in case
+      rm -rf /moodle_old_delete_me || true # Keep the files just in case
    fi
 
    create_last_modified_time_update_script
