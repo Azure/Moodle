@@ -41,7 +41,8 @@
                     "mysqlPgresStgSizeGB":          { "value": 512 },
                     "fileServerType":               { "value": "azurefiles" },
                     "fileServerDiskSize":           { "value": 1024 },
-                    "storageAccountType":           { "value": "Premium_LRS" }
+                    "storageAccountType":           { "value": "Premium_LRS" },
+					"autoscaleVmSku":				{ "value": "Standard_DS3_v2" }
                 },
                 "templateLink": {
                     "uri": "[concat(parameters('_artifactsLocation'), 'azuredeploy.json', parameters('_artifactsLocationSasToken'))]"
