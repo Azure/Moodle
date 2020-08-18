@@ -75,7 +75,17 @@ check_fileServerType_param $fileServerType
   # install the base stack
   # passing php versions $phpVersion
   sudo apt-get -y install varnish php$phpVersion php$phpVersion-cli php$phpVersion-curl php$phpVersion-zip php-pear php$phpVersion-mbstring php$phpVersion-dev mcrypt
-  
+
+  # if webservertype is nginx then apache2 will be masked.
+  service=apache2
+  if [ "$webServerType" = "nginx" ]; then
+  if [ $(ps -ef | grep -v grep | grep $service | wc -l) > 0 ]; then
+       echo “Stop the $service!!!”
+       sudo systemctl stop $service
+	   sudo systemctl mask $service
+  fi
+fi
+
   if [ "$webServerType" = "nginx" -o "$httpsTermination" = "VMSS" ]; then
     sudo apt-get -y install nginx
   fi
