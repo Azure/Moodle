@@ -79,12 +79,12 @@ check_fileServerType_param $fileServerType
   # if webservertype is nginx then apache2 will be masked.
   service=apache2
   if [ "$webServerType" = "nginx" ]; then
-  if [ $(ps -ef | grep -v grep | grep $service | wc -l) > 0 ]; then
-       echo “Stop the $service!!!”
-       sudo systemctl stop $service
-	   sudo systemctl mask $service
+    if [ $(ps -ef | grep -v grep | grep $service | wc -l) > 0 ]; then
+        echo “Stop the $service!!!”
+        sudo systemctl stop $service
+        sudo systemctl mask $service
+    fi
   fi
-fi
 
   if [ "$webServerType" = "nginx" -o "$httpsTermination" = "VMSS" ]; then
     sudo apt-get -y install nginx
@@ -669,14 +669,14 @@ sub vcl_synth {
 }
 EOF
 
-# service=apache2
-# if [ "$webServerType" = "nginx" ]; then
-#  if [ $(ps -ef | grep -v grep | grep $service | wc -l) > 0 ]; then
-#       echo “Stop the $service!!!”
-#       sudo systemctl stop $service
-# 	   sudo systemctl mask $service
-#  fi
-# fi
+  # service=apache2
+  # if [ "$webServerType" = "nginx" ]; then
+    #  if [ $(ps -ef | grep -v grep | grep $service | wc -l) > 0 ]; then
+    #       echo “Stop the $service!!!”
+    #       sudo systemctl stop $service
+    # 	    sudo systemctl mask $service
+    #  fi
+  # fi
   # Restart Varnish
   systemctl daemon-reload
   service varnish restart
