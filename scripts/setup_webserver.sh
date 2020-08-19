@@ -52,12 +52,16 @@ echo $phpVersion          >> /tmp/vars.txt
 check_fileServerType_param $fileServerType
 
 {
+  echo "line55"
   # make sure the system does automatic update
   sudo apt-get -y update
+  echo "line58"
   sudo apt-get -y install unattended-upgrades
+  echo "line60"
 
   # install pre-requisites
   sudo apt-get install -y --fix-missing python-software-properties unzip 
+  echo "line64"
   #sudo apt-get install software-properties-common
   #sudo apt-get install unzip
   #sudo apt-get install rsyslog
@@ -75,6 +79,7 @@ check_fileServerType_param $fileServerType
   # install the base stack
   # passing php versions $phpVersion
   sudo apt-get -y install varnish php$phpVersion php$phpVersion-cli php$phpVersion-curl php$phpVersion-zip php-pear php$phpVersion-mbstring php$phpVersion-dev mcrypt
+echo "line82"
 
   # if webservertype is nginx then apache2 will be masked.
   service=apache2
