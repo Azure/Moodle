@@ -19,10 +19,10 @@ typical Moodle scenarios follow this.
 
 All of the deployment options require you to provide a valid SSH protocol 2 (SSH-2) RSA public-private key pairs with a minimum length of 2048 bits. Other key formats such as ED25519 and ECDSA are not supported. 
 
-If you are unfamiliar with SSH and SSH keys, read this [article](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/mac-create-ssh-keys) which will explain how to generate a key using the Windows Subsystem for Linux (it takes only a few minutes).  You will create a ssh key pair. The public key is copied to the instances via the template. The private key is your identity that you will use to connect to different parts of the service.
+If you are unfamiliar with SSH and SSH keys, read this [article](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/mac-create-ssh-keys) which will explain how to generate a key pair.  You will create a ssh key pair. The public key is copied to the instances via the template. The private key is your identity that you will use to connect to different parts of the service.
 
 ## Predefined deployment options
-Below are a list of pre-defined/restricted deployment options based on typical deployment scenarios (i.e. dev/test, production etc.) All configurations are fixed and you just need to pass your ssh public key to the template so that you can log in to the deployed VMs. Costs are approximate, and will vary based on resources used including autoscaled VMs, backups and network cost.
+Below are a list of pre-defined/restricted deployment options based on typical deployment scenarios (i.e. dev/test, production etc.) All configurations are fixed and you just need to pass your ssh public key to the template so that you can log in to the deployed VMs.
 
 | Deployment Type | Description | Launch |
 | --- | --- | ---
