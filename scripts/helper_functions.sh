@@ -65,6 +65,9 @@ function get_setup_params_from_configs_json
     export storageAccountType=$(echo $json | jq -r .moodleProfile.storageAccountType)
     export fileServerDiskSize=$(echo $json | jq -r .fileServerProfile.fileServerDiskSize)
     export phpVersion=$(echo $json | jq -r .phpProfile.phpVersion)
+    export moodleStackConfigurationDownloadPath=$(echo $json | jq -r .confPaths.moodleStackConfigurationDownloadPath)
+    export confLocation=$(echo $json | jq -r .confPaths.confLocation)
+    export artifactsSasToken=$(echo $json | jq -r .confPaths.artifactsSasToken)
 }
 
 function get_php_version {
