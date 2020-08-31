@@ -211,9 +211,9 @@ EOF
 
 # ------
     if [ "$httpsTermination" = "None" ]; then 
-      nginxConfFileName="nginx-and-none -  nginx.conf"
+      nginxConfFileName="nginx_and_none_nginx.conf"
     else 
-      nginxConfFileName="nginx-and-VMSS  -  nginx.conf"
+      nginxConfFileName="nginx_and_VMSS_nginx.conf"
     fi
 
     nginxConfUri="${confLocation}${nginxConfFileName}${artifactsSasToken}"
@@ -245,12 +245,12 @@ EOF
 # -------------------------
 
     if [ "$httpsTermination" = "VMSS" ]; then
-        siteFqdnFileName="sitefqdn- vmss and nginx.conf"
+        siteFqdnFileName="sitefqdn_vmss_and_nginx.conf"
     elif [ "$httpsTermination" = "None" ]; then
-        siteFqdnFileName="sitefqdn - none and nginx.conf"
+        siteFqdnFileName="sitefqdn_none_and_nginx.conf"
     else
         # httpsTermination will be AppGw
-        siteFqdnFileName="sitefqdn- vmss and nginx.conf"
+        siteFqdnFileName="sitefqdn_appgw_and_nginx"
     fi
 
     siteFqdnUri="${confLocation}${siteFqdnFileName}${artifactsSasToken}"
