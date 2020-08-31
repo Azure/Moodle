@@ -152,7 +152,7 @@ local2.*   @${syslogServer}:514
 EOF
   service syslog restart
 
-  if [ "$webServerType" = "nginx" -o "$httpsTermination" = "VMSS" ]; then
+  # if [ "$webServerType" = "nginx" -o "$httpsTermination" = "VMSS" ]; then
     # Build nginx config
 #     cat <<EOF > /etc/nginx/nginx.conf
 # user www-data;
