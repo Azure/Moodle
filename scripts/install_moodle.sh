@@ -138,7 +138,7 @@ set -ex
     fi
 
     # Replace root directory
-    sudo sed -i "s~$\{htmlRootDir}~$rootDir~" ${moodleStackConfigurationDownloadPath}/siteFqdn.conf
+    sudo sed -i "s~\${htmlRootDir}~$rootDir~" ${moodleStackConfigurationDownloadPath}/siteFqdn.conf
 
 
     # create gluster, nfs or Azure Files mount point

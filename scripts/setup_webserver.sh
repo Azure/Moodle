@@ -264,7 +264,7 @@ EOF
     fi
 
     # Replace root directory
-    sudo sed -i "s~$\{htmlRootDir}~$rootDir~" ${moodleStackConfigurationDownloadPath}/siteFqdn.conf
+    sudo sed -i "s~\${htmlRootDir}~$rootDir~" ${moodleStackConfigurationDownloadPath}/siteFqdn.conf
 
 
 # -------------------------
