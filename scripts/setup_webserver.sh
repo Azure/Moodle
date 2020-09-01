@@ -256,6 +256,17 @@ EOF
     siteFqdnUri="${confLocation}${siteFqdnFileName}${artifactsSasToken}"
     wget ${siteFqdnUri} -O "${moodleStackConfigurationDownloadPath}/siteFqdn.conf"
 
+    # Find and replace htmlRootDir based on condition
+    if [ "$htmlLocalCopySwitch" = "true" ]; then
+        rootDir="/var/www/html/moodle"
+    else
+        rootDir="/moodle/html/moodle"
+    fi
+
+    # Replace root directory
+    sudo sed -i "s~$\{htmlRootDir}~$rootDir~" ${moodleStackConfigurationDownloadPath}/siteFqdn.conf
+
+
 # -------------------------
 
 
