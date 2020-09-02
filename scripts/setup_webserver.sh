@@ -250,7 +250,7 @@ EOF
         siteFqdnFileName="sitefqdn_none_and_nginx.conf"
     else
         # httpsTermination will be AppGw
-        siteFqdnFileName="sitefqdn_appgw_and_nginx"
+        siteFqdnFileName="sitefqdn_appgw_and_nginx.conf"
     fi
 
     siteFqdnUri="${confLocation}${siteFqdnFileName}${artifactsSasToken}"
