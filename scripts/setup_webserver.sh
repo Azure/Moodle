@@ -213,7 +213,7 @@ EOF
     if [ "$httpsTermination" = "None" ]; then 
       nginxConfFileName="nginx_and_none_nginx.conf"
     else 
-      nginxConfFileName="nginx_and_VMSS_nginx.conf"
+      nginxConfFileName="nginx_and_vmss_nginx.conf"
     fi
 
     nginxConfUri="${confLocation}${nginxConfFileName}${artifactsSasToken}"
