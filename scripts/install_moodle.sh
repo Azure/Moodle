@@ -182,9 +182,9 @@ set -ex
     # install pre-requisites
     sudo add-apt-repository ppa:ubuntu-toolchain-r/ppa
     sudo apt-get -y update > /dev/null 2>&1
-    sudo apt-get install -y --fix-missing python-software-properties unzip
-    #sudo apt-get install software-properties-common
-    #sudo apt-get install unzip
+    # sudo apt-get install -y --fix-missing python-software-properties unzip
+    sudo apt-get -y install software-properties-common
+    sudo apt-get -y install unzip
 
 
     # install the entire stack

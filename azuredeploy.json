@@ -115,17 +115,7 @@
         "moodleVersion": {
             "allowedValues": [
                 "MOODLE_39_STABLE",
-                "MOODLE_38_STABLE",
-                "MOODLE_35_STABLE",
-                "MOODLE_34_STABLE",
-                "v3.4.3",
-                "v3.4.2",
-                "v3.4.1",
-                "MOODLE_33_STABLE",
-                "MOODLE_32_STABLE",
-                "MOODLE_31_STABLE",
-                "MOODLE_30_STABLE",
-                "MOODLE_29_STABLE"
+                "MOODLE_38_STABLE"
             ],
             "defaultValue": "MOODLE_38_STABLE",
             "metadata": {
@@ -655,7 +645,7 @@
                 "16.04-LTS",
                 "18.04-LTS"
             ],
-            "defaultValue": "16.04-LTS"
+            "defaultValue": "18.04-LTS"
         },
         "location": {
             "type": "string",
