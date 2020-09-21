@@ -682,4 +682,17 @@ EOF
   systemctl daemon-reload
   service varnish restart
 
+  
+# Making password enabled for VMSS instances.
+function enable_password_authentication
+{
+sudo sed -i "s~PasswordAuthentication no~PasswordAuthentication yes~" /etc/ssh/sshd_config
+sudo sed -i "s~#UseLogin no~UseLogin yes~" /etc/ssh/sshd_config
+sudo sed -i "s~# StrictHostKeyChecking ask~ StrictHostKeyChecking no~" /etc/ssh/ssh_config
+sudo systemctl restart sshd
+}
+
+enable_password_authentication
+
+
 }  > /tmp/setup.log
