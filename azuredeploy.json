@@ -117,7 +117,7 @@
                 "MOODLE_39_STABLE",
                 "MOODLE_38_STABLE"
             ],
-            "defaultValue": "MOODLE_38_STABLE",
+            "defaultValue": "MOODLE_39_STABLE",
             "metadata": {
                 "description": "The Moodle version you want to install."
             },
