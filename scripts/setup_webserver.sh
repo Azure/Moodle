@@ -57,10 +57,10 @@ check_fileServerType_param $fileServerType
   sudo apt-get -y install unattended-upgrades
 
   # install pre-requisites
-  sudo apt-get -y install python-software-properties unzip rsyslog
-  #sudo apt-get install software-properties-common
-  #sudo apt-get install unzip
-  #sudo apt-get install rsyslog
+  # sudo apt-get -y install python-software-properties unzip rsyslog
+  sudo apt-get -y install software-properties-common
+  sudo apt-get -y install unzip
+  sudo apt-get -y install rsyslog
   sudo apt-get -y install postgresql-client mysql-client git
 
   if [ $fileServerType = "gluster" ]; then
@@ -77,14 +77,14 @@ check_fileServerType_param $fileServerType
   sudo apt-get -y install varnish php$phpVersion php$phpVersion-cli php$phpVersion-curl php$phpVersion-zip php-pear php$phpVersion-mbstring php$phpVersion-dev mcrypt
 
   # if webservertype is nginx then apache2 will be masked.
-  service=apache2
-  if [ "$webServerType" = "nginx" ]; then
-    if [ $(ps -ef | grep -v grep | grep $service | wc -l) > 0 ]; then
-        echo “Stop the $service!!!”
-        sudo systemctl stop $service
-        sudo systemctl mask $service
-    fi
-  fi
+  # service=apache2
+  # if [ "$webServerType" = "nginx" ]; then
+  #     if [ $(ps -ef | grep -v grep | grep $service | wc -l) > 0 ]; then
+  #         echo “Stop the $service!!!”
+  #         sudo systemctl stop $service
+  #         sudo systemctl mask $service
+  #     fi
+  # fi
 
   if [ "$webServerType" = "nginx" -o "$httpsTermination" = "VMSS" ]; then
     sudo apt-get -y install nginx
@@ -669,14 +669,15 @@ sub vcl_synth {
 }
 EOF
 
-  # service=apache2
-  # if [ "$webServerType" = "nginx" ]; then
-    #  if [ $(ps -ef | grep -v grep | grep $service | wc -l) > 0 ]; then
-    #       echo “Stop the $service!!!”
-    #       sudo systemctl stop $service
-    # 	    sudo systemctl mask $service
-    #  fi
-  # fi
+# This code is stop apache2 which is installing in 18.04
+  service=apache2
+  if [ "$webServerType" = "nginx" ]; then
+      if [ $(ps -ef | grep -v grep | grep $service | wc -l) > 0 ]; then
+            echo “Stop the $service!!!”
+            sudo systemctl stop $service
+            sudo systemctl mask $service
+      fi
+  fi
   # Restart Varnish
   systemctl daemon-reload
   service varnish restart
