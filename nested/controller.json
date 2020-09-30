@@ -139,6 +139,7 @@
                     "imageReference": "[parameters('moodleCommon').osType]",
                     "osDisk": {
                         "createOption": "FromImage",
+                        "diskSizeGB": 1024,
                         "managedDisk": {
                             "storageAccountType": "[parameters('moodleCommon').osDiskStorageType]"
                         },

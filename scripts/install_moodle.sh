@@ -831,6 +831,10 @@ EOF
 
     echo -e "\n\rDone! Installation completed!\n\r"
 
+    # use /tmp/localcache/ for localcache
+    sed -i "22 a \$CFG->localcachedir = '/tmp/localcachedir';" /moodle/html/moodle/config.php
+    sed -i "22 a \$CFG->alternative_component_cache = '/tmp/localcachedir/core_component.php';" /moodle/html/moodle/config.php
+
     if [ "$redisAuth" != "None" ]; then
         create_redis_configuration_in_moodledata_muc_config_php
 

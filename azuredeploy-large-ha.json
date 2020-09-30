@@ -31,17 +31,42 @@
             "properties": {
                 "mode": "Incremental",
                 "parameters": {
-                    "_artifactsLocation":           { "value": "[parameters('_artifactsLocation')]" },
-                    "_artifactsLocationSasToken":   { "value": "[parameters('_artifactsLocationSasToken')]" },
-                    "redisDeploySwitch":            { "value": true },
-                    "sshPublicKey":                 { "value": "[parameters('sshPublicKey')]" },
-                    "autoscaleVmCountMax":          { "value": 20 },
-		    "autoscaleVmSku":		    { "value": "Standard_DS3_v2" },
-                    "mysqlPgresVcores":             { "value": 16 },
-                    "mysqlPgresStgSizeGB":          { "value": 512 },
-                    "fileServerType":               { "value": "azurefiles" },
-                    "fileServerDiskSize":           { "value": 1024 },
-                    "storageAccountType":           { "value": "Premium_LRS" }
+                    "_artifactsLocation": {
+                        "value": "[parameters('_artifactsLocation')]"
+                    },
+                    "_artifactsLocationSasToken": {
+                        "value": "[parameters('_artifactsLocationSasToken')]"
+                    },
+                    "loadBalancerSku": {
+                        "value": "Standard"
+                    },
+                    "redisDeploySwitch": {
+                        "value": true
+                    },
+                    "sshPublicKey": {
+                        "value": "[parameters('sshPublicKey')]"
+                    },
+                    "autoscaleVmCountMax": {
+                        "value": 20
+                    },
+                    "autoscaleVmSku": {
+                        "value": "Standard_DS3_v2"
+                    },
+                    "mysqlPgresVcores": {
+                        "value": 16
+                    },
+                    "mysqlPgresStgSizeGB": {
+                        "value": 512
+                    },
+                    "fileServerType": {
+                        "value": "azurefiles"
+                    },
+                    "fileServerDiskSize": {
+                        "value": 1024
+                    },
+                    "storageAccountType": {
+                        "value": "Premium_LRS"
+                    }
                 },
                 "templateLink": {
                     "uri": "[concat(parameters('_artifactsLocation'), 'azuredeploy.json', parameters('_artifactsLocationSasToken'))]"
