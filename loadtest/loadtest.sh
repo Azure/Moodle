@@ -119,9 +119,10 @@ function delete_resource_group
 function install_moosh
 {
     # 'composer install' keeps failing, so try apt...
-    sudo apt-add-repository 'deb http://ppa.launchpad.net/zabuch/ppa/ubuntu trusty main'
+    sudo apt-add-repository "deb http://ppa.launchpad.net/zabuch/ppa/ubuntu $(lsb_release -sc) main"
     sudo apt-get update || true
-    sudo apt-get install -y --allow-unauthenticated moosh
+    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CA1F0167ECFEA95
+    sudo apt-get install --assume-yes moosh
 
     # sudo apt update || return 1
     # sudo apt install -y composer || return 1
