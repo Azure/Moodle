@@ -6,8 +6,14 @@ function get_setup_params_from_configs_json
 {
     local configs_json_path=${1}    # E.g., /var/lib/cloud/instance/moodle_on_azure_configs.json
 
-    (dpkg -l jq &> /dev/null) || (apt -y update; apt -y install jq)
+    # (dpkg -l jq &> /dev/null) || (apt -y update; apt -y install jq)
+    # sudo add-apt-repository universe
+    # sudo apt-get -y update
+    # sudo apt-get -y install jq
 
+    # Added curl command to download jq.
+    curl https://stedolan.github.io/jq/download/linux64/jq > /usr/bin/jq && chmod +x /usr/bin/jq
+	
     # Wait for the cloud-init write-files user data file to be generated (just in case)
     local wait_time_sec=0
     while [ ! -f "$configs_json_path" ]; do
@@ -60,6 +66,9 @@ function get_setup_params_from_configs_json
     export nfsHaLbIP=$(echo $json | jq -r .fileServerProfile.nfsHaLbIP)
     export nfsHaExportPath=$(echo $json | jq -r .fileServerProfile.nfsHaExportPath)
     export nfsByoIpExportPath=$(echo $json | jq -r .fileServerProfile.nfsByoIpExportPath)
+    export storageAccountType=$(echo $json | jq -r .moodleProfile.storageAccountType)
+    export fileServerDiskSize=$(echo $json | jq -r .fileServerProfile.fileServerDiskSize)
+    export phpVersion=$(echo $json | jq -r .phpProfile.phpVersion)
 }
 
 function get_php_version {
@@ -108,12 +117,14 @@ function create_azure_files_moodle_share
     local storageAccountName=$1
     local storageAccountKey=$2
     local logFilePath=$3
+    local fileServerDiskSize=$4
 
     az storage share create \
         --name moodle \
         --account-name $storageAccountName \
         --account-key $storageAccountKey \
-        --fail-on-exist >> $logFilePath
+        --fail-on-exist >>$logFilePath \
+        --quota $fileServerDiskSize
 }
 
 function setup_and_mount_gluster_moodle_share

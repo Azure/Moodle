@@ -64,8 +64,15 @@ set -ex
     echo $azureSearchNameHost >> /tmp/vars.txt
     echo $tikaVmIP >> /tmp/vars.txt
     echo $nfsByoIpExportPath >> /tmp/vars.txt
+    echo $storageAccountType >>/tmp/vars.txt
+    echo $fileServerDiskSize >>/tmp/vars.txt
+    echo $phpVersion         >> /tmp/vars.txt
 
     check_fileServerType_param $fileServerType
+
+    #Updating php sources
+   sudo add-apt-repository ppa:ondrej/php -y
+   sudo apt-get update
 
     if [ "$dbServerType" = "mysql" ]; then
       mysqlIP=$dbIP
@@ -119,39 +126,43 @@ set -ex
     elif [ "$dbServerType" = "postgres" ]; then
         sudo apt-get -y --force-yes install postgresql-client >> /tmp/apt3.log
     fi
-
+	
     if [ "$installObjectFsSwitch" = "true" -o "$fileServerType" = "azurefiles" ]; then
-        # install azure cli & setup container
+	# install azure cli & setup container
         echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ wheezy main" | \
             sudo tee /etc/apt/sources.list.d/azure-cli.list
-
         curl -L https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - >> /tmp/apt4.log
         sudo apt-get -y install apt-transport-https >> /tmp/apt4.log
         sudo apt-get -y update > /dev/null
         sudo apt-get -y install azure-cli >> /tmp/apt4.log
+	
+        # FileStorage accounts can only be used to store Azure file shares;
+        # Premium_LRS will support FileStorage kind
+        # No other storage resources (blob containers, queues, tables, etc.) can be deployed in a FileStorage account.
+        if [ $storageAccountType != "Premium_LRS" ]; then
+		az storage container create \
+		    --name objectfs \
+		    --account-name $storageAccountName \
+		    --account-key $storageAccountKey \
+		    --public-access off \
+		    --fail-on-exist >> /tmp/wabs.log
 
-        az storage container create \
-            --name objectfs \
-            --account-name $storageAccountName \
-            --account-key $storageAccountKey \
-            --public-access off \
-            --fail-on-exist >> /tmp/wabs.log
+		az storage container policy create \
+		    --account-name $storageAccountName \
+		    --account-key $storageAccountKey \
+		    --container-name objectfs \
+		    --name readwrite \
+		    --start $(date --date="1 day ago" +%F) \
+		    --expiry $(date --date="2199-01-01" +%F) \
+		    --permissions rw >> /tmp/wabs.log
 
-        az storage container policy create \
-            --account-name $storageAccountName \
-            --account-key $storageAccountKey \
-            --container-name objectfs \
-            --name readwrite \
-            --start $(date --date="1 day ago" +%F) \
-            --expiry $(date --date="2199-01-01" +%F) \
-            --permissions rw >> /tmp/wabs.log
-
-        sas=$(az storage container generate-sas \
-            --account-name $storageAccountName \
-            --account-key $storageAccountKey \
-            --name objectfs \
-            --policy readwrite \
-            --output tsv)
+		sas=$(az storage container generate-sas \
+		    --account-name $storageAccountName \
+		    --account-key $storageAccountKey \
+		    --name objectfs \
+		    --policy readwrite \
+		    --output tsv)
+	fi
     fi
 
     if [ $fileServerType = "gluster" ]; then
@@ -169,19 +180,25 @@ set -ex
     fi
     
     # install pre-requisites
-    sudo apt-get install -y --fix-missing python-software-properties unzip
+    sudo add-apt-repository ppa:ubuntu-toolchain-r/ppa
+    sudo apt-get -y update > /dev/null 2>&1
+    # sudo apt-get install -y --fix-missing python-software-properties unzip
+    sudo apt-get -y install software-properties-common
+    sudo apt-get -y install unzip
+
 
     # install the entire stack
-    sudo apt-get -y  --force-yes install nginx php-fpm varnish >> /tmp/apt5a.log
-    sudo apt-get -y  --force-yes install php php-cli php-curl php-zip >> /tmp/apt5b.log
+    # passing php versions $phpVersion
+    sudo apt-get -y  --force-yes install nginx php$phpVersion-fpm varnish >> /tmp/apt5a.log
+    sudo apt-get -y  --force-yes install php$phpVersion php$phpVersion-cli php$phpVersion-curl php$phpVersion-zip >> /tmp/apt5b.log
 
     # Moodle requirements
     sudo apt-get -y update > /dev/null
-    sudo apt-get install -y --force-yes graphviz aspell php-common php-soap php-json php-redis > /tmp/apt6.log
-    sudo apt-get install -y --force-yes php-bcmath php-gd php-xmlrpc php-intl php-xml php-bz2 php-pear php-mbstring php-dev mcrypt >> /tmp/apt6.log
+    sudo apt-get install -y --force-yes graphviz aspell php$phpVersion-common php$phpVersion-soap php$phpVersion-json php$phpVersion-redis > /tmp/apt6.log
+    sudo apt-get install -y --force-yes php$phpVersion-bcmath php$phpVersion-gd php$phpVersion-xmlrpc php$phpVersion-intl php$phpVersion-xml php$phpVersion-bz2 php-pear php$phpVersion-mbstring php$phpVersion-dev mcrypt >> /tmp/apt6.log
     PhpVer=$(get_php_version)
     if [ $dbServerType = "mysql" ]; then
-        sudo apt-get install -y --force-yes php-mysql
+        sudo apt-get install -y --force-yes php$phpVersion-mysql
     elif [ $dbServerType = "mssql" ]; then
         sudo apt-get install -y libapache2-mod-php  # Need this because install_php_mssql_driver tries to update apache2-mod-php settings always (which will fail without this)
         install_php_mssql_driver
@@ -296,8 +313,12 @@ http {
 
   set_real_ip_from   127.0.0.1;
   real_ip_header      X-Forwarded-For;
-  ssl_protocols TLSv1 TLSv1.1 TLSv1.2; # Dropping SSLv3, ref: POODLE
-  ssl_prefer_server_ciphers on;
+  #upgrading to TLSv1.2 and droping 1 & 1.1
+  ssl_protocols TLSv1.2;
+  #ssl_prefer_server_ciphers on;
+  #adding ssl ciphers
+  ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384;
+
 
   gzip on;
   gzip_disable "msie6";
@@ -891,7 +912,7 @@ EOF
    service php${PhpVer}-fpm stop
    service varnish stop
    service varnishncsa stop
-   service varnishlog stop
+   #service varnishlog stop
 
     # No need to run the commands below any more, as permissions & modes are already as such (no more "sudo -u www-data ...")
     # Leaving this code as a remark that we are explicitly leaving the ownership to root:root
@@ -917,14 +938,14 @@ EOF
       mv /moodle /moodle_old_delete_me
       # Then create the moodle share
       echo -e '\n\rCreating an Azure Files share for moodle'
-      create_azure_files_moodle_share $storageAccountName $storageAccountKey /tmp/wabs.log
+      create_azure_files_moodle_share $storageAccountName $storageAccountKey /tmp/wabs.log $fileServerDiskSize
       # Set up and mount Azure Files share. Must be done after nginx is installed because of www-data user/group
       echo -e '\n\rSetting up and mounting Azure Files share on //'$storageAccountName'.file.core.windows.net/moodle on /moodle\n\r'
       setup_and_mount_azure_files_moodle_share $storageAccountName $storageAccountKey
       # Move the local installation over to the Azure Files
       echo -e '\n\rMoving locally installed moodle over to Azure Files'
       cp -a /moodle_old_delete_me/* /moodle || true # Ignore case sensitive directory copy failure
-      # rm -rf /moodle_old_delete_me || true # Keep the files just in case
+      rm -rf /moodle_old_delete_me || true # Keep the files just in case
    fi
 
    create_last_modified_time_update_script

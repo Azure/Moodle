@@ -114,18 +114,10 @@
         },
         "moodleVersion": {
             "allowedValues": [
-                "MOODLE_35_STABLE",
-                "MOODLE_34_STABLE",
-                "v3.4.3",
-                "v3.4.2",
-                "v3.4.1",
-                "MOODLE_33_STABLE",
-                "MOODLE_32_STABLE",
-                "MOODLE_31_STABLE",
-                "MOODLE_30_STABLE",
-                "MOODLE_29_STABLE"
+                "MOODLE_39_STABLE",
+                "MOODLE_38_STABLE"
             ],
-            "defaultValue": "MOODLE_35_STABLE",
+            "defaultValue": "MOODLE_38_STABLE",
             "metadata": {
                 "description": "The Moodle version you want to install."
             },
@@ -152,7 +144,7 @@
             "type": "string"
         },
         "webServerType": {
-            "defaultValue": "apache",
+            "defaultValue": "nginx",
             "allowedValues": [
                 "apache",
                 "nginx"
@@ -191,6 +183,18 @@
             ],
             "metadata": {
                 "description": "Azure storage type for all VMs' OS disks. With htmlLocalCopySwith true, Premium_LRS (SSD) is strongly recommended, as PHP files will be served from OS disks."
+            },
+            "type": "string"
+        },
+        "phpVersion": {
+            "allowedValues": [
+                "7.2",
+                "7.3",
+                "7.4"
+            ],
+            "defaultValue": "7.4",
+            "metadata": {
+                "description": "php version"
             },
             "type": "string"
         },
@@ -364,7 +368,8 @@
                 "gluster",
                 "nfs",
                 "nfs-ha",
-                "nfs-byo"
+                "nfs-byo",
+                "azurefiles"
             ],
             "metadata": {
                 "description": "File server type: GlusterFS, NFS, and NFS-HA (2-VM highly available NFS cluster)"
@@ -493,7 +498,8 @@
             "allowedValues": [
                 "Standard_LRS",
                 "Standard_GRS",
-                "Standard_ZRS"
+                "Standard_ZRS",
+                "Premium_LRS"
             ],
             "metadata": {
                 "description": "Storage Account type. This storage account is only for the Moodle ObjectFS plugin and/or the (currently disabled) Azure Files file share option"
@@ -695,6 +701,14 @@
                 "description": "Loadbalancer SKU"
             },
             "type": "string"
+        },
+        "ubuntuVersion": {
+            "type": "string",
+            "allowedValues": [
+                "16.04-LTS",
+                "18.04-LTS"
+            ],
+            "defaultValue": "18.04-LTS"
         },
         "location": {
             "type": "string",
@@ -979,6 +993,9 @@
                     "dbFQDN": {
                         "value": "[reference('dbTemplate').outputs.dbFQDN.value]"
                     },
+                    "storageAccountName": {
+                        "value": "[reference('storageAccountTemplate').outputs.storageAccountName.value]"
+                    },
                     "storageAccountKey": {
                         "value": "[reference('storageAccountTemplate').outputs.storageAccountKey.value]"
                     },
@@ -1225,9 +1242,10 @@
             "osType": {
                 "offer": "UbuntuServer",
                 "publisher": "Canonical",
-                "sku": "16.04-LTS",
+                "sku": "[parameters('ubuntuVersion')]",
                 "version": "latest"
             },
+            "phpVersion": "[parameters('phpVersion')]",
             "policyName": "[concat('policy-',variables('resourceprefix'))]",
             "postgresVersion": "[parameters('postgresVersion')]",
             "redisCacheName": "[concat('redis-',variables('resourceprefix'))]",

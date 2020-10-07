@@ -24,7 +24,7 @@
     "resources": [
         {
             "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2017-06-01",
+            "apiVersion": "2019-06-01",
             "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').vmssdStorageAccounttName]",
             "kind": "Storage",
@@ -34,7 +34,7 @@
         },
         {
             "type": "Microsoft.Compute/virtualMachineScaleSets",
-            "apiVersion": "2017-03-30",
+            "apiVersion": "2019-07-01",
             "dependsOn": [
                 "[concat('Microsoft.Storage/storageAccounts/', parameters('moodleCommon').vmssdStorageAccounttName)]"
             ],
@@ -59,7 +59,7 @@
                                             "[parameters('moodleCommon').commonFunctionsScriptUri]"
                                         ]
                                     },
-                                    "protectedSettings":{
+                                    "protectedSettings": {
                                         "commandToExecute": "[concat('bash ', parameters('moodleCommon').webServerSetupScriptFilename, ' ', parameters('moodleCommon').moodleOnAzureConfigsJsonPath)]"
                                     },
                                     "type": "CustomScript",
