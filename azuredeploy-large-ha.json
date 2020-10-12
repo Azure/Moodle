@@ -36,12 +36,14 @@
                     "redisDeploySwitch":            { "value": true },
                     "sshPublicKey":                 { "value": "[parameters('sshPublicKey')]" },
                     "autoscaleVmCountMax":          { "value": 20 },
-		    "autoscaleVmSku":		    { "value": "Standard_DS3_v2" },
+		            "autoscaleVmSku":		        { "value": "Standard_DS3_v2" },
+                    "searchType":                   { "value": "elastic" },
                     "mysqlPgresVcores":             { "value": 16 },
                     "mysqlPgresStgSizeGB":          { "value": 512 },
                     "fileServerType":               { "value": "azurefiles" },
                     "fileServerDiskSize":           { "value": 1024 },
-                    "storageAccountType":           { "value": "Premium_LRS" }
+                    "storageAccountType":           { "value": "Premium_LRS" },
+                    "loadBalancerSku":              { "value": "Standard" }
                 },
                 "templateLink": {
                     "uri": "[concat(parameters('_artifactsLocation'), 'azuredeploy.json', parameters('_artifactsLocationSasToken'))]"
