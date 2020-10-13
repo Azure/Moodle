@@ -1,14 +1,7 @@
-# Contributing to Moodle on Azure 
+# Contribution Guidelines
 
-The TL;DR version is:
-
-  * We are a community project
-  * We seek to make decisions through community consensus
-  * We prefer debate through gradual improvement through pull requests to endless discussion about the "perfect" solution
-  * We are a meritocracy, not a democracy
-  * We welcome all your contributions including but not limited to feature requests, bug-reports, documentation and code
-  
-## How the project is managed
+Thank you for your interest in contributing to the guides and templates for managing a scalable and highly available Moodle on Azure. We welcome your contributions and participation! If you aren't sure what to expect, here are some norms for our project so you feel more comfortable with
+how things will go.
 
 This project welcomes contributions and suggestions. Our goal is to
 work on Azure specific tooling for deploying and managing the open
@@ -16,22 +9,7 @@ source [Moodle](http://moodle.org) learning management system on
 Azure. We do not work on Moodle itself here, instead we work upstream
 as appropriate.
 
-The short version of how to contribute to this project is "just do
-it". Where "it" can be defined as any valuable contribution (and to be
-clear, asking questions is a valuable contribution):
-
-  * ask questions
-  * provide feedback
-  * write or update documentation
-  * help new users
-  * recommend the project to others
-  * test the code and report bugs
-  * fix bugs and issue pull requests
-  * give us feedback on required features
-  * write and update the software
-  * create artwork
-  * translate to different languages
-  * anything you can see that needs doing
+## CLA Required
 
 Most contributions require you to agree to a Contributor License
 Agreement (CLA) declaring that you have the right to, and actually do,
@@ -44,193 +22,116 @@ whether you need to provide a CLA and decorate the PR appropriately
 bot. You will only need to do this once across all repos using our
 CLA.
 
-## Decision Making
+## Code of Conduct
 
-This is a community project. Decisions are made through consensus
-building. All voices are equal and we welcome input from everyone.
+This project has adopted the Microsoft [Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
+For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/)
+or contact opencode@microsoft.com with any additional questions or comments.
 
-That said, this is not a democracy. Consensus does not mean everyone
-has to agree. It merely means that nobody is objecting *and* offering
-an alternative.
+Contributions come in many forms: submitting issues, writing code, participating in discussions and community calls.
 
-What this means, in practive, is that she who does the work makes the
-decisions. We'd rather discuss how to improve imperfect code than
-argue over what would make perfect code. So if you have an objection
-to the way we are doing things issue a pull request.
-
-In the unlikely event that we cannot reach consensus through consensus
-then the project maintainers (as identified by their having the admin
-bit on GitHub) will make a judgetment call. But normally their
-role is to guide the community to consensus action, not to make
-decisions on bhalf of the community.
-
-## Minimum Bar for Contributions
-
-As the project matures we will add more thorough testing. It is expected
-that all contributions pass the currently available suite of tests. If
-they do not then they will be rejected.
-
-It is also required that contributions which add features also bring
-at least basic testing of that feature.
-
-## Planning
-
-This is an open source project. We have a few mantras to ensure
-efficient collaboration, these mostly boil down to ensuring good
-visibility into the communities goals. These include:
-
-  * If it didn't happen in public, it didn't happen
-  * Scratch your own itch
+This document provides the guidelines for how to contribute to this project.
   
-### If it didn't happen in public, it didn't happen (aka full transparency)
+## Issues
 
-The goal of this mantra is to ensure maximum visibility into our
-communities work in order to:
+There are 4 types of issues that you may want to contribute to this project: bugs, discussions, proposals, or questions. 
 
-  1. Provide an opportunity for community feedback in order to ensure
-     our plans are good
-  2. Provide a clear indication of what will be done, what may be done
-     and what won't be done
-  
-Both of these goals lead to the second mantra "Scratch your own itch".
+- Bug: You've found a bug with the code, and want to report it, or create an issue to track the bug.
+- Discussion: You have something on your mind, which requires input from others in a discussion, before it eventually manifests as a proposal.
+- Proposal: If you want to propose a new idea or functionality. This allows feedback from others before you start working on code.
+- Question: If you need support with the template or documentation.
 
-### Scratch your own itch (aka getting what you want)
+### Ready to file an Issue?
 
-This is an open source project. We welcome feature requests and, as a
-community, we will provide feedback on whether we intend to work on it
-or not. To this end we categories feature requests in one of 4 ways:
+Before you file an issue, check:
 
-  * Priority 0 (will address)
-  * Priority 1 (may address)
-  * Priority 2 (maybe one day)
-  * wontfix (out of scope)
+* Is this the right repository? If you are trying to improve Moodle for example, this wouldn't be the place. 
+* Check for existing issues. If the issue has already been created, update the issue and add your reaction to it with a up-vote or down-vote. 
+* For bugs, provide as much detail as possible about what failed. Do not share secrets in the issue though. 
 
-Using these priorities it is easy for community members to decide
-where to spend their time. For example:
+## Pull Requests
 
-  * Priority 0 items are actively being worked on by at least one
-    community member. Others are welcome to contribute as appropriate
-    (reviews are particularly important)
-  * Priority 1 items are seen as important and are likely to be worked
-    on in the short to medium term, but there is no community member
-    active on the project at this time. Community members are welcome
-    to take ownership of these issues and propose a solution that they
-    intend to implement. If the community accepts the proposal then it
-    will become a Priority 0 issue.
-  * Priority 2 items are seen as interesting proposals that are not in
-    conflict with the projects goals but are unlikely to be worked on
-    by any existing communty members. Community members who have a
-    need for these items are strongly encouraged to identify
-    themselves and offer a proposal for a solution. If there is enough
-    support within the existing community this item can become a
-    Priority 0 under your leadership.
-  * Wontfix items are considered out of scope for this project.
-    Community members should seek to solve the problem in different
-    ways. Often this will mean contribution to Moodle itself or a
-    plugin that is external to this community.
+All contributions come through pull requests. 
 
-## Community roles
+It's OK to submit a PR directly for problems such as misspellings or other
+things where the motivation/problem is unambiguous.
 
-This section outlines roles and responsibilities within the community.
+If there isn't an issue for your PR, please make an issue first and explain the
+problem or motivation for the change you are proposing. When the solution isn't
+straightforward, for example "Implement missing command X", then also outline
+your proposed solution. Your PR will go smoother if the solution is agreed upon
+before you've spent a lot of time implementing it.
 
-### Users
+To submit a proposed change, we recommend following this workflow:
 
-Users self-identify by using our software and documentation. Their
-responsibilities are to benefit from our work, but we welcome
-contributions from users, such as:
+1. Make sure there's an issue (bug or proposal) raised, which sets the expectations for the contribution you are about to make.
+1. Fork the relevant repo and create a new branch
+1. Create your change
+    - Code changes require tests
+1. Update relevant documentation for the change
+1. Commit and open a PR
+1. A maintainer of the project will be assigned, and you can expect a review within a few days
 
-  * Ask questions
-  * Answer questions
-  * Feature requests
-  * Bug reports
-  * Design reviews
-  * Planning reviews
-  * Evangelize the project
-  * and more...
-  
-Some users will become more involved with the project, those users
-become Contributors.
+
+## Contribution Ladder
+
+This section outlines roles and responsibilities on this project and how to participate with the goal of moving from a user to a maintainer. 
+
+### Community Member
+
+Everyone is a community member! 
+
+Here are some ideas of how you can be more involved and participate in this community:
+
+* Comment on issues you are interested in.
+* Submit pull requests to fix an issue.
+* Report bugs.
+* Participate in design reviews.
+* Share your wins in using this project in blog posts or videos. 
+* Participate in discussions. 
 
 ### Contributors
 
-Contributes self-identify by making longer term commitments to our
-project. Their responsibilities are to help the project be succesful
-by ensuring that our work matches the needs of our users.
-Possible contributions can include:
+Contributors have the following capabilities:
 
-  * Everything a User might contribute
-  * Remove blocks for users
-  * Provide design input
-  * Review pull requests
-  * Implement features
-  * Triage questions, feature requests and bug reports
-  * and more...
-  
-Some contributors will become very engaged and therefore become an
-essential part of the community, these contributors will become
-Maintainers.
+* Have issues and pull requests assigned to them.
+* Apply labels, milestones, and projects.
+* Can mark issues as duplicates.
+* Can close, reopen, and assign issues and pull requests. 
+
+#### How to become a contributor
+
+To become a contributor, the maintainers of this project would like to see you:
+
+* Comment on issues with your experience and opinions.
+* Add your comments and reviews on pull requests.
+* Contribute pull requests.
+* Open issues with bugs, experience reports, and questions. 
+
+Contributors and maintainers will be on the look out for community members who may make good contributors. You can also reach out and ask if you feel like you would make a good contributor. 
 
 ### Maintainers
 
-We are fans of efficient processes. Maintainers are people who insert
-themselves into our process to ensure they run well. The goal is to
-empower our contributors who in turn focus on delighting our users.
-Maintainers contributions may include:
+Maintainers have additional capabilities including:
 
-  * Everyting Users and Contributors do
-  * Merge pull requests where appropriate
-  * Seek community consensus where conflict occurs
-  * Remove blocks for contributors
-  * and more...
+* Be a Code Owner and have reviews automatically requested.
+* Review pull requests.
+* Merge pull requests. 
 
-## Pull requests, Review and Merges
+Maintainers also have additional responsibilities beyond just merging code:
 
-We like efficient processes. Anyone is welcome to issue pull requests.
-Everyone is encouraged to review pull requests. Maintainers are
-responsible for merging pull requests but they are not responsible for
-reviews, that is a community wide responsibility.
+* Help foster a safe and welcoming environment for all project participants.
+  This will include understanding and enforcing the Code of Conduct.
+* Organize and promote pull request reviews, e.g. prompting community members,
+  contributors, and other maintainers to review.
+* Triage issues, e.g. adding labels, promoting discussions, finalizing decisions.
 
-We operate under two models of review process as appropriate to each
-circumstance:
+### How to become a maintainer
 
-  * Merge then Review (our preferred model)
-  * Review then Merge
-  
-### Merge Then Review
+To become a maintainer, we would like you to see you be an effective
+contributor, and show that you can do some of the things maintainers do.
+Maintainers will do their best to regularly discuss promoting contributors. But
+don’t be shy, if you feel that this is you, please reach out to one or more of
+the maintainers.
 
-In the "merge then review" model a maintainer will merge the pull
-request into with minimal review. Community members are still expected
-to review the code, but it is done after the fact.
-
-The goal is to get the code into a shared repository as early as
-possible. This allows people, including advanced users, to start
-testing it. This ensures we have the maximum possible exposure to
-testing in real scenarios early in the process. Encouragin bug reports
-from the whole community ensures we have visibility into breaks as
-early as possible.
-
-This model has its risks, however. If a PR is on the critical path or
-it is controversial in some way it is expected that maintainers will
-ensure it recieves a thorough review before merging (see next section
-on "Review then Merge". This decision is at the discretion of the
-maintainer who first triages the pull request.
-
-Should a mistake be made and a bad merge be performed then it can
-often be easier and faster to fix it under the "Merge then Review"
-model than it is to provide feedback to the original author and await
-a fix from them. Should the mistake have a high impact and/or no easy
-fix is available we simply roll back the merge and provide feedback
-via the review process.
-
-It should be noted that this model means that maintainers have the
-right to simply merge their own code and expect others to review it
-*after*. Maintainers are expected to use their best judgement when
-excercising this priviledge.
-
-### Review Then Merge
-
-Where a change is on the critical path or it is potentiall
-contriversial maintainers should request reviews using the GitHub
-tooling. The last reviewer to sign-off on the pull request will merge
-the pull request.
 
