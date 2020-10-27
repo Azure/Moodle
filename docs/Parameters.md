@@ -14,7 +14,7 @@ run the following commands which will extract the necessary
 information and display it in a more readable form.
 
 ```bash
-sudp apt install jq
+sudo apt install jq
 ```
 
 ``` bash
