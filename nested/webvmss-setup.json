@@ -11,7 +11,7 @@
     },
     "resources": [
         {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "type": "Microsoft.Compute/virtualMachineScaleSets/extensions",
             "apiVersion": "2017-03-30",
             "location": "[parameters('moodleCommon').location]",
             "name": "[concat(parameters('moodleCommon').vmssName,'/','setup_moodle')]",
