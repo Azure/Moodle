@@ -87,26 +87,7 @@
                 },
                 "virtualMachineProfile": {
                     "extensionProfile": {
-                        "extensions": [
-                            {
-                                "name": "setup_moodle",
-                                "properties": {
-                                    "autoUpgradeMinorVersion": true,
-                                    "publisher": "Microsoft.Azure.Extensions",
-                                    "settings": {
-                                        "fileUris": [
-                                            "[variables('scriptUri')]",
-                                            "[parameters('moodleCommon').commonFunctionsScriptUri]"
-                                        ]
-                                    },
-                                    "protectedSettings": {
-                                        "commandToExecute": "[concat('bash ', parameters('moodleCommon').webServerSetupScriptFilename, ' ', parameters('moodleCommon').moodleOnAzureConfigsJsonPath)]"
-                                    },
-                                    "type": "CustomScript",
-                                    "typeHandlerVersion": "2.0"
-                                }
-                            }
-                        ]
+                        "extensions": [ ]
                     },
                     "networkProfile": {
                         "networkInterfaceConfigurations": [
@@ -169,6 +150,26 @@
             },
             "tags": {
                 "displayName": "webfarm"
+            }
+        },
+        {
+            "condition": "[parameters('moodleCommon').applyScriptsSwitch]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('moodleCommon').vmssName)]"
+            ],
+            "name": "[concat(parameters('moodleCommon').vmssName,'-ScriptProcessor')]",
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {
+                    "moodleCommon": {
+                        "value": "[parameters('moodleCommon')]"
+                    }
+                },
+                "templateLink": {
+                    "uri": "[concat(parameters('moodleCommon').baseTemplateUrl, 'webvmss-setup.json', parameters('moodleCommon').artifactsSasToken)]"
+                }
             }
         },
         {
@@ -238,12 +239,8 @@
     ],
     "variables": {
         "singleQuote": "'",
-        "dstorID": "[resourceId('Microsoft.Storage/storageAccounts',parameters('moodleCommon').vmssdStorageAccounttName)]",
         "extBeID": "[concat(variables('extLbID'),'/backendAddressPools/',parameters('moodleCommon').extBeName)]",
-        "extFeID": "[concat(variables('extLbID'),'/frontendIPConfigurations/',parameters('moodleCommon').extFeName)]",
         "extLbID": "[resourceId('Microsoft.Network/loadBalancers',parameters('moodleCommon').lbName)]",
-        "pipID": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('moodleCommon').lbPipName)]",
-        "scriptUri": "[concat(parameters('moodleCommon').scriptLocation,parameters('moodleCommon').webServerSetupScriptFilename,parameters('moodleCommon').artifactsSasToken)]",
         "vmssID": "[resourceId('Microsoft.Compute/virtualMachineScaleSets',parameters('moodleCommon').vmssName)]",
         "webvmss1NIC": "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('moodleCommon').vmssName, '/virtualMachines/0/networkInterfaces/vmssnic')]",
         "appGwID": "[resourceId('Microsoft.Network/applicationGateways', parameters('moodleCommon').appGwName)]",
