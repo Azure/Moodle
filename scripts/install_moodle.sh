@@ -830,6 +830,15 @@ EOF
     fi
 
     echo -e "\n\rDone! Installation completed!\n\r"
+    
+    # use /tmp/localcachedir/ for localcache and /var/www/html/moodle/ for core_component.php
+    dir="/var/www/html/moodle"
+    if [[ ! -d $dir ]]; then
+        mkdir -p $dir
+        chown -R www-data:www-data $dir
+    fi
+    sed -i "22 a \$CFG->localcachedir = '/tmp/localcachedir';" /moodle/html/moodle/config.php
+    sed -i "22 a \$CFG->alternative_component_cache = '/var/www/html/moodle/core_component.php';" /moodle/html/moodle/config.php
 
     if [ "$redisAuth" != "None" ]; then
         create_redis_configuration_in_moodledata_muc_config_php
