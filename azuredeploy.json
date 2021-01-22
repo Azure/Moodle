@@ -506,14 +506,6 @@
             },
             "type": "string"
         },
-        "storageAccountNamePrefix": {
-            "defaultValue":"",
-            "maxLength": 15,
-            "metadata": {
-                "description": "Storage account name prefix. Instread of unsing random prefix, this value will be used to construct storage account name"
-            },
-            "type": "string"
-        },
         "searchType": {
             "defaultValue": "none",
             "allowedValues": [
@@ -1201,7 +1193,7 @@
             "sshPublicKey": "[parameters('sshPublicKey')]",
             "sshUsername": "[parameters('sshUsername')]",
             "sslEnforcement": "[parameters('sslEnforcement')]",
-            "storageAccountName": "[if(empty(parameters('storageAccountNamePrefix')), concat('abs', variables('resourceprefix')), parameters('storageAccountNamePrefix'))]",
+            "storageAccountName": "[tolower(concat('abs',variables('resourceprefix')))]",
             "storageAccountType": "[parameters('storageAccountType')]",
             "subnetAppGw": "[concat('appgw-subnet-',variables('resourceprefix'))]",
             "subnetAppGwPrefix": "[concat(variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),6)))]",

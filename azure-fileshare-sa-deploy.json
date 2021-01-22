@@ -29,14 +29,6 @@
             },
             "type": "string"
         },
-        "storageAccountNamePrefix": {
-            "defaultValue":"[substring(uniqueString(resourceGroup().id), 3, 12)]",
-            "maxLength": 15,
-            "metadata": {
-                "description": "Storage account name prefix. Instread of unsing random prefix, this value will be used to construct storage account name"
-            },
-            "type": "string"
-        },
         "fileServerDiskSize": {
             "defaultValue": 100,
             "metadata": {
@@ -53,19 +45,6 @@
         }
     },
     "resources": [
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2017-05-10",
-            "name": "pid-738e3eec-68d4-4667-8377-c05c77c21f1b",
-            "properties": {
-                "mode": "Incremental",
-                "template": {
-                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                    "contentVersion": "1.0.0.0",
-                    "resources": []
-                }
-            }
-        },
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
@@ -105,9 +84,10 @@
             "fileServerType": "azurefiles",
             "azureFileshareName": "moodle",
             "location": "[parameters('location')]",
-            "storageAccountName": "[parameters('storageAccountNamePrefix')]",
+            "storageAccountName": "[tolower(concat('abs',variables('resourceprefix')))]",
             "storageAccountType": "[parameters('storageAccountType')]",
             "fileServerDiskSize": "[parameters('fileServerDiskSize')]"
-        }
+        },
+        "resourceprefix": "[substring(uniqueString(resourceGroup().id, 'mainTemplate'), 3, 6)]"
     }
 }
