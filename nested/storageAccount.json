@@ -15,7 +15,7 @@
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-06-01",
             "location": "[parameters('moodleCommon').location]",
-            "name": "[concat(parameters('moodleCommon').storageAccountName,'naf')]",
+            "name": "[variables('storageName')]",
             "kind": "Storage",
             "sku": {
                 "name": "[parameters('moodleCommon').storageAccountType]"
@@ -46,7 +46,7 @@
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-06-01",
             "location": "[parameters('moodleCommon').location]",
-            "name": "[concat(parameters('moodleCommon').storageAccountName,'af')]",
+            "name": "[variables('storageName')]",
             "kind": "[if(equals(parameters('moodleCommon').storageAccountType, 'Premium_LRS'), 'FileStorage', 'Storage')]",
             "sku": {
                 "name": "[parameters('moodleCommon').storageAccountType]"
@@ -74,12 +74,49 @@
                     "keySource": "Microsoft.Storage"
                 }
             }
+        },
+        {
+            "condition": "[equals(parameters('moodleCommon').azureFileshareName, 'moodle')]",
+            "type": "Microsoft.Storage/storageAccounts/fileServices",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(variables('storageName'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
+            ],
+            "sku": {
+                "name": "[parameters('moodleCommon').storageAccountType]",
+                "tier": "[if(equals(parameters('moodleCommon').storageAccountType, 'Premium_LRS'),'Premium', 'Standard')]"
+            },
+            "properties": {
+                "protocolSettings": {
+                    "smb": {}
+                },
+                "cors": {
+                    "corsRules": []
+                }
+            }
+        },
+        {
+            "condition": "[equals(parameters('moodleCommon').azureFileshareName, 'moodle')]",
+            "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(variables('storageName'), '/default/moodle')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/fileServices', variables('storageName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
+            ],
+            "properties": {
+                "accessTier": "[if(equals(parameters('moodleCommon').storageAccountType, 'Premium_LRS'), 'Premium', 'TransactionOptimized')]",
+                "shareQuota": "[int(parameters('moodleCommon').fileServerDiskSize)]",
+                "enabledProtocols": "SMB"
+            }
         }
     ],
     "variables": {
         "documentation1": "This sub-template creates a storage account.  It expects certain values in the 'common' datastructure.",
         "documentation2": " storageAccountName - name of storage account",
         "documentation3": " storageAccountType - type of storage account",
+        "documentation4": " azureFileshareName - name of the azure files that needs to be created along with fileshare storage account. This value is introduced to support migration scenario, and it optional for fresh deployments.",
         "storageName": "[concat(parameters('moodleCommon').storageAccountName,if(equals(parameters('moodleCommon').fileServerType, 'azurefiles'), 'af', 'naf'))]",
         "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
     },
