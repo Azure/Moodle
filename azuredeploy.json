@@ -653,6 +653,13 @@
             "metadata": {
                 "description": "Azure Location for all resources."
             }
+        },
+        "isMigration": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "Indicates whether the this template is using for migration scenario."
+            }
         }
     },
     "resources": [
@@ -1232,7 +1239,8 @@
             "vnetName": "[concat('vnet-',variables('resourceprefix'))]",
             "vpnType": "[parameters('vpnType')]",
             "webServerSetupScriptFilename": "setup_webserver.sh",
-            "webServerType": "[parameters('webServerType')]"
+            "webServerType": "[parameters('webServerType')]",
+            "isMigration": "[parameters('isMigration')]"
         },
         "certUrlArray": [
             {

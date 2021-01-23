@@ -1,0 +1,105 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "_artifactsLocation": {
+            "type": "string",
+            "metadata": {
+                "description": "The base URI where artifacts required by this template are located."
+            },
+            "defaultValue": "https://raw.githubusercontent.com/Azure/Moodle/master/"
+        },
+        "_artifactsLocationSasToken": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+            },
+            "defaultValue": ""
+        },
+        "storageAccountType": {
+            "defaultValue": "Premium_LRS",
+            "allowedValues": [
+                "Standard_LRS",
+                "Standard_GRS",
+                "Standard_ZRS",
+                "Premium_LRS"
+            ],
+            "metadata": {
+                "description": "Storage Account type."
+            },
+            "type": "string"
+        },
+        "fileServerDiskSize": {
+            "defaultValue": 100,
+            "metadata": {
+                "description": "Size of the azure file share in GB."
+            },
+            "type": "int"
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Azure Location for all resources."
+            }
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "name": "storageAccountTemplate",
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {
+                    "moodleCommon": {
+                        "value": "[variables('moodleCommon')]"
+                    }
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'storageAccount.json',parameters('_artifactsLocationSasToken'))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(variables('storageName'), '/default/moodle')]",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/storageAccountTemplate"
+            ],
+            "properties": {
+                "accessTier": "[if(equals(variables('moodleCommon').storageAccountType, 'Premium_LRS'), 'Premium', 'TransactionOptimized')]",
+                "shareQuota": "[int(variables('moodleCommon').fileServerDiskSize)]",
+                "enabledProtocols": "SMB"
+            }
+        }
+    ],
+    "outputs": {
+        "storageAccountName": {
+            "type": "string",
+            "value": "[variables('moodleCommon').storageAccountName]"
+        },
+        "storageAccountType": {
+            "type": "string",
+            "value": "[variables('moodleCommon').storageAccountType]"
+        },
+        "fileServerDiskSize": {
+            "type": "int",
+            "value": "[variables('moodleCommon').fileServerDiskSize]"
+        }
+    },
+    "variables": {
+        "moodleCommon": {
+            "baseTemplateUrl": "[concat(parameters('_artifactsLocation'), 'nested/')]",
+            "artifactsSasToken": "[parameters('_artifactsLocationSasToken')]",
+            "fileServerType": "azurefiles",
+            "location": "[parameters('location')]",
+            "storageAccountName": "[tolower(concat('abs',variables('resourceprefix')))]",
+            "storageAccountType": "[parameters('storageAccountType')]",
+            "fileServerDiskSize": "[parameters('fileServerDiskSize')]"
+        },
+        "resourceprefix": "[substring(uniqueString(resourceGroup().id, 'mainTemplate'), 3, 6)]",
+        "storageName": "[concat(variables('moodleCommon').storageAccountName,if(equals(variables('moodleCommon').fileServerType, 'azurefiles'), 'af', 'naf'))]"
+    }
+}
