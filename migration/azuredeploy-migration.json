@@ -35,6 +35,17 @@
             },
             "type": "string"
         },
+        "loadBalancerSku": {
+            "defaultValue": "Basic",
+            "allowedValues": [
+                "Basic",
+                "Standard"
+            ],
+            "metadata": {
+                "description": "Loadbalancer SKU"
+            },
+            "type": "string"
+        },
         "siteURL": {
             "metadata": {
                 "description": "URL for Moodle site"
@@ -188,8 +199,7 @@
             "defaultValue": "none",
             "allowedValues": [
                 "none",
-                "azure",
-                "elastic"
+                "azure"
             ],
             "metadata": {
                 "description": "options of moodle global search"
@@ -237,19 +247,20 @@
                     "_artifactsLocationSasToken":   { "value": "[parameters('_artifactsLocationSasToken')]" },
                     "redisDeploySwitch":            { "value": "[parameters('redisDeploySwitch')]" },
                     "httpsTermination":             { "value": "[parameters('httpsTermination')]"},
+					"loadBalancerSku":              { "value": "[parameters('loadBalancerSku')]"},
                     "siteURL":                      { "value": "[parameters('siteURL')]"},
                     "moodleVersion":                { "value": "[parameters('moodleVersion')]"},
                     "sshPublicKey":                 { "value": "[parameters('sshPublicKey')]" },
                     "controllerVmSku":              { "value": "[parameters('controllerVmSku')]"},
                     "webServerType":                { "value": "[parameters('webServerType')]"},
-		            "autoscaleVmSku":   		    { "value": "[parameters('autoscaleVmSku')]" },
-		            "autoscaleVmCountMax":   		{ "value": "[parameters('autoscaleVmCountMax')]" },
-                    "dbServerType":   		        { "value": "[parameters('dbServerType')]" },
-                    "dbLogin":   		            { "value": "[parameters('dbLogin')]" },
+                    "autoscaleVmSku":               { "value": "[parameters('autoscaleVmSku')]" },
+                    "autoscaleVmCountMax":          { "value": "[parameters('autoscaleVmCountMax')]" },
+                    "dbServerType":                 { "value": "[parameters('dbServerType')]" },
+                    "dbLogin":                      { "value": "[parameters('dbLogin')]" },
                     "mysqlPgresVcores":             { "value": "[parameters('mysqlPgresVcores')]" },
                     "mysqlPgresStgSizeGB":          { "value": "[parameters('mysqlPgresStgSizeGB')]" },
-                    "mysqlPgresSkuTier":   		    { "value": "[parameters('mysqlPgresSkuTier')]" },
-                    "mysqlPgresSkuHwFamily":   		{ "value": "[parameters('mysqlPgresSkuHwFamily')]" },
+                    "mysqlPgresSkuTier":            { "value": "[parameters('mysqlPgresSkuTier')]" },
+                    "mysqlPgresSkuHwFamily":        { "value": "[parameters('mysqlPgresSkuHwFamily')]" },
                     "mysqlVersion":                 { "value": "[parameters('mysqlVersion')]" },
                     "postgresVersion":              { "value": "[parameters('postgresVersion')]" },
                     "fileServerType":               { "value": "azurefiles" },
