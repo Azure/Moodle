@@ -135,7 +135,7 @@ function check_azure_files_moodle_share_exists
 
     local azResponse=$(az storage share exists --name moodle --account-name $storageAccountName --account-key $storageAccountKey)
     if [ $? -ne 0 ];then
-      echo "Could not check if moodle exists in the storage account ($storageAccountName)"
+      echo "Could not check if moodle file share exists in the storage account ($storageAccountName)"
       exit 1
     fi
 

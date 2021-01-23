@@ -7,7 +7,7 @@
             "metadata": {
                 "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
             },
-            "defaultValue": "https://raw.githubusercontent.com/venu-sivanadham/Moodle/MigrationDevelop/"
+            "defaultValue": "https://raw.githubusercontent.com/venu-sivanadham/Moodle/master/"
         },
         "_artifactsLocationSasToken": {
             "type": "securestring",
@@ -247,7 +247,7 @@
                     "_artifactsLocationSasToken":   { "value": "[parameters('_artifactsLocationSasToken')]" },
                     "redisDeploySwitch":            { "value": "[parameters('redisDeploySwitch')]" },
                     "httpsTermination":             { "value": "[parameters('httpsTermination')]"},
-					"loadBalancerSku":              { "value": "[parameters('loadBalancerSku')]"},
+                    "loadBalancerSku":              { "value": "[parameters('loadBalancerSku')]"},
                     "siteURL":                      { "value": "[parameters('siteURL')]"},
                     "moodleVersion":                { "value": "[parameters('moodleVersion')]"},
                     "sshPublicKey":                 { "value": "[parameters('sshPublicKey')]" },
