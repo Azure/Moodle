@@ -69,6 +69,7 @@ function get_setup_params_from_configs_json
     export storageAccountType=$(echo $json | jq -r .moodleProfile.storageAccountType)
     export fileServerDiskSize=$(echo $json | jq -r .fileServerProfile.fileServerDiskSize)
     export phpVersion=$(echo $json | jq -r .phpProfile.phpVersion)
+    export isMigration=$(echo $json | jq -r .moodleProfile.isMigration)
 }
 
 function get_php_version {
@@ -125,6 +126,29 @@ function create_azure_files_moodle_share
         --account-key $storageAccountKey \
         --fail-on-exist >>$logFilePath \
         --quota $fileServerDiskSize
+}
+
+function check_azure_files_moodle_share_exists
+{
+    local storageAccountName=$1
+    local storageAccountKey=$2
+
+    local azResponse=$(az storage share exists --name moodle --account-name $storageAccountName --account-key $storageAccountKey)
+    if [ $? -ne 0 ];then
+      echo "Could not check if moodle exists in the storage account ($storageAccountName)"
+      exit 1
+    fi
+
+    echo "az storage share exists command response:"
+    echo $azResponse
+    #Sample 'az storage share exists' command response
+    # { "exists": true }
+    local exists=$(echo $azResponse | jq -r .exists)
+
+    if [ "$exists" != "true" ];then
+      echo "File share 'moodle' does not exists in the storage account ($storageAccountName)"
+      exit 1
+    fi
 }
 
 function setup_and_mount_gluster_moodle_share
