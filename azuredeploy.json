@@ -217,6 +217,20 @@
             },
             "type": "string"
         },
+        "moodleDbName": {
+            "defaultValue": "moodle",
+            "metadata": {
+                "description": "Moodle Database name"
+            },
+            "type": "string"
+        },
+        "moodleDbUser": {
+            "defaultValue": "moodle",
+            "metadata": {
+                "description": "Moodle Database username. This user is different from Database admin user."
+            },
+            "type": "string"
+        },
         "mysqlPgresVcores": {
             "allowedValues": [
                 1,
@@ -1157,10 +1171,10 @@
             "lbPipName": "[concat('lb-pubip-',variables('resourceprefix'))]",
             "location": "[parameters('location')]",
             "moodleAdminPass": "[concat(toUpper('xl'), substring(uniqueString(resourceGroup().id, deployment().name), 6, 7),',1*8')]",
-            "moodleDbName": "moodle",
+            "moodleDbName": "[parameters('moodleDbName')]",
             "moodleDbPass": "[concat('9#36^', substring(uniqueString(resourceGroup().id, deployment().name), 5, 8), toUpper('ercq'))]",
-            "moodleDbUser": "moodle",
-            "moodleDbUserAzure": "[concat('moodle', '@', parameters('dbServerType'), '-', variables('resourceprefix'))]",
+            "moodleDbUser": "[parameters('moodleDbUser')]",
+            "moodleDbUserAzure": "[concat(parameters('moodleDbUser'), '@', parameters('dbServerType'), '-', variables('resourceprefix'))]",
             "moodleInstallScriptFilename": "install_moodle.sh",
             "moodleOnAzureConfigsJsonPath": "/var/lib/cloud/instance/moodle_on_azure_configs.json",
             "moodleVersion": "[parameters('moodleVersion')]",

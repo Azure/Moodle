@@ -119,6 +119,20 @@
             },
             "type": "string"
         },
+        "moodleDbName": {
+            "defaultValue": "moodle",
+            "metadata": {
+                "description": "Moodle Database name"
+            },
+            "type": "string"
+        },
+        "moodleDbUser": {
+            "defaultValue": "moodle",
+            "metadata": {
+                "description": "Moodle Database username. This user is different from Database admin user."
+            },
+            "type": "string"
+        },
         "mysqlPgresVcores": {
             "allowedValues": [
                 1,
@@ -257,6 +271,8 @@
                     "autoscaleVmCountMax":          { "value": "[parameters('autoscaleVmCountMax')]" },
                     "dbServerType":                 { "value": "[parameters('dbServerType')]" },
                     "dbLogin":                      { "value": "[parameters('dbLogin')]" },
+                    "moodleDbName":                 { "value": "[parameters('moodleDbName')]" },
+                    "moodleDbUser":                 { "value": "[parameters('moodleDbUser')]" },
                     "mysqlPgresVcores":             { "value": "[parameters('mysqlPgresVcores')]" },
                     "mysqlPgresStgSizeGB":          { "value": "[parameters('mysqlPgresStgSizeGB')]" },
                     "mysqlPgresSkuTier":            { "value": "[parameters('mysqlPgresSkuTier')]" },
