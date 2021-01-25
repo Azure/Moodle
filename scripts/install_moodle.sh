@@ -828,8 +828,8 @@ EOF
             replace_moodle_config_value "dbpass" "$moodledbpass"
             
             echo "Updating other moodle config settings"
-            replace_moodle_config_value "dataroot" "/moodle/moodledata"
-            replace_moodle_config_value "wwwroot" "$siteProtocol://$siteFQDN"
+            replace_moodle_config_value "dataroot" "\/moodle\/moodledata"
+            replace_moodle_config_value "wwwroot" "$siteProtocol:\/\/$siteFQDN"
         else
             echo -e "cd /tmp; /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot="$siteProtocol"://"$siteFQDN" --dataroot=/moodle/moodledata --dbhost="$mysqlIP" --dbname="$moodledbname" --dbuser="$azuremoodledbuser" --dbpass="$moodledbpass" --dbtype=mysqli --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass="$adminpass" --adminemail=admin@"$siteFQDN" --non-interactive --agree-license --allow-unstable || true "
             cd /tmp; /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en_us --wwwroot=$siteProtocol://$siteFQDN   --dataroot=/moodle/moodledata --dbhost=$mysqlIP   --dbname=$moodledbname   --dbuser=$azuremoodledbuser   --dbpass=$moodledbpass   --dbtype=mysqli --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass=$adminpass   --adminemail=admin@$siteFQDN   --non-interactive --agree-license --allow-unstable || true
