@@ -807,14 +807,14 @@ EOF
     if [ $dbServerType = "mysql" ]; then
         if [ "$isMigration" = "true" ]; then
             echo "Importing database from the mysql dump file"
-            if [ ! -f /moodle/migration-db-moodle.tar.gz ];
+            if [ ! -f /moodle/migration-db-moodle.tar.gz ]; then
               echo "Migrating moodle DB dump archive file not found."
               exit 1
             fi
             
             tar -xvf /moodle/migration-db-moodle.tar.gz --directly /moodle/
             
-            if [ ! -f /moodle/migration-db-moodle.sql ];
+            if [ ! -f /moodle/migration-db-moodle.sql ]; then
               echo "Migrating moodle DB dump file not found."
               exit 1
             fi
