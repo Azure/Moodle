@@ -128,6 +128,33 @@ function create_azure_files_moodle_share
         --quota $fileServerDiskSize
 }
 
+function replace_config_setting_value
+{
+    local setting_name=$1
+    local setting_value=$2
+    local delemeter=$3
+    local file_name=$4
+
+    echo "Replacing $setting_name $delemeter $setting_value in $file_name"
+
+    sed -i "s/^\($setting_name\s*$delemeter\s*\).*\$/\1$setting_value/" $file_name
+}
+
+# This function can replace only single line $CFG setting in moodle/config.php file.
+# Supported config setting format:
+#      $CFG->setting = 'value';
+# Usage:
+#      replace_moodle_config_value "setting" "value"
+function replace_moodle_config_value
+{
+    local formated_setting_name="\$CFG->$1"
+    local formated_setting_value="'$2';"
+    local delemeter="="
+    local moodle_config_file=/moodle/html/moodle/config.php
+    
+    replace_config_setting_value $formated_setting_name $formated_setting_value $delemeter $moodle_config_file
+}
+
 function check_azure_files_moodle_share_exists
 {
     local storageAccountName=$1
