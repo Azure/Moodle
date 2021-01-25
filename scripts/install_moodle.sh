@@ -101,17 +101,6 @@ set -ex
 
     # create gluster, nfs or Azure Files mount point
     mkdir -p /moodle
-    
-    # If its a migration flow, then mount the azure file share now.
-    if [ "$isMigration" = "true" ]; then
-        # On migration flow, the moodle azure file share must present before running this script.
-        echo -e '\n\rIts a migration flow, check whether moodle fileshare exists\n\r'
-        check_azure_files_moodle_share_exists $storageAccountName $storageAccountKey
-        
-        # Set up and mount Azure Files share.
-        echo -e '\n\rSetting up and mounting Azure Files share //'$storageAccountName'.file.core.windows.net/moodle on /moodle\n\r'
-        setup_and_mount_azure_files_moodle_share $storageAccountName $storageAccountKey
-    fi
 
     export DEBIAN_FRONTEND=noninteractive
 
@@ -174,7 +163,18 @@ set -ex
             --name objectfs \
             --policy readwrite \
             --output tsv)
-    fi
+        fi
+
+        # If its a migration flow, then mount the azure file share now.
+        if [ "$isMigration" = "true" ]; then
+            # On migration flow, the moodle azure file share must present before running this script.
+            echo -e '\n\rIts a migration flow, check whether moodle fileshare exists\n\r'
+            check_azure_files_moodle_share_exists $storageAccountName $storageAccountKey
+            
+            # Set up and mount Azure Files share.
+            echo -e '\n\rSetting up and mounting Azure Files share //'$storageAccountName'.file.core.windows.net/moodle on /moodle\n\r'
+            setup_and_mount_azure_files_moodle_share $storageAccountName $storageAccountKey
+        fi
     fi
 
     if [ $fileServerType = "gluster" ]; then
@@ -812,7 +812,7 @@ EOF
               exit 1
             fi
             
-            tar -xvf /moodle/migration-db-moodle.tar.gz --directly /moodle/
+            tar -xvf /moodle/migration-db-moodle.tar.gz -C /moodle/
             
             if [ ! -f /moodle/migration-db-moodle.sql ]; then
               echo "Migrating moodle DB dump file not found."
