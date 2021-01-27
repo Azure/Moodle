@@ -944,7 +944,27 @@ EOF
       setup_and_mount_azure_files_moodle_share $storageAccountName $storageAccountKey
       # Move the local installation over to the Azure Files
       echo -e '\n\rMoving locally installed moodle over to Azure Files'
-      cp -a /moodle_old_delete_me/* /moodle || true # Ignore case sensitive directory copy failure
+
+      # install azcopy
+      wget -q -O azcopy_v10.tar.gz https://aka.ms/downloadazcopy-v10-linux && tar -xf azcopy_v10.tar.gz --strip-components=1 && mv ./azcopy /usr/bin/
+      
+      ACCOUNT_KEY="$storageAccountKey"
+      NAME="$storageAccountName"
+      END=`date -u -d "60 minutes" '+%Y-%m-%dT%H:%M:00Z'`
+
+      sas=$(az storage share generate-sas \
+        -n moodle \
+        --account-key $ACCOUNT_KEY \
+        --account-name $NAME \
+        --https-only \
+        --permissions lrw \
+        --expiry $END -o tsv)
+
+      export AZCOPY_CONCURRENCY_VALUE='48'
+      export AZCOPY_BUFFER_GB='4'
+
+      # cp -a /moodle_old_delete_me/* /moodle || true # Ignore case sensitive directory copy failure
+      azcopy --log-level ERROR copy "/moodle_old_delete_me/*" "https://$NAME.file.core.windows.net/moodle?$sas" --recursive || true # Ignore case sensitive directory copy failure
       rm -rf /moodle_old_delete_me || true # Keep the files just in case
    fi
 
