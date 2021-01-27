@@ -383,6 +383,13 @@
             },
             "type": "string"
         },
+        "OSDiskSizeInGB": {
+            "defaultValue": 256,
+            "metadata": {
+                "description": "OS disk size per Webserver in VMSS"
+            },
+            "type": "int"
+        },
         "fileServerDiskSize": {
             "defaultValue": 127,
             "metadata": {
@@ -898,6 +905,9 @@
                     "dataDiskSizeInGB": {
                         "value": "[parameters('fileServerDiskSize')]"
                     },
+                    "OSDiskSizeInGB": {
+                        "value": "[parameters('OSDiskSizeInGB')]"
+                    },
                     "resourcesUniqueString": {
                         "value": "[variables('resourceprefix')]"
                     }
@@ -1130,6 +1140,7 @@
             "extProbeHTTPS": "[concat('lb-probe-https-',variables('resourceprefix'))]",
             "fileServerDiskCount": "[parameters('fileServerDiskCount')]",
             "fileServerDiskSize": "[parameters('fileServerDiskSize')]",
+            "OSDiskSizeInGB": "[parameters('OSDiskSizeInGB')]",
             "fileServerType": "[parameters('fileServerType')]",
             "fileServerVmCount": 2,
             "fileServerVmSku": "[parameters('fileServerVmSku')]",
