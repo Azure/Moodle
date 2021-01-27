@@ -646,6 +646,17 @@
             },
             "type": "string"
         },
+        "loadBalancerTier": {
+            "defaultValue": "Regional",
+            "allowedValues": [
+                "Regional",
+                "Global"
+            ],
+            "metadata": {
+                "description": "Loadbalancer Tier"
+            },
+            "type": "string"
+        },
         "ubuntuVersion": {
             "type": "string",
             "allowedValues": [
@@ -1065,6 +1076,10 @@
         "loadBalancerSku": {
             "type": "string",
             "value": "[variables('moodleCommon').lbSku]"
+        },
+        "loadBalancerTier": {
+            "type": "string",
+            "value": "[variables('moodleCommon').lbTier]"
         }
     },
     "variables": {
@@ -1157,6 +1172,7 @@
             "installObjectFsSwitch": "[parameters('installObjectFsSwitch')]",
             "lbDns": "[concat('lb-',variables('resourceprefix'),'.',parameters('location'),'.cloudapp.azure.com')]",
             "lbSku": "[parameters('loadBalancerSku')]",
+            "lbTier": "[parameters('loadBalancerTier')]",
             "lbName": "[concat('lb-',variables('resourceprefix'))]",
             "lbPipName": "[concat('lb-pubip-',variables('resourceprefix'))]",
             "location": "[parameters('location')]",

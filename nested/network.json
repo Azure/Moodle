@@ -133,7 +133,8 @@
             "condition": "[not(equals(parameters('moodleCommon').httpsTermination, 'AppGw'))]",
             "type": "Microsoft.Network/publicIPAddresses",
             "sku": {
-                "name": "[parameters('moodleCommon').lbSku]"
+                "name": "[parameters('moodleCommon').lbSku]",
+                "tier": "[parameters('moodleCommon').lbTier]"
             },
             "apiVersion": "2019-11-01",
             "location": "[parameters('moodleCommon').location]",
