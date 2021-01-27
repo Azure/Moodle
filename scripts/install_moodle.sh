@@ -950,5 +950,7 @@ EOF
 
    create_last_modified_time_update_script
    run_once_last_modified_time_update_script
-   
-}  > /tmp/install.log
+
+   echo "### Script End `date`###"
+
+}  2>&1 | tee /tmp/install.log
