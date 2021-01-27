@@ -129,8 +129,8 @@ set -ex
 	
     if [ "$installObjectFsSwitch" = "true" -o "$fileServerType" = "azurefiles" ]; then
 	# install azure cli & setup container
-        echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ wheezy main" | \
-            sudo tee /etc/apt/sources.list.d/azure-cli.list
+        AZ_REPO=$(lsb_release -cs)
+        echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" |  tee /etc/apt/sources.list.d/azure-cli.list
         curl -L https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - >> /tmp/apt4.log
         sudo apt-get -y install apt-transport-https >> /tmp/apt4.log
         sudo apt-get -y update > /dev/null
