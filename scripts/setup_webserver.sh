@@ -46,6 +46,7 @@ echo $htmlLocalCopySwitch >> /tmp/vars.txt
 echo $phpVersion          >> /tmp/vars.txt
 
 
+
 check_fileServerType_param $fileServerType
 
 {
@@ -203,12 +204,16 @@ EOF
     # Build nginx config
     cat <<EOF > /etc/nginx/nginx.conf
 user www-data;
-worker_processes 2;
+worker_processes auto;
 pid /run/nginx.pid;
 
 events {
-	worker_connections 2048;
+	worker_connections 8192;
+  multi_accept on;
+  use epoll;
 }
+
+worker_rlimit_nofile 100000;
 
 http {
 
@@ -229,13 +234,18 @@ http {
   access_log /var/log/nginx/access.log;
   error_log /var/log/nginx/error.log;
 
+  open_file_cache max=20000 inactive=20s;
+  open_file_cache_valid 30s;
+  open_file_cache_min_uses 2;
+  open_file_cache_errors on;
+
   set_real_ip_from   127.0.0.1;
   real_ip_header      X-Forwarded-For;
   #upgrading to TLSv1.2 and droping 1 & 1.1
-  ssl_protocols TLSv1.2;
-  #ssl_prefer_server_ciphers on;
+  ssl_protocols TLSv1.2 TLSv1.3;
+  ssl_prefer_server_ciphers off;
   #adding ssl ciphers
-  ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384;
+  ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
 
   gzip on;
   gzip_disable "msie6";
@@ -297,13 +307,16 @@ EOF
     # Configure nginx/https
     cat <<EOF >> /etc/nginx/sites-enabled/${siteFQDN}.conf
 server {
-        listen 443 ssl;
+        listen 443 ssl http2;
         root ${htmlRootDir};
-	index index.php index.html index.htm;
+	      index index.php index.html index.htm;
 
         ssl on;
         ssl_certificate /moodle/certs/nginx.crt;
         ssl_certificate_key /moodle/certs/nginx.key;
+        ssl_session_timeout 1d;
+        ssl_session_cache shared:MozSSL:10m;  # about 40000 sessions
+        ssl_session_tickets off;
 
         # Log to syslog
         error_log syslog:server=localhost,facility=local1,severity=error,tag=moodle;
@@ -326,12 +339,18 @@ server {
           proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
           proxy_pass http://localhost:80;
 
+          proxy_next_upstream error timeout http_502 http_504;
           proxy_connect_timeout       3600;
           proxy_send_timeout          3600;
           proxy_read_timeout          3600;
           send_timeout                3600;
         }
 }
+
+upstream backend {
+        server unix:/run/php/php${PhpVer}-fpm.sock fail_timeout=1s;
+        server unix:/run/php/php${PhpVer}-fpm-backup.sock backup;
+}    
 EOF
   fi
 
@@ -382,8 +401,8 @@ EOF
  
           fastcgi_buffers 16 16k;
           fastcgi_buffer_size 32k;
-          fastcgi_param   SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
-          fastcgi_pass unix:/run/php/php${PhpVer}-fpm.sock;
+          fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+          fastcgi_pass backend;
           fastcgi_read_timeout 3600;
           fastcgi_index index.php;
           include fastcgi_params;
@@ -391,7 +410,7 @@ EOF
 }
 
 EOF
-  fi # if [ "$webServerType" = "nginx" ];
+  fi
 
   if [ "$webServerType" = "apache" ]; then
     # Configure Apache/php
@@ -451,8 +470,8 @@ EOF
    sed -i "s/;opcache.save_comments.*/opcache.save_comments = 1/" $PhpIni
    sed -i "s/;opcache.enable_file_override.*/opcache.enable_file_override = 0/" $PhpIni
    sed -i "s/;opcache.enable.*/opcache.enable = 1/" $PhpIni
-   sed -i "s/;opcache.memory_consumption.*/opcache.memory_consumption = 256/" $PhpIni
-   sed -i "s/;opcache.max_accelerated_files.*/opcache.max_accelerated_files = 8000/" $PhpIni
+   sed -i "s/;opcache.memory_consumption.*/opcache.memory_consumption = 512/" $PhpIni
+   sed -i "s/;opcache.max_accelerated_files.*/opcache.max_accelerated_files = 20000/" $PhpIni
     
    # Remove the default site. Moodle is the only site we want
    rm -f /etc/nginx/sites-enabled/default
@@ -465,33 +484,6 @@ EOF
      setup_moodle_mount_dependency_for_systemd_service nginx || exit 1
      # restart Nginx
      sudo service nginx restart 
-   fi
-
-   if [ "$webServerType" = "nginx" ]; then
-     # fpm config - overload this 
-     cat <<EOF > /etc/php/${PhpVer}/fpm/pool.d/www.conf
-[www]
-user = www-data
-group = www-data
-listen = /run/php/php${PhpVer}-fpm.sock
-listen.owner = www-data
-listen.group = www-data
-pm = dynamic
-pm.max_children = 3000 
-pm.start_servers = 20 
-pm.min_spare_servers = 20 
-pm.max_spare_servers = 30 
-EOF
-
-     # Restart fpm
-     service php${PhpVer}-fpm restart
-   fi
-
-   if [ "$webServerType" = "apache" ]; then
-      if [ "$htmlLocalCopySwitch" != "true" ]; then
-        setup_moodle_mount_dependency_for_systemd_service apache2 || exit 1
-      fi
-      sudo service apache2 restart
    fi
 
    # Configure varnish startup for 18.04
@@ -745,15 +737,56 @@ EOF
 # This code is stop apache2 which is installing in 18.04
   service=apache2
   if [ "$webServerType" = "nginx" ]; then
-      if [ $(ps -ef | grep -v grep | grep $service | wc -l) > 0 ]; then
+      if pgrep -x "$service" >/dev/null 
+      then
             echo “Stop the $service!!!”
-            sudo systemctl stop $service
-            sudo systemctl mask $service
+            systemctl stop $service
+      else
+            systemctl mask $service
       fi
   fi
   # Restart Varnish
   systemctl daemon-reload
-  service varnish restart
+  systemctl restart varnish
+
+   if [ "$webServerType" = "nginx" ]; then
+     # fpm config - overload this 
+     cat <<EOF > /etc/php/${PhpVer}/fpm/pool.d/www.conf
+[www]
+user = www-data
+group = www-data
+listen = /run/php/php${PhpVer}-fpm.sock
+listen.owner = www-data
+listen.group = www-data
+pm = static
+pm.max_children = 32
+pm.start_servers = 32
+pm.max_requests = 300000
+EOF
+
+cat <<EOF > /etc/php/${PhpVer}/fpm/pool.d/backup.conf
+[backup]
+user = www-data
+group = www-data
+listen = /run/php/php${PhpVer}-fpm-backup.sock
+listen.owner = www-data
+listen.group = www-data
+pm = static
+pm.max_children = 16
+pm.start_servers = 16
+pm.max_requests = 300000
+EOF
+
+     # Restart fpm
+     service php${PhpVer}-fpm restart
+   fi
+
+   if [ "$webServerType" = "apache" ]; then
+      if [ "$htmlLocalCopySwitch" != "true" ]; then
+        setup_moodle_mount_dependency_for_systemd_service apache2 || exit 1
+      fi
+        service apache2 restart
+   fi
 
   echo "### Script End `date`###"
 } 2>&1 | tee /tmp/setup.log
