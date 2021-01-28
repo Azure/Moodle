@@ -45,10 +45,6 @@ echo $nfsByoIpExportPath >> /tmp/vars.txt
 echo $htmlLocalCopySwitch >> /tmp/vars.txt
 echo $phpVersion          >> /tmp/vars.txt
 
-# downloading and updating php packages from the repository 
-# sudo dpkg --configure –a
- sudo add-apt-repository ppa:ondrej/php -y > /dev/null 2>&1
- sudo apt-get update > /dev/null 2>&1
 
 check_fileServerType_param $fileServerType
 
@@ -56,57 +52,87 @@ check_fileServerType_param $fileServerType
   set -ex
   echo "### Function Start `date`###"
 
-  # make sure the system does automatic update
-  sudo apt-get -y update
-  sudo apt-get -y install unattended-upgrades
+  # add azure-cli repository
+  curl -sL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null
+  AZ_REPO=$(lsb_release -cs)
+  echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" |  tee /etc/apt/sources.list.d/azure-cli.list
+  
+  # add PHP-FPM repository 
+  add-apt-repository ppa:ondrej/php -y > /dev/null 2>&1
 
-  # install pre-requisites
-  # sudo apt-get -y install python-software-properties unzip rsyslog
-  sudo apt-get -y install software-properties-common
-  sudo apt-get -y install unzip
-  sudo apt-get -y install rsyslog
-  sudo apt-get -y install postgresql-client mysql-client git
+  apt-get -qq -o=Dpkg::Use-Pty=0 update 
+
+  # install pre-requisites including VARNISH and PHP-FPM
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get --yes \
+    --no-install-recommends \
+    -qq -o=Dpkg::Use-Pty=0 \
+    -o Dpkg::Options::="--force-confdef" \
+    -o Dpkg::Options::="--force-confold" \
+    install \
+    azure-cli \
+    ca-certificates \
+    curl \
+    apt-transport-https \
+    lsb-release gnupg \
+    software-properties-common \
+    unzip \
+    rsyslog \
+    postgresql-client \
+    mysql-client \
+    git \
+    unattended-upgrades \
+    tuned \
+    varnish \
+    php$phpVersion \
+    php$phpVersion-cli \
+    php$phpVersion-curl \
+    php$phpVersion-zip \
+    php-pear \
+    php$phpVersion-mbstring \
+    mcrypt \
+    php$phpVersion-dev \
+    graphviz \
+    aspell \
+    php$phpVersion-soap \
+    php$phpVersion-json \
+    php$phpVersion-redis \
+    php$phpVersion-bcmath \
+    php$phpVersion-gd \
+    php$phpVersion-pgsql \
+    php$phpVersion-mysql \
+    php$phpVersion-xmlrpc \
+    php$phpVersion-intl \
+    php$phpVersion-xml \
+    php$phpVersion-bz2
+
+  # install azcopy
+  wget -q -O azcopy_v10.tar.gz https://aka.ms/downloadazcopy-v10-linux && tar -xf azcopy_v10.tar.gz --strip-components=1 && mv ./azcopy /usr/bin/
 
   if [ $fileServerType = "gluster" ]; then
     #configure gluster repository & install gluster client
-    sudo add-apt-repository ppa:gluster/glusterfs-3.10 -y
-    sudo apt-get -y update
-    sudo apt-get -y install glusterfs-client
+    add-apt-repository ppa:gluster/glusterfs-3.10 -y
+    apt-get -y update
+    apt-get -y -qq -o=Dpkg::Use-Pty=0 install glusterfs-client
   elif [ "$fileServerType" = "azurefiles" ]; then
-    sudo apt-get -y install cifs-utils
+    apt-get -y -qq -o=Dpkg::Use-Pty=0 install cifs-utils
   fi
-  
-  # install the base stack
-  # passing php versions $phpVersion
-  sudo apt-get -y install varnish php$phpVersion php$phpVersion-cli php$phpVersion-curl php$phpVersion-zip php-pear php$phpVersion-mbstring php$phpVersion-dev mcrypt
-
-  # if webservertype is nginx then apache2 will be masked.
-  # service=apache2
-  # if [ "$webServerType" = "nginx" ]; then
-  #     if [ $(ps -ef | grep -v grep | grep $service | wc -l) > 0 ]; then
-  #         echo “Stop the $service!!!”
-  #         sudo systemctl stop $service
-  #         sudo systemctl mask $service
-  #     fi
-  # fi
 
   if [ "$webServerType" = "nginx" -o "$httpsTermination" = "VMSS" ]; then
-    sudo apt-get -y install nginx
+    apt-get --yes -qq -o=Dpkg::Use-Pty=0 install nginx
   fi
    
   if [ "$webServerType" = "apache" ]; then
     # install apache pacakges
-    sudo apt-get -y install apache2 libapache2-mod-php
+    apt-get --yes -qq -o=Dpkg::Use-Pty=0 install apache2 libapache2-mod-php
   else
     # for nginx-only option
-    sudo apt-get -y install php$phpVersion-fpm
+    apt-get --yes -qq -o=Dpkg::Use-Pty=0 install php$phpVersion-fpm
   fi
    
   # Moodle requirements
-  sudo apt-get install -y graphviz aspell php$phpVersion-soap php$phpVersion-json php$phpVersion-redis php$phpVersion-bcmath php$phpVersion-gd php$phpVersion-pgsql php$phpVersion-mysql php$phpVersion-xmlrpc php$phpVersion-intl php$phpVersion-xml php$phpVersion-bz2
   if [ "$dbServerType" = "mssql" ]; then
     install_php_mssql_driver
-    
   fi
    
   # PHP Version
