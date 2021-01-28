@@ -125,6 +125,13 @@ EOF
   # apply the new kernel settings
   sysctl -p /etc/sysctl.d/99-network-performance.conf
 
+  # scheduling IRQ interrupts on the last two cores of the cpu
+  # masking 0011 or 00000011 the result will always be 3 echo "obase=16;ibase=2;0011" | bc | tr '[:upper:]' '[:lower:]'
+  if [ -f /etc/default/irqbalance ]; then
+    sed -i "s/\#IRQBALANCE_BANNED_CPUS\=/IRQBALANCE_BANNED_CPUS\=3/g" /etc/default/irqbalance
+    systemctl restart irqbalance.service 
+  fi
+
   # configuring tuned for throughput-performance
   systemctl enable tuned
   tuned-adm profile throughput-performance
