@@ -22,6 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 set -ex
+echo "### Script Start `date`###"
 
 moodle_on_azure_configs_json_path=${1}
 
@@ -52,6 +53,9 @@ echo $phpVersion          >> /tmp/vars.txt
 check_fileServerType_param $fileServerType
 
 {
+  set -ex
+  echo "### Function Start `date`###"
+
   # make sure the system does automatic update
   sudo apt-get -y update
   sudo apt-get -y install unattended-upgrades
@@ -682,4 +686,5 @@ EOF
   systemctl daemon-reload
   service varnish restart
 
-}  > /tmp/setup.log
+  echo "### Script End `date`###"
+} 2>&1 | tee /tmp/setup.log
