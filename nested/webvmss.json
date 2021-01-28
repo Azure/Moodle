@@ -199,16 +199,16 @@
                                     "metricResourceUri": "[variables('vmssID')]",
                                     "operator": "GreaterThan",
                                     "statistic": "Average",
-                                    "threshold": 60,
+                                    "threshold": 25,
                                     "timeAggregation": "Average",
                                     "timeGrain": "PT1M",
                                     "timeWindow": "PT5M"
                                 },
                                 "scaleAction": {
-                                    "cooldown": "PT10M",
+                                    "cooldown": "PT30M",
                                     "direction": "Increase",
                                     "type": "ChangeCount",
-                                    "value": "1"
+                                    "value": "2"
                                 }
                             },
                             {
@@ -224,7 +224,7 @@
                                     "timeWindow": "PT5M"
                                 },
                                 "scaleAction": {
-                                    "cooldown": "PT10M",
+                                    "cooldown": "PT20M",
                                     "direction": "Decrease",
                                     "type": "ChangeCount",
                                     "value": "1"
