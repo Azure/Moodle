@@ -735,6 +735,12 @@
                     "lbPubIp": {
                         "value": "[reference('networkTemplate').outputs.lbPubIp.value]"
                     },
+                    "lbOut001PubIp": {
+                        "value": "[reference('networkTemplate').outputs.lbOut001PubIp.value]"
+                    },
+                    "lbOut002PubIp": {
+                        "value": "[reference('networkTemplate').outputs.lbOut002PubIp.value]"
+                    },
                     "ctlrPubIp": {
                         "value": "[reference('networkTemplate').outputs.ctlrPubIp.value]"
                     }
@@ -1150,6 +1156,8 @@
             "enableAccelNwForOtherVmsSwitch": "[parameters('enableAccelNwForOtherVmsSwitch')]",
             "extBeName": "[concat('lb-backend-',variables('resourceprefix'))]",
             "extFeName": "[concat('lb-frontend-',variables('resourceprefix'))]",
+            "extOutName001": "[concat('lb-outbound001-',variables('resourceprefix'))]",
+            "extOutName002": "[concat('lb-outbound002-',variables('resourceprefix'))]",
             "extNatPool": "[concat('lb-natpool-',variables('resourceprefix'))]",
             "extProbeHTTP": "[concat('lb-probe-http-',variables('resourceprefix'))]",
             "extProbeHTTPS": "[concat('lb-probe-https-',variables('resourceprefix'))]",
@@ -1174,7 +1182,11 @@
             "lbSku": "[parameters('loadBalancerSku')]",
             "lbTier": "[parameters('loadBalancerTier')]",
             "lbName": "[concat('lb-',variables('resourceprefix'))]",
+            "lbOutName001": "[concat('lb-out001-',variables('resourceprefix'))]",
+            "lbOutName002": "[concat('lb-out002-',variables('resourceprefix'))]",
             "lbPipName": "[concat('lb-pubip-',variables('resourceprefix'))]",
+            "lbOutPipName001": "[concat('lb-outpubip001-',variables('resourceprefix'))]",
+            "lbOutPipName002": "[concat('lb-outpubip002-',variables('resourceprefix'))]",
             "location": "[parameters('location')]",
             "moodleAdminPass": "[concat(toUpper('xl'), substring(uniqueString(resourceGroup().id, deployment().name), 6, 7),',1*8')]",
             "moodleDbName": "moodle",
