@@ -109,6 +109,26 @@ check_fileServerType_param $fileServerType
   # install azcopy
   wget -q -O azcopy_v10.tar.gz https://aka.ms/downloadazcopy-v10-linux && tar -xf azcopy_v10.tar.gz --strip-components=1 && mv ./azcopy /usr/bin/
 
+  # kernel settings
+  cat <<EOF > /etc/sysctl.d/99-network-performance.conf
+net.core.somaxconn = 65536
+net.core.netdev_max_backlog = 5000
+net.core.rmem_max = 16777216
+net.core.wmem_max = 16777216
+net.ipv4.tcp_wmem = 4096 12582912 16777216
+net.ipv4.tcp_rmem = 4096 12582912 16777216
+net.ipv4.route.flush = 1
+net.ipv4.tcp_max_syn_backlog = 8096
+net.ipv4.tcp_tw_reuse = 1
+net.ipv4.ip_local_port_range = 10240 65535
+EOF
+  # apply the new kernel settings
+  sysctl -p /etc/sysctl.d/99-network-performance.conf
+
+  # configuring tuned for throughput-performance
+  systemctl enable tuned
+  tuned-adm profile throughput-performance
+
   if [ $fileServerType = "gluster" ]; then
     #configure gluster repository & install gluster client
     add-apt-repository ppa:gluster/glusterfs-3.10 -y
