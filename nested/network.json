@@ -133,7 +133,8 @@
             "condition": "[not(equals(parameters('moodleCommon').httpsTermination, 'AppGw'))]",
             "type": "Microsoft.Network/publicIPAddresses",
             "sku": {
-                "name": "[parameters('moodleCommon').lbSku]"
+                "name": "[parameters('moodleCommon').lbSku]",
+                "tier": "[parameters('moodleCommon').lbTier]"
             },
             "apiVersion": "2019-11-01",
             "location": "[parameters('moodleCommon').location]",
@@ -146,6 +147,46 @@
             },
             "tags": {
                 "displayName": "Load Balancer Public IP"
+            }
+        },
+        {
+            "condition": "[not(equals(parameters('moodleCommon').httpsTermination, 'AppGw'))]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "sku": {
+                "name": "[parameters('moodleCommon').lbSku]",
+                "tier": "[parameters('moodleCommon').lbTier]"
+            },
+            "apiVersion": "2019-11-01",
+            "location": "[parameters('moodleCommon').location]",
+            "name": "[parameters('moodleCommon').lbOutPipName001]",
+            "properties": {
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('moodleCommon').lbOutName001]"
+                },
+                "publicIPAllocationMethod": "Static"
+            },
+            "tags": {
+                "displayName": "Load Balancer Outbound Public IP 001"
+            }
+        },
+        {
+            "condition": "[not(equals(parameters('moodleCommon').httpsTermination, 'AppGw'))]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "sku": {
+                "name": "[parameters('moodleCommon').lbSku]",
+                "tier": "[parameters('moodleCommon').lbTier]"
+            },
+            "apiVersion": "2019-11-01",
+            "location": "[parameters('moodleCommon').location]",
+            "name": "[parameters('moodleCommon').lbOutPipName002]",
+            "properties": {
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('moodleCommon').lbOutName002]"
+                },
+                "publicIPAllocationMethod": "Static"
+            },
+            "tags": {
+                "displayName": "Load Balancer Outbound Public IP 002"
             }
         },
         {
@@ -183,11 +224,15 @@
             "condition": "[not(equals(parameters('moodleCommon').httpsTermination, 'AppGw'))]",
             "type": "Microsoft.Network/loadBalancers",
             "sku": {
-                "name": "[parameters('moodleCommon').lbSku]"
+                "name": "[parameters('moodleCommon').lbSku]",
+                "tier": "[parameters('moodleCommon').lbTier]"
+
             },
-            "apiVersion": "2017-10-01",
+            "apiVersion": "2019-11-01",
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/',parameters('moodleCommon').lbPipName)]"
+                "[concat('Microsoft.Network/publicIPAddresses/',parameters('moodleCommon').lbPipName)]",
+                "[concat('Microsoft.Network/publicIPAddresses/',parameters('moodleCommon').lbOutPipName001)]",
+                "[concat('Microsoft.Network/publicIPAddresses/',parameters('moodleCommon').lbOutPipName002)]"
             ],
             "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').lbName]",
@@ -205,17 +250,39 @@
                                 "id": "[variables('lbPipID')]"
                             }
                         }
+
+                    },
+                    {
+                        "name": "[parameters('moodleCommon').extOutName001 ]",
+                        "properties": {
+                            "publicIPAddress": {
+                                "id": "[variables('lbOutPip001ID')]"
+                            }
+                        }
+
+                    },
+                    {
+                        "name": "[parameters('moodleCommon').extOutName002 ]",
+                        "properties": {
+                            "publicIPAddress": {
+                                "id": "[variables('lbOutPip002ID')]"
+                            }
+                        }
+
                     }
                 ],
                 "loadBalancingRules": [
                     {
-                        "name": "Http",
+                        "name": "HTTP",
                         "properties": {
                             "backendAddressPool": {
                                 "id": "[variables('extBeID')]"
                             },
                             "backendPort": 80,
                             "enableFloatingIP": false,
+                            "enableTcpReset": false,
+                            "loadDistribution": "Default",
+                            "disableOutboundSnat": true,
                             "frontendIPConfiguration": {
                                 "id": "[variables('extFeID')]"
                             },
@@ -228,13 +295,16 @@
                         }
                     },
                     {
-                        "name": "Https",
+                        "name": "HTTPS",
                         "properties": {
                             "backendAddressPool": {
                                 "id": "[variables('extBeID')]"
                             },
                             "backendPort": 443,
                             "enableFloatingIP": false,
+                            "enableTcpReset": false,
+                            "loadDistribution": "Default",
+                            "disableOutboundSnat": true,
                             "frontendIPConfiguration": {
                                 "id": "[variables('extFeID')]"
                             },
@@ -266,7 +336,31 @@
                             "protocol": "Tcp"
                         }
                     }
-                ]
+                ],
+                "inboundNatRules": [],
+                "outboundRules": [
+                    {
+                        "name": "Outboundrule001",
+                        "properties": {
+                            "allocatedOutboundPorts": 12800,
+                            "protocol": "Tcp",
+                            "enableTcpReset": false,
+                            "idleTimeoutInMinutes": 5,
+                            "backendAddressPool": {
+                                "id": "[variables('extBeID')]"
+                            },
+                            "frontendIPConfigurations": [
+                                {
+                                    "id": "[variables('extOutID001')]"
+                                },
+                                {
+                                    "id": "[variables('extOutID002')]"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "inboundNatPools": []
             }
         },
         {
@@ -306,10 +400,14 @@
         "documentation01": "This sub-template creates a virtual network with a number of subnets and then creates the moodle load-balancer (or an Azure Application Gateway) with public IP/dns",
         "extBeID": "[concat(variables('extLbID'),'/backendAddressPools/',parameters('moodleCommon').extBeName)]",
         "extFeID": "[concat(variables('extLbID'),'/frontendIPConfigurations/',parameters('moodleCommon').extFeName)]",
+        "extOutID001": "[concat(variables('extLbID'),'/frontendIPConfigurations/',parameters('moodleCommon').extOutName001)]",
+        "extOutID002": "[concat(variables('extLbID'),'/frontendIPConfigurations/',parameters('moodleCommon').extOutName002)]",
         "extLbID": "[resourceId('Microsoft.Network/loadBalancers',parameters('moodleCommon').lbName)]",
         "extProbeHTTPID": "[concat(variables('extLbID'),'/probes/',parameters('moodleCommon').extProbeHTTP)]",
         "extProbeHTTPSID": "[concat(variables('extLbID'),'/probes/',parameters('moodleCommon').extProbeHTTPS)]",
         "lbPipID": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('moodleCommon').lbPipName)]",
+        "lbOutPip001ID": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('moodleCommon').lbOutPipName001)]",
+        "lbOutPip002ID": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('moodleCommon').lbOutPipName002)]",
         "ctlrPipID": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('moodleCommon').ctlrPipName)]",
         "customVnetIdArr":              "[split(parameters('moodleCommon').customVnetId, '/')]",
         "vnetSub":                      "[if(equals(parameters('moodleCommon').customVnetId, ''), subscription().subscriptionId, variables('customVnetIdArr')[2])]",
@@ -333,6 +431,14 @@
     "outputs": {
         "lbPubIp": {
             "value": "[if(equals(parameters('moodleCommon').httpsTermination, 'AppGw'), '0.0.0.0', reference(parameters('moodleCommon').lbPipName, '2017-10-01').ipAddress)]",
+            "type": "string"
+        },
+        "lbOut001PubIp": {
+            "value": "[if(equals(parameters('moodleCommon').httpsTermination, 'AppGw'), '0.0.0.0', reference(parameters('moodleCommon').lbOutPipName001, '2017-10-01').ipAddress)]",
+            "type": "string"
+        },
+        "lbOut002PubIp": {
+            "value": "[if(equals(parameters('moodleCommon').httpsTermination, 'AppGw'), '0.0.0.0', reference(parameters('moodleCommon').lbOutPipName002, '2017-10-01').ipAddress)]",
             "type": "string"
         },
         "ctlrPubIp": {
