@@ -281,26 +281,34 @@ EOF
   # Set up html dir local copy if specified
   htmlRootDir="/moodle/html/moodle"
   if [ "$htmlLocalCopySwitch" = "true" ]; then
-    mkdir -p /var/www/html
-    ACCOUNT_KEY="$storageAccountKey"
-    NAME="$storageAccountName"
-    END=`date -u -d "60 minutes" '+%Y-%m-%dT%H:%M:00Z'`
-    htmlRootDir="/var/www/html/moodle"
+    if [ "$fileServerType" = "azurefiles" ]; then
+      mkdir -p /var/www/html
+      ACCOUNT_KEY="$storageAccountKey"
+      NAME="$storageAccountName"
+      END=`date -u -d "60 minutes" '+%Y-%m-%dT%H:%M:00Z'`
+      htmlRootDir="/var/www/html/moodle"
 
-    sas=$(az storage share generate-sas \
-      -n moodle \
-      --account-key $ACCOUNT_KEY \
-      --account-name $NAME \
-      --https-only \
-      --permissions lr \
-      --expiry $END -o tsv)
+      sas=$(az storage share generate-sas \
+        -n moodle \
+        --account-key $ACCOUNT_KEY \
+        --account-name $NAME \
+        --https-only \
+        --permissions lr \
+        --expiry $END -o tsv)
 
-    export AZCOPY_CONCURRENCY_VALUE='48'
-    export AZCOPY_BUFFER_GB='4'
+      export AZCOPY_CONCURRENCY_VALUE='48'
+      export AZCOPY_BUFFER_GB='4'
 
-    azcopy --log-level ERROR copy "https://$NAME.file.core.windows.net/moodle/html/moodle/*?$sas" $htmlRootDir --recursive
-    chown www-data:www-data -R $htmlRootDir && sync
-    setup_html_local_copy_cron_job
+      azcopy --log-level ERROR copy "https://$NAME.file.core.windows.net/moodle/html/moodle/*?$sas" $htmlRootDir --recursive
+      chown www-data:www-data -R $htmlRootDir && sync
+      setup_html_local_copy_cron_job
+    fi
+    if [ "$fileServerType" = "nfs" -o "$fileServerType" = "nfs-ha" -o "$fileServerType" = "nfs-byo" -o "$fileServerType" = "gluster" ]; then
+      mkdir -p /var/www/html/moodle
+      rsync -a /moodle/html/moodle/ $htmlRootDir/
+      chown www-data:www-data -R $htmlRootDir && sync
+      setup_html_local_copy_cron_job
+    fi
   fi
 
   if [ "$httpsTermination" = "VMSS" ]; then
@@ -347,10 +355,6 @@ server {
         }
 }
 
-upstream backend {
-        server unix:/run/php/php${PhpVer}-fpm.sock fail_timeout=1s;
-        server unix:/run/php/php${PhpVer}-fpm-backup.sock backup;
-}    
 EOF
   fi
 
@@ -403,11 +407,17 @@ EOF
           fastcgi_buffer_size 32k;
           fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
           fastcgi_pass backend;
+          fastcgi_param PATH_INFO \$fastcgi_path_info;
           fastcgi_read_timeout 3600;
           fastcgi_index index.php;
           include fastcgi_params;
         }
 }
+
+upstream backend {
+        server unix:/run/php/php${PhpVer}-fpm.sock fail_timeout=1s;
+        server unix:/run/php/php${PhpVer}-fpm-backup.sock backup;
+}  
 
 EOF
   fi
