@@ -2,20 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "_artifactsLocation": {
-            "type": "string",
-            "metadata": {
-                "description": "The base URI where artifacts required by this template are located."
-            },
-            "defaultValue": "https://raw.githubusercontent.com/Azure/Moodle/master/"
-        },
-        "_artifactsLocationSasToken": {
-            "type": "securestring",
-            "metadata": {
-                "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
-            },
-            "defaultValue": ""
-        },
         "storageAccountType": {
             "defaultValue": "Premium_LRS",
             "allowedValues": [
@@ -30,18 +16,11 @@
             "type": "string"
         },
         "fileServerDiskSize": {
-            "defaultValue": 100,
+            "defaultValue": "100",
             "metadata": {
                 "description": "Size of the azure file share in GB."
             },
-            "type": "int"
-        },
-        "location": {
-            "type": "string",
-            "defaultValue": "[resourceGroup().location]",
-            "metadata": {
-                "description": "Azure Location for all resources."
-            }
+            "type": "string"
         }
     },
     "resources": [
@@ -57,7 +36,7 @@
                     }
                 },
                 "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'storageAccount.json',parameters('_artifactsLocationSasToken'))]"
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'storageAccount.json',variables('moodleCommon').artifactsSasToken)]"
                 }
             }
         },
@@ -85,16 +64,19 @@
             "value": "[variables('moodleCommon').storageAccountType]"
         },
         "fileServerDiskSize": {
-            "type": "int",
+            "type": "string",
             "value": "[variables('moodleCommon').fileServerDiskSize]"
         }
     },
     "variables": {
+        "_artifactsLocation": "https://raw.githubusercontent.com/Azure/Moodle/master/",
+        "_artifactsLocationSasToken": "",
+        "location": "[resourceGroup().location]",
         "moodleCommon": {
-            "baseTemplateUrl": "[concat(parameters('_artifactsLocation'), 'nested/')]",
-            "artifactsSasToken": "[parameters('_artifactsLocationSasToken')]",
+            "baseTemplateUrl": "[concat(variables('_artifactsLocation'), 'nested/')]",
+            "artifactsSasToken": "[variables('_artifactsLocationSasToken')]",
             "fileServerType": "azurefiles",
-            "location": "[parameters('location')]",
+            "location": "[variables('location')]",
             "storageAccountName": "[tolower(concat('abs',variables('resourceprefix')))]",
             "storageAccountType": "[parameters('storageAccountType')]",
             "fileServerDiskSize": "[parameters('fileServerDiskSize')]"
