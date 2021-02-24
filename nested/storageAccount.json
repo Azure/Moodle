@@ -14,7 +14,7 @@
             "condition": "[not(equals(parameters('moodleCommon').fileServerType, 'azurefiles'))]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-06-01",
-            "location": "[parameters('moodleCommon').location]",
+            "location": "[if(equals(variables('location'), 'eastus2euap'), 'westus2', variables('location'))]",
             "name": "[concat(parameters('moodleCommon').storageAccountName,'naf')]",
             "kind": "Storage",
             "sku": {
@@ -45,7 +45,7 @@
             "condition": "[equals(parameters('moodleCommon').fileServerType, 'azurefiles')]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-06-01",
-            "location": "[parameters('moodleCommon').location]",
+            "location": "[if(equals(variables('location'), 'eastus2euap'), 'westus2', variables('location'))]",
             "name": "[concat(parameters('moodleCommon').storageAccountName,'af')]",
             "kind": "[if(equals(parameters('moodleCommon').storageAccountType, 'Premium_LRS'), 'FileStorage', 'Storage')]",
             "sku": {
@@ -81,7 +81,8 @@
         "documentation2": " storageAccountName - name of storage account",
         "documentation3": " storageAccountType - type of storage account",
         "storageName": "[concat(parameters('moodleCommon').storageAccountName,if(equals(parameters('moodleCommon').fileServerType, 'azurefiles'), 'af', 'naf'))]",
-        "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
+        "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]",
+        "location": "[toLower(parameters('moodleCommon').location)]"
     },
     "outputs": {
         "storageAccountKey": {
