@@ -820,7 +820,7 @@ EOF
             fi
             
             echo "Importing migration moodle DB."
-            mysql -h $mysqlIP -u $mysqladminlogin -p ${mysqladminpass} ${moodledbname} < /moodle/migration-db-moodle.sql
+            mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} < /moodle/migration-db-moodle.sql
             
             echo "Updating moodle db config settings"
             replace_moodle_config_value "dbhost" "$mysqlIP"
