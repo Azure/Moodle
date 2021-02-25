@@ -53,7 +53,7 @@ That said, this is not a democracy. Consensus does not mean everyone
 has to agree. It merely means that nobody is objecting *and* offering
 an alternative.
 
-What this means, in practive, is that she who does the work makes the
+What this means, in practice, is that she who does the work makes the
 decisions. We'd rather discuss how to improve imperfect code than
 argue over what would make perfect code. So if you have an objection
 to the way we are doing things issue a pull request.
