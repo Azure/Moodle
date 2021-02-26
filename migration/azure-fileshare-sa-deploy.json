@@ -71,7 +71,10 @@
     "variables": {
         "_artifactsLocation": "https://raw.githubusercontent.com/venu-sivanadham/Moodle/master/",
         "_artifactsLocationSasToken": "",
-        "location": "[resourceGroup().location]",
+        "documentationLine1": "'eastus2euap' is an Azure internal test region. It has limited support for many features such as: 'FileStorage' storageAccount kind etc.",
+        "documentationLine2": "If resource group location is 'eastus2euap' then use nearest prod region i.e 'eastus2' for deployment.",
+        "rgLocation": "[toLower(resourceGroup().location)]",
+        "location": "[if(equals(variables('rgLocation'), 'eastus2euap'), 'eastus2', variables('rgLocation'))]",
         "moodleCommon": {
             "baseTemplateUrl": "[concat(variables('_artifactsLocation'), 'nested/')]",
             "artifactsSasToken": "[variables('_artifactsLocationSasToken')]",
