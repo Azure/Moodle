@@ -14,7 +14,7 @@
             "condition": "[not(equals(parameters('moodleCommon').fileServerType, 'azurefiles'))]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-06-01",
-            "location": "[variables('locationNotCanary')]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[concat(parameters('moodleCommon').storageAccountName,'naf')]",
             "kind": "Storage",
             "sku": {
@@ -45,7 +45,7 @@
             "condition": "[equals(parameters('moodleCommon').fileServerType, 'azurefiles')]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-06-01",
-            "location": "[variables('locationNotCanary')]",
+            "location": "[parameters('moodleCommon').location]",
             "name": "[concat(parameters('moodleCommon').storageAccountName,'af')]",
             "kind": "[if(equals(parameters('moodleCommon').storageAccountType, 'Premium_LRS'), 'FileStorage', 'Storage')]",
             "sku": {
@@ -81,11 +81,7 @@
         "documentation2": " storageAccountName - name of storage account",
         "documentation3": " storageAccountType - type of storage account",
         "storageName": "[concat(parameters('moodleCommon').storageAccountName,if(equals(parameters('moodleCommon').fileServerType, 'azurefiles'), 'af', 'naf'))]",
-        "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]",
-        
-        "documentation4": "eastus2euap region doesn't support storageAccount kind 'FileStorage'. Hence using near prod region.",
-        "location": "[toLower(parameters('moodleCommon').location)]",
-        "locationNotCanary": "[if(equals(variables('location'), 'eastus2euap'), 'eastus2', variables('location'))]"
+        "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
     },
     "outputs": {
         "storageAccountKey": {
