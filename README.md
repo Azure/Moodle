@@ -237,4 +237,4 @@ implication, estoppel or otherwise.
 
   1. [Deploy a Moodle Cluster](docs/Deploy.md)
   1. [Obtain Deployment Details about a Moodle Cluster](docs/Get-Install-Data.md)
-  1. [Delete a Moodle Cluster](docs/Delete.md)
+  1. [Delete a Moodle Cluster](docs/Cleanup.md)

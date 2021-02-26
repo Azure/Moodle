@@ -69,6 +69,7 @@ function get_setup_params_from_configs_json
     export storageAccountType=$(echo $json | jq -r .moodleProfile.storageAccountType)
     export fileServerDiskSize=$(echo $json | jq -r .fileServerProfile.fileServerDiskSize)
     export phpVersion=$(echo $json | jq -r .phpProfile.phpVersion)
+		export mysqlVersion=$(echo $json | jq -r .dbServerProfile.mysqlSrvversion)
 }
 
 function get_php_version {

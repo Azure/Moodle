@@ -81,7 +81,8 @@
                 "adminPassword": "[parameters('moodleCommon').dbLoginPassword]",
                 "mssqlDbServiceObjectiveName": "[parameters('moodleCommon').mssqlDbServiceObjectiveName]",
                 "mssqlDbEdition": "[parameters('moodleCommon').mssqlDbEdition]",
-                "mssqlDbSize": "[parameters('moodleCommon').mssqlDbSize]"
+                "mssqlDbSize": "[parameters('moodleCommon').mssqlDbSize]",
+								"mysqlSrvversion": "[parameters('moodleCommon').mysqlVersion]"
             },
             "fileServerProfile": {
                 "type": "[parameters('moodleCommon').fileServerType]",
