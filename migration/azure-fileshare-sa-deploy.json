@@ -71,10 +71,14 @@
     "variables": {
         "_artifactsLocation": "https://raw.githubusercontent.com/venu-sivanadham/Moodle/master/",
         "_artifactsLocationSasToken": "",
-        "documentationLine1": "'eastus2euap' is an Azure internal test region. It has limited support for many features such as: 'FileStorage' storageAccount kind etc.",
-        "documentationLine2": "If resource group location is 'eastus2euap' then use a prod region for deployment.",
+        "unsupportedLocations": [
+            "eastus2euap",
+            "westcentralus"
+        ],
+        "documentationLine1": "Some of the Azure Services used by moodle migration are not available in few regions. Those regions are declared above.",
+        "documentationLine2": "If resource group belong to one of those unsupported regions, then use default region 'southeastasia' for deployment.",
         "rgLocation": "[toLower(resourceGroup().location)]",
-        "location": "[if(equals(variables('rgLocation'), 'eastus2euap'), 'southeastasia', variables('rgLocation'))]",
+        "location": "[if(contains(variables('unsupportedLocations'), variables('rgLocation')), 'southeastasia', variables('rgLocation'))]",
         "moodleCommon": {
             "baseTemplateUrl": "[concat(variables('_artifactsLocation'), 'nested/')]",
             "artifactsSasToken": "[variables('_artifactsLocationSasToken')]",
