@@ -201,9 +201,9 @@
             "westcentralus"
         ],
         "documentationLine1": "Some of the Azure Services used by moodle migration are not available in few regions. Those regions are declared above.",
-        "documentationLine2": "If resource group belong to one of those unsupported regions, then use default region 'southeastasia' for deployment.",
+        "documentationLine2": "If resource group belong to one of those unsupported regions, then use default region 'westus' for deployment.",
         "rgLocation": "[toLower(resourceGroup().location)]",
-        "location": "[if(contains(variables('unsupportedLocations'), variables('rgLocation')), 'southeastasia', variables('rgLocation'))]"
+        "location": "[if(contains(variables('unsupportedLocations'), variables('rgLocation')), 'westus', variables('rgLocation'))]"
     },
     "resources": [
         {
