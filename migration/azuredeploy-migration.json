@@ -194,7 +194,7 @@
         }
     },
     "variables": {
-        "_artifactsLocation": "https://raw.githubusercontent.com/venu-sivanadham/Moodle/master/",
+        "_artifactsLocation": "https://raw.githubusercontent.com/Azure/Moodle/master/",
         "_artifactsLocationSasToken": "",
         "unsupportedLocations": [
             "eastus2euap",
