@@ -22,6 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 set -ex
+echo "### Script Start `date`###"
 
 moodle_on_azure_configs_json_path=${1}
 
@@ -44,65 +45,122 @@ echo $nfsByoIpExportPath >> /tmp/vars.txt
 echo $htmlLocalCopySwitch >> /tmp/vars.txt
 echo $phpVersion          >> /tmp/vars.txt
 
-# downloading and updating php packages from the repository 
-# sudo dpkg --configure –a
- sudo add-apt-repository ppa:ondrej/php -y > /dev/null 2>&1
- sudo apt-get update > /dev/null 2>&1
+
 
 check_fileServerType_param $fileServerType
 
 {
-  # make sure the system does automatic update
-  sudo apt-get -y update
-  sudo apt-get -y install unattended-upgrades
+  set -ex
+  echo "### Function Start `date`###"
 
-  # install pre-requisites
-  # sudo apt-get -y install python-software-properties unzip rsyslog
-  sudo apt-get -y install software-properties-common
-  sudo apt-get -y install unzip
-  sudo apt-get -y install rsyslog
-  sudo apt-get -y install postgresql-client mysql-client git
+  # add azure-cli repository
+  curl -sL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null
+  AZ_REPO=$(lsb_release -cs)
+  echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" |  tee /etc/apt/sources.list.d/azure-cli.list
+  
+  # add PHP-FPM repository 
+  add-apt-repository ppa:ondrej/php -y > /dev/null 2>&1
+
+  apt-get -qq -o=Dpkg::Use-Pty=0 update 
+
+  # install pre-requisites including VARNISH and PHP-FPM
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get --yes \
+    --no-install-recommends \
+    -qq -o=Dpkg::Use-Pty=0 \
+    -o Dpkg::Options::="--force-confdef" \
+    -o Dpkg::Options::="--force-confold" \
+    install \
+    azure-cli \
+    ca-certificates \
+    curl \
+    apt-transport-https \
+    lsb-release gnupg \
+    software-properties-common \
+    unzip \
+    rsyslog \
+    postgresql-client \
+    mysql-client \
+    git \
+    unattended-upgrades \
+    tuned \
+    varnish \
+    php$phpVersion \
+    php$phpVersion-cli \
+    php$phpVersion-curl \
+    php$phpVersion-zip \
+    php-pear \
+    php$phpVersion-mbstring \
+    mcrypt \
+    php$phpVersion-dev \
+    graphviz \
+    aspell \
+    php$phpVersion-soap \
+    php$phpVersion-json \
+    php$phpVersion-redis \
+    php$phpVersion-bcmath \
+    php$phpVersion-gd \
+    php$phpVersion-pgsql \
+    php$phpVersion-mysql \
+    php$phpVersion-xmlrpc \
+    php$phpVersion-intl \
+    php$phpVersion-xml \
+    php$phpVersion-bz2
+
+  # install azcopy
+  wget -q -O azcopy_v10.tar.gz https://aka.ms/downloadazcopy-v10-linux && tar -xf azcopy_v10.tar.gz --strip-components=1 && mv ./azcopy /usr/bin/
+
+  # kernel settings
+  cat <<EOF > /etc/sysctl.d/99-network-performance.conf
+net.core.somaxconn = 65536
+net.core.netdev_max_backlog = 5000
+net.core.rmem_max = 16777216
+net.core.wmem_max = 16777216
+net.ipv4.tcp_wmem = 4096 12582912 16777216
+net.ipv4.tcp_rmem = 4096 12582912 16777216
+net.ipv4.route.flush = 1
+net.ipv4.tcp_max_syn_backlog = 8096
+net.ipv4.tcp_tw_reuse = 1
+net.ipv4.ip_local_port_range = 10240 65535
+EOF
+  # apply the new kernel settings
+  sysctl -p /etc/sysctl.d/99-network-performance.conf
+
+  # scheduling IRQ interrupts on the last two cores of the cpu
+  # masking 0011 or 00000011 the result will always be 3 echo "obase=16;ibase=2;0011" | bc | tr '[:upper:]' '[:lower:]'
+  if [ -f /etc/default/irqbalance ]; then
+    sed -i "s/\#IRQBALANCE_BANNED_CPUS\=/IRQBALANCE_BANNED_CPUS\=3/g" /etc/default/irqbalance
+    systemctl restart irqbalance.service 
+  fi
+
+  # configuring tuned for throughput-performance
+  systemctl enable tuned
+  tuned-adm profile throughput-performance
 
   if [ $fileServerType = "gluster" ]; then
     #configure gluster repository & install gluster client
-    sudo add-apt-repository ppa:gluster/glusterfs-3.10 -y
-    sudo apt-get -y update
-    sudo apt-get -y install glusterfs-client
+    add-apt-repository ppa:gluster/glusterfs-3.10 -y
+    apt-get -y update
+    apt-get -y -qq -o=Dpkg::Use-Pty=0 install glusterfs-client
   elif [ "$fileServerType" = "azurefiles" ]; then
-    sudo apt-get -y install cifs-utils
+    apt-get -y -qq -o=Dpkg::Use-Pty=0 install cifs-utils
   fi
-  
-  # install the base stack
-  # passing php versions $phpVersion
-  sudo apt-get -y install varnish php$phpVersion php$phpVersion-cli php$phpVersion-curl php$phpVersion-zip php-pear php$phpVersion-mbstring php$phpVersion-dev mcrypt
-
-  # if webservertype is nginx then apache2 will be masked.
-  # service=apache2
-  # if [ "$webServerType" = "nginx" ]; then
-  #     if [ $(ps -ef | grep -v grep | grep $service | wc -l) > 0 ]; then
-  #         echo “Stop the $service!!!”
-  #         sudo systemctl stop $service
-  #         sudo systemctl mask $service
-  #     fi
-  # fi
 
   if [ "$webServerType" = "nginx" -o "$httpsTermination" = "VMSS" ]; then
-    sudo apt-get -y install nginx
+    apt-get --yes -qq -o=Dpkg::Use-Pty=0 install nginx
   fi
    
   if [ "$webServerType" = "apache" ]; then
     # install apache pacakges
-    sudo apt-get -y install apache2 libapache2-mod-php
+    apt-get --yes -qq -o=Dpkg::Use-Pty=0 install apache2 libapache2-mod-php
   else
     # for nginx-only option
-    sudo apt-get -y install php$phpVersion-fpm
+    apt-get --yes -qq -o=Dpkg::Use-Pty=0 install php$phpVersion-fpm
   fi
    
   # Moodle requirements
-  sudo apt-get install -y graphviz aspell php$phpVersion-soap php$phpVersion-json php$phpVersion-redis php$phpVersion-bcmath php$phpVersion-gd php$phpVersion-pgsql php$phpVersion-mysql php$phpVersion-xmlrpc php$phpVersion-intl php$phpVersion-xml php$phpVersion-bz2
   if [ "$dbServerType" = "mssql" ]; then
     install_php_mssql_driver
-    
   fi
    
   # PHP Version
@@ -146,12 +204,16 @@ EOF
     # Build nginx config
     cat <<EOF > /etc/nginx/nginx.conf
 user www-data;
-worker_processes 2;
+worker_processes auto;
 pid /run/nginx.pid;
 
 events {
-	worker_connections 2048;
+	worker_connections 8192;
+  multi_accept on;
+  use epoll;
 }
+
+worker_rlimit_nofile 100000;
 
 http {
 
@@ -172,13 +234,18 @@ http {
   access_log /var/log/nginx/access.log;
   error_log /var/log/nginx/error.log;
 
+  open_file_cache max=20000 inactive=20s;
+  open_file_cache_valid 30s;
+  open_file_cache_min_uses 2;
+  open_file_cache_errors on;
+
   set_real_ip_from   127.0.0.1;
   real_ip_header      X-Forwarded-For;
   #upgrading to TLSv1.2 and droping 1 & 1.1
-  ssl_protocols TLSv1.2;
-  #ssl_prefer_server_ciphers on;
+  ssl_protocols TLSv1.2 TLSv1.3;
+  ssl_prefer_server_ciphers off;
   #adding ssl ciphers
-  ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384;
+  ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
 
   gzip on;
   gzip_disable "msie6";
@@ -214,23 +281,50 @@ EOF
   # Set up html dir local copy if specified
   htmlRootDir="/moodle/html/moodle"
   if [ "$htmlLocalCopySwitch" = "true" ]; then
-    mkdir -p /var/www/html
-    rsync -av --delete /moodle/html/moodle /var/www/html
-    htmlRootDir="/var/www/html/moodle"
-    setup_html_local_copy_cron_job
+    if [ "$fileServerType" = "azurefiles" ]; then
+      mkdir -p /var/www/html
+      ACCOUNT_KEY="$storageAccountKey"
+      NAME="$storageAccountName"
+      END=`date -u -d "60 minutes" '+%Y-%m-%dT%H:%M:00Z'`
+      htmlRootDir="/var/www/html/moodle"
+
+      sas=$(az storage share generate-sas \
+        -n moodle \
+        --account-key $ACCOUNT_KEY \
+        --account-name $NAME \
+        --https-only \
+        --permissions lr \
+        --expiry $END -o tsv)
+
+      export AZCOPY_CONCURRENCY_VALUE='48'
+      export AZCOPY_BUFFER_GB='4'
+
+      azcopy --log-level ERROR copy "https://$NAME.file.core.windows.net/moodle/html/moodle/*?$sas" $htmlRootDir --recursive
+      chown www-data:www-data -R $htmlRootDir && sync
+      setup_html_local_copy_cron_job
+    fi
+    if [ "$fileServerType" = "nfs" -o "$fileServerType" = "nfs-ha" -o "$fileServerType" = "nfs-byo" -o "$fileServerType" = "gluster" ]; then
+      mkdir -p /var/www/html/moodle
+      rsync -a /moodle/html/moodle/ $htmlRootDir/
+      chown www-data:www-data -R $htmlRootDir && sync
+      setup_html_local_copy_cron_job
+    fi
   fi
 
   if [ "$httpsTermination" = "VMSS" ]; then
     # Configure nginx/https
     cat <<EOF >> /etc/nginx/sites-enabled/${siteFQDN}.conf
 server {
-        listen 443 ssl;
+        listen 443 ssl http2;
         root ${htmlRootDir};
-	index index.php index.html index.htm;
+	      index index.php index.html index.htm;
 
         ssl on;
         ssl_certificate /moodle/certs/nginx.crt;
         ssl_certificate_key /moodle/certs/nginx.key;
+        ssl_session_timeout 1d;
+        ssl_session_cache shared:MozSSL:10m;  # about 40000 sessions
+        ssl_session_tickets off;
 
         # Log to syslog
         error_log syslog:server=localhost,facility=local1,severity=error,tag=moodle;
@@ -253,12 +347,14 @@ server {
           proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
           proxy_pass http://localhost:80;
 
+          proxy_next_upstream error timeout http_502 http_504;
           proxy_connect_timeout       3600;
           proxy_send_timeout          3600;
           proxy_read_timeout          3600;
           send_timeout                3600;
         }
 }
+
 EOF
   fi
 
@@ -309,16 +405,22 @@ EOF
  
           fastcgi_buffers 16 16k;
           fastcgi_buffer_size 32k;
-          fastcgi_param   SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
-          fastcgi_pass unix:/run/php/php${PhpVer}-fpm.sock;
+          fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+          fastcgi_pass backend;
+          fastcgi_param PATH_INFO \$fastcgi_path_info;
           fastcgi_read_timeout 3600;
           fastcgi_index index.php;
           include fastcgi_params;
         }
 }
 
+upstream backend {
+        server unix:/run/php/php${PhpVer}-fpm.sock fail_timeout=1s;
+        server unix:/run/php/php${PhpVer}-fpm-backup.sock backup;
+}  
+
 EOF
-  fi # if [ "$webServerType" = "nginx" ];
+  fi
 
   if [ "$webServerType" = "apache" ]; then
     # Configure Apache/php
@@ -378,8 +480,8 @@ EOF
    sed -i "s/;opcache.save_comments.*/opcache.save_comments = 1/" $PhpIni
    sed -i "s/;opcache.enable_file_override.*/opcache.enable_file_override = 0/" $PhpIni
    sed -i "s/;opcache.enable.*/opcache.enable = 1/" $PhpIni
-   sed -i "s/;opcache.memory_consumption.*/opcache.memory_consumption = 256/" $PhpIni
-   sed -i "s/;opcache.max_accelerated_files.*/opcache.max_accelerated_files = 8000/" $PhpIni
+   sed -i "s/;opcache.memory_consumption.*/opcache.memory_consumption = 512/" $PhpIni
+   sed -i "s/;opcache.max_accelerated_files.*/opcache.max_accelerated_files = 20000/" $PhpIni
     
    # Remove the default site. Moodle is the only site we want
    rm -f /etc/nginx/sites-enabled/default
@@ -394,35 +496,8 @@ EOF
      sudo service nginx restart 
    fi
 
-   if [ "$webServerType" = "nginx" ]; then
-     # fpm config - overload this 
-     cat <<EOF > /etc/php/${PhpVer}/fpm/pool.d/www.conf
-[www]
-user = www-data
-group = www-data
-listen = /run/php/php${PhpVer}-fpm.sock
-listen.owner = www-data
-listen.group = www-data
-pm = dynamic
-pm.max_children = 3000 
-pm.start_servers = 20 
-pm.min_spare_servers = 20 
-pm.max_spare_servers = 30 
-EOF
-
-     # Restart fpm
-     service php${PhpVer}-fpm restart
-   fi
-
-   if [ "$webServerType" = "apache" ]; then
-      if [ "$htmlLocalCopySwitch" != "true" ]; then
-        setup_moodle_mount_dependency_for_systemd_service apache2 || exit 1
-      fi
-      sudo service apache2 restart
-   fi
-
-   # Configure varnish startup for 16.04
-   VARNISHSTART="ExecStart=\/usr\/sbin\/varnishd -j unix,user=vcache -F -a :80 -T localhost:6082 -f \/etc\/varnish\/moodle.vcl -S \/etc\/varnish\/secret -s malloc,1024m -p thread_pool_min=200 -p thread_pool_max=4000 -p thread_pool_add_delay=2 -p timeout_linger=100 -p timeout_idle=30 -p send_timeout=1800 -p thread_pools=4 -p http_max_hdr=512 -p workspace_backend=512k"
+   # Configure varnish startup for 18.04
+   VARNISHSTART="ExecStart=\/usr\/sbin\/varnishd -j unix,user=vcache -F -a :80 -T localhost:6082 -f \/etc\/varnish\/moodle.vcl -S \/etc\/varnish\/secret -s malloc,4096m -p thread_pool_min=1000 -p thread_pool_max=4000 -p thread_pool_add_delay=0.1 -p timeout_linger=10 -p timeout_idle=30 -p send_timeout=1800 -p thread_pools=2 -p http_max_hdr=512 -p workspace_backend=512k"
    sed -i "s/^ExecStart.*/${VARNISHSTART}/" /lib/systemd/system/varnish.service
 
    # Configure varnish VCL for moodle
@@ -672,14 +747,56 @@ EOF
 # This code is stop apache2 which is installing in 18.04
   service=apache2
   if [ "$webServerType" = "nginx" ]; then
-      if [ $(ps -ef | grep -v grep | grep $service | wc -l) > 0 ]; then
+      if pgrep -x "$service" >/dev/null 
+      then
             echo “Stop the $service!!!”
-            sudo systemctl stop $service
-            sudo systemctl mask $service
+            systemctl stop $service
+      else
+            systemctl mask $service
       fi
   fi
   # Restart Varnish
   systemctl daemon-reload
-  service varnish restart
+  systemctl restart varnish
 
-}  > /tmp/setup.log
+   if [ "$webServerType" = "nginx" ]; then
+     # fpm config - overload this 
+     cat <<EOF > /etc/php/${PhpVer}/fpm/pool.d/www.conf
+[www]
+user = www-data
+group = www-data
+listen = /run/php/php${PhpVer}-fpm.sock
+listen.owner = www-data
+listen.group = www-data
+pm = static
+pm.max_children = 32
+pm.start_servers = 32
+pm.max_requests = 300000
+EOF
+
+cat <<EOF > /etc/php/${PhpVer}/fpm/pool.d/backup.conf
+[backup]
+user = www-data
+group = www-data
+listen = /run/php/php${PhpVer}-fpm-backup.sock
+listen.owner = www-data
+listen.group = www-data
+pm = static
+pm.max_children = 16
+pm.start_servers = 16
+pm.max_requests = 300000
+EOF
+
+     # Restart fpm
+     service php${PhpVer}-fpm restart
+   fi
+
+   if [ "$webServerType" = "apache" ]; then
+      if [ "$htmlLocalCopySwitch" != "true" ]; then
+        setup_moodle_mount_dependency_for_systemd_service apache2 || exit 1
+      fi
+        service apache2 restart
+   fi
+
+  echo "### Script End `date`###"
+} 2>&1 | tee /tmp/setup.log
