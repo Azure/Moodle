@@ -69,6 +69,7 @@ function get_setup_params_from_configs_json
     export storageAccountType=$(echo $json | jq -r .moodleProfile.storageAccountType)
     export fileServerDiskSize=$(echo $json | jq -r .fileServerProfile.fileServerDiskSize)
     export phpVersion=$(echo $json | jq -r .phpProfile.phpVersion)
+    export isMigration=$(echo $json | jq -r .moodleProfile.isMigration)
 }
 
 function get_php_version {
@@ -125,6 +126,56 @@ function create_azure_files_moodle_share
         --account-key $storageAccountKey \
         --fail-on-exist >>$logFilePath \
         --quota $fileServerDiskSize
+}
+
+function replace_config_setting_value
+{
+    local setting_name=$1
+    local setting_value=$2
+    local delemeter=$3
+    local file_name=$4
+
+    echo "Replacing $setting_name $delemeter $setting_value in $file_name"
+
+    sed -i "s/^\($setting_name\s*$delemeter\s*\).*\$/\1$setting_value/" $file_name
+}
+
+# This function can replace only single line $CFG setting in moodle/config.php file.
+# Supported config setting format:
+#      $CFG->setting = 'value';
+# Usage:
+#      replace_moodle_config_value "setting" "value"
+function replace_moodle_config_value
+{
+    local formated_setting_name="\$CFG->$1"
+    local formated_setting_value="'$2';"
+    local delemeter="="
+    local moodle_config_file=/moodle/html/moodle/config.php
+    
+    replace_config_setting_value $formated_setting_name $formated_setting_value $delemeter $moodle_config_file
+}
+
+function check_azure_files_moodle_share_exists
+{
+    local storageAccountName=$1
+    local storageAccountKey=$2
+
+    local azResponse=$(az storage share exists --name moodle --account-name $storageAccountName --account-key $storageAccountKey)
+    if [ $? -ne 0 ];then
+      echo "Could not check if moodle file share exists in the storage account ($storageAccountName)"
+      exit 1
+    fi
+
+    echo "az storage share exists command response:"
+    echo $azResponse
+    #Sample 'az storage share exists' command response
+    # { "exists": true }
+    local exists=$(echo $azResponse | jq -r .exists)
+
+    if [ "$exists" != "true" ];then
+      echo "File share 'moodle' does not exists in the storage account ($storageAccountName)"
+      exit 1
+    fi
 }
 
 function setup_and_mount_gluster_moodle_share

@@ -1,0 +1,261 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "redisDeploySwitch": {
+            "defaultValue": "false",
+            "metadata": {
+                "description": "Switch to deploy a redis cache or not. Note that certain versions of Moodle (e.g., 3.1) don't work well with Redis, so use this only for known well-working Moodle versions (e.g., 3.4)."
+            },
+            "allowedValues": [ 
+                "true", 
+                "false" 
+            ],
+            "type": "string"
+        },
+        "httpsTermination": {
+            "allowedValues": [
+                "VMSS",
+                "AppGw",
+                "None"
+            ],
+            "defaultValue": "VMSS",
+            "metadata": {
+                "description": "Indicates where https termination occurs. 'VMSS' is for https termination at the VMSS instance VMs (using nginx https proxy). 'AppGw' is for https termination with an Azure Application Gateway. When selecting this, you need to specify all appGw* parameters. 'None' is for testing only with no https. 'None' may not be used with a separately configured https termination layer. If you want to use the 'None' option with your separately configured https termination layer, you'll need to update your Moodle config.php manually for $cfg->wwwroot and $cfg->sslproxy."
+            },
+            "type": "string"
+        },
+        "loadBalancerSku": {
+            "defaultValue": "Basic",
+            "allowedValues": [
+                "Basic",
+                "Standard"
+            ],
+            "metadata": {
+                "description": "Loadbalancer SKU"
+            },
+            "type": "string"
+        },
+        "moodleVersion": {
+            "allowedValues": [
+                "MOODLE_39_STABLE",
+                "MOODLE_38_STABLE"
+            ],
+            "defaultValue": "MOODLE_38_STABLE",
+            "metadata": {
+                "description": "The Moodle version you want to install."
+            },
+            "type": "string"
+        },
+        "sshPublicKey": {
+            "metadata": {
+                "description": "ssh public key"
+            },
+            "type": "string"
+        },
+        "webServerType": {
+            "defaultValue": "nginx",
+            "allowedValues": [
+                "apache",
+                "nginx"
+            ],
+            "metadata": {
+                "description": "Web server type"
+            },
+            "type": "string"
+        },
+        "autoscaleVmSku": {	
+            "defaultValue": "Standard_DS2_v2",	
+            "metadata": {	
+                "description": "VM size for autoscaled web VMs"	
+            },	
+            "type": "string"	
+        },	
+        "autoscaleVmCountMax": {	
+            "defaultValue": "10",	
+            "metadata": {	
+                "description": "Maximum number of autoscaled web VMs"	
+            },	
+            "type": "string"	
+        },
+        "phpVersion": {
+            "allowedValues": [
+                "7.2",
+                "7.3",
+                "7.4"
+            ],
+            "defaultValue": "7.4",
+            "metadata": {
+                "description": "php version"
+            },
+            "type": "string"
+        },
+        "dbServerType": {
+            "defaultValue": "mysql",
+            "allowedValues": [
+                "postgres",
+                "mysql"
+            ],
+            "metadata": {
+                "description": "Database type"
+            },
+            "type": "string"
+        },
+        "moodleDbName": {
+            "defaultValue": "moodle",
+            "metadata": {
+                "description": "Moodle Database name"
+            },
+            "type": "string"
+        },
+        "moodleDbUser": {
+            "defaultValue": "moodle",
+            "metadata": {
+                "description": "Moodle Database username. This user is different from Database admin user."
+            },
+            "type": "string"
+        },
+        "mysqlPgresVcores": {
+            "allowedValues": [
+                "1",
+                "2",
+                "4",
+                "8",
+                "16",
+                "32"
+            ],
+            "defaultValue": "2",
+            "metadata": {
+                "description": "MySql/Postgresql vCores. For Basic tier, only 1 & 2 are allowed. For GeneralPurpose tier, 2, 4, 8, 16, 32 are allowed. For MemoryOptimized, 2, 4, 8, 16 are allowed."
+            },
+            "type": "string"
+        },
+        "mysqlPgresStgSizeGB": {
+            "defaultValue": "125",
+            "metadata": {
+                "description": "MySql/Postgresql storage size in GB. Minimum 5GB, increase by 1GB, up to 1TB (1024 GB)"
+            },
+            "type": "string"
+        },
+        "mysqlPgresSkuTier": {
+            "allowedValues": [
+                "Basic",
+                "GeneralPurpose",
+                "MemoryOptimized"
+            ],
+            "defaultValue": "GeneralPurpose",
+            "metadata": {
+                "description": "MySql/Postgresql sku tier"
+            },
+            "type": "string"
+        },
+        "mysqlPgresSkuHwFamily": {
+            "allowedValues": [
+                "Gen4",
+                "Gen5"
+            ],
+            "defaultValue": "Gen5",
+            "metadata": {
+                "description": "MySql/Postgresql sku hardware family. Central US is Gen4 only, so make sure to change this parameter to Gen4 if your deployment is on Central US."
+            },
+            "type": "string"
+        },
+        "mysqlVersion": {
+            "allowedValues": [
+                "5.6",
+                "5.7"
+            ],
+            "defaultValue": "5.7",
+            "metadata": {
+                "description": "Mysql version"
+            },
+            "type": "string"
+        },
+        "fileServerDiskSize": {
+            "defaultValue": "100",
+            "metadata": {
+                "description": "Size per disk for gluster nodes or nfs server"
+            },
+            "type": "string"
+        },
+        "vNetAddressSpace": {
+            "defaultValue": "172.31.0.0",
+            "metadata": {
+                "description": "Address range for the Moodle virtual network and various subnets - presumed /16 for a newly created vnet in case customVnetId is blank. Further subneting (a number of */24 subnets starting from the xxx.yyy.zzz.0/24 will be created on a newly created vnet or your BYO-vnet (specified in customVnetId parameter)."
+            },
+            "type": "string"
+        },
+        "ubuntuVersion": {
+            "type": "string",
+            "allowedValues": [
+                "18.04-LTS"
+            ],
+            "defaultValue": "18.04-LTS"
+        }
+    },
+    "variables": {
+        "_artifactsLocation": "https://raw.githubusercontent.com/Azure/Moodle/master/",
+        "_artifactsLocationSasToken": "",
+        "unsupportedLocations": [
+            "eastus2euap",
+            "westcentralus"
+        ],
+        "documentationLine1": "Some of the Azure Services used by moodle migration are not available in few regions. Those regions are declared above.",
+        "documentationLine2": "If resource group belong to one of those unsupported regions, then use default region 'westus' for deployment.",
+        "rgLocation": "[toLower(resourceGroup().location)]",
+        "location": "[if(contains(variables('unsupportedLocations'), variables('rgLocation')), 'westus', variables('rgLocation'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "name": "mainTemplate",
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {
+                    "_artifactsLocation":           { "value": "[variables('_artifactsLocation')]" },
+                    "_artifactsLocationSasToken":   { "value": "[variables('_artifactsLocationSasToken')]" },
+                    "redisDeploySwitch":            { "value": "[bool(parameters('redisDeploySwitch'))]" },
+                    "httpsTermination":             { "value": "[parameters('httpsTermination')]"},
+                    "loadBalancerSku":              { "value": "[parameters('loadBalancerSku')]"},
+                    "siteURL":                      { "value": ""},
+                    "moodleVersion":                { "value": "[parameters('moodleVersion')]"},
+                    "sshPublicKey":                 { "value": "[parameters('sshPublicKey')]" },
+                    "controllerVmSku":              { "value": "Standard_DS1_v2"},
+                    "webServerType":                { "value": "[parameters('webServerType')]"},
+                    "autoscaleVmSku":               { "value": "[parameters('autoscaleVmSku')]" },
+                    "autoscaleVmCountMax":          { "value": "[int(parameters('autoscaleVmCountMax'))]" },
+                    "phpVersion":                   { "value": "[parameters('phpVersion')]" },
+                    "dbServerType":                 { "value": "[parameters('dbServerType')]" },
+                    "dbLogin":                      { "value": "dbadmin" },
+                    "moodleDbName":                 { "value": "[parameters('moodleDbName')]" },
+                    "moodleDbUser":                 { "value": "[parameters('moodleDbUser')]" },
+                    "mysqlPgresVcores":             { "value": "[int(parameters('mysqlPgresVcores'))]" },
+                    "mysqlPgresStgSizeGB":          { "value": "[int(parameters('mysqlPgresStgSizeGB'))]" },
+                    "mysqlPgresSkuTier":            { "value": "[parameters('mysqlPgresSkuTier')]" },
+                    "mysqlPgresSkuHwFamily":        { "value": "[parameters('mysqlPgresSkuHwFamily')]" },
+                    "mysqlVersion":                 { "value": "[parameters('mysqlVersion')]" },
+                    "postgresVersion":              { "value": "9.6" },
+                    "fileServerType":               { "value": "azurefiles" },
+                    "storageAccountType":           { "value": "Premium_LRS" },
+                    "fileServerDiskSize":           { "value": "[int(parameters('fileServerDiskSize'))]" },
+                    "searchType":                   { "value": "none" },
+                    "azureSearchSku":               { "value": "basic" },
+                    "vNetAddressSpace":             { "value": "[parameters('vNetAddressSpace')]"},
+                    "ubuntuVersion":                { "value": "[parameters('ubuntuVersion')]"},
+                    "location":                     { "value": "[variables('location')]" },
+                    "isMigration":                  { "value": true }
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('_artifactsLocation'), 'azuredeploy.json', variables('_artifactsLocationSasToken'))]"
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "mainTemplateOutputs": {
+            "type": "object",
+            "value": "[reference('mainTemplate').outputs]"
+        }
+    }
+}

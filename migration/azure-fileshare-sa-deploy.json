@@ -1,0 +1,94 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageAccountType": {
+            "defaultValue": "Premium_LRS",
+            "allowedValues": [
+                "Standard_LRS",
+                "Standard_GRS",
+                "Standard_ZRS",
+                "Premium_LRS"
+            ],
+            "metadata": {
+                "description": "Storage Account type."
+            },
+            "type": "string"
+        },
+        "fileServerDiskSize": {
+            "defaultValue": "100",
+            "metadata": {
+                "description": "Size of the azure file share in GB."
+            },
+            "type": "string"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "name": "storageAccountTemplate",
+            "properties": {
+                "mode": "Incremental",
+                "parameters": {
+                    "moodleCommon": {
+                        "value": "[variables('moodleCommon')]"
+                    }
+                },
+                "templateLink": {
+                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'storageAccount.json',variables('moodleCommon').artifactsSasToken)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(variables('storageName'), '/default/moodle')]",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/storageAccountTemplate"
+            ],
+            "properties": {
+                "accessTier": "[if(equals(variables('moodleCommon').storageAccountType, 'Premium_LRS'), 'Premium', 'TransactionOptimized')]",
+                "shareQuota": "[int(variables('moodleCommon').fileServerDiskSize)]",
+                "enabledProtocols": "SMB"
+            }
+        }
+    ],
+    "outputs": {
+        "storageAccountName": {
+            "type": "string",
+            "value": "[variables('moodleCommon').storageAccountName]"
+        },
+        "storageAccountType": {
+            "type": "string",
+            "value": "[variables('moodleCommon').storageAccountType]"
+        },
+        "fileServerDiskSize": {
+            "type": "string",
+            "value": "[variables('moodleCommon').fileServerDiskSize]"
+        }
+    },
+    "variables": {
+        "_artifactsLocation": "https://raw.githubusercontent.com/Azure/Moodle/master/",
+        "_artifactsLocationSasToken": "",
+        "unsupportedLocations": [
+            "eastus2euap",
+            "westcentralus"
+        ],
+        "documentationLine1": "Some of the Azure Services used by moodle migration are not available in few regions. Those regions are declared above.",
+        "documentationLine2": "If resource group belong to one of those unsupported regions, then use default region 'westus' for deployment.",
+        "rgLocation": "[toLower(resourceGroup().location)]",
+        "location": "[if(contains(variables('unsupportedLocations'), variables('rgLocation')), 'westus', variables('rgLocation'))]",
+        "moodleCommon": {
+            "baseTemplateUrl": "[concat(variables('_artifactsLocation'), 'nested/')]",
+            "artifactsSasToken": "[variables('_artifactsLocationSasToken')]",
+            "fileServerType": "azurefiles",
+            "location": "[variables('location')]",
+            "storageAccountName": "[tolower(concat('abs',variables('resourceprefix')))]",
+            "storageAccountType": "[parameters('storageAccountType')]",
+            "fileServerDiskSize": "[parameters('fileServerDiskSize')]"
+        },
+        "resourceprefix": "[substring(uniqueString(resourceGroup().id, 'mainTemplate'), 3, 6)]",
+        "storageName": "[concat(variables('moodleCommon').storageAccountName,if(equals(variables('moodleCommon').fileServerType, 'azurefiles'), 'af', 'naf'))]"
+    }
+}
