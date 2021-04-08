@@ -16,7 +16,7 @@
             "type": "string"
         },
         "fileServerDiskSize": {
-            "defaultValue": "100",
+            "defaultValue": "1024",
             "metadata": {
                 "description": "Size of the azure file share in GB."
             },

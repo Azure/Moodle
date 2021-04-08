@@ -172,7 +172,7 @@
             "type": "string"
         },
         "fileServerDiskSize": {
-            "defaultValue": "100",
+            "defaultValue": "1024",
             "metadata": {
                 "description": "Size per disk for gluster nodes or nfs server"
             },
