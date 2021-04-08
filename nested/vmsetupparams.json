@@ -71,7 +71,8 @@
                 "tikaVmIP": "[parameters('moodleCommon').tikaVmIP]",
                 "syslogServer": "[parameters('moodleCommon').ctlrVmName]",
                 "webServerType": "[parameters('moodleCommon').webServerType]",
-                "htmlLocalCopySwitch": "[parameters('moodleCommon').htmlLocalCopySwitch]"
+                "htmlLocalCopySwitch": "[parameters('moodleCommon').htmlLocalCopySwitch]",
+                "isMigration": "[parameters('moodleCommon').isMigration]"
             },
             "dbServerProfile": {
                 "type": "[parameters('moodleCommon').dbServerType]",
