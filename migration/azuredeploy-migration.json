@@ -26,7 +26,7 @@
             "type": "string"
         },
         "loadBalancerSku": {
-            "defaultValue": "Basic",
+            "defaultValue": "Standard",
             "allowedValues": [
                 "Basic",
                 "Standard"
