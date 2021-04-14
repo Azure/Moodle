@@ -244,6 +244,7 @@
                     "vNetAddressSpace":             { "value": "[parameters('vNetAddressSpace')]"},
                     "ubuntuVersion":                { "value": "[parameters('ubuntuVersion')]"},
                     "location":                     { "value": "[variables('location')]" },
+                    "enableAccelNwForOtherVmsSwitch":   { "value" : false },
                     "isMigration":                  { "value": true }
                 },
                 "templateLink": {
