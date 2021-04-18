@@ -11,7 +11,7 @@ customize these values by copying and editing `env.json` into
 
 ## Setup for Publishing the Moodle Managed Application
 
-``` bash
+```Bash
 MOODLE_MANAGED_APP_OWNER_GROUP_NAME=MoodleOwner
 MOODLE_MANAGED_APP_OWNER_NICKNAME=MoodleOwner
 MOODLE_SERVICE_CATALOG_LOCATION=southcentralus
@@ -29,7 +29,7 @@ managed application provider. This is the resource group that
 infrastructure will be deployed into. The end user does not,
 generally, manage this group.
 
-``` bash
+```Bash
 SUBSCRIPTION_ID=$(az account show --query id --output tsv)
 MOODLE_MANAGED_RG_ID=/subscriptions/$SUBSCRIPTION_ID/resourceGroups/MoodleInfrastructure
 ```
@@ -38,7 +38,7 @@ We'll also need a resource group for the application deployment. This is the
 resource group into which the application is deployed. This is the resource group that
 the provider of the managed application will have access to.
 
-``` bash
+```Bash
 MOODLE_DEPLOYMENT_RG_NAME=MoodleManagedAppRG
 MOODLE_DEPLOYMENT_LOCATION=southcentralus
 MOODLE_DEPLOYMENT_NAME=MoodleManagedApp
@@ -49,7 +49,7 @@ MOODLE_DEPLOYMENT_NAME=MoodleManagedApp
 We need a workspace for storing configuration files and other
 per-deployment artifacts:
 
-``` shell
+```Bash
 MOODLE_MANAGED_APP_WORKSPACE=~/.moodle
 mkdir -p $MOODLE_MANAGED_APP_WORKSPACE/$MOODLE_DEPLOYMENT_NAME
 ```
@@ -59,7 +59,7 @@ mkdir -p $MOODLE_MANAGED_APP_WORKSPACE/$MOODLE_DEPLOYMENT_NAME
 We use SSH for secure communication with our hosts. The following line
 will check there is a valid SSH key available and, if not, create one.
 
-```
+```Bash
 MOODLE_SSH_KEY_FILENAME=~/.ssh/moodle_managedapp_id_rsa
 if [ ! -f "$MOODLE_SSH_KEY_FILENAME" ]; then ssh-keygen -t rsa -N "" -f $MOODLE_SSH_KEY_FILENAME; fi
 ```

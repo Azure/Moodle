@@ -6,4 +6,4 @@ It is obviously necessary to have a [Moodle cluster up and running](./Deploy.md)
 
 ## Next Steps
 
-  * [Delete all Resources](./Delete.md)
+* [Delete all Resources](./Delete.md)

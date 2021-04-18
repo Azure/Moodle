@@ -11,16 +11,15 @@ name for your deployment and related resources. We'll use a timestamp.
 If the environmnt variable `MOODLE_RG_NAME` is not set we will
 create a new value using a timestamp:
 
-
-``` shell
-if [ -z "$MOODLE_RG_NAME" ]; then MOODLE_RG_NAME=moodle_$(date +%Y-%m-%d-%H); fi
+```Bash
+if [ ! -z "$MOODLE_RG_NAME" ]; then MOODLE_RG_NAME=moodle_$(date +%Y-%m-%d-%H); fi
 ```
 
 Other configurable values for our Azure deployment include the
 location and depoloyment name. We'll standardize these, but you can
 use different values if you like.
 
-``` shell
+```Bash
 MOODLE_RG_LOCATION=southcentralus
 MOODLE_DEPLOYMENT_NAME=MasterDeploy
 ```
@@ -29,14 +28,14 @@ We also need to provide an SSH key. Later we'll generate this if it
 doesn't already exist but to enable us to reuse an existing key we'll
 store it's filename in an Environment Variable.
 
-``` shell
+```Bash
 MOODLE_SSH_KEY_FILENAME=~/.ssh/moodle_id_rsa
 ```
 
 We need a workspace for storing configuration files and other
 per-deployment artifacts:
 
-``` shell
+```Bash
 MOODLE_AZURE_WORKSPACE=~/.moodle
 ```
 
@@ -44,7 +43,7 @@ MOODLE_AZURE_WORKSPACE=~/.moodle
 
 Ensure the workspace for this particular deployment exists:
 
-```
+```Bash
 mkdir -p $MOODLE_AZURE_WORKSPACE/$MOODLE_RG_NAME
 ```
 
@@ -55,78 +54,64 @@ environment variables defined that will be used to provide a common
 setup for all our Moodle on Azure work.
 
 The resource group name defines the name of the group into which all
-resources will be, or are, deployed. 
+resources will be, or are, deployed.
 
-```bash
+```Bash
 echo "Resource Group for deployment: $MOODLE_RG_NAME"
 ```
 
 Results:
 
-```
-Resource Group for deployment: southcentralus
-```
+> Resource Group for deployment: southcentralus
 
 The resource group location is:
 
-```bash
+```Bash
 echo "Deployment location: $MOODLE_RG_LOCATION"
 ```
 
 Results:
 
-```
-Deployment location: southcentralus
-```
+> Deployment location: southcentralus
 
 When deploying a Moodle cluster the deployment will be given a name so
 that it can be identified later should it be neceessary to debug.
 
-
-```bash
+```Bash
 echo "Deployment name: $MOODLE_DEPLOYMENT_NAME"
 ```
 
 Results:
 
-```
-Deployment name: MasterDeploy
-```
+> Deployment name: MasterDeploy
 
 The SSH key to use can be found in a file, if necessary this will be
 created as part of these scripts.
 
-``` shell
+```Bash
 echo "SSH key filename: $MOODLE_SSH_KEY_FILENAME"
 ```
 
 Results:
 
-```
-SSH key filename: ~/.ssh/moodle_id_rsa
-```
+> SSH key filename: ~/.ssh/moodle_id_rsa
 
 Configuration files will be written to / read from a customer directory:
 
-``` shell
+```Bash
 echo "Workspace directory: $MOODLE_AZURE_WORKSPACE"
 ```
 
 Results:
 
-```
-Workspace directory: ~/.moodle
-```
+> Workspace directory: ~/.moodle
 
 Ensure the workspace directory exists:
 
-
-``` bash
-if [ ! -f "$MOODLE_AZURE_WORKSPACE/$MOODLE_RG_NAME" ]; then echo "Worspace exists"; fi
+```shell
+if [ -d "$MOODLE_AZURE_WORKSPACE/$MOODLE_RG_NAME" ]; then echo "Worspace exists"; fi
 ```
 
 Results:
 
-```
-Workspace exists
-```
+> Workspace exists

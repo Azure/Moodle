@@ -36,22 +36,20 @@ To connect to your Controller VM use SSH with a username of
 parameter. For example, to retrieve a listing of files and directories
 in the `/moodle` directory use:
 
-```
+```Bash
 ssh -o StrictHostKeyChecking=no azureadmin@$MOODLE_CONTROLLER_INSTANCE_IP ls -l /moodle
 ```
 
 Results:
 
-```
-Warning: Permanently added '52.228.45.38' (ECDSA) to the list of known hosts.
-total 12
-drwxr-xr-x  2 www-data www-data 4096 Jan 17 00:59 certs
--rw-r--r--  1 root     root        0 Jan 17 02:22 db-backup.sql
-drwxr-xr-x  3 www-data www-data 4096 Jan 17 00:54 html
-drwxrwx--- 10 www-data www-data 4096 Jan 17 06:55 moodledata
-```
+> Warning: Permanently added '52.228.45.38' (ECDSA) to the list of known hosts.
+> total 12
+> drwxr-xr-x  2 www-data www-data 4096 Jan 17 00:59 certs
+> -rw-r--r--  1 root     root        0 Jan 17 02:22 db-backup.sql
+> drwxr-xr-x  3 www-data www-data 4096 Jan 17 00:54 html
+> drwxrwx--- 10 www-data www-data 4096 Jan 17 06:55 moodledata
 
-**IMPORTANT NOTE**
+### **IMPORTANT NOTE**
 
 It is important to realize that the `-o StrictHostKeyChecking=no`
 option in the above SSH command presents a security risk. It is
@@ -63,7 +61,7 @@ validation step. For more information there is an excellent
 [superuser.com
 Q&A](https://superuser.com/questions/421074/ssh-the-authenticity-of-host-host-cant-be-established/421084#421084).
 
-### If you set `htmlLocalCopySwitch` to true (this is the default now)
+#### If you set `htmlLocalCopySwitch` to true (this is the default now)
 
 Originally the `/moodle/html` directory was shared across all autoscaled
 web VMs through the specified file server (Gluster or NFS), and this is
@@ -80,22 +78,24 @@ following steps:
 * Put your Moodle site to maintenance mode.
   * This will need to be done on the contoller VM with some shell command.
   * It should be followed by running the following command to propagate the change to all autoscaled web VMs:
-    ```bash
-    $ sudo /usr/local/bin/update_last_modified_time.moodle_on_azure.sh
+
+    ```Bash
+    sudo /usr/local/bin/update_last_modified_time.moodle_on_azure.sh
     ```
+
   * Once this command is executed, each autoscaled web VM will pick up (sync) the changes within 1 minute, so wait for one minute.
 * Then you can start updating your Moodle code/settings, like installing/updating plugins or upgrading Moodle version or changing Moodle configurations. Again, note that this should be all done on the controller VM using some shell commands.
 * When you are done updating your Moodle code/settings, run the same command as above to let each autoscaled web VM pick up (sync) the changes (wait for another minute here, for the same reason).
 
 Please do let us know on this Github repo's Issues if you encounter any problems with this process.
 
-## Getting an SQL dump
+### Getting an SQL dump
 
 By default a daily sql dump of your database is taken at 02:22 and
 saved to `/moodle/db-backup.sql`(.gz). This file can be retrieved
 using SCP or similar. For example:
 
-``` bash
+```Bash
 scp azureadmin@$MOODLE_CONTROLLER_INSTANCE_IP:/moodle/db-backup.sql /tmp/moodle-db-backup.sql
 ```
 
@@ -109,7 +109,7 @@ Postgress provides a `pg_dump` command that can be used to take a
 snapshot of the database via SSH. For example, use the following
 command:
 
-``` bash
+```Bash
 ssh azureadmin@$MOODLE_CONTROLLER_INSTANCE_IP 'pg_dump -Fc -h $MOODLE_DATABASE_DNS -U $MOODLE_DATABASE_ADMIN_USERNAME moodle > /moodle/db-snapshot.sql'
 ```
 
@@ -121,7 +121,7 @@ MySQL provides a `mysql_dump` command that can be used to take a
 snapshot of the database via SSH. For example, use the following
 command:
 
-``` bash
+```Bash
 ssh azureadmin@$MOODLE_CONTROLLER_INSTANCE_IP 'mysqldump -h $mysqlIP -u ${azuremoodledbuser} -p'${moodledbpass}' --databases ${moodledbname} | gzip > /moodle/db-backup.sql.gz'
 ```
 
@@ -132,7 +132,7 @@ then Azure will provide VM backups of your Gluster node. This is
 recommended as it contains both your Moodle code and your sitedata.
 Restoring a backed up VM is outside the scope of this doc, but Azure's
 documentation on Recovery Services can be found here:
-https://docs.microsoft.com/en-us/azure/backup/backup-azure-vms-first-look-arm
+[https://docs.microsoft.com/en-us/azure/backup/backup-azure-vms-first-look-arm]
 
 ## Resizing your Database
 
@@ -170,27 +170,27 @@ basic testing, but a public website will want a real cert. After
 purchasing a trusted certificate, it can be copied to the following
 files to be ready immediately:
 
-  - /moodle/certs/nginx.key: Your certificate's private key
-  - /moodle/certs/nginx.crt: Your combined signed certificate and trust chain certificate(s).
+* /moodle/certs/nginx.key: Your certificate's private key
+* /moodle/certs/nginx.crt: Your combined signed certificate and trust chain certificate(s).
 
 ## Managing Azure DDoS protection
 
-By default, every plublic IP is protected by Azure DDoS protection Basic SKU. 
+By default, every plublic IP is protected by Azure DDoS protection Basic SKU.
 You can find more information about Azure DDoS protection Basic SKU [here](https://docs.microsoft.com/en-us/azure/virtual-network/ddos-protection-overview).
 
-If you want more protection, you can activate Azure DDoS protection Standard SKU by setting 
-the ddosSwith to true. You can find how to work with Azure DDoS 
+If you want more protection, you can activate Azure DDoS protection Standard SKU by setting
+the ddosSwith to true. You can find how to work with Azure DDoS
 protection plan [here](https://docs.microsoft.com/en-us/azure/virtual-network/manage-ddos-protection#work-with-ddos-protection-plans).
 
-If you want to disable the Azure DDoS protection, you can follow the instruction 
-[here](https://docs.microsoft.com/en-us/azure/virtual-network/manage-ddos-protection#disable-ddos-for-a-virtual-network). 
+If you want to disable the Azure DDoS protection, you can follow the instruction
+[here](https://docs.microsoft.com/en-us/azure/virtual-network/manage-ddos-protection#disable-ddos-for-a-virtual-network).
 
 Be careful, disabling the Azure DDoS protection on your vnet will not stop the fee.
 You have to delete the Azure DDoS protection plan if you want to stop the fee.
 
-If you have deployed your cluster without Azure DDoS protection plan, you still can activate the 
+If you have deployed your cluster without Azure DDoS protection plan, you still can activate the
 Azure DDoS protection plan thanks to the instruction [here](https://docs.microsoft.com/en-us/azure/virtual-network/manage-ddos-protection#enable-ddos-for-an-existing-virtual-network).
 
 ## Next Steps
 
-  1. [Retrieve configuration details using CLI](./Get-Install-Data.md)
+1. [Retrieve configuration details using CLI](./Get-Install-Data.md)
