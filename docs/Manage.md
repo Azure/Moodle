@@ -173,6 +173,8 @@ files to be ready immediately:
   - /moodle/certs/nginx.key: Your certificate's private key
   - /moodle/certs/nginx.crt: Your combined signed certificate and trust chain certificate(s).
 
+Once you have updated these files you will need to restart the Web Front End. Management of [SSL Certs is expanded upon elsehwhere](SslCert.md). 
+
 ## Managing Azure DDoS protection
 
 By default, every plublic IP is protected by Azure DDoS protection Basic SKU. 
