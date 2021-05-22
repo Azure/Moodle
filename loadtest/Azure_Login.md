@@ -5,26 +5,26 @@ logged in to Azure using the CLI.
 
 ## Azure Login
 
-``` bash
+```Bash
 az login --username $AZURE_USERNAME --password $AZURE_PASWORD
 ```
 
 Note that if your username or password has any special characters in
 it, such as '$' this may fail. You can login using a browser using `az login`.
 
-``` bash
+```Bash
 az account set --subscription $AZURE_SUBSCRIPTION_ID
 ```
 
 ## Validation
 
-``` bash
+```Bash
 az account show
 ```
 
 Results:
 
-```
+```json
 {
   "environmentName": "AzureCloud",
   "id": "325e7c34-99fb-4190-aa87-1df746c67705",
@@ -38,4 +38,3 @@ Results:
   }
 }
 ```
-

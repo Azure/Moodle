@@ -17,6 +17,6 @@ Note, that this command will not fully delete the resource group if
 you have Azure Backup enabled since the Recovery Services Vault will
 not be deleted (it's got the backups of you data!).
 
-``` bash
+```Bash
 for filename in $MOODLE_AZURE_WORKSPACE/*; do az group delete --yes --name $(basename $filename) --no-wait; done
 ```

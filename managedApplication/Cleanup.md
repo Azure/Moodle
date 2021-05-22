@@ -10,14 +10,14 @@ We need to ensure the [variables](Environment.md) are set up correctly.
 
 ## Azure Active Directory
 
-``` bash
+```Bash
 MOODLE_MANAGED_APP_AD_ID=$(az ad group list --filter="displayName eq '$MOODLE_MANAGED_APP_OWNER_GROUP_NAME'" --query [0].objectId --output tsv)
 az ad group delete --group $MOODLE_MANAGED_APP_AD_ID
 ```
 
 ## Remove the Service Catalog Entry
 
-``` bash
+```Bash
 az managedapp definition delete --resource-group $MOODLE_SERVICE_CATALOG_RG_NAME --ids $MOODLE_MANAGED_APP_ID
 ```
 
@@ -26,7 +26,7 @@ az managedapp definition delete --resource-group $MOODLE_SERVICE_CATALOG_RG_NAME
 If you create a resource group solely for the managed application you
 are now deleting you can safely remove its resource group:
 
-``` bash
+```Bash
 az group delete --name $MOODLE_SERVICE_CATALOG_RG_NAME --yes
 ```
 
@@ -38,13 +38,12 @@ was created as part of the managed application deployment).
 
 First we need the application ID.
 
-``` bash
+```Bash
 MOODLE_DEPLOYMENT_ID=$(az managedapp show --resource-group $MOODLE_DEPLOYMENT_RG_NAME --name $MOODLE_DEPLOYMENT_NAME)
 ```
 
 Now we have the ID we can delete the application.
 
-``` bash
+```Bash
 az managedapp delete --resource-group $MOODLE_DEPLOYMENT_RG_NAME --ids $MOODLE_DEPLOYMENT_ID
 ```
-
