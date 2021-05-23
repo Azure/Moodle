@@ -36,37 +36,28 @@ Once you updloaded the files to your deployment environment, you can run the fol
 to create an Azure Key Vault on your subscription and store your SSL certificate, private key, and optionally
 the intermediate CA certificate:
 
-``` bash
-$ bash $MOODLE_AZURE_WORKSPACE/arm_template/etc/keyvault.sh <key_vault_name> <resource_group_name> <azure_region> <secret_name> cert.pem key.pem chain.pem
+```Bash
+bash $MOODLE_AZURE_WORKSPACE/arm_template/etc/keyvault.sh <key_vault_name> <resource_group_name> <azure_region> <secret_name> cert.pem key.pem chain.pem
 ```
 
 Make sure to set `<azure_region>` the same as the Azure region you'll be using to deploy the Moodle template.
 Assign desired names for `<key_vault_name>`, `<resource_group_name>` (you can use an existing resource group) and `<secret_name>`.
 `<secret_name>` is not very important in our deployment. Then you'll get outputs as follows:
 
-```
-...
-Specified SSL cert/key .pem files are now stored in your Azure Key Vault and ready to be used by the template.
-Use the following values for the related template parameters:
+> ...
+> Specified SSL cert/key .pem files are now stored in your Azure Key Vault and ready to > be used by the template.
+> Use the following values for the related template parameters:
+>
+> - keyVaultResourceId: /subscriptions/206c66fc-a48c-480d-ad06-0d429e82c586/> resourceGroups/keyvault/providers/Microsoft.KeyVault/vaults/mdl-kv
+> - sslCertKeyVaultURL: https://mdl-kv.vault.azure.net/secrets/mymoodlesitecert/> 4c88452fe72b4d469253af48348f4944
+> - sslCertThumbprint:  56478E4F9555662476E2763D909F50B3DD26FF84
+> - caCertKeyVaultURL:  https://mdl-kv.vault.azure.net/secrets/camymoodlesitecert/> 684efab1f2124e71a2c809457d10808b
+> - caCertThumbprint:   E6A3B45B062D509B3382282D196EFE97D5956CCB
+> Done
 
-- keyVaultResourceId: /subscriptions/206c66fc-a48c-480d-ad06-0d429e82c586/resourceGroups/keyvault/providers/Microsoft.KeyVault/vaults/mdl-kv
-- sslCertKeyVaultURL: https://mdl-kv.vault.azure.net/secrets/mymoodlesitecert/4c88452fe72b4d469253af48348f4944
-- sslCertThumbprint:  56478E4F9555662476E2763D909F50B3DD26FF84
-- caCertKeyVaultURL:  https://mdl-kv.vault.azure.net/secrets/camymoodlesitecert/684efab1f2124e71a2c809457d10808b
-- caCertThumbprint:   E6A3B45B062D509B3382282D196EFE97D5956CCB
-Done
-```
-
-This example outputs assumes `"keyvault"` is used for `<resource_group_name>`, `"mdl-kv"` for `<key_vault_name>`,
-and `"mymoodlesitecert"` for `<secret_name>`. Note that `caCertKeyVaultURL` and `caCertThumbprint` will be empty
-if you didn't specify `chain.pem`. Then you can copy these outputs to the template's corresponding parameters,
-and Azure Resource Manager will install the certificate and the private key on the deployed VMs and the deployed
-HTTPS server will use this certificate and private key.
+This example outputs assumes `"keyvault"` is used for `<resource_group_name>`, `"mdl-kv"` for `<key_vault_name>`, and `"mymoodlesitecert"` for `<secret_name>`. Note that `caCertKeyVaultURL` and `caCertThumbprint` will be empty if you didn't specify `chain.pem`. Then you can copy these outputs to the template's corresponding parameters, and Azure Resource Manager will install the certificate and the private key on the deployed VMs and the deployed HTTPS server will use this certificate and private key.
 
 ## Certificate rotation
 
-Another important benefit of using Azure Key Vault is to handle certificate expiration/rotation automatically.
-Unfortunately, the current implementation doesn't support the auto-rotation. So when it becomes near your SSL
-certificate's expiry, you'll need to manually update the deployed certificate and private key files
-(it's in `/moodle/certs/nginx.{crt,key}` on the controller VM) and restart all the web frontend VM instances.
-We'll improve our implementation to support auto-rotation in the future.
+Another important benefit of using Azure Key Vault is to handle certificate expiration/rotation automatically. Unfortunately, the current implementation doesn't support the auto-rotation. So when it becomes near your SSL certificate's expiry, you'll need to manually update the deployed certificate and private key files
+(it's in `/moodle/certs/nginx.{crt,key}` on the controller VM) and restart all the web frontend VM instances. We'll improve our implementation to support auto-rotation in the future.

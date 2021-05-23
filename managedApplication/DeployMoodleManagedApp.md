@@ -23,14 +23,14 @@ the output of the command to create the service catalog entry.
 However, we'll use the CLI to retrieve it and record it into a
 variable:
 
-``` bash
+```Bash
 MOODLE_MANAGED_APP_ID=$(az managedapp definition show --name $MOODLE_MANAGED_APP_NAME --resource-group $MOODLE_SERVICE_CATALOG_RG_NAME --query id --output tsv)
 ```
 
 Create the application resource group, this is the group in which the
 customer will see the managed application.
 
-``` bash
+```Bash
 az group create --name $MOODLE_DEPLOYMENT_RG_NAME --location=$MOODLE_DEPLOYMENT_LOCATION
 ```
 
@@ -70,14 +70,16 @@ adding the `--parameters` attribute. This attribute can take either
 a JSON string or a filename (preceded with an '@', e.g. '--parameters @parameters.json`) containing a JSON
 definition for the paramters, e.g.
 
-    {
-        "parameterName": {
-            "value": "some value"
-        },
-        "anotherParameterName": {
-            "value": "another value"
-        }
+```json
+{
+    "parameterName": {
+        "value": "some value"
+    },
+    "anotherParameterName": {
+        "value": "another value"
     }
+}
+```
 
 The Moodle template provides sensible defaults for almost every
 parameter, the one exception to this is the SSH Public Key, used to
@@ -89,7 +91,7 @@ placeholder in the parameters template file with an SSH key used for
 testing puporses (this is created as part of the envrionment setup in
 the prerequisites):
 
-``` bash
+```Bash
 ssh_pub_key=`cat $MOODLE_SSH_KEY_FILENAME.pub`
 echo $ssh_pub_key
 sed "s|GEN-SSH-PUB-KEY|$ssh_pub_key|g" parameters-template.json > $MOODLE_MANAGED_APP_WORKSPACE/$MOODLE_DEPLOYMENT_NAME/parameters.json
@@ -103,6 +105,6 @@ parameter files for specific deployments.
 
 Deploy the managed application and corresponding infrastructure.
 
-``` bash
+```Bash
 az managedapp create --name $MOODLE_DEPLOYMENT_NAME --location $MOODLE_DEPLOYMENT_LOCATION --kind ServiceCatalog --resource-group $MOODLE_DEPLOYMENT_RG_NAME --managedapp-definition-id $MOODLE_MANAGED_APP_ID --managed-rg-id $MOODLE_MANAGED_RG_ID --parameters @$MOODLE_MANAGED_APP_WORKSPACE/$MOODLE_DEPLOYMENT_NAME/parameters.json
 ```

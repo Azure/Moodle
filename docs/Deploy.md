@@ -12,7 +12,6 @@ install.
 To make things consitent across different sessions managing Moodle we
 should [configure the environment](./Preparation.md).
 
-
 ## Create Resource Group
 
 When you create the Moodle cluster you will create many resources. On
@@ -20,7 +19,7 @@ Azure it is a best practice to collect such resources together in a
 Resource Group. The first thing we need to do, therefore, is create a
 resource group:
 
-```
+```Bash
 az group create --name $MOODLE_RG_NAME --location $MOODLE_RG_LOCATION
 ```
 
@@ -57,7 +56,7 @@ placeholder in the parameters template file with an SSH key used for
 testing puporses (this is created as part of the envrionment setup in
 the prerequisites):
 
-``` bash
+```Bash
 ssh_pub_key=`cat $MOODLE_SSH_KEY_FILENAME.pub`
 echo $ssh_pub_key
 sed "s|GEN-SSH-PUB-KEY|$ssh_pub_key|g" $MOODLE_AZURE_WORKSPACE/arm_template/azuredeploy.parameters.json > $MOODLE_AZURE_WORKSPACE/$MOODLE_RG_NAME/azuredeploy.parameters.json
@@ -75,7 +74,7 @@ For more information see the [parameters documentation](Parameters.md).
 Now that we have a resource group and a configuration file we can
 create the cluster itself. This is done with a single command:
 
-```
+```Bash
 az group deployment create --name $MOODLE_DEPLOYMENT_NAME --resource-group $MOODLE_RG_NAME --template-file $MOODLE_AZURE_WORKSPACE/arm_template/azuredeploy.json --parameters $MOODLE_AZURE_WORKSPACE/$MOODLE_RG_NAME/azuredeploy.parameters.json
 ```
 
@@ -86,7 +85,7 @@ depending on spec. Once complete you will receive a JSON output
 containing information needed to manage your Moodle install (see
 `outputs`). You can also retrieve this infromation from the portal or
 the CLI.
-                      
+
 Once Moodle has been created, and (where necessary) you have
 configured your custom `siteURL` DNS to point to the
 `loadBalancerDNS`, you should be able to load the `siteURL` in a
@@ -122,7 +121,7 @@ database tier:
 - Memory Optimized: 2, 4, 8, 16
 
 This value also limits the maximum number of connections, as defined
-here: https://docs.microsoft.com/en-us/azure/mysql/concepts-limits
+here: [https://docs.microsoft.com/en-us/azure/mysql/concepts-limits]
 
 As the Moodle database will handle cron processes as well as the
 website, any public facing website with more than 10 users will likely
@@ -161,8 +160,7 @@ memory and not require manual configuration. FPM also allows for a
 very large number of threads which prevents the system from failing
 during many small jobs.
 
-
 ## Next Steps
 
-  1. [Retrieve configuration details using CLI](./Get-Install-Data.md)
-  1. [Manage the Moodle cluster](./Manage.md)
+1. [Retrieve configuration details using CLI](./Get-Install-Data.md)
+1. [Manage the Moodle cluster](./Manage.md)

@@ -57,26 +57,26 @@ use in the examples below.
 If the Group already exists we don't want to create a new one, so we
 will try to get the Group ID first:
 
-``` bash
+```Bash
 MOODLE_MANAGED_APP_AD_ID=$(az ad group list --filter="displayName eq '$MOODLE_MANAGED_APP_OWNER_GROUP_NAME'" --query [0].objectId --output tsv)
 ```
 
 At this point MOODLE_MANAGED_APP_AD_ID will either be empty or it will have the ID of an existing group. If it is empty we need to create the group and grab its ID:
 
-``` bash
+```Bash
 if [ -z "$MOODLE_MANAGED_APP_AD_ID" ]; then az ad group create --display-name $MOODLE_MANAGED_APP_OWNER_GROUP_NAME --mail-nickname=$MOODLE_MANAGED_APP_OWNER_NICKNAME; fi
 ```
 
 Let's ensure that we have the object ID even if we created a new one.
 
-``` bash
+```Bash
 MOODLE_MANAGED_APP_AD_ID=$(az ad group list --filter="displayName eq '$MOODLE_MANAGED_APP_OWNER_GROUP_NAME'" --query [0].objectId --output tsv)
 ```
 
 You will also need the Role ID for your chosen role, here we will use
 the built-in 'Owner' role:
 
-``` bash
+```Bash
 MOODLE_MANAGED_APP_ROLE_ID=$(az role definition list --name Owner --query [].name --output tsv)
 ```
 
@@ -84,7 +84,7 @@ The Azure documentation has more information on how to work with [Azure Active D
 
 ## Create a Resource Group for the Managed Application Service Catalog Entry
 
-``` bash
+```Bash
 az group create --name $MOODLE_SERVICE_CATALOG_RG_NAME --location $MOODLE_SERVICE_CATALOG_LOCATION
 ```
 
@@ -96,13 +96,13 @@ to make it easier to work with the application. We'll need to construct
 the authorization configuration from the app and role IDs retrieved
 earlier.
 
-``` bash
+```Bash
 MOODLE_MANAGED_APP_AUTHORIZATIONS=$MOODLE_MANAGED_APP_AD_ID:$MOODLE_MANAGED_APP_ROLE_ID
 ```
 
 The following command will add your managed application definition to the Service Catalog.
 
-``` bash
+```Bash
 az managedapp definition create --name $MOODLE_MANAGED_APP_NAME --location $MOODLE_SERVICE_CATALOG_LOCATION --resource-group $MOODLE_SERVICE_CATALOG_RG_NAME --lock-level $MOODLE_MANAGED_APP_LOCK_LEVEL --display-name $MOODLE_MANAGED_APP_DISPLAY_NAME --description "$MOODLE_MANAGED_APP_DESCRIPTION" --authorizations="$MOODLE_MANAGED_APP_AUTHORIZATIONS" --main-template=@../azuredeploy.json --create-ui-definition=@createUIDefinition.json
 ```
 
