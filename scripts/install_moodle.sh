@@ -80,6 +80,16 @@ set -ex
       mysqlIP=$dbIP
       mysqladminlogin=$dbadminloginazure
       mysqladminpass=$dbadminpass
+      if [ "$mysqlVersion" = "8.0" ]; then
+        # MySQL 8.0
+        mysqldbport=3309
+      elif [ "$mysqlVersion" = "5.7" ]; then
+        # MySQL 5.7
+        mysqldbport=3308
+      else
+        # MySQL 5.6 or default
+        mysqldbport=3306
+      fi
     elif [ "$dbServerType" = "mssql" ]; then
       mssqlIP=$dbIP
       mssqladminlogin=$dbadminloginazure
@@ -765,18 +775,18 @@ EOF
     service varnish restart
 
     if [ $dbServerType = "mysql" ]; then
-		mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e "CREATE DATABASE ${moodledbname} CHARACTER SET utf8;"
-		echo "mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e \"CREATE DATABASE ${moodledbname};\"" >>/tmp/sql_debug.log
+		mysql -h $mysqlIP -P $mysqldbport -u $mysqladminlogin -p${mysqladminpass} -e "CREATE DATABASE ${moodledbname} CHARACTER SET utf8;"
+		echo "mysql -h $mysqlIP -P $mysqldbport -u $mysqladminlogin -p${mysqladminpass} -e \"CREATE DATABASE ${moodledbname};\"" >>/tmp/sql_debug.log
         if [ "$mysqlVersion" = "8.0" ]; then
         	# MySQL 8.0
-        	mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e "CREATE USER '${moodledbuser}' IDENTIFIED BY '${moodledbpass}';"
-        	echo "mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e \"CREATE USER '${moodledbuser}' IDENTIFIED BY '${moodledbpass}';\"" >>/tmp/sql_debug.log
-        	mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e "GRANT ALL ON ${moodledbname}.* TO '${moodledbuser}';"
-        	echo "mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e \"GRANT ALL ON ${moodledbname}.* TO ${moodledbuser};\"" >>/tmp/sql_debug.log
+        	mysql -h $mysqlIP -P $mysqldbport -u $mysqladminlogin -p${mysqladminpass} -e "CREATE USER '${moodledbuser}' IDENTIFIED BY '${moodledbpass}';"
+        	echo "mysql -h $mysqlIP -P $mysqldbport -u $mysqladminlogin -p${mysqladminpass} -e \"CREATE USER '${moodledbuser}' IDENTIFIED BY '${moodledbpass}';\"" >>/tmp/sql_debug.log
+        	mysql -h $mysqlIP -P $mysqldbport -u $mysqladminlogin -p${mysqladminpass} -e "GRANT ALL ON ${moodledbname}.* TO '${moodledbuser}';"
+        	echo "mysql -h $mysqlIP -P $mysqldbport -u $mysqladminlogin -p${mysqladminpass} -e \"GRANT ALL ON ${moodledbname}.* TO ${moodledbuser};\"" >>/tmp/sql_debug.log
         else
         	# MySQL 5.6 or 5.7
-        	mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e "GRANT ALL ON ${moodledbname}.* TO ${moodledbuser} IDENTIFIED BY '${moodledbpass}';"
-        	echo "mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e \"GRANT ALL ON ${moodledbname}.* TO ${moodledbuser} IDENTIFIED BY '${moodledbpass}';\"" >>/tmp/debug
+        	mysql -h $mysqlIP -P $mysqldbport -u $mysqladminlogin -p${mysqladminpass} -e "GRANT ALL ON ${moodledbname}.* TO ${moodledbuser} IDENTIFIED BY '${moodledbpass}';"
+        	echo "mysql -h $mysqlIP -P $mysqldbport -u $mysqladminlogin -p${mysqladminpass} -e \"GRANT ALL ON ${moodledbname}.* TO ${moodledbuser} IDENTIFIED BY '${moodledbpass}';\"" >>/tmp/debug
         fi
     elif [ $dbServerType = "mssql" ]; then
         /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -Q "CREATE DATABASE ${moodledbname} ( MAXSIZE = $mssqlDbSize, EDITION = '$mssqlDbEdition', SERVICE_OBJECTIVE = '$mssqlDbServiceObjectiveName' )"
@@ -830,7 +840,7 @@ EOF
             fi
             
             echo "Importing migration moodle DB."
-            mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} < /moodle/migration-db-moodle.sql
+            mysql -h $mysqlIP -P $mysqldbport  -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} < /moodle/migration-db-moodle.sql
             
             echo "Updating moodle db config settings"
             replace_moodle_config_value "dbhost" "$mysqlIP"
@@ -846,11 +856,11 @@ EOF
         fi
 
         if [ "$installObjectFsSwitch" = "true" ]; then
-            mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'enabletasks', 1);" 
-            mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'filesystem', '\\\tool_objectfs\\\azure_file_system');"
-            mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_accountname', '${storageAccountName}');"
-            mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_container', 'objectfs');"
-            mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_sastoken', '${sas}');"
+            mysql -h $mysqlIP -P $mysqldbport -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'enabletasks', 1);" 
+            mysql -h $mysqlIP -P $mysqldbport -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'filesystem', '\\\tool_objectfs\\\azure_file_system');"
+            mysql -h $mysqlIP -P $mysqldbport -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_accountname', '${storageAccountName}');"
+            mysql -h $mysqlIP -P $mysqldbport -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_container', 'objectfs');"
+            mysql -h $mysqlIP -P $mysqldbport -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_sastoken', '${sas}');"
         fi
     elif [ $dbServerType = "mssql" ]; then
         cd /tmp; /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en --wwwroot=$siteProtocol://$siteFQDN   --dataroot=/moodle/moodledata --dbhost=$mssqlIP   --dbname=$moodledbname   --dbuser=$azuremoodledbuser   --dbpass=$moodledbpass   --dbtype=sqlsrv --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass=$adminpass   --adminemail=admin@$siteFQDN   --non-interactive --agree-license --allow-unstable || true
@@ -863,8 +873,8 @@ EOF
             /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -d${moodledbname} -Q "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'azure_sastoken', '${sas}')"
         fi
     else
-        echo -e "cd /tmp; /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en --wwwroot="$siteProtocol"://"$siteFQDN" --dataroot=/moodle/moodledata --dbhost="$postgresIP" --dbname="$moodledbname" --dbuser="$azuremoodledbuser" --dbpass="$moodledbpass" --dbtype=pgsql --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass="$adminpass" --adminemail=admin@"$siteFQDN" --non-interactive --agree-license --allow-unstable || true "
-        cd /tmp; /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en --wwwroot=$siteProtocol://$siteFQDN   --dataroot=/moodle/moodledata --dbhost=$postgresIP   --dbname=$moodledbname   --dbuser=$azuremoodledbuser   --dbpass=$moodledbpass   --dbtype=pgsql --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass=$adminpass   --adminemail=admin@$siteFQDN   --non-interactive --agree-license --allow-unstable || true
+        echo -e "cd /tmp; /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en --wwwroot="$siteProtocol"://"$siteFQDN" --dataroot=/moodle/moodledata --dbhost="$mysqlIP"   --dbport="$mysqldbport"   --dbname="$moodledbname" --dbport=3308 --dbuser="$azuremoodledbuser" --dbpass="$moodledbpass" --dbtype=mysqli --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass="$adminpass" --adminemail=admin@"$siteFQDN" --non-interactive --agree-license --allow-unstable || true "
+        cd /tmp; /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en --wwwroot=$siteProtocol://$siteFQDN   --dataroot=/moodle/moodledata --dbhost=$mysqlIP   --dbport=$mysqldbport   --dbname=$moodledbname   --dbuser=$azuremoodledbuser   --dbpass=$moodledbpass   --dbtype=mysqli --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass=$adminpass   --adminemail=admin@$siteFQDN   --non-interactive --agree-license --allow-unstable || true
 
         if [ "$installObjectFsSwitch" = "true" ]; then
             # Add the ObjectFS configuration to Moodle.
