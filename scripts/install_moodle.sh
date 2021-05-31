@@ -53,8 +53,8 @@ set -ex
     echo $dbServerType                >> /tmp/vars.txt
     echo $fileServerType              >> /tmp/vars.txt
     echo $mssqlDbServiceObjectiveName >> /tmp/vars.txt
-    echo $mssqlDbEdition	>> /tmp/vars.txt
-    echo $mssqlDbSize	>> /tmp/vars.txt
+    echo $mssqlDbEdition    >> /tmp/vars.txt
+    echo $mssqlDbSize   >> /tmp/vars.txt
     echo $installObjectFsSwitch >> /tmp/vars.txt
     echo $installGdprPluginsSwitch >> /tmp/vars.txt
     echo $thumbprintSslCert >> /tmp/vars.txt
@@ -67,7 +67,8 @@ set -ex
     echo $storageAccountType >>/tmp/vars.txt
     echo $fileServerDiskSize >>/tmp/vars.txt
     echo $phpVersion         >> /tmp/vars.txt
-		echo $mysqlVersion >>/tmp/vars.txt
+    echo $isMigration        >> /tmp/vars.txt
+    echo $mysqlVersion >>/tmp/vars.txt
 
     check_fileServerType_param $fileServerType
 
@@ -127,43 +128,55 @@ set -ex
     elif [ "$dbServerType" = "postgres" ]; then
         sudo apt-get -y --force-yes install postgresql-client >> /tmp/apt3.log
     fi
-	
+    
     if [ "$installObjectFsSwitch" = "true" -o "$fileServerType" = "azurefiles" ]; then
-	# install azure cli & setup container
+        # install azure cli & setup container
         AZ_REPO=$(lsb_release -cs)
         echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" |  tee /etc/apt/sources.list.d/azure-cli.list
+
         curl -L https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - >> /tmp/apt4.log
         sudo apt-get -y install apt-transport-https >> /tmp/apt4.log
         sudo apt-get -y update > /dev/null
         sudo apt-get -y install azure-cli >> /tmp/apt4.log
-	
+    
         # FileStorage accounts can only be used to store Azure file shares;
         # Premium_LRS will support FileStorage kind
         # No other storage resources (blob containers, queues, tables, etc.) can be deployed in a FileStorage account.
         if [ $storageAccountType != "Premium_LRS" ]; then
-		az storage container create \
-		    --name objectfs \
-		    --account-name $storageAccountName \
-		    --account-key $storageAccountKey \
-		    --public-access off \
-		    --fail-on-exist >> /tmp/wabs.log
+        az storage container create \
+            --name objectfs \
+            --account-name $storageAccountName \
+            --account-key $storageAccountKey \
+            --public-access off \
+            --fail-on-exist >> /tmp/wabs.log
 
-		az storage container policy create \
-		    --account-name $storageAccountName \
-		    --account-key $storageAccountKey \
-		    --container-name objectfs \
-		    --name readwrite \
-		    --start $(date --date="1 day ago" +%F) \
-		    --expiry $(date --date="2199-01-01" +%F) \
-		    --permissions rw >> /tmp/wabs.log
+        az storage container policy create \
+            --account-name $storageAccountName \
+            --account-key $storageAccountKey \
+            --container-name objectfs \
+            --name readwrite \
+            --start $(date --date="1 day ago" +%F) \
+            --expiry $(date --date="2199-01-01" +%F) \
+            --permissions rw >> /tmp/wabs.log
 
-		sas=$(az storage container generate-sas \
-		    --account-name $storageAccountName \
-		    --account-key $storageAccountKey \
-		    --name objectfs \
-		    --policy readwrite \
-		    --output tsv)
-	fi
+        sas=$(az storage container generate-sas \
+            --account-name $storageAccountName \
+            --account-key $storageAccountKey \
+            --name objectfs \
+            --policy readwrite \
+            --output tsv)
+        fi
+
+        # If its a migration flow, then mount the azure file share now.
+        if [ "$isMigration" = "true" ]; then
+            # On migration flow, the moodle azure file share must present before running this script.
+            echo -e '\n\rIts a migration flow, check whether moodle fileshare exists\n\r'
+            check_azure_files_moodle_share_exists $storageAccountName $storageAccountKey
+            
+            # Set up and mount Azure Files share.
+            echo -e '\n\rSetting up and mounting Azure Files share //'$storageAccountName'.file.core.windows.net/moodle on /moodle\n\r'
+            setup_and_mount_azure_files_moodle_share $storageAccountName $storageAccountKey
+        fi
     fi
 
     if [ $fileServerType = "gluster" ]; then
@@ -290,7 +303,7 @@ worker_processes 2;
 pid /run/nginx.pid;
 
 events {
-	worker_connections 768;
+    worker_connections 768;
 }
 
 http {
@@ -387,9 +400,9 @@ EOF
             return 404;
         }
 
-	location / {
-		try_files \$uri \$uri/index.php?\$query_string;
-	}
+    location / {
+        try_files \$uri \$uri/index.php?\$query_string;
+    }
  
     location ~ [^/]\.php(/|$) {
         fastcgi_split_path_info ^(.+?\.php)(/.*)$;
@@ -802,8 +815,35 @@ EOF
         siteProtocol="https"
     fi
     if [ $dbServerType = "mysql" ]; then
-        echo -e "cd /tmp; /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en --wwwroot="$siteProtocol"://"$siteFQDN" --dataroot=/moodle/moodledata --dbhost="$mysqlIP" --dbname="$moodledbname" --dbuser="$azuremoodledbuser" --dbpass="$moodledbpass" --dbtype=mysqli --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass="$adminpass" --adminemail=admin@"$siteFQDN" --non-interactive --agree-license --allow-unstable || true "
-        cd /tmp; /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en --wwwroot=$siteProtocol://$siteFQDN   --dataroot=/moodle/moodledata --dbhost=$mysqlIP   --dbname=$moodledbname   --dbuser=$azuremoodledbuser   --dbpass=$moodledbpass   --dbtype=mysqli --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass=$adminpass   --adminemail=admin@$siteFQDN   --non-interactive --agree-license --allow-unstable || true
+        if [ "$isMigration" = "true" ]; then
+            echo "Importing database from the mysql dump file"
+            if [ ! -f /moodle/migration-db-moodle.sql.tar.gz ]; then
+              echo "Migrating moodle DB dump archive file not found."
+              exit 1
+            fi
+            
+            tar -xvf /moodle/migration-db-moodle.sql.tar.gz -C /moodle/
+            
+            if [ ! -f /moodle/migration-db-moodle.sql ]; then
+              echo "Migrating moodle DB dump file not found."
+              exit 1
+            fi
+            
+            echo "Importing migration moodle DB."
+            mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} < /moodle/migration-db-moodle.sql
+            
+            echo "Updating moodle db config settings"
+            replace_moodle_config_value "dbhost" "$mysqlIP"
+            replace_moodle_config_value "dbuser" "$azuremoodledbuser"
+            replace_moodle_config_value "dbpass" "$moodledbpass"
+            
+            echo "Updating other moodle config settings"
+            replace_moodle_config_value "dataroot" "\/moodle\/moodledata"
+            replace_moodle_config_value "wwwroot" "$siteProtocol:\/\/$siteFQDN"
+        else
+            echo -e "cd /tmp; /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en --wwwroot="$siteProtocol"://"$siteFQDN" --dataroot=/moodle/moodledata --dbhost="$mysqlIP" --dbname="$moodledbname" --dbuser="$azuremoodledbuser" --dbpass="$moodledbpass" --dbtype=mysqli --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass="$adminpass" --adminemail=admin@"$siteFQDN" --non-interactive --agree-license --allow-unstable || true "
+            cd /tmp; /usr/bin/php /moodle/html/moodle/admin/cli/install.php --chmod=770 --lang=en --wwwroot=$siteProtocol://$siteFQDN   --dataroot=/moodle/moodledata --dbhost=$mysqlIP   --dbname=$moodledbname   --dbuser=$azuremoodledbuser   --dbpass=$moodledbpass   --dbtype=mysqli --fullname='Moodle LMS' --shortname='Moodle' --adminuser=admin --adminpass=$adminpass   --adminemail=admin@$siteFQDN   --non-interactive --agree-license --allow-unstable || true
+        fi
 
         if [ "$installObjectFsSwitch" = "true" ]; then
             mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} ${moodledbname} -e "INSERT INTO mdl_config_plugins (plugin, name, value) VALUES ('tool_objectfs', 'enabletasks', 1);" 
@@ -952,40 +992,44 @@ EOF
     fi
 
    if [ $fileServerType = "azurefiles" ]; then
-      # Delayed copy of moodle installation to the Azure Files share
+      if [ "$isMigration" = "true" ]; then
+        echo -e '\n\rIts a migration flow, the moodle content is already on azure file share\n\r'
+      else
+         # Delayed copy of moodle installation to the Azure Files share
 
-      # First rename moodle directory to something else
-      mv /moodle /moodle_old_delete_me
-      # Then create the moodle share
-      echo -e '\n\rCreating an Azure Files share for moodle'
-      create_azure_files_moodle_share $storageAccountName $storageAccountKey /tmp/wabs.log $fileServerDiskSize
-      # Set up and mount Azure Files share. Must be done after nginx is installed because of www-data user/group
-      echo -e '\n\rSetting up and mounting Azure Files share on //'$storageAccountName'.file.core.windows.net/moodle on /moodle\n\r'
-      setup_and_mount_azure_files_moodle_share $storageAccountName $storageAccountKey
-      # Move the local installation over to the Azure Files
-      echo -e '\n\rMoving locally installed moodle over to Azure Files'
+         # First rename moodle directory to something else
+         mv /moodle /moodle_old_delete_me
+         # Then create the moodle share
+         echo -e '\n\rCreating an Azure Files share for moodle'
+         create_azure_files_moodle_share $storageAccountName $storageAccountKey /tmp/wabs.log $fileServerDiskSize
+         # Set up and mount Azure Files share. Must be done after nginx is installed because of www-data user/group
+         echo -e '\n\rSetting up and mounting Azure Files share on //'$storageAccountName'.file.core.windows.net/moodle on /moodle\n\r'
+         setup_and_mount_azure_files_moodle_share $storageAccountName $storageAccountKey
+         # Move the local installation over to the Azure Files
+         echo -e '\n\rMoving locally installed moodle over to Azure Files'
 
-      # install azcopy
-      wget -q -O azcopy_v10.tar.gz https://aka.ms/downloadazcopy-v10-linux && tar -xf azcopy_v10.tar.gz --strip-components=1 && mv ./azcopy /usr/bin/
+         # install azcopy
+         wget -q -O azcopy_v10.tar.gz https://aka.ms/downloadazcopy-v10-linux && tar -xf azcopy_v10.tar.gz --strip-components=1 && mv ./azcopy /usr/bin/
       
-      ACCOUNT_KEY="$storageAccountKey"
-      NAME="$storageAccountName"
-      END=`date -u -d "60 minutes" '+%Y-%m-%dT%H:%M:00Z'`
+         ACCOUNT_KEY="$storageAccountKey"
+         NAME="$storageAccountName"
+         END=`date -u -d "60 minutes" '+%Y-%m-%dT%H:%M:00Z'`
 
-      sas=$(az storage share generate-sas \
-        -n moodle \
-        --account-key $ACCOUNT_KEY \
-        --account-name $NAME \
-        --https-only \
-        --permissions lrw \
-        --expiry $END -o tsv)
+         sas=$(az storage share generate-sas \
+           -n moodle \
+           --account-key $ACCOUNT_KEY \
+           --account-name $NAME \
+           --https-only \
+           --permissions lrw \
+           --expiry $END -o tsv)
 
-      export AZCOPY_CONCURRENCY_VALUE='48'
-      export AZCOPY_BUFFER_GB='4'
+         export AZCOPY_CONCURRENCY_VALUE='48'
+         export AZCOPY_BUFFER_GB='4'
 
-      # cp -a /moodle_old_delete_me/* /moodle || true # Ignore case sensitive directory copy failure
-      azcopy --log-level ERROR copy "/moodle_old_delete_me/*" "https://$NAME.file.core.windows.net/moodle?$sas" --recursive || true # Ignore case sensitive directory copy failure
-      rm -rf /moodle_old_delete_me || true # Keep the files just in case
+         # cp -a /moodle_old_delete_me/* /moodle || true # Ignore case sensitive directory copy failure
+         azcopy --log-level ERROR copy "/moodle_old_delete_me/*" "https://$NAME.file.core.windows.net/moodle?$sas" --recursive || true # Ignore case sensitive directory copy failure
+         rm -rf /moodle_old_delete_me || true # Keep the files just in case
+      fi
    fi
 
    create_last_modified_time_update_script

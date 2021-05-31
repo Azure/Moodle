@@ -114,8 +114,10 @@
         },
         "moodleVersion": {
             "allowedValues": [
+                "MOODLE_38_STABLE",
                 "MOODLE_39_STABLE",
-                "MOODLE_38_STABLE"
+                "MOODLE_310_STABLE"
+                
             ],
             "defaultValue": "MOODLE_39_STABLE",
             "metadata": {
@@ -217,6 +219,20 @@
             },
             "type": "string"
         },
+        "moodleDbName": {
+            "defaultValue": "moodle",
+            "metadata": {
+                "description": "Moodle Database name"
+            },
+            "type": "string"
+        },
+        "moodleDbUser": {
+            "defaultValue": "moodle",
+            "metadata": {
+                "description": "Moodle Database username. This user is different from Database admin user."
+            },
+            "type": "string"
+        },
         "mysqlPgresVcores": {
             "allowedValues": [
                 1,
@@ -268,7 +284,7 @@
             "allowedValues": [
                 "5.6",
                 "5.7",
-								"8.0"
+                "8.0"
             ],
             "defaultValue": "5.7",
             "metadata": {
@@ -671,6 +687,13 @@
             "defaultValue": "[resourceGroup().location]",
             "metadata": {
                 "description": "Azure Location for all resources."
+            }
+        },
+        "isMigration": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "Indicates whether the this template is using for migration scenario."
             }
         }
     },
@@ -1272,7 +1295,8 @@
             "vnetName": "[concat('vnet-',variables('resourceprefix'))]",
             "vpnType": "[parameters('vpnType')]",
             "webServerSetupScriptFilename": "setup_webserver.sh",
-            "webServerType": "[parameters('webServerType')]"
+            "webServerType": "[parameters('webServerType')]",
+            "isMigration": "[parameters('isMigration')]"
         },
         "certUrlArray": [
             {
