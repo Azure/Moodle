@@ -216,7 +216,7 @@ set -ex
         sudo apt-get install -y libapache2-mod-php  # Need this because install_php_mssql_driver tries to update apache2-mod-php settings always (which will fail without this)
         install_php_mssql_driver
     else
-        sudo apt-get install -y --force-yes php-pgsql
+        sudo apt-get install -y --force-yes php$phpVersion-pgsql
     fi
 
     # Set up initial moodle dirs
@@ -500,7 +500,7 @@ listen.owner = www-data
 listen.group = www-data
 pm = dynamic
 pm.max_children = 3000
-pm.start_servers = 20 
+pm.start_servers = 25
 pm.min_spare_servers = 22 
 pm.max_spare_servers = 30 
 EOF
@@ -786,7 +786,7 @@ EOF
     fi
 
     # Master config for syslog
-    mkdir /var/log/sitelogs
+    mkdir -p /var/log/sitelogs
     chown syslog.adm /var/log/sitelogs
     cat <<EOF >> /etc/rsyslog.conf
 \$ModLoad imudp
@@ -936,6 +936,7 @@ EOF
 
    if [ "$dbServerType" = "postgres" ]; then
      # Get a new version of Postgres to match Azure version
+     apt-get install curl ca-certificates gnupg
      add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main"
      wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
      apt-get update
