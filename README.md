@@ -9,11 +9,7 @@ CLI](docs/Deploy.md). Please note that while you can use an [Azure free account]
 
 ## Fully configurable deployment
 
-The following button will allow you to specify various configurations for your Moodle cluster
-deployment. The number of configuration options might be overwhelming, so some pre-defined/restricted deployment options for
-typical Moodle scenarios follow this.
-
-[![Deploy to Azure Fully Configurable](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy.json)  [![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.png)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy.json)
+In the table below we provide a number of default configurations at different scales of operation. These options miniize the configuration you need to do manually they are essentially "good practice" recommendations. Once deployed you have full access to the resources and can adjust the deployment to suit your needs. If you would prefer to have full control over all the configuration options at deployment see the section after the table below.
 
 ## SSH Key Requirement
 
@@ -31,7 +27,13 @@ Below are a list of pre-defined/restricted deployment options based on typical d
 |Large size deployment (with high availability)| Supporting more than 2000 concurrent users. This deployment will use Gluster (for high availability, requiring 2 VMs), MySQL (16 vCores) and redis cache, without other options like elastic search. |[![Deploy to Azure Minimally](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy-large-ha.json)
 | Maximum |This maximal deployment will use Gluster (for high availability, adding 2 VMs for a Gluster cluster), MySQL with highest SKU, redis cache, elastic search (3 VMs), and pretty large storage sizes (both data disks and DB).|[![Deploy to Azure Maximally](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy-maximal.json)
 
-NOTE: Depending on the region you choose to deploy the stack in - the deployment might fail due to SKUs being hardcoded in the template where they are not available. For example, today our small-mid-size deployment option hard codes Gen-4 Azure MySQL SKUs into the template, and if a region where that is currently not available in (i.e. westus2) is used, your deployment will fail.  If your deployment fails, please revert to the fully configurable template where possible and change the SKU paramater to one that exists in your region (i.e. Gen-5) or alternatively change your deployment region to one in which the SKU is available (i.e. southcentralus).     
+NOTE: Depending on the region you choose to deploy the stack in - the deployment might fail due to SKUs being hardcoded in the template where they are not available. For example, today our small-mid-size deployment option hard codes Gen-4 Azure MySQL SKUs into the template, and if a region where that is currently not available in (i.e. westus2) is used, your deployment will fail.  If your deployment fails, please revert to the fully configurable template where possible and change the SKU paramater to one that exists in your region (i.e. Gen-5) or alternatively change your deployment region to one in which the SKU is available (i.e. southcentralus).    
+
+## Fully Configrable
+
+If you would prefer to configure the deployment right at the start of the process you use the button below. Beware, however, this exposes a very large number of parameters. it is also possible to set a configuration that will not perform well. This is for power users only.
+
+[![Deploy to Azure Fully Configurable](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy.json)  [![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.png)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy.json)
 
 ## Stack Architecture
 
