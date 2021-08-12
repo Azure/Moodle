@@ -1,15 +1,15 @@
 
 # Deploy and Manage a Scalable Moodle Cluster on Azure
 
-This repo contains guides and [Azure Resource Manager](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-overview) templates designed to help you deploy and manage a highly available and scalable
-[Moodle](https://moodle.com) cluster on Azure. In addition, the repo contains other useful information relevant to running Moodle on Azure such as a listing of Azure-relevant Moodle plugins and information on how to offer Moodle as a Managed Application on the Azure Marketplace or on an IT Service Catalog.
+This repository contains guides and [Azure Resource Manager](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-overview) templates designed to help you deploy and manage a highly available and scalable
+[Moodle](https://moodle.com) cluster on Azure. In addition, the repository contains other useful information relevant to running Moodle on Azure such as a listing of Azure-relevant Moodle plugins and information on how to offer Moodle as a Managed Application on the Azure Marketplace or on an IT Service Catalog.
 
 If you have an Azure account you can deploy Moodle via the [Azure portal](https://portal.azure.com) using the button below, or you can [deploy Moodle via the
 CLI](docs/Deploy.md). Please note that while you can use an [Azure free account](https://azure.microsoft.com/en-us/free/) to get started depending on which template configuration you choose you will likely be required to upgrade to a paid account.
 
-## Fully configurable deployment
+## Deployment Introduction
 
-In the table below we provide a number of default configurations at different scales of operation. These options miniize the configuration you need to do manually they are essentially "good practice" recommendations. Once deployed you have full access to the resources and can adjust the deployment to suit your needs. If you would prefer to have full control over all the configuration options at deployment see the section after the table below.
+In the table below, we provide a number of default configurations at different scales of operation. These options minimize the configuration you would otherwise need to do manually; these options are essentially "good practice" recommendations. Once deployed, you will have full access to the Azure resources and can adjust the deployment to suit your needs. If you would prefer to have full control over all the configuration options at deployment, please refer to [the fully configurable section](#Fully Configurable) right after the Predefined deployment option section.
 
 ## SSH Key Requirement
 
@@ -29,9 +29,9 @@ Below are a list of pre-defined/restricted deployment options based on typical d
 
 NOTE: Depending on the region you choose to deploy the stack in - the deployment might fail due to SKUs being hardcoded in the template where they are not available. For example, today our small-mid-size deployment option hard codes Gen-4 Azure MySQL SKUs into the template, and if a region where that is currently not available in (i.e. westus2) is used, your deployment will fail.  If your deployment fails, please revert to the fully configurable template where possible and change the SKU paramater to one that exists in your region (i.e. Gen-5) or alternatively change your deployment region to one in which the SKU is available (i.e. southcentralus).    
 
-## Fully Configrable
+## Fully Configurable
 
-If you would prefer to configure the deployment right at the start of the process you use the button below. Beware, however, this exposes a very large number of parameters. it is also possible to set a configuration that will not perform well. This is for power users only.
+If you would prefer to configure the deployment right at the start of the process, you use the button below. Please note that this method opens up a large number of parameters to configure and users new to this deployment process may find it overwhelming. It is also very likely you may end up with a deployment configuration that is not optimal to your needs. This method is recommended for power users.
 
 [![Deploy to Azure Fully Configurable](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy.json)  [![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.png)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FMoodle%2Fmaster%2Fazuredeploy.json)
 
