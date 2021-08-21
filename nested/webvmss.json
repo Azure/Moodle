@@ -61,21 +61,21 @@
                 "displayName": "VMSS NSG"
             }
         },
-        {
-            "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2019-06-01",
-            "location": "[parameters('moodleCommon').location]",
-            "name": "[parameters('moodleCommon').vmssdStorageAccounttName]",
-            "kind": "Storage",
-            "sku": {
-                "name": "Standard_LRS"
-            }
-        },
+        // {
+        //     "type": "Microsoft.Storage/storageAccounts",
+        //     "apiVersion": "2019-06-01",
+        //     "location": "[parameters('moodleCommon').location]",
+        //     "name": "[parameters('moodleCommon').vmssdStorageAccounttName]",
+        //     "kind": "Storage",
+        //     "sku": {
+        //         "name": "Standard_LRS"
+        //     }
+        // },
         {
             "type": "Microsoft.Compute/virtualMachineScaleSets",
-            "apiVersion": "2019-07-01",
+            "apiVersion": "2021-04-01",
             "dependsOn": [
-                "[concat('Microsoft.Storage/storageAccounts/', parameters('moodleCommon').vmssdStorageAccounttName)]",
+                //"[concat('Microsoft.Storage/storageAccounts/', parameters('moodleCommon').vmssdStorageAccounttName)]",
                 "[concat('Microsoft.Network/networkSecurityGroups/', parameters('moodleCommon').vmssNsgName)]"
             ],
             "location": "[parameters('moodleCommon').location]",
@@ -116,8 +116,8 @@
                                     "ipConfigurations": [
                                         {
                                             "name": "ipcfg_lb",
-                                            "primary": true,
                                             "properties": {
+                                                "primary": true,
                                                 "loadBalancerBackendAddressPools": "[take(variables('lbBePoolArray'), variables('lbBePoolArrayTakeCount'))]",
                                                 "applicationGatewayBackendAddressPools": "[take(variables('appGwBePoolArray'), variables('appGwBePoolArrayTakeCount'))]",
                                                 "subnet": {
