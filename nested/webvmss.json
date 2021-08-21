@@ -108,7 +108,7 @@
                         ]
                     },
                     "networkProfile": {
-                        "networkApiVersion": "2021-11-01",
+                        "networkApiVersion": "2020-11-01",
                         "networkInterfaceConfigurations": [
                             {
                                 "name": "vmssnic",
@@ -265,9 +265,9 @@
         "appGwBePoolArrayTakeCount": "[if(equals(parameters('moodleCommon').httpsTermination, 'AppGw'), 1, 0)]"
     },
     "outputs": {
-        "webvm1IP": {
-            "value": "[reference(variables('webvmss1NIC'), '2017-03-30').ipConfigurations[0].properties.privateIPAddress]",
-            "type": "string"
-        }
+        // "webvm1IP": {
+        //     "value": "[reference(variables('webvmss1NIC'), '2017-03-30').ipConfigurations[0].properties.privateIPAddress]",
+        //     "type": "string"
+        // }
     }
 }
