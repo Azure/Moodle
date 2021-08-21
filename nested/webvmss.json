@@ -108,11 +108,11 @@
                         ]
                     },
                     "networkProfile": {
+                        "networkApiVersion": "2021-11-01",
                         "networkInterfaceConfigurations": [
                             {
                                 "name": "vmssnic",
                                 "properties": {
-                                    "networkApiVersion": "2021-11-01",
                                     "ipConfigurations": [
                                         {
                                             "name": "ipcfg_lb",
