@@ -73,7 +73,7 @@
         },
         {
             "type": "Microsoft.Compute/virtualMachineScaleSets",
-            "apiVersion": "2019-07-01",
+            "apiVersion": "2021-04-01",
             "dependsOn": [
                 "[concat('Microsoft.Storage/storageAccounts/', parameters('moodleCommon').vmssdStorageAccounttName)]",
                 "[concat('Microsoft.Network/networkSecurityGroups/', parameters('moodleCommon').vmssNsgName)]"
@@ -81,10 +81,9 @@
             "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').vmssName]",
             "properties": {
-                "overprovision": true,
-                "upgradePolicy": {
-                    "mode": "Manual"
-                },
+                "orchestrationMode": "flexible",
+                "singlePlacementGroup": false,
+                "platformFaultDomainCount": 1,
                 "virtualMachineProfile": {
                     "extensionProfile": {
                         "extensions": [
@@ -113,6 +112,7 @@
                             {
                                 "name": "vmssnic",
                                 "properties": {
+                                    "networkApiVersion": "2021-11-01",
                                     "ipConfigurations": [
                                         {
                                             "name": "ipcfg_lb",
