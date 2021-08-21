@@ -73,7 +73,7 @@
         },
         {
             "type": "Microsoft.Compute/virtualMachineScaleSets",
-            "apiVersion": "2021-04-01",
+            "apiVersion": "2019-07-01",
             "dependsOn": [
                 "[concat('Microsoft.Storage/storageAccounts/', parameters('moodleCommon').vmssdStorageAccounttName)]",
                 "[concat('Microsoft.Network/networkSecurityGroups/', parameters('moodleCommon').vmssNsgName)]"
@@ -116,6 +116,7 @@
                                     "ipConfigurations": [
                                         {
                                             "name": "ipcfg_lb",
+                                            "primary": true,
                                             "properties": {
                                                 "loadBalancerBackendAddressPools": "[take(variables('lbBePoolArray'), variables('lbBePoolArrayTakeCount'))]",
                                                 "applicationGatewayBackendAddressPools": "[take(variables('appGwBePoolArray'), variables('appGwBePoolArrayTakeCount'))]",
