@@ -154,8 +154,8 @@
                     "diagnosticsProfile": {
                         "bootDiagnostics": {
                         "enabled": true,
-                        "storageUri": "[resourceId('Microsoft.Storage/storageAccounts',parameters('moodleCommon').vmssdStorageAccounttName)]"
-                        }
+                        "storageUri":  "[reference(resourceId('Microsoft.Storage/storageAccounts', parameters('moodleCommon').vmssdStorageAccounttName)).primaryEndpoints.blob]"
+                        }         
                     },
                     "storageProfile": {
                         "imageReference": "[parameters('moodleCommon').osType]",
