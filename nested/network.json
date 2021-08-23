@@ -358,26 +358,6 @@
                                 }
                             ]
                         }
-                    },
-                    {
-                        "name": "Outboundrule-fileshare",
-                        "properties": {
-                            "allocatedOutboundPorts": 445,
-                            "protocol": "Tcp",
-                            "enableTcpReset": false,
-                            "idleTimeoutInMinutes": 5,
-                            "backendAddressPool": {
-                                "id": "[variables('extBeID')]"
-                            },
-                            "frontendIPConfigurations": [
-                                {
-                                    "id": "[variables('extOutID001')]"
-                                },
-                                {
-                                    "id": "[variables('extOutID002')]"
-                                }
-                            ]
-                        }
                     }
                 ],
                 "inboundNatPools": []

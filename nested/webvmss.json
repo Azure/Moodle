@@ -54,6 +54,19 @@
                             "sourceAddressPrefix": "*",
                             "sourcePortRange": "*"
                         }
+                    },
+                    {
+                        "name": "Allow_SMB",
+                        "properties": {
+                            "access": "Allow",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "445",
+                            "direction": "Inbound",
+                            "priority": 1010,
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*"
+                        }
                     }
                 ]
             },
