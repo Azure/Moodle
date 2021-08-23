@@ -153,8 +153,8 @@
                     },
                     "diagnosticsProfile": {
                         "bootDiagnostics": {
-                        "enabled": true,
-                        "storageUri":  "[reference(resourceId('Microsoft.Storage/storageAccounts', parameters('moodleCommon').vmssdStorageAccounttName)).primaryEndpoints.blob]"
+                        "enabled": true
+                        //"storageUri":  "[reference(resourceId('Microsoft.Storage/storageAccounts', parameters('moodleCommon').vmssdStorageAccounttName)).primaryEndpoints.blob]"
                         }         
                     },
                     "storageProfile": {
