@@ -253,7 +253,7 @@
         "pipID": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('moodleCommon').lbPipName)]",
         "scriptUri": "[concat(parameters('moodleCommon').scriptLocation,parameters('moodleCommon').webServerSetupScriptFilename,parameters('moodleCommon').artifactsSasToken)]",
         "vmssID": "[resourceId('Microsoft.Compute/virtualMachineScaleSets',parameters('moodleCommon').vmssName)]",
-        "webvmss1NIC": "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('moodleCommon').vmssName, '/virtualMachines/0/networkInterfaces/vmssnic')]",
+        //"webvmss1NIC": "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('moodleCommon').vmssName, '/virtualMachines/0/networkInterfaces/vmssnic')]",
         "appGwID": "[resourceId('Microsoft.Network/applicationGateways', parameters('moodleCommon').appGwName)]",
         "appGwBePoolId": "[concat(variables('appGwID'), '/backendAddressPools/', parameters('moodleCommon').appGwBePoolName)]",
         "vmssNsgNameId": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('moodleCommon').vmssNsgName)]",
