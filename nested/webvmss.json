@@ -135,6 +135,13 @@
                                                 "applicationGatewayBackendAddressPools": "[take(variables('appGwBePoolArray'), variables('appGwBePoolArrayTakeCount'))]",
                                                 "subnet": {
                                                     "id": "[parameters('subnetIdWeb')]"
+                                                },
+                                                "publicIpAddressConfiguration": {
+                                                    "name": "pub1",
+                                                    "properties": {
+                                                    "idleTimeoutInMinutes": 5,
+                                                    "publicIpAddressVersion": "IPv4"
+                                                    }
                                                 }
                                             }
                                         }
