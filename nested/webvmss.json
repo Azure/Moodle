@@ -56,7 +56,7 @@
                         }
                     },
                     {
-                        "name": "Allow_SMB",
+                        "name": "Allow_SMB_In",
                         "properties": {
                             "access": "Allow",
                             "destinationAddressPrefix": "*",
@@ -66,6 +66,23 @@
                             "protocol": "Tcp",
                             "sourceAddressPrefix": "*",
                             "sourcePortRange": "*"
+                        }
+                    },
+                    {
+                        "name": "Allow_Outbound_445",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "445",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1000,
+                            "direction": "Outbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
                         }
                     }
                 ]
