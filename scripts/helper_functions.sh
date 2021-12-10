@@ -2,6 +2,14 @@
 
 # Common functions definitions
 
+function wait_for_apt
+{
+    while fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1 ; do
+        echo "Waiting for front-end lock"
+        sleep 2
+    done
+}
+
 function get_setup_params_from_configs_json
 {
     local configs_json_path=${1}    # E.g., /var/lib/cloud/instance/moodle_on_azure_configs.json

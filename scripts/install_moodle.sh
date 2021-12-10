@@ -27,6 +27,7 @@ set -ex
     moodle_on_azure_configs_json_path=${1}
 
     . ./helper_functions.sh
+    export DEBIAN_FRONTEND=noninteractive
 
     get_setup_params_from_configs_json $moodle_on_azure_configs_json_path || exit 99
 
@@ -72,7 +73,10 @@ set -ex
     check_fileServerType_param $fileServerType
 
     #Updating php sources
+    wait_for_apt
    sudo add-apt-repository ppa:ondrej/php -y
+
+   wait_for_apt
    sudo apt-get update
 
     if [ "$dbServerType" = "mysql" ]; then
@@ -94,7 +98,10 @@ set -ex
     fi
 
     # make sure system does automatic updates and fail2ban
+    wait_for_apt
     sudo apt-get -y update
+
+    wait_for_apt
     sudo apt-get -y install unattended-upgrades fail2ban
 
     config_fail2ban
@@ -106,6 +113,7 @@ set -ex
 
     if [ $fileServerType = "gluster" ]; then
         # configure gluster repository & install gluster client
+        wait_for_apt
         sudo add-apt-repository ppa:gluster/glusterfs-3.10 -y                 >> /tmp/apt1.log
     elif [ $fileServerType = "nfs" ]; then
         # configure NFS server and export
@@ -113,28 +121,42 @@ set -ex
         configure_nfs_server_and_export /moodle
     fi
 
+    wait_for_apt
     sudo apt-get -y update                                                   >> /tmp/apt2.log
+    
+    wait_for_apt
     sudo apt-get -y --force-yes install rsyslog git                          >> /tmp/apt3.log
 
     if [ $fileServerType = "gluster" ]; then
+        wait_for_apt
         sudo apt-get -y --force-yes install glusterfs-client                 >> /tmp/apt3.log
     elif [ "$fileServerType" = "azurefiles" ]; then
+        wait_for_apt
         sudo apt-get -y --force-yes install cifs-utils                       >> /tmp/apt3.log
     fi
 
     if [ $dbServerType = "mysql" ]; then
+        wait_for_apt
         sudo apt-get -y --force-yes install mysql-client >> /tmp/apt3.log
     elif [ "$dbServerType" = "postgres" ]; then
+        wait_for_apt
         sudo apt-get -y --force-yes install postgresql-client >> /tmp/apt3.log
     fi
     
     if [ "$installObjectFsSwitch" = "true" -o "$fileServerType" = "azurefiles" ]; then
     # install azure cli & setup container
+        wait_for_apt
         echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ wheezy main" | \
             sudo tee /etc/apt/sources.list.d/azure-cli.list
         curl -L https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - >> /tmp/apt4.log
+
+        wait_for_apt
         sudo apt-get -y install apt-transport-https >> /tmp/apt4.log
+
+        wait_for_apt
         sudo apt-get -y update > /dev/null
+
+        wait_for_apt
         sudo apt-get -y install azure-cli >> /tmp/apt4.log
     
         # FileStorage accounts can only be used to store Azure file shares;
@@ -192,29 +214,48 @@ set -ex
     fi
     
     # install pre-requisites
-    sudo add-apt-repository ppa:ubuntu-toolchain-r/ppa
+
+    wait_for_apt
+    sudo add-apt-repository ppa:ubuntu-toolchain-r/ppa -y
+
+    wait_for_apt
     sudo apt-get -y update > /dev/null 2>&1
     # sudo apt-get install -y --fix-missing python-software-properties unzip
+
+    wait_for_apt
     sudo apt-get -y install software-properties-common
+
+    wait_for_apt
     sudo apt-get -y install unzip
 
 
     # install the entire stack
     # passing php versions $phpVersion
+    wait_for_apt
     sudo apt-get -y  --force-yes install nginx php$phpVersion-fpm varnish >> /tmp/apt5a.log
+
+    wait_for_apt
     sudo apt-get -y  --force-yes install php$phpVersion php$phpVersion-cli php$phpVersion-curl php$phpVersion-zip >> /tmp/apt5b.log
 
     # Moodle requirements
+    wait_for_apt
     sudo apt-get -y update > /dev/null
+
+    wait_for_apt
     sudo apt-get install -y --force-yes graphviz aspell php$phpVersion-common php$phpVersion-soap php$phpVersion-json php$phpVersion-redis > /tmp/apt6.log
+    
+    wait_for_apt
     sudo apt-get install -y --force-yes php$phpVersion-bcmath php$phpVersion-gd php$phpVersion-xmlrpc php$phpVersion-intl php$phpVersion-xml php$phpVersion-bz2 php-pear php$phpVersion-mbstring php$phpVersion-dev mcrypt >> /tmp/apt6.log
     PhpVer=$(get_php_version)
     if [ $dbServerType = "mysql" ]; then
+        wait_for_apt
         sudo apt-get install -y --force-yes php$phpVersion-mysql
     elif [ $dbServerType = "mssql" ]; then
+        wait_for_apt
         sudo apt-get install -y libapache2-mod-php  # Need this because install_php_mssql_driver tries to update apache2-mod-php settings always (which will fail without this)
         install_php_mssql_driver
     else
+        wait_for_apt
         sudo apt-get install -y --force-yes php-pgsql
     fi
 
