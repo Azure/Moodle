@@ -480,8 +480,10 @@ EOF
    sed -i "s/max_execution_time.*/max_execution_time = 18000/" $PhpIni
    sed -i "s/max_input_vars.*/max_input_vars = 100000/" $PhpIni
    sed -i "s/max_input_time.*/max_input_time = 600/" $PhpIni
-   sed -i "s/upload_max_filesize.*/upload_max_filesize = 1024M/" $PhpIni
+   #*** Rafael Silva -> Change upload_max_filesize and post_max_size from 1024M to 1056M
+   sed -i "s/upload_max_filesize.*/upload_max_filesize = 1056M/" $PhpIni
    sed -i "s/post_max_size.*/post_max_size = 1056M/" $PhpIni
+   #***
    sed -i "s/;opcache.use_cwd.*/opcache.use_cwd = 1/" $PhpIni
    sed -i "s/;opcache.validate_timestamps.*/opcache.validate_timestamps = 1/" $PhpIni
    sed -i "s/;opcache.save_comments.*/opcache.save_comments = 1/" $PhpIni
