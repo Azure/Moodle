@@ -38,10 +38,10 @@
         },
         "moodleVersion": {
             "allowedValues": [
-                "MOODLE_39_STABLE",
-                "MOODLE_38_STABLE"
+                "MOODLE_310_STABLE",
+                "MOODLE_311_STABLE"
             ],
-            "defaultValue": "MOODLE_38_STABLE",
+            "defaultValue": "MOODLE_311_STABLE",
             "metadata": {
                 "description": "The Moodle version you want to install."
             },
@@ -194,7 +194,7 @@
         }
     },
     "variables": {
-        "_artifactsLocation": "https://raw.githubusercontent.com/Azure/Moodle/master/",
+        "_artifactsLocation": "https://github.com/Marklaps/Moodle-azure/master/",
         "_artifactsLocationSasToken": "",
         "unsupportedLocations": [
             "eastus2euap",
