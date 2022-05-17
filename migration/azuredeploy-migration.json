@@ -194,7 +194,7 @@
         }
     },
     "variables": {
-        "_artifactsLocation": "https://github.com/Marklaps/Moodle-azure/master/",
+        "_artifactsLocation": "https://raw.githubusercontent.com/Marklaps/Moodle-auze/master/",
         "_artifactsLocationSasToken": "",
         "unsupportedLocations": [
             "eastus2euap",
