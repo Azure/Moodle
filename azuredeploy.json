@@ -673,10 +673,10 @@
         "ubuntuVersion": {
             "type": "string",
             "allowedValues": [
-                "20.04-LTS",
+                "20_04-lts-gen2",
                 "18.04-LTS"
             ],
-            "defaultValue": "20.04-LTS"
+            "defaultValue": "20_04-lts-gen2"
         },
         "location": {
             "type": "string",
