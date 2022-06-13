@@ -114,7 +114,7 @@
         },
         "moodleVersion": {
             "allowedValues": [
-                "MOODLE_310_STABLE",
+                "MOODLE_39_STABLE",
                 "MOODLE_311_STABLE",
                 "MOODLE_400_STABLE"
             ],
