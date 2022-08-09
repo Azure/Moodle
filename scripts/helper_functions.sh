@@ -425,7 +425,7 @@ if [ -f "$SERVER_TIMESTAMP_FULLPATH" ]; then
     fi
     echo \$(date +%Y%m%d%H%M%S) >> $SYNC_LOG_FULLPATH
     rsync -av --delete /moodle/html/moodle /var/www/html >> $SYNC_LOG_FULLPATH
-    #*** Rafael Silva -> Add prune cache
+    #*** Rafael Silva <rafael.silva@alfasoft.pt> -> Add prune cache
     /etc/init.d/varnish restart
     #***
   fi
