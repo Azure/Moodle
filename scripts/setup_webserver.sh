@@ -417,7 +417,32 @@ EOF
 upstream backend {
         server unix:/run/php/php${PhpVer}-fpm.sock fail_timeout=1s;
         server unix:/run/php/php${PhpVer}-fpm-backup.sock backup;
-}  
+}
+
+# Rafael Silva <rafael.silva@alfasoft.pt> -> Endpoint health probe
+server {
+  listen 82 default;
+  server_name _;
+
+  # Log to syslog
+  access_log /var/log/nginx/access.log;
+  error_log /var/log/nginx/error.log;
+
+  location /admin/tool/heartbeat {
+    proxy_set_header Host ${siteFQDN};
+    proxy_redirect off;
+    proxy_http_version 1.1;
+    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    proxy_set_header X-Real-IP \$remote_addr;
+    proxy_set_header X-Forwarded-Proto https;
+
+    proxy_pass http://localhost;
+  }
+
+  location / {
+    return 444;
+  }
+}
 
 EOF
   fi
@@ -471,12 +496,14 @@ EOF
    fi
    sed -i "s/memory_limit.*/memory_limit = 512M/" $PhpIni
    sed -i "s/max_execution_time.*/max_execution_time = 18000/" $PhpIni
-   sed -i "s/max_input_vars.*/max_input_vars = 100000/" $PhpIni
    sed -i "s/max_input_time.*/max_input_time = 600/" $PhpIni
-   #*** Rafael Silva -> Change upload_max_filesize and post_max_size from 1024M to 1056M
+   
+   #*** Rafael Silva <rafael.silva@alfasoft.pt> -> Change max_input_vars, upload_max_filesize and post_max_size
+   sed -i "s/;max_input_vars.*/max_input_vars = 100000/" $PhpIni
    sed -i "s/upload_max_filesize.*/upload_max_filesize = 1056M/" $PhpIni
    sed -i "s/post_max_size.*/post_max_size = 1056M/" $PhpIni
    #***
+
    sed -i "s/;opcache.use_cwd.*/opcache.use_cwd = 1/" $PhpIni
    sed -i "s/;opcache.validate_timestamps.*/opcache.validate_timestamps = 1/" $PhpIni
    sed -i "s/;opcache.save_comments.*/opcache.save_comments = 1/" $PhpIni
