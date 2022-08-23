@@ -53,7 +53,7 @@ ExecReload = /usr/local/bin/tika-server reload
 WantedBy=multi-user.target
 EOF
 
-  chmod 777 /etc/systemd/system/tika-server.service
+  chmod 550 /etc/systemd/system/tika-server.service
 
   cat <<EOF > /usr/local/bin/tika-server
 #!/bin/sh
