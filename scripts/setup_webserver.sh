@@ -429,7 +429,7 @@ server {
   error_log /var/log/nginx/error.log;
 
   location /admin/tool/heartbeat {
-    proxy_set_header Host ${siteFQDN};
+    proxy_set_header Host fad.iefp.pt;
     proxy_redirect off;
     proxy_http_version 1.1;
     proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
