@@ -35,8 +35,8 @@
                     "_artifactsLocationSasToken":   { "value": "[parameters('_artifactsLocationSasToken')]" },
                     "redisDeploySwitch":            { "value": false },
                     "sshPublicKey":                 { "value": "[parameters('sshPublicKey')]" },
-                    "mysqlPgresVcores":             { "value": 8 },
-                    "mysqlPgresStgSizeGB":          { "value": 128 },
+                    "mysqlflexSkuName":             { "value": "Standard_D16ds_v4" },
+                    "mysqlflexStgIops":             { "value": 6000 },
                     "fileServerDiskSize":           { "value": 128 }
                 },
                 "templateLink": {
