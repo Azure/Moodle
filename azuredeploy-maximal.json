@@ -21,6 +21,18 @@
                 "description": "ssh public key"
             },
             "type": "string"
+        },
+        "mysqlflexHaEnabled": {
+            "allowedValues": [
+                "Disabled",
+                "SameZone",
+                "ZoneRedundant"
+            ],
+            "defaultValue": "Disabled",
+            "metadata": {
+              "description": "High availability mode for azure database for mysql flexible server."
+            },
+            "type": "string"
         }
     },
     "resources": [
@@ -37,12 +49,16 @@
                     "azureBackupSwitch":            { "value": true },
                     "searchType":                   { "value": "elastic" },
                     "sshPublicKey":                 { "value": "[parameters('sshPublicKey')]" },
-                    "mysqlPgresVcores":             { "value": 16 },
-                    "mysqlPgresStgSizeGB":          { "value": 512 },
+                    "dbServerType":                 { "value": "mysqlflex" },
+                    "vnetDbDeploySwitch":           {"value": true },
+                    "mysqlflexSkuName":             { "value": "Standard_E64ds_v4" },
+                    "mysqlflexStgIops":             { "value": 10000 },
+                    "mysqlflexStgSizeGiB":          { "value": 1024 },
+                    "mysqlflexHaEnabled":           { "value": "[parameters('mysqlflexHaEnabled')]" },
                     "fileServerType":               { "value": "azurefiles" },
                     "fileServerDiskSize":           { "value": 1024 },
                     "storageAccountType":           { "value": "Premium_LRS" },
-		    "autoscaleVmSku":		    { "value": "Standard_DS3_v2" }
+		            "autoscaleVmSku":		        { "value": "Standard_DS3_v2" }
                 },
                 "templateLink": {
                     "uri": "[concat(parameters('_artifactsLocation'), 'azuredeploy.json', parameters('_artifactsLocationSasToken'))]"

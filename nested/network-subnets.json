@@ -97,7 +97,28 @@
             "properties": {
                 "addressPrefix": "[parameters('moodleCommon').subnetAppGwRange]"
             }
-        }
+        },
+        {
+            "condition": "[and(parameters('moodleCommon').vnetDbDeploySwitch, equals(parameters('moodleCommon').dbServerType, 'mysqlflex'))]",
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2021-05-01",
+            "name": "[concat(parameters('vnetName'),'/',parameters('moodleCommon').subnetDb)]",
+            "location": "[parameters('moodleCommon').location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('moodleCommon').subnetAppGw)]"
+            ],
+            "properties": {
+                "addressPrefix": "[parameters('moodleCommon').subnetDbRange]",
+                "delegations": [
+                    {
+                      "name": "MySQLflexibleServers",
+                      "properties": {
+                        "serviceName": "Microsoft.DBforMySQL/flexibleServers"
+                      }
+                    }
+                ]
+            }
+        }       
     ],
     "variables": {
         "documentation01": "This sub-template creates various subnets needed for various components of the cluster.",

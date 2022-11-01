@@ -93,6 +93,13 @@
             },
             "type": "bool"
         },
+        "vnetDbDeploySwitch": {
+            "defaultValue": false,
+            "metadata": {
+                "description": "Switch to deploying the db in VNet. Note: currently the Vnet DB Deployment is available for mysqlflex only. For other db server types, the database will not be deployed in VNet."
+            },
+            "type": "bool"
+        },
         "httpsTermination": {
             "allowedValues": [
                 "VMSS",
@@ -199,11 +206,12 @@
             "type": "string"
         },
         "dbServerType": {
-            "defaultValue": "mysql",
+            "defaultValue": "mysqlflex",
             "allowedValues": [
                 "postgres",
                 "mysql",
-                "mssql"
+                "mssql",
+                "mysqlflex"
             ],
             "metadata": {
                 "description": "Database type"
@@ -280,11 +288,130 @@
         },
         "mysqlVersion": {
             "allowedValues": [
-                "5.7"
+                "5.7",
+                "8.0.21"
             ],
             "defaultValue": "5.7",
             "metadata": {
                 "description": "Mysql version"
+            },
+            "type": "string"
+        },
+        "mysqlflexSkuName": {
+            "allowedValues": [
+                "Standard_B1s",
+                "Standard_B1ms",
+                "Standard_B2s",
+                "Standard_B2ms",
+                "Standard_B4ms",
+                "Standard_B8ms",
+                "Standard_B12ms",
+                "Standard_B16ms",
+                "Standard_B20ms",
+                "Standard_D2ads_v5",
+                "Standard_D2ds_v4",
+                "Standard_D4ads_v5",
+                "Standard_D4ds_v4",
+                "Standard_D8ads_v5",
+                "Standard_D8ds_v4",
+                "Standard_D16ads_v5",
+                "Standard_D16ds_v4",
+                "Standard_D32ads_v5",
+                "Standard_D32ds_v4",
+                "Standard_D48ads_v5",
+                "Standard_D48ds_v4",
+                "Standard_D64ads_v5",
+                "Standard_D64ds_v4",
+                "Standard_E2ds_v4",
+                "Standard_E2ads_v5",
+                "Standard_E4ds_v4",
+                "Standard_E4ads_v5",
+                "Standard_E8ds_v4",
+                "Standard_E8ads_v5",
+                "Standard_E16ds_v4",
+                "Standard_E16ads_v5",
+                "Standard_E32ds_v4",
+                "Standard_E32ads_v5",
+                "Standard_E48ds_v4",
+                "Standard_E48ads_v5",
+                "Standard_E64ds_v4",
+                "Standard_E64ads_v5",
+                "Standard_E80ids_v4",
+                "Standard_E2ds_v5",
+                "Standard_E4ds_v5",
+                "Standard_E8ds_v5",
+                "Standard_E16ds_v5",
+                "Standard_E32ds_v5",
+                "Standard_E48ds_v5",
+                "Standard_E64ds_v5",
+                "Standard_E96ds_v5"
+            ],
+            "defaultValue": "Standard_B2s",
+            "metadata": {
+                "description": "The name of the sku for Azure Database for MySQL Flexible Servers, e.g. Standard_D32ds_v4. Complete list is available here : https://learn.microsoft.com/en-us/azure/mysql/flexible-server/concepts-service-tiers-storage "
+            },
+            "type": "string"
+        },
+        "mysqlflexStgSizeGiB": {
+            "defaultValue": 20,
+            "minValue": 20,
+            "maxValue": 16384,
+            "metadata": {
+                "description": "Azure Database for MySQL Flexible server storage size in GiB. Minimum 20GiB, increase by 1GiB, up to 16TiB (1024 GiB)"
+            },
+            "type": "int"
+        },
+        "mysqlflexStgIops": {
+            "defaultValue": 360,
+            "minValue": 360,
+            "metadata": {
+                "description": "Azure Database for MySQL Flexible server storage iops. Minimum 360, Maxium is determined by selected mysqlflexSkuName."
+            },
+            "type": "int"
+        },
+        "mysqlflexStgAutogrow": {
+            "allowedValues": [
+                "Enabled",
+                "Disabled"
+            ],
+            "defaultValue": "Enabled",
+            "type": "string"
+        },
+        "mysqlflexHaEnabled": {
+            "allowedValues": [
+                "Disabled",
+                "SameZone",
+                "ZoneRedundant"
+            ],
+            "defaultValue": "Disabled",
+            "metadata": {
+              "description": "High availability mode for azure database for mysql flexible server."
+            },
+            "type": "string"
+        },
+        "mysqlflexAvailabilityZone": {
+            "allowedValues": [
+                "1",
+                "2",
+                "3",
+                ""
+            ],
+            "defaultValue": "",
+            "metadata": {
+                "description": "Availability Zone information of the server. (Leave blank for No Preference)."
+            },
+            "type": "string"
+        },
+        "mysqlflexStandbyAvailabilityZone": {
+            "allowedValues": [
+                "1",
+                "2",
+                "3",
+                ""
+            ],
+            "defaultValue": "",
+            "metadata": {
+            "description": "Availability zone of the High availability standby server. (Leave blank for No Preference). Add this value if HA is enabled."
             },
             "type": "string"
         },
@@ -762,6 +889,9 @@
                     },
                     "ctlrPubIp": {
                         "value": "[reference('networkTemplate').outputs.ctlrPubIp.value]"
+                    },
+                    "subnetIdDb": {
+                        "value": "[reference('networkTemplate').outputs.subnetIdDb.value]"
                     }
                 },
                 "templateLink": {
@@ -1154,7 +1284,7 @@
             "dbLogin": "[parameters('dbLogin')]",
             "dbLoginPassword": "[concat(substring(uniqueString(resourceGroup().id, deployment().name), 2, 11), '*7', toUpper('pfiwb'))]",
             "dbServerType": "[parameters('dbServerType')]",
-            "dbUsername": "[concat(parameters('dbLogin'), '@', parameters('dbServerType'), '-', variables('resourceprefix'))]",
+            "dbUsername": "[if(equals(parameters('dbServerType'), 'mysqlflex'), parameters('dbLogin'), concat(parameters('dbLogin'), '@', parameters('dbServerType'), '-', variables('resourceprefix')))]",
             "ddosPlanName": "[concat('ddos-plan-',variables('resourceprefix'))]",
             "ddosSwitch": "[parameters('ddosSwitch')]",
             "elasticVmSku": "[parameters('elasticVmSku')]",
@@ -1211,7 +1341,7 @@
             "moodleDbName": "[parameters('moodleDbName')]",
             "moodleDbPass": "[concat('9#36^', substring(uniqueString(resourceGroup().id, deployment().name), 5, 8), toUpper('ercq'))]",
             "moodleDbUser": "[parameters('moodleDbUser')]",
-            "moodleDbUserAzure": "[concat(parameters('moodleDbUser'), '@', parameters('dbServerType'), '-', variables('resourceprefix'))]",
+            "moodleDbUserAzure": "[if(equals(parameters('dbServerType'), 'mysqlflex'), parameters('moodleDbUser'), concat(parameters('moodleDbUser'), '@', parameters('dbServerType'), '-', variables('resourceprefix')))]",
             "moodleInstallScriptFilename": "install_moodle.sh",
             "moodleOnAzureConfigsJsonPath": "/var/lib/cloud/instance/moodle_on_azure_configs.json",
             "moodleVersion": "[parameters('moodleVersion')]",
@@ -1225,6 +1355,16 @@
             "mysqlPgresStgSizeGB": "[parameters('mysqlPgresStgSizeGB')]",
             "mysqlPgresVcores": "[parameters('mysqlPgresVcores')]",
             "mysqlVersion": "[parameters('mysqlVersion')]",
+            "mysqlflexSkuName": "[parameters('mysqlflexSkuName')]",
+            "mysqlflexSkuTier": "[if(startsWith(parameters('mysqlflexSkuName'), 'Standard_B'), 'Burstable', if(startsWith(parameters('mysqlflexSkuName'), 'Standard_D'), 'GeneralPurpose', 'MemoryOptimized'))]",
+            "mysqlflexStgSizeGiB": "[parameters('mysqlflexStgSizeGiB')]",
+            "mysqlflexStgIops": "[parameters('mysqlflexStgIops')]",
+            "mysqlflexStgAutogrow": "[parameters('mysqlflexStgAutogrow')]",
+            "mysqlflexHaEnabled": "[parameters('mysqlflexHaEnabled')]",
+            "mysqlflexAvailabilityZone": "[parameters('mysqlflexAvailabilityZone')]",
+            "mysqlflexStandbyAvailabilityZone": "[parameters('mysqlflexStandbyAvailabilityZone')]",
+            "mysqlflexRequireSecureTransport":  "[if(equals(parameters('sslEnforcement'),'Enabled'),'ON','OFF')]",
+            "mysqlflexPrivateDnsZoneName": "[concat(parameters('dbServerType'), '-',variables('resourceprefix'),'.private.mysql.database.azure.com')]",
             "nfsByoIpExportPath": "[parameters('nfsByoIpExportPath')]",
             "nfsHaClientsIPRange": "[variables('subnetWebRange')]",
             "nfsHaExportPath": "/drbd/data",
@@ -1253,6 +1393,9 @@
             "sslEnforcement": "[parameters('sslEnforcement')]",
             "storageAccountName": "[tolower(concat('abs',variables('resourceprefix')))]",
             "storageAccountType": "[parameters('storageAccountType')]",
+            "subnetDb": "[concat('db-subnet-',variables('resourceprefix'))]",
+            "subnetDbPrefix": "[concat(variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),7)))]",
+            "subnetDbRange": "[concat(variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),7)), '.0/24')]",
             "subnetAppGw": "[concat('appgw-subnet-',variables('resourceprefix'))]",
             "subnetAppGwPrefix": "[concat(variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),6)))]",
             "subnetAppGwRange": "[concat(variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),6)), '.0/24')]",
@@ -1286,6 +1429,7 @@
             "vaultName": "[concat('vault-',variables('resourceprefix'))]",
             "vmssName": "[concat('vmss-',variables('resourceprefix'))]",
             "vmssdStorageAccounttName": "[concat('vmss',uniqueString(resourceGroup().id))]",
+            "vnetDbDeploySwitch": "[and(parameters('vnetDbDeploySwitch'), equals(parameters('dbServerType'), 'mysqlflex'))]",
             "vnetGwDeploySwitch": "[parameters('vnetGwDeploySwitch')]",
             "vnetName": "[concat('vnet-',variables('resourceprefix'))]",
             "vpnType": "[parameters('vpnType')]",
