@@ -38,6 +38,7 @@
                     "autoscaleVmSku":               { "value": "Standard_DS1_v2" },
                     "enableAccelNwForOtherVmsSwitch":   { "value": false },
                     "dbServerType":                 { "value": "mysqlflex" },
+                    "vnetDbDeploySwitch":           {"value": true },
                     "fileServerDiskCount":          { "value": 2 },
                     "fileServerDiskSize":           { "value": 32 }
                 },

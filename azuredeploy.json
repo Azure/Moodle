@@ -93,6 +93,13 @@
             },
             "type": "bool"
         },
+        "vnetDbDeploySwitch": {
+            "defaultValue": false,
+            "metadata": {
+                "description": "Switch to deploying the db in VNet. Note: currently the Vnet DB Deployment is available for mysqlflex only. For other db server types, the database will not be deployed in VNet."
+            },
+            "type": "bool"
+        },
         "httpsTermination": {
             "allowedValues": [
                 "VMSS",
@@ -1374,7 +1381,7 @@
             "vaultName": "[concat('vault-',variables('resourceprefix'))]",
             "vmssName": "[concat('vmss-',variables('resourceprefix'))]",
             "vmssdStorageAccounttName": "[concat('vmss',uniqueString(resourceGroup().id))]",
-            "vnetDbDeploySwitch": "[equals(parameters('dbServerType'), 'mysqlflex')]",
+            "vnetDbDeploySwitch": "[and(parameters('vnetDbDeploySwitch'), equals(parameters('dbServerType'), 'mysqlflex'))]",
             "vnetGwDeploySwitch": "[parameters('vnetGwDeploySwitch')]",
             "vnetName": "[concat('vnet-',variables('resourceprefix'))]",
             "vpnType": "[parameters('vpnType')]",

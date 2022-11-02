@@ -63,10 +63,7 @@
             "iops": "[parameters('moodleCommon').mysqlflexStgIops]",
             "autogrow": "[parameters('moodleCommon').mysqlflexStgAutogrow]"
           },
-          "network": {
-            "delegatedSubnetResourceId": "[parameters('subnetIdDb')]",
-            "privateDnsZoneResourceId": "[resourceId('Microsoft.Network/privateDnsZones', parameters('moodleCommon').mysqlflexPrivateDnsZoneName)]"
-          },
+          "network": "[if(parameters('moodleCommon').vnetDbDeploySwitch, variables('vnetNetworkData'), createObject())]",
           "Backup": {
             "backupRetentionDays": 35,
             "geoRedundantBackup": "Enabled"
@@ -84,8 +81,70 @@
           "value": "[parameters('moodleCommon').mysqlflexRequireSecureTransport]",
           "source": "user-override"
         }
+      },
+      {
+        "condition": "[not(parameters('moodleCommon').vnetDbDeploySwitch)]",
+        "type": "Microsoft.DBforMySQL/flexibleServers/firewallRules",
+        "apiVersion": "2021-05-01",
+        "name": "[concat(parameters('moodleCommon').serverName, '/mysqlflex-firewall-allow-lb')]",
+        "dependsOn": [
+            "[concat('Microsoft.DBforMySQL/flexibleservers/', parameters('moodleCommon').serverName)]"
+        ],
+        "location": "[parameters('moodleCommon').location]",
+        "properties": {
+            "startIpAddress": "[parameters('lbPubIp')]",
+            "endIpAddress": "[parameters('lbPubIp')]"
+        }
+      },
+      {
+        "condition": "[not(parameters('moodleCommon').vnetDbDeploySwitch)]",
+        "type": "Microsoft.DBforMySQL/flexibleServers/firewallRules",
+        "apiVersion": "2021-05-01",
+        "name": "[concat(parameters('moodleCommon').serverName, '/mysqlflex-firewall-allow-lb-out001')]",
+        "dependsOn": [
+            "[concat('Microsoft.DBforMySQL/flexibleservers/', parameters('moodleCommon').serverName)]"
+        ],
+        "location": "[parameters('moodleCommon').location]",
+        "properties": {
+            "startIpAddress": "[parameters('lbOut001PubIp')]",
+            "endIpAddress": "[parameters('lbOut001PubIp')]"
+        }
+      },
+      {
+        "condition": "[not(parameters('moodleCommon').vnetDbDeploySwitch)]",
+        "type": "Microsoft.DBforMySQL/flexibleServers/firewallRules",
+        "apiVersion": "2021-05-01",
+        "name": "[concat(parameters('moodleCommon').serverName, '/mysqlflex-firewall-allow-lb-out002')]",
+        "dependsOn": [
+            "[concat('Microsoft.DBforMySQL/flexibleservers/', parameters('moodleCommon').serverName)]"
+        ],
+        "location": "[parameters('moodleCommon').location]",
+        "properties": {
+            "startIpAddress": "[parameters('lbOut002PubIp')]",
+            "endIpAddress": "[parameters('lbOut002PubIp')]"
+        }
+      },
+      {
+        "condition": "[not(parameters('moodleCommon').vnetDbDeploySwitch)]",
+        "type": "Microsoft.DBforMySQL/flexibleServers/firewallRules",
+        "apiVersion": "2021-05-01",
+        "name": "[concat(parameters('moodleCommon').serverName, '/mysqlflex-firewall-allow-ctlr')]",
+        "dependsOn": [
+            "[concat('Microsoft.DBforMySQL/flexibleservers/', parameters('moodleCommon').serverName)]"
+        ],
+        "location": "[parameters('moodleCommon').location]",
+        "properties": {
+            "startIpAddress": "[parameters('ctlrPubIp')]",
+            "endIpAddress": "[parameters('ctlrPubIp')]"
+        }
       }
     ],
+    "variables": {
+      "vnetNetworkData": {
+        "delegatedSubnetResourceId": "[parameters('subnetIdDb')]",
+        "privateDnsZoneResourceId": "[resourceId('Microsoft.Network/privateDnsZones', parameters('moodleCommon').mysqlflexPrivateDnsZoneName)]"
+      }
+    },
     "outputs": {
       "dbFQDN": {
           "type": "string",

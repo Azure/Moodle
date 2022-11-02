@@ -50,6 +50,8 @@
                     "autoscaleVmCountMax":          { "value": 20 },
 		            "autoscaleVmSku":		        { "value": "Standard_DS3_v2" },
                     "searchType":                   { "value": "elastic" },
+                    "dbServerType":                 { "value": "mysqlflex" },
+                    "vnetDbDeploySwitch":           {"value": true },
                     "mysqlflexSkuName":             { "value": "Standard_E32ds_v4" },
                     "mysqlflexStgIops":             { "value": 10000 },
                     "mysqlflexStgSizeGiB":          { "value": 2048 },
