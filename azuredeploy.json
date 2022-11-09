@@ -346,14 +346,14 @@
                 "Standard_E64ds_v5",
                 "Standard_E96ds_v5"
             ],
-            "defaultValue": "Standard_D8ds_v4",
+            "defaultValue": "Standard_B2s",
             "metadata": {
                 "description": "The name of the sku for Azure Database for MySQL Flexible Servers, e.g. Standard_D32ds_v4. Complete list is available here : https://learn.microsoft.com/en-us/azure/mysql/flexible-server/concepts-service-tiers-storage "
             },
             "type": "string"
         },
         "mysqlflexStgSizeGiB": {
-            "defaultValue": 1024,
+            "defaultValue": 20,
             "minValue": 20,
             "maxValue": 16384,
             "metadata": {
@@ -362,7 +362,7 @@
             "type": "int"
         },
         "mysqlflexStgIops": {
-            "defaultValue": 3372,
+            "defaultValue": 360,
             "minValue": 360,
             "metadata": {
                 "description": "Azure Database for MySQL Flexible server storage iops. Minimum 360, Maxium is determined by selected mysqlflexSkuName."
