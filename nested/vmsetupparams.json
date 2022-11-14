@@ -75,10 +75,10 @@
                 "isMigration": "[parameters('moodleCommon').isMigration]"
             },
             "dbServerProfile": {
-                "type": "[if(equals(parameters('moodleCommon').dbServerType, 'mysqlflex'), 'mysql', parameters('moodleCommon').dbServerType)]",
+                "type": "[parameters('moodleCommon').dbServerType]",
                 "fqdn": "[parameters('dbFQDN')]",
                 "adminLogin": "[parameters('moodleCommon').dbLogin]",
-                "adminLoginAzure": "[if(equals(parameters('moodleCommon').dbServerType, 'mysqlflex'), parameters('moodleCommon').dbLogin, concat(parameters('moodleCommon').dbLogin, '@', parameters('moodleCommon').dbServerType, '-', parameters('moodleCommon').resourcesPrefix))]",
+                "adminLoginAzure": "[concat(parameters('moodleCommon').dbLogin, '@', parameters('moodleCommon').dbServerType, '-', parameters('moodleCommon').resourcesPrefix)]",
                 "adminPassword": "[parameters('moodleCommon').dbLoginPassword]",
                 "mssqlDbServiceObjectiveName": "[parameters('moodleCommon').mssqlDbServiceObjectiveName]",
                 "mssqlDbEdition": "[parameters('moodleCommon').mssqlDbEdition]",

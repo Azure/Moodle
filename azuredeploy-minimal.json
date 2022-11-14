@@ -37,8 +37,7 @@
                     "sshPublicKey":                 { "value": "[parameters('sshPublicKey')]" },
                     "autoscaleVmSku":               { "value": "Standard_DS1_v2" },
                     "enableAccelNwForOtherVmsSwitch":   { "value": false },
-                    "dbServerType":                 { "value": "mysqlflex" },
-                    "vnetDbDeploySwitch":           {"value": true },
+                    "dbServerType":                 { "value": "mysql" },
                     "fileServerDiskCount":          { "value": 2 },
                     "fileServerDiskSize":           { "value": 32 }
                 },
@@ -60,7 +59,7 @@
         "documentation03": "   - fileServerType: nfs",
         "documentation04": "   - autoscaleVmSku: Standard_DS1_vs",
         "documentation05": "   - fileServerDiskCount: 2",
-        "documentation06": "   - dbServerType: mysqlflex",
+        "documentation06": "   - dbServerType: mysql",
         "documentation07": "   - redisDeploySwitch: false"
     }
 }
