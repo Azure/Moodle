@@ -166,28 +166,8 @@ EOF
   # PHP Version
   PhpVer=$(get_php_version)
 
-  if [ $fileServerType = "gluster" ]; then
-    # Mount gluster fs for /moodle
-    sudo mkdir -p /moodle
-    sudo chown www-data /moodle
-    sudo chmod 770 /moodle
-    sudo echo -e 'Adding Gluster FS to /etc/fstab and mounting it'
-    setup_and_mount_gluster_moodle_share $glusterNode $glusterVolume
-  elif [ $fileServerType = "nfs" ]; then
-    # mount NFS export (set up on controller VM--No HA)
-    echo -e '\n\rMounting NFS export from '$nfsVmName':/moodle on /moodle and adding it to /etc/fstab\n\r'
-    configure_nfs_client_and_mount $nfsVmName /moodle /moodle
-  elif [ $fileServerType = "nfs-ha" ]; then
-    # mount NFS-HA export
-    echo -e '\n\rMounting NFS export from '$nfsHaLbIP':'$nfsHaExportPath' on /moodle and adding it to /etc/fstab\n\r'
-    configure_nfs_client_and_mount $nfsHaLbIP $nfsHaExportPath /moodle
-  elif [ $fileServerType = "nfs-byo" ]; then
-    # mount NFS-BYO export
-    echo -e '\n\rMounting NFS export from '$nfsByoIpExportPath' on /moodle and adding it to /etc/fstab\n\r'
-    configure_nfs_client_and_mount0 $nfsByoIpExportPath /moodle
-  else # "azurefiles"
-    setup_and_mount_azure_files_moodle_share $storageAccountName $storageAccountKey
-  fi
+  # Rafael Silva <rafael.silva@alfasoft.pt> -> Change to NFS with HA
+  configure_nfs_client_and_mount 192.168.36.134 /moodle /moodle
 
   # Configure syslog to forward
   cat <<EOF >> /etc/rsyslog.conf
