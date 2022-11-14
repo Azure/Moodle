@@ -31,6 +31,12 @@
                 "description": "Public IP address of the deployed controller VM"
             },
             "type": "string"
+        },
+        "subnetIdDb": {
+            "metadata": {
+                "description": "Azure resource ID of the subnet where the Db is to be deployed.(if deployed in vnet)"
+            },
+            "type": "string"
         }
     },
     "resources": [
