@@ -107,6 +107,10 @@ check_fileServerType_param $fileServerType
     php$phpVersion-xml \
     php$phpVersion-bz2
 
+  # Rafael Silva <rafael.silva@alfasoft.pt> -> Install PT_PT & PT_BR locales
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get --yes --no-install-recommends -qq -o=Dpkg::Use-Pty=0 -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install language-pack-pt
+
   # install azcopy
   wget -q -O azcopy_v10.tar.gz https://aka.ms/downloadazcopy-v10-linux && tar -xf azcopy_v10.tar.gz --strip-components=1 && mv ./azcopy /usr/bin/
 
