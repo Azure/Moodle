@@ -6,7 +6,7 @@ function install_java_and_jmeter
     sudo apt update || return 1
     sudo apt install -y openjdk-8-jdk || return 1
 
-    wget -O apache-jmeter-4.0.tgz http://www-us.apache.org/dist/jmeter/binaries/apache-jmeter-4.0.tgz || return 1
+    wget -O apache-jmeter-4.0.tgz https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-4.0.tgz || return 1
     tar xfz apache-jmeter-4.0.tgz -C ~
     mkdir -p ~/bin
     ln -s ~/apache-jmeter-4.0/bin/jmeter ~/bin/jmeter
