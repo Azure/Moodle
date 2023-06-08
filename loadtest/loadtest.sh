@@ -36,10 +36,19 @@ function install_java_and_jmeter
 function install_az_cli
 {
     local az_repo=$(lsb_release -cs)
-    echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $az_repo main" | sudo tee /etc/apt/sources.list.d/azure-cli.list
-    sudo apt-key adv --keyserver packages.microsoft.com --recv-keys 52E16F86FEE04B979B07E28DB02C46DF417A0893
-    sudo apt-get install -y apt-transport-https || return 1
-    sudo apt-get update && sudo apt-get install -y azure-cli || return 1
+    
+    sudo mkdir -p /etc/apt/keyrings
+    curl -sLS https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | sudo tee /etc/apt/keyrings/microsoft.gpg > /dev/null
+    sudo chmod go+r /etc/apt/keyrings/microsoft.gpg
+    echo "deb [arch=`dpkg --print-architecture` signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/azure-cli/ $az_repo main" | sudo tee /etc/apt/sources.list.d/azure-cli.list
+
+    export DEBIAN_FRONTEND=noninteractive
+    sudo apt-get -qq -o=Dpkg::Use-Pty=0 update || return 1
+    sudo apt-get --yes --no-install-recommends \
+        -qq -o=Dpkg::Use-Pty=0 \
+        -o Dpkg::Options::="--force-confdef" \
+        -o Dpkg::Options::="--force-confold" \
+        install azure-cli || return 1
 }
 
 function check_if_logged_on_azure
