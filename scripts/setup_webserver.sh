@@ -99,6 +99,7 @@ check_fileServerType_param $fileServerType
     php$phpVersion-json \
     php$phpVersion-redis \
     php$phpVersion-bcmath \
+    php$phpVersion-ldap \
     php$phpVersion-gd \
     php$phpVersion-pgsql \
     php$phpVersion-mysql \
