@@ -1,6 +1,5 @@
-# Custom Script for Linux
-
 #!/bin/bash
+# Custom Script for Linux
 
 # The MIT License (MIT)
 #
@@ -22,55 +21,48 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 set -ex
-echo "### Script Start `date`###"
+echo "### Script Start $(date)###"
 
 moodle_on_azure_configs_json_path=${1}
 
 . ./helper_functions.sh
 
-get_setup_params_from_configs_json $moodle_on_azure_configs_json_path || exit 99
+get_setup_params_from_configs_json "$moodle_on_azure_configs_json_path" || exit 99
 
-echo $glusterNode    >> /tmp/vars.txt
-echo $glusterVolume  >> /tmp/vars.txt
-echo $siteFQDN >> /tmp/vars.txt
-echo $httpsTermination >> /tmp/vars.txt
-echo $syslogServer >> /tmp/vars.txt
-echo $webServerType >> /tmp/vars.txt
-echo $dbServerType >> /tmp/vars.txt
-echo $fileServerType >> /tmp/vars.txt
-echo $storageAccountName >> /tmp/vars.txt
-echo $storageAccountKey >> /tmp/vars.txt
-echo $nfsVmName >> /tmp/vars.txt
-echo $nfsByoIpExportPath >> /tmp/vars.txt
-echo $htmlLocalCopySwitch >> /tmp/vars.txt
-echo $phpVersion          >> /tmp/vars.txt
+echo "$glusterNode"           >> /tmp/vars.txt
+echo "$glusterVolume"         >> /tmp/vars.txt
+echo "$siteFQDN"              >> /tmp/vars.txt
+echo "$httpsTermination"      >> /tmp/vars.txt
+echo "$syslogServer"          >> /tmp/vars.txt
+echo "$webServerType"         >> /tmp/vars.txt
+echo "$dbServerType"          >> /tmp/vars.txt
+echo "$fileServerType"        >> /tmp/vars.txt
+echo "$storageAccountName"    >> /tmp/vars.txt
+echo "$storageAccountKey"     >> /tmp/vars.txt
+echo "$nfsVmName"             >> /tmp/vars.txt
+echo "$nfsByoIpExportPath"    >> /tmp/vars.txt
+echo "$htmlLocalCopySwitch"   >> /tmp/vars.txt
+echo "$phpVersion"            >> /tmp/vars.txt
 
 
 
-check_fileServerType_param $fileServerType
+check_fileServerType_param "$fileServerType"
 
 {
   set -ex
-  echo "### Function Start `date`###"
+  echo "### Function Start $(date)###"
 
-  # add azure-cli repository
-  curl -sL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null
+  # add azure-cli repository && install azure cli
   AZ_REPO=$(lsb_release -cs)
-  echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" |  tee /etc/apt/sources.list.d/azure-cli.list
-  
-  # add PHP-FPM repository 
-  add-apt-repository ppa:ondrej/php -y > /dev/null 2>&1
+  mkdir -p /etc/apt/keyrings
+  curl -sLS https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /etc/apt/keyrings/microsoft.gpg && chmod go+r /etc/apt/keyrings/microsoft.gpg
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" > /etc/apt/sources.list.d/azure-cli.list
 
-  apt-get -qq -o=Dpkg::Use-Pty=0 update 
+  apt_update_noninteractive
 
   # install pre-requisites including VARNISH and PHP-FPM
-  export DEBIAN_FRONTEND=noninteractive
-  apt-get --yes \
-    --no-install-recommends \
-    -qq -o=Dpkg::Use-Pty=0 \
-    -o Dpkg::Options::="--force-confdef" \
-    -o Dpkg::Options::="--force-confold" \
-    install \
+
+  apt_install_noninteractive \
     azure-cli \
     ca-certificates \
     curl \
@@ -85,28 +77,28 @@ check_fileServerType_param $fileServerType
     unattended-upgrades \
     tuned \
     varnish \
-    php$phpVersion \
-    php$phpVersion-cli \
-    php$phpVersion-curl \
-    php$phpVersion-zip \
+    php \
+    php-cli \
+    php-curl \
+    php-zip \
     php-pear \
-    php$phpVersion-mbstring \
+    php-mbstring \
     mcrypt \
-    php$phpVersion-dev \
+    php-dev \
     graphviz \
     aspell \
-    php$phpVersion-soap \
-    php$phpVersion-json \
-    php$phpVersion-redis \
-    php$phpVersion-bcmath \
-    php$phpVersion-ldap \
-    php$phpVersion-gd \
-    php$phpVersion-pgsql \
-    php$phpVersion-mysql \
-    php$phpVersion-xmlrpc \
-    php$phpVersion-intl \
-    php$phpVersion-xml \
-    php$phpVersion-bz2
+    php-soap \
+    php-json \
+    php-redis \
+    php-bcmath \
+    php-ldap \
+    php-gd \
+    php-pgsql \
+    php-mysql \
+    php-xmlrpc \
+    php-intl \
+    php-xml \
+    php-bz2
 
   # install azcopy
   wget -q -O azcopy_v10.tar.gz https://aka.ms/downloadazcopy-v10-linux && tar -xf azcopy_v10.tar.gz --strip-components=1 && mv ./azcopy /usr/bin/
@@ -138,42 +130,42 @@ EOF
   systemctl enable tuned
   tuned-adm profile throughput-performance
 
-  if [ $fileServerType = "gluster" ]; then
+  if [ "$fileServerType" = "gluster" ]; then
     #configure gluster repository & install gluster client
-    add-apt-repository ppa:gluster/glusterfs-3.10 -y
-    apt-get -y update
-    apt-get -y -qq -o=Dpkg::Use-Pty=0 install glusterfs-client
+    add-apt-repository ppa:gluster/glusterfs-9 --yes
+    apt_update_noninteractive
+    apt_install_noninteractive glusterfs-client
   elif [ "$fileServerType" = "azurefiles" ]; then
-    apt-get -y -qq -o=Dpkg::Use-Pty=0 install cifs-utils
+    apt_install_noninteractive cifs-utils
   fi
 
   if [ "$webServerType" = "nginx" -o "$httpsTermination" = "VMSS" ]; then
-    apt-get --yes -qq -o=Dpkg::Use-Pty=0 install nginx
+    apt_install_noninteractive nginx
   fi
    
   if [ "$webServerType" = "apache" ]; then
     # install apache pacakges
-    apt-get --yes -qq -o=Dpkg::Use-Pty=0 install apache2 libapache2-mod-php
+    apt_install_noninteractive apache2 libapache2-mod-php
   else
     # for nginx-only option
-    apt-get --yes -qq -o=Dpkg::Use-Pty=0 install php$phpVersion-fpm
+    apt_install_noninteractive php-fpm
   fi
-   
+
   # Moodle requirements
   if [ "$dbServerType" = "mssql" ]; then
     install_php_mssql_driver
   fi
-   
+
   # PHP Version
   PhpVer=$(get_php_version)
 
-  if [ $fileServerType = "gluster" ]; then
+  if [ "$fileServerType" = "gluster" ]; then
     # Mount gluster fs for /moodle
     sudo mkdir -p /moodle
     sudo chown www-data /moodle
     sudo chmod 770 /moodle
     sudo echo -e 'Adding Gluster FS to /etc/fstab and mounting it'
-    setup_and_mount_gluster_moodle_share $glusterNode $glusterVolume
+    setup_and_mount_gluster_moodle_share "$glusterNode" "$glusterVolume"
   elif [ $fileServerType = "nfs" ]; then
     # mount NFS export (set up on controller VM--No HA)
     echo -e '\n\rMounting NFS export from '$nfsVmName':/moodle on /moodle and adding it to /etc/fstab\n\r'
@@ -209,7 +201,7 @@ worker_processes auto;
 pid /run/nginx.pid;
 
 events {
-	worker_connections 8192;
+  worker_connections 8192;
   multi_accept on;
   use epoll;
 }
@@ -286,7 +278,7 @@ EOF
       mkdir -p /var/www/html
       ACCOUNT_KEY="$storageAccountKey"
       NAME="$storageAccountName"
-      END=`date -u -d "60 minutes" '+%Y-%m-%dT%H:%M:00Z'`
+      END=$(date -u -d "60 minutes" '+%Y-%m-%dT%H:%M:00Z')
       htmlRootDir="/var/www/html/moodle"
 
       sas=$(az storage share generate-sas \
@@ -320,7 +312,6 @@ server {
         root ${htmlRootDir};
 	      index index.php index.html index.htm;
 
-        ssl on;
         ssl_certificate /moodle/certs/nginx.crt;
         ssl_certificate_key /moodle/certs/nginx.key;
         ssl_session_timeout 1d;
@@ -365,7 +356,7 @@ server {
         listen 81 default;
         server_name ${siteFQDN};
         root ${htmlRootDir};
-	index index.php index.html index.htm;
+        index index.php index.html index.htm;
 
         # Log to syslog
         error_log syslog:server=localhost,facility=local1,severity=error,tag=moodle;
@@ -394,9 +385,9 @@ EOF
             return 404;
         }
 
-	location / {
-		try_files \$uri \$uri/index.php?\$query_string;
-	}
+  location / {
+    try_files \$uri \$uri/index.php?\$query_string;
+  }
  
         location ~ [^/]\.php(/|$) {
           fastcgi_split_path_info ^(.+?\.php)(/.*)$;
@@ -418,7 +409,7 @@ EOF
 upstream backend {
         server unix:/run/php/php${PhpVer}-fpm.sock fail_timeout=1s;
         server unix:/run/php/php${PhpVer}-fpm-backup.sock backup;
-}  
+}
 
 EOF
   fi
@@ -430,16 +421,16 @@ EOF
 
     cat <<EOF >> /etc/apache2/sites-enabled/${siteFQDN}.conf
 <VirtualHost *:81>
-	ServerName ${siteFQDN}
+  ServerName ${siteFQDN}
 
-	ServerAdmin webmaster@localhost
-	DocumentRoot ${htmlRootDir}
+  ServerAdmin webmaster@localhost
+  DocumentRoot ${htmlRootDir}
 
-	<Directory ${htmlRootDir}>
-		Options FollowSymLinks
-		AllowOverride All
-		Require all granted
-	</Directory>
+  <Directory ${htmlRootDir}>
+    Options FollowSymLinks
+    AllowOverride All
+    Require all granted
+  </Directory>
 EOF
     if [ "$httpsTermination" != "None" ]; then
       cat <<EOF >> /etc/apache2/sites-enabled/${siteFQDN}.conf
@@ -456,7 +447,7 @@ EOF
     SetEnvIf X-Forwarded-For "^.*\..*\..*\..*" forwarded
     LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
     LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" forwarded
-	ErrorLog "|/usr/bin/logger -t moodle -p local1.error"
+    ErrorLog "|/usr/bin/logger -t moodle -p local1.error"
     CustomLog "|/usr/bin/logger -t moodle -p local1.notice" combined env=!forwarded
     CustomLog "|/usr/bin/logger -t moodle -p local1.notice" forwarded env=forwarded
 
@@ -472,7 +463,7 @@ EOF
    fi
    sed -i "s/memory_limit.*/memory_limit = 512M/" $PhpIni
    sed -i "s/max_execution_time.*/max_execution_time = 18000/" $PhpIni
-   sed -i "s/max_input_vars.*/max_input_vars = 100000/" $PhpIni
+   sed -i "s/;max_input_vars.*/max_input_vars = 100000/" $PhpIni
    sed -i "s/max_input_time.*/max_input_time = 600/" $PhpIni
    sed -i "s/upload_max_filesize.*/upload_max_filesize = 1024M/" $PhpIni
    sed -i "s/post_max_size.*/post_max_size = 1056M/" $PhpIni
@@ -483,7 +474,7 @@ EOF
    sed -i "s/;opcache.enable.*/opcache.enable = 1/" $PhpIni
    sed -i "s/;opcache.memory_consumption.*/opcache.memory_consumption = 512/" $PhpIni
    sed -i "s/;opcache.max_accelerated_files.*/opcache.max_accelerated_files = 20000/" $PhpIni
-    
+
    # Remove the default site. Moodle is the only site we want
    rm -f /etc/nginx/sites-enabled/default
    if [ "$webServerType" = "apache" ]; then
@@ -750,7 +741,7 @@ EOF
   if [ "$webServerType" = "nginx" ]; then
       if pgrep -x "$service" >/dev/null 
       then
-            echo “Stop the $service!!!”
+            echo "Stop the $service!!!"
             systemctl stop $service
       else
             systemctl mask $service
@@ -799,5 +790,5 @@ EOF
         service apache2 restart
    fi
 
-  echo "### Script End `date`###"
+  echo "### Script End $(date)###"
 } 2>&1 | tee /tmp/setup.log

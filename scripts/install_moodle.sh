@@ -30,50 +30,46 @@ set -ex
 
     get_setup_params_from_configs_json $moodle_on_azure_configs_json_path || exit 99
 
-    echo $moodleVersion        >> /tmp/vars.txt
-    echo $glusterNode          >> /tmp/vars.txt
-    echo $glusterVolume        >> /tmp/vars.txt
-    echo $siteFQDN             >> /tmp/vars.txt
-    echo $httpsTermination     >> /tmp/vars.txt
-    echo $dbIP                 >> /tmp/vars.txt
-    echo $moodledbname         >> /tmp/vars.txt
-    echo $moodledbuser         >> /tmp/vars.txt
-    echo $moodledbpass         >> /tmp/vars.txt
-    echo $adminpass            >> /tmp/vars.txt
-    echo $dbadminlogin         >> /tmp/vars.txt
-    echo $dbadminloginazure    >> /tmp/vars.txt
-    echo $dbadminpass          >> /tmp/vars.txt
-    echo $storageAccountName   >> /tmp/vars.txt
-    echo $storageAccountKey    >> /tmp/vars.txt
-    echo $azuremoodledbuser    >> /tmp/vars.txt
-    echo $redisDns             >> /tmp/vars.txt
-    echo $redisAuth            >> /tmp/vars.txt
-    echo $elasticVm1IP         >> /tmp/vars.txt
-    echo $installO365pluginsSwitch    >> /tmp/vars.txt
-    echo $dbServerType                >> /tmp/vars.txt
-    echo $fileServerType              >> /tmp/vars.txt
-    echo $mssqlDbServiceObjectiveName >> /tmp/vars.txt
-    echo $mssqlDbEdition    >> /tmp/vars.txt
-    echo $mssqlDbSize   >> /tmp/vars.txt
-    echo $installObjectFsSwitch >> /tmp/vars.txt
-    echo $installGdprPluginsSwitch >> /tmp/vars.txt
-    echo $thumbprintSslCert >> /tmp/vars.txt
-    echo $thumbprintCaCert >> /tmp/vars.txt
-    echo $searchType >> /tmp/vars.txt
-    echo $azureSearchKey >> /tmp/vars.txt
-    echo $azureSearchNameHost >> /tmp/vars.txt
-    echo $tikaVmIP >> /tmp/vars.txt
-    echo $nfsByoIpExportPath >> /tmp/vars.txt
-    echo $storageAccountType >>/tmp/vars.txt
-    echo $fileServerDiskSize >>/tmp/vars.txt
-    echo $phpVersion         >> /tmp/vars.txt
-    echo $isMigration        >> /tmp/vars.txt
+    echo $moodleVersion                 >> /tmp/vars.txt
+    echo $glusterNode                   >> /tmp/vars.txt
+    echo $glusterVolume                 >> /tmp/vars.txt
+    echo $siteFQDN                      >> /tmp/vars.txt
+    echo $httpsTermination              >> /tmp/vars.txt
+    echo $dbIP                          >> /tmp/vars.txt
+    echo $moodledbname                  >> /tmp/vars.txt
+    echo $moodledbuser                  >> /tmp/vars.txt
+    echo $moodledbpass                  >> /tmp/vars.txt
+    echo $adminpass                     >> /tmp/vars.txt
+    echo $dbadminlogin                  >> /tmp/vars.txt
+    echo $dbadminloginazure             >> /tmp/vars.txt
+    echo $dbadminpass                   >> /tmp/vars.txt
+    echo $storageAccountName            >> /tmp/vars.txt
+    echo $storageAccountKey             >> /tmp/vars.txt
+    echo $azuremoodledbuser             >> /tmp/vars.txt
+    echo $redisDns                      >> /tmp/vars.txt
+    echo $redisAuth                     >> /tmp/vars.txt
+    echo $elasticVm1IP                  >> /tmp/vars.txt
+    echo $installO365pluginsSwitch      >> /tmp/vars.txt
+    echo $dbServerType                  >> /tmp/vars.txt
+    echo $fileServerType                >> /tmp/vars.txt
+    echo $mssqlDbServiceObjectiveName   >> /tmp/vars.txt
+    echo $mssqlDbEdition                >> /tmp/vars.txt
+    echo $mssqlDbSize                   >> /tmp/vars.txt
+    echo $installObjectFsSwitch         >> /tmp/vars.txt
+    echo $installGdprPluginsSwitch      >> /tmp/vars.txt
+    echo $thumbprintSslCert             >> /tmp/vars.txt
+    echo $thumbprintCaCert              >> /tmp/vars.txt
+    echo $searchType                    >> /tmp/vars.txt
+    echo $azureSearchKey                >> /tmp/vars.txt
+    echo $azureSearchNameHost           >> /tmp/vars.txt
+    echo $tikaVmIP                      >> /tmp/vars.txt
+    echo $nfsByoIpExportPath            >> /tmp/vars.txt
+    echo $storageAccountType            >>/tmp/vars.txt
+    echo $fileServerDiskSize            >>/tmp/vars.txt
+    echo $phpVersion                    >> /tmp/vars.txt
+    echo $isMigration                   >> /tmp/vars.txt
 
     check_fileServerType_param $fileServerType
-
-    #Updating php sources
-   sudo add-apt-repository ppa:ondrej/php -y
-   sudo apt-get update
 
     if [ "$dbServerType" = "mysql" ]; then
       mysqlIP=$dbIP
@@ -83,7 +79,6 @@ set -ex
       mssqlIP=$dbIP
       mssqladminlogin=$dbadminloginazure
       mssqladminpass=$dbadminpass
-
     elif [ "$dbServerType" = "postgres" ]; then
       postgresIP=$dbIP
       pgadminlogin=$dbadminloginazure
@@ -93,51 +88,53 @@ set -ex
       exit 1
     fi
 
-    # make sure system does automatic updates and fail2ban
-    sudo apt-get -y update
-    sudo apt-get -y install unattended-upgrades fail2ban
+    #
+    # Export apt default settings for this install script
+    #
+
+    apt_update_noninteractive >> /tmp/apt.log
+    apt_install_noninteractive fail2ban >> /tmp/apt.log
 
     config_fail2ban
 
     # create gluster, nfs or Azure Files mount point
     mkdir -p /moodle
 
-    export DEBIAN_FRONTEND=noninteractive
-
     if [ $fileServerType = "gluster" ]; then
-        # configure gluster repository & install gluster client
-        sudo add-apt-repository ppa:gluster/glusterfs-3.10 -y                 >> /tmp/apt1.log
+        # configure gluster repository & install gluster clientapt 
+        add-apt-repository ppa:gluster/glusterfs-9 --yes >> /tmp/apt.log
     elif [ $fileServerType = "nfs" ]; then
         # configure NFS server and export
         setup_raid_disk_and_filesystem /moodle /dev/md1 /dev/md1p1
         configure_nfs_server_and_export /moodle
     fi
 
-    sudo apt-get -y update                                                   >> /tmp/apt2.log
-    sudo apt-get -y --force-yes install rsyslog git                          >> /tmp/apt3.log
+    apt_update_noninteractive >> /tmp/apt.log
+    apt_install_noninteractive rsyslog git >> /tmp/apt.log
 
     if [ $fileServerType = "gluster" ]; then
-        sudo apt-get -y --force-yes install glusterfs-client                 >> /tmp/apt3.log
+        apt_install_noninteractive glusterfs-client >> /tmp/apt.log
     elif [ "$fileServerType" = "azurefiles" ]; then
-        sudo apt-get -y --force-yes install cifs-utils                       >> /tmp/apt3.log
+        apt_install_noninteractive cifs-utils >> /tmp/apt.log
     fi
 
     if [ $dbServerType = "mysql" ]; then
-        sudo apt-get -y --force-yes install mysql-client >> /tmp/apt3.log
+        apt_install_noninteractive mysql-client >> /tmp/apt.log
     elif [ "$dbServerType" = "postgres" ]; then
-        sudo apt-get -y --force-yes install postgresql-client >> /tmp/apt3.log
+        apt_install_noninteractive postgresql-client >> /tmp/apt.log
     fi
-    
-    if [ "$installObjectFsSwitch" = "true" -o "$fileServerType" = "azurefiles" ]; then
-        # install azure cli & setup container
-        AZ_REPO=$(lsb_release -cs)
-        echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" |  tee /etc/apt/sources.list.d/azure-cli.list
 
-        curl -L https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - >> /tmp/apt4.log
-        sudo apt-get -y install apt-transport-https >> /tmp/apt4.log
-        sudo apt-get -y update > /dev/null
-        sudo apt-get -y install azure-cli >> /tmp/apt4.log
-    
+    if [ "$installObjectFsSwitch" = "true" -o "$fileServerType" = "azurefiles" ]; then
+        # install azure cli
+        AZ_REPO=$(lsb_release -cs)
+        mkdir -p /etc/apt/keyrings
+        curl -sLS https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /etc/apt/keyrings/microsoft.gpg && chmod go+r /etc/apt/keyrings/microsoft.gpg
+        echo "deb [arch=`dpkg --print-architecture` signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" > /etc/apt/sources.list.d/azure-cli.list
+
+    apt_update_noninteractive >> /tmp/apt.log
+
+    apt_install_noninteractive apt-transport-https ca-certificates curl apt-transport-https lsb-release gnupg azure-cli >> /tmp/apt.log
+
         # FileStorage accounts can only be used to store Azure file shares;
         # Premium_LRS will support FileStorage kind
         # No other storage resources (blob containers, queues, tables, etc.) can be deployed in a FileStorage account.
@@ -191,32 +188,47 @@ set -ex
         echo -e '\n\rMounting NFS export from '$nfsByoIpExportPath' on /moodle\n\r'
         configure_nfs_client_and_mount0 $nfsByoIpExportPath /moodle
     fi
-    
-    # install pre-requisites
-    sudo add-apt-repository ppa:ubuntu-toolchain-r/ppa
-    sudo apt-get -y update > /dev/null 2>&1
-    # sudo apt-get install -y --fix-missing python-software-properties unzip
-    sudo apt-get -y install software-properties-common
-    sudo apt-get -y install unzip
 
+    # install pre-requisites
+    add-apt-repository ppa:ubuntu-toolchain-r/ppa --yes >> /tmp/apt.log
+    apt_update_noninteractive >> /tmp/apt.log
+    apt_install_noninteractive software-properties-common unzip >> /tmp/apt.log
 
     # install the entire stack
-    # passing php versions $phpVersion
-    sudo apt-get -y  --force-yes install nginx php$phpVersion-fpm varnish >> /tmp/apt5a.log
-    sudo apt-get -y  --force-yes install php$phpVersion php$phpVersion-cli php$phpVersion-curl php$phpVersion-zip >> /tmp/apt5b.log
+    apt_install_noninteractive \
+        nginx \
+        varnish \
+        php \
+        php-fpm \
+        php-cli \
+        php-curl \
+        php-zip \
+        graphviz \
+        aspell \
+        php-common \
+        php-soap \
+        php-json \
+        php-redis \
+        php-bcmath \
+        php-ldap \
+        php-gd \
+        php-xmlrpc \
+        php-intl \
+        php-xml \
+        php-bz2 \
+        php-pear \
+        php-mbstring \
+        php-dev \
+        mcrypt >> /tmp/apt.log
 
-    # Moodle requirements
-    sudo apt-get -y update > /dev/null
-    sudo apt-get install -y --force-yes graphviz aspell php$phpVersion-common php$phpVersion-soap php$phpVersion-json php$phpVersion-redis > /tmp/apt6.log
-    sudo apt-get install -y --force-yes php$phpVersion-bcmath php$phpVersion-ldap php$phpVersion-gd php$phpVersion-xmlrpc php$phpVersion-intl php$phpVersion-xml php$phpVersion-bz2 php-pear php$phpVersion-mbstring php$phpVersion-dev mcrypt >> /tmp/apt6.log
     PhpVer=$(get_php_version)
     if [ $dbServerType = "mysql" ]; then
-        sudo apt-get install -y --force-yes php$phpVersion-mysql
+        apt_install_noninteractive php-mysql
     elif [ $dbServerType = "mssql" ]; then
-        sudo apt-get install -y libapache2-mod-php  # Need this because install_php_mssql_driver tries to update apache2-mod-php settings always (which will fail without this)
+        apt_install_noninteractive libapache2-mod-php
         install_php_mssql_driver
     else
-        sudo apt-get install -y --force-yes php-pgsql
+        apt_install_noninteractive php-pgsql
     fi
 
     # Set up initial moodle dirs
@@ -229,68 +241,69 @@ set -ex
     moodleUnzipDir=$(get_moodle_unzip_dir_from_moodle_version $moodleVersion)
 
     # install Moodle 
-    echo '#!/bin/bash
-    mkdir -p /moodle/tmp
-    cd /moodle/tmp
+    cat <<EOF > /tmp/setup-moodle.sh
+#!/bin/bash
+mkdir -p /moodle/tmp
+cd /moodle/tmp
 
-    if [ ! -d /moodle/html/moodle ]; then
-        # downloading moodle only if /moodle/html/moodle does not exist -- if it exists, user should populate it in advance correctly as below. This is to reduce template deployment time.
-        /usr/bin/curl -k --max-redirs 10 https://github.com/moodle/moodle/archive/'$moodleVersion'.zip -L -o moodle.zip
-        /usr/bin/unzip -q moodle.zip
-        /bin/mv '$moodleUnzipDir' /moodle/html/moodle
-    fi
+if [ ! -d /moodle/html/moodle ]; then
+    # downloading moodle only if /moodle/html/moodle does not exist -- if it exists, user should populate it in advance correctly as below. This is to reduce template deployment time.
+    /usr/bin/curl -k --max-redirs 10 https://github.com/moodle/moodle/archive/MOODLE_402_STABLE.zip -L -o moodle.zip
+    /usr/bin/unzip -q moodle.zip
+    /bin/mv "$moodleUnzipDir" /moodle/html/moodle
+fi
 
-    if [ "'$installGdprPluginsSwitch'" = "true" ]; then
-        # install Moodle GDPR plugins (Note: This is only for Moodle versions 3.4.2+ or 3.3.5+ and will be included in Moodle 3.5, so no need for 3.5)
-        curl -k --max-redirs 10 https://github.com/moodlehq/moodle-tool_policy/archive/'$moodleStableVersion'.zip -L -o plugin-policy.zip
-        unzip -q plugin-policy.zip
-        mv moodle-tool_policy-'$moodleStableVersion' /moodle/html/moodle/admin/tool/policy
+if [ "$installGdprPluginsSwitch" = "true" ]; then
+    # install Moodle GDPR plugins (Note: This is only for Moodle versions 3.4.2+ or 3.3.5+ and will be included in Moodle 3.5, so no need for 3.5)
+    curl -k --max-redirs 10 https://github.com/moodlehq/moodle-tool_policy/archive/"$moodleStableVersion".zip -L -o plugin-policy.zip
+    unzip -q plugin-policy.zip
+    mv moodle-tool_policy-"$moodleStableVersion" /moodle/html/moodle/admin/tool/policy
 
-        curl -k --max-redirs 10 https://github.com/moodlehq/moodle-tool_dataprivacy/archive/'$moodleStableVersion'.zip -L -o plugin-dataprivacy.zip
-        unzip -q plugin-dataprivacy.zip
-        mv moodle-tool_dataprivacy-'$moodleStableVersion' /moodle/html/moodle/admin/tool/dataprivacy
-    fi
+    curl -k --max-redirs 10 https://github.com/moodlehq/moodle-tool_dataprivacy/archive/"$moodleStableVersion".zip -L -o plugin-dataprivacy.zip
+    unzip -q plugin-dataprivacy.zip
+    mv moodle-tool_dataprivacy-"$moodleStableVersion" /moodle/html/moodle/admin/tool/dataprivacy
+fi
 
-    if [ "'$installO365pluginsSwitch'" = "true" ]; then
-        # install Office 365 plugins
-        curl -k --max-redirs 10 https://github.com/Microsoft/o365-moodle/archive/'$o365pluginVersion'.zip -L -o o365.zip
-        unzip -q o365.zip
-        cp -r o365-moodle-'$o365pluginVersion'/* /moodle/html/moodle
-        rm -rf o365-moodle-'$o365pluginVersion'
-    fi
+if [ "$installO365pluginsSwitch" = "true" ]; then
+    # install Office 365 plugins
+    curl -k --max-redirs 10 https://github.com/Microsoft/o365-moodle/archive/"$o365pluginVersion".zip -L -o o365.zip
+    unzip -q o365.zip
+    cp -r o365-moodle-"$o365pluginVersion"/* /moodle/html/moodle
+    rm -rf o365-moodle-"$o365pluginVersion"
+fi
 
-    if [ "'$searchType'" = "elastic" ]; then
-        # Install ElasticSearch plugin
-        /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-search_elastic/archive/master.zip -L -o plugin-elastic.zip
-        /usr/bin/unzip -q plugin-elastic.zip
-        /bin/mv moodle-search_elastic-master /moodle/html/moodle/search/engine/elastic
+if [ "$searchType" = "elastic" ]; then
+    # Install ElasticSearch plugin
+    /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-search_elastic/archive/master.zip -L -o plugin-elastic.zip
+    /usr/bin/unzip -q plugin-elastic.zip
+    /bin/mv moodle-search_elastic-master /moodle/html/moodle/search/engine/elastic
 
-        # Install ElasticSearch plugin dependency
-        /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-local_aws/archive/master.zip -L -o local-aws.zip
-        /usr/bin/unzip -q local-aws.zip
-        /bin/mv moodle-local_aws-master /moodle/html/moodle/local/aws
+    # Install ElasticSearch plugin dependency
+    /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-local_aws/archive/master.zip -L -o local-aws.zip
+    /usr/bin/unzip -q local-aws.zip
+    /bin/mv moodle-local_aws-master /moodle/html/moodle/local/aws
 
-    elif [ "'$searchType'" = "azure" ]; then
-        # Install Azure Search service plugin
-        /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-search_azure/archive/master.zip -L -o plugin-azure-search.zip
-        /usr/bin/unzip -q plugin-azure-search.zip
-        /bin/mv moodle-search_azure-master /moodle/html/moodle/search/engine/azure
-    fi
+elif [ "$searchType" = "azure" ]; then
+    # Install Azure Search service plugin
+    /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-search_azure/archive/master.zip -L -o plugin-azure-search.zip
+    /usr/bin/unzip -q plugin-azure-search.zip
+    /bin/mv moodle-search_azure-master /moodle/html/moodle/search/engine/azure
+fi
 
-    if [ "'$installObjectFsSwitch'" = "true" ]; then
-        # Install the ObjectFS plugin
-        /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-tool_objectfs/archive/master.zip -L -o plugin-objectfs.zip
-        /usr/bin/unzip -q plugin-objectfs.zip
-        /bin/mv moodle-tool_objectfs-master /moodle/html/moodle/admin/tool/objectfs
+if [ "$installObjectFsSwitch" = "true" ]; then
+    # Install the ObjectFS plugin
+    /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-tool_objectfs/archive/master.zip -L -o plugin-objectfs.zip
+    /usr/bin/unzip -q plugin-objectfs.zip
+    /bin/mv moodle-tool_objectfs-master /moodle/html/moodle/admin/tool/objectfs
 
-        # Install the ObjectFS Azure library
-        /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-local_azure_storage/archive/master.zip -L -o plugin-azurelibrary.zip
-        /usr/bin/unzip -q plugin-azurelibrary.zip
-        /bin/mv moodle-local_azure_storage-master /moodle/html/moodle/local/azure_storage
-    fi
-    cd /moodle
-    rm -rf /moodle/tmp
-    ' > /tmp/setup-moodle.sh 
+    # Install the ObjectFS Azure library
+    /usr/bin/curl -k --max-redirs 10 https://github.com/catalyst/moodle-local_azure_storage/archive/master.zip -L -o plugin-azurelibrary.zip
+    /usr/bin/unzip -q plugin-azurelibrary.zip
+    /bin/mv moodle-local_azure_storage-master /moodle/html/moodle/local/azure_storage
+fi
+cd /moodle
+rm -rf /moodle/tmp
+EOF
 
     chmod 755 /tmp/setup-moodle.sh
     /tmp/setup-moodle.sh >> /tmp/setupmoodle.log
@@ -473,12 +486,12 @@ EOF
         chmod 0400 /moodle/certs/nginx.*
     fi
 
-   # php config 
+   # PHP 8 fpm config
    PhpVer=$(get_php_version)
    PhpIni=/etc/php/${PhpVer}/fpm/php.ini
    sed -i "s/memory_limit.*/memory_limit = 512M/" $PhpIni
    sed -i "s/max_execution_time.*/max_execution_time = 18000/" $PhpIni
-   sed -i "s/max_input_vars.*/max_input_vars = 100000/" $PhpIni
+   sed -i "s/;max_input_vars.*/max_input_vars = 100000/" $PhpIni
    sed -i "s/max_input_time.*/max_input_time = 600/" $PhpIni
    sed -i "s/upload_max_filesize.*/upload_max_filesize = 1024M/" $PhpIni
    sed -i "s/post_max_size.*/post_max_size = 1056M/" $PhpIni
@@ -489,6 +502,10 @@ EOF
    sed -i "s/;opcache.enable.*/opcache.enable = 1/" $PhpIni
    sed -i "s/;opcache.memory_consumption.*/opcache.memory_consumption = 256/" $PhpIni
    sed -i "s/;opcache.max_accelerated_files.*/opcache.max_accelerated_files = 8000/" $PhpIni
+
+   # required for PHP8 cli at install time
+   PhpIniCli=/etc/php/${PhpVer}/cli/php.ini
+   sed -i "s/;max_input_vars.*/max_input_vars = 100000/" $PhpIniCli
 
    # fpm config - overload this 
    cat <<EOF > /etc/php/${PhpVer}/fpm/pool.d/www.conf
@@ -764,11 +781,10 @@ EOF
     service varnish restart
 
     if [ $dbServerType = "mysql" ]; then
-        mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e "CREATE DATABASE ${moodledbname} CHARACTER SET utf8;"
-        mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e "GRANT ALL ON ${moodledbname}.* TO ${moodledbuser} IDENTIFIED BY '${moodledbpass}';"
+        mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e "CREATE DATABASE ${moodledbname} DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" | tee -a /tmp/debug
+        mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e "CREATE USER ${moodledbuser}@'%' IDENTIFIED BY '${moodledbpass}';" | tee -a /tmp/debug
+        mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e "GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,CREATE TEMPORARY TABLES,DROP,INDEX,ALTER ON ${moodledbname}.* TO ${moodledbuser}@'%';" | tee -a /tmp/debug
 
-        echo "mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e \"CREATE DATABASE ${moodledbname};\"" >> /tmp/debug
-        echo "mysql -h $mysqlIP -u $mysqladminlogin -p${mysqladminpass} -e \"GRANT ALL ON ${moodledbname}.* TO ${moodledbuser} IDENTIFIED BY '${moodledbpass}';\"" >> /tmp/debug
     elif [ $dbServerType = "mssql" ]; then
         /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -Q "CREATE DATABASE ${moodledbname} ( MAXSIZE = $mssqlDbSize, EDITION = '$mssqlDbEdition', SERVICE_OBJECTIVE = '$mssqlDbServiceObjectiveName' )"
         /opt/mssql-tools/bin/sqlcmd -S $mssqlIP -U $mssqladminlogin -P ${mssqladminpass} -Q "CREATE LOGIN ${moodledbuser} with password = '${moodledbpass}'" 
@@ -912,7 +928,7 @@ EOF
         sed -i "23 a \$CFG->searchengine = 'elastic';" /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->enableglobalsearch = 'true';" /moodle/html/moodle/config.php
         # create index
-        php /moodle/html/moodle/search/cli/indexer.php --force --reindex
+        php /moodle/html/moodle/search/cli/indexer.php --force --reindex || true
 
     elif [ "$searchType" = "azure" ]; then
         # Set up Azure Search service plugin
@@ -925,7 +941,7 @@ EOF
         sed -i "23 a \$CFG->searchengine = 'azure';" /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->enableglobalsearch = 'true';" /moodle/html/moodle/config.php
         # create index
-        php /moodle/html/moodle/search/cli/indexer.php --force --reindex
+        php /moodle/html/moodle/search/cli/indexer.php --force --reindex || true
 
     fi
 
@@ -937,7 +953,7 @@ EOF
    if [ "$dbServerType" = "postgres" ]; then
      # Get a new version of Postgres to match Azure version
      add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main"
-     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE='a' apt -key add -
      apt-get update
      apt-get install -y postgresql-client-9.6
    fi

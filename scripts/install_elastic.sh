@@ -31,20 +31,48 @@ echo $elasticvm1ip     >> /tmp/vars.txt
 echo $elasticvm2ip     >> /tmp/vars.txt
 echo $elasticvm3ip     >> /tmp/vars.txt
 
+function wait_for_process {
+  until [ -z $(/usr/bin/pgrep ${1}) ]; do
+    printf '.'
+    sleep 0.5
+  done
+}
+
+function apt_update_noninteractive {
+  export DEBIAN_FRONTEND='noninteractive'
+
+  # waiting for apt to finish before running any other commands
+  wait_for_process apt;
+
+  apt --yes -qq -o=Dpkg::Use-Pty=0 update
+}
+
+function apt_install_noninteractive {
+  export DEBIAN_FRONTEND='noninteractive'
+  export NEEDRESTART_MODE='a'
+  export ACCEPT_EULA='Y'
+
+  # waiting for apt to finish before running any other commands
+  wait_for_process apt;
+
+  apt --yes --no-install-recommends -qq -o=Dpkg::Use-Pty=0 -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install "${@}"
+}
+
 {
 
   # make sure the system does automatic update
-  sudo apt-get -y update
-  sudo apt-get -y install unattended-upgrades
+  apt_update_noninteractive
+  apt_install_noninteractive unattended-upgrades apt-transport-https
 
   # configure elastic search repository & install elastic search
-  wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
-  echo "deb https://artifacts.elastic.co/packages/5.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-5.x.list
-  sudo apt-get -y update
-  sudo apt-get -y install elasticsearch=5.5.0
+  wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | gpg --dearmor -o /usr/share/keyrings/elasticsearch-keyring.gpg
+  echo "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/5.x/apt stable main" | tee /etc/apt/sources.list.d/elastic-5.x.list
+
+  apt_update_noninteractive
+  apt_install_noninteractive elasticsearch=5.6.16
 
   # install the required packages
-  sudo apt-get install -y openjdk-8-jre openjdk-8-jdk default-jre default-jdk
+  apt_install_noninteractive openjdk-8-jre openjdk-8-jdk default-jre default-jdk
 
   # Configure elasticsearch
   cat <<EOF > /etc/elasticsearch/elasticsearch.yml
@@ -70,7 +98,7 @@ cluster.name: ${esClusterName}
 #
 # Use a descriptive name for the node:
 #
-node.name: \${HOSTNAME}
+node.name: ${HOSTNAME}
 #
 # Add custom attributes to the node:
 #

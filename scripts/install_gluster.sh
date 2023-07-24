@@ -5,7 +5,9 @@
 # You can also customize it to work with other Linux flavours and versions.
 # If you customize it, copy it to either Azure blob storage or Github so that Azure
 # custom script Linux VM extension can access it, and specify its location in the 
-# parameters of powershell script or runbook or Azure Resource Manager CRP template.   
+# parameters of powershell script or runbook or Azure Resource Manager CRP template.
+
+. ./helper_functions.sh
 
 AZUREVMOFFSET=4
 
@@ -35,8 +37,8 @@ RAIDPARTITION="/dev/md1p1"
 BLACKLIST="/dev/sda|/dev/sdb"
 
 # make sure the system does automatic update
-sudo apt-get -y update
-sudo apt-get -y install unattended-upgrades
+apt_update_noninteractive
+apt_install_noninteractive unattended-upgrades
 
 {
         check_os() {
@@ -187,13 +189,13 @@ sudo apt-get -y install unattended-upgrades
             if [ ! -e /etc/apt/sources.list.d/gluster* ];
             then
                 echo "adding gluster ppa"
-                apt-get  -y install python-software-properties
-                apt-add-repository -y ppa:gluster/glusterfs-3.10
-                apt-get -y update
+                apt_install_noninteractive python-software-properties
+                apt-add-repository ppa:gluster/glusterfs-3.10 --yes
+                apt_update_noninteractive
             fi
             
             echo "installing gluster"
-            apt-get -y install glusterfs-server
+            apt_install_noninteractive glusterfs-server
             
             return
         }
