@@ -2,14 +2,36 @@
 
 # Common functions definitions
 
+function wait_for_process {
+  until [ -z $(/usr/bin/pgrep ${1}) ]; do
+    printf '.'
+    sleep 0.5
+  done
+}
+
+function apt_update_noninteractive {
+  export DEBIAN_FRONTEND='noninteractive'
+
+  # waiting for apt to finish before running any other commands
+  wait_for_process apt;
+
+  apt --yes -qq -o=Dpkg::Use-Pty=0 update
+}
+
+function apt_install_noninteractive {
+  export DEBIAN_FRONTEND='noninteractive'
+  export NEEDRESTART_MODE='a'
+  export ACCEPT_EULA='Y'
+
+  # waiting for apt to finish before running any other commands
+  wait_for_process apt;
+
+  apt --yes --no-install-recommends -qq -o=Dpkg::Use-Pty=0 -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install "${@}"
+}
+
 function get_setup_params_from_configs_json
 {
     local configs_json_path=${1}    # E.g., /var/lib/cloud/instance/moodle_on_azure_configs.json
-
-    # (dpkg -l jq &> /dev/null) || (apt -y update; apt -y install jq)
-    # sudo add-apt-repository universe
-    # sudo apt-get -y update
-    # sudo apt-get -y install jq
 
     # Added wget command to download jq.
     wget https://github.com/jqlang/jq/releases/download/jq-1.6/jq-linux64 -O /usr/bin/jq && chmod +x /usr/bin/jq
@@ -83,12 +105,22 @@ function get_php_version {
 function install_php_mssql_driver
 {
     # Download and build php/mssql driver
-    /usr/bin/curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
-    /usr/bin/curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
-    sudo apt-get update
-    sudo ACCEPT_EULA=Y apt-get install msodbcsql mssql-tools unixodbc-dev -y
-    echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
-    echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+    export AZ_REPO=$(lsb_release -cs)
+    export DEBIAN_FRONTEND='noninteractive'
+    export NEEDRESTART_MODE='a'
+    export ACCEPT_EULA='Y'
+
+    mkdir -p /etc/apt/keyrings
+    curl -sLS https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /etc/apt/keyrings/microsoft.gpg && chmod go+r /etc/apt/keyrings/microsoft.gpg
+    
+    echo "deb [arch=`dpkg --print-architecture` signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/ubuntu/22.04/prod $AZ_REPO main" > /etc/apt/sources.list.d/mssql-release.list
+    
+    wait_for_process apt && \
+    apt_update_noninteractive && \
+    apt --yes --no-install-recommends -qq install msodbcsql18 mssql-tools18 unixodbc-dev >> /tmp/apt.log
+    
+    echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bash_profile
+    echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc
     source ~/.bashrc
 
     #Build mssql driver
@@ -234,9 +266,9 @@ EOF
 # TODO refactor these functions with the same ones in install_gluster.sh
 function scan_for_new_disks
 {
-    local BLACKLIST=${1}    # E.g., /dev/sda|/dev/sdb
+    local ALLOWLIST=${1}    # E.g., /dev/sda|/dev/sdb
     declare -a RET
-    local DEVS=$(ls -1 /dev/sd*|egrep -v "${BLACKLIST}"|egrep -v "[0-9]$")
+    local DEVS=$(ls -1 /dev/disk/azure/scsi1/lun*|egrep "${ALLOWLIST}"|egrep "[0-9]$")
     for DEV in ${DEVS};
     do
         # Check each device if there is a "1" partition.  If not,
@@ -262,7 +294,7 @@ function create_raid0_ubuntu {
     if [ $_RET -eq 1 ];
     then 
         echo "installing mdadm"
-        sudo apt-get -y -q install mdadm
+        apt_install_noninteractive mdadm
     fi
     echo "Creating raid0"
     udevadm control --stop-exec-queue
@@ -311,7 +343,7 @@ function setup_raid_disk_and_filesystem {
     local RAIDPARTITION=${3}  # E.g., /dev/md1p1
     local CREATE_FILESYSTEM=${4}  # E.g., "" (true) or any non-empty string (false)
 
-    local DISKS=$(scan_for_new_disks "/dev/sda|/dev/sdb")
+    local DISKS=$(scan_for_new_disks "/dev/disk/azure/scsi1/lun0|/dev/disk/azure/scsi1/lun1")
     echo "Disks are ${DISKS}"
     declare -i DISKCOUNT
     local DISKCOUNT=$(echo "$DISKS" | wc -w) 
@@ -353,7 +385,7 @@ function configure_nfs_server_and_export {
     local MOUNTPOINT=${1}     # E.g., /moodle
 
     echo "Installing nfs server..."
-    apt install -y nfs-kernel-server
+    apt_install_noninteractive nfs-kernel-server
 
     echo "Exporting ${MOUNTPOINT}..."
     grep -q -s "^${MOUNTPOINT}" /etc/exports && _RET=$? || _RET=$?

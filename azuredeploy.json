@@ -121,10 +121,9 @@
         },
         "moodleVersion": {
             "allowedValues": [
-                "MOODLE_39_STABLE",
-                "MOODLE_311_STABLE"
+                "MOODLE_402_STABLE"
             ],
-            "defaultValue": "MOODLE_39_STABLE",
+            "defaultValue": "MOODLE_402_STABLE",
             "metadata": {
                 "description": "The Moodle version you want to install."
             },
@@ -195,11 +194,9 @@
         },
         "phpVersion": {
             "allowedValues": [
-                "7.2",
-                "7.3",
-                "7.4"
+                "8.1"
             ],
-            "defaultValue": "7.4",
+            "defaultValue": "8.1",
             "metadata": {
                 "description": "php version"
             },
@@ -288,10 +285,9 @@
         },
         "mysqlVersion": {
             "allowedValues": [
-                "5.7",
                 "8.0.21"
             ],
-            "defaultValue": "5.7",
+            "defaultValue": "8.0.21",
             "metadata": {
                 "description": "Mysql version"
             },
@@ -799,9 +795,9 @@
         "ubuntuVersion": {
             "type": "string",
             "allowedValues": [
-                "20_04-lts-gen2"
+                "22_04-lts-gen2"
             ],
-            "defaultValue": "20_04-lts-gen2"
+            "defaultValue": "22_04-lts-gen2"
         },
         "location": {
             "type": "string",
@@ -1372,7 +1368,7 @@
             "nfsHaNode1IP": "[concat(variables('subnetSanPrefix'), '.120')]",
             "osDiskStorageType": "[parameters('osDiskStorageType')]",
             "osType": {
-                "offer": "0001-com-ubuntu-server-focal",
+                "offer": "0001-com-ubuntu-server-jammy",
                 "publisher": "Canonical",
                 "sku": "[parameters('ubuntuVersion')]",
                 "version": "latest"
