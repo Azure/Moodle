@@ -115,7 +115,12 @@ set -ex
     if [ $fileServerType = "gluster" ]; then
         apt_install_noninteractive glusterfs-client >> /tmp/apt.log
     elif [ "$fileServerType" = "azurefiles" ]; then
-        apt_install_noninteractive cifs-utils >> /tmp/apt.log
+        apt_install_noninteractive \
+            linux-modules-extra-azure \
+            cifs-utils >> /tmp/apt.log
+
+        # Because of https://bugs.launchpad.net/ubuntu/+source/linux-azure/+bug/2042092
+        modprobe cifs
     fi
 
     if [ $dbServerType = "mysql" ]; then
