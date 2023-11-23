@@ -136,7 +136,12 @@ EOF
     apt_update_noninteractive
     apt_install_noninteractive glusterfs-client
   elif [ "$fileServerType" = "azurefiles" ]; then
-    apt_install_noninteractive cifs-utils
+    apt_install_noninteractive \
+      linux-modules-extra-azure \
+      cifs-utils >> /tmp/apt.log
+      
+      # Because of https://bugs.launchpad.net/ubuntu/+source/linux-azure/+bug/2042092
+      modprobe cifs
   fi
 
   if [ "$webServerType" = "nginx" -o "$httpsTermination" = "VMSS" ]; then
