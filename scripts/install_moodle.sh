@@ -120,7 +120,7 @@ set -ex
             cifs-utils >> /tmp/apt.log
 
         # Because of https://bugs.launchpad.net/ubuntu/+source/linux-azure/+bug/2042092
-        modprobe cifs
+        modprobe cifs && true
     fi
 
     if [ $dbServerType = "mysql" ]; then
