@@ -39,14 +39,14 @@ The available output parameters are:
 To get a complete list of outputs in json format use:
 
 ```bash
-az group deployment show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out json --query *.outputs
+az deployment group show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out json --query *.outputs
 ```
 
 Individual outputs can be retrieved by filtering, for example, to get
 just the value of the `siteURL` use:
 
 ``` bash
-az group deployment show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out json --query *.outputs.siteURL.value
+az deployment group show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out json --query *.outputs.siteURL.value
 ```
 
 However, since we are reqeusting JSON output (the default) the value
@@ -54,13 +54,13 @@ is enclosed in quotes. In order to remove these we can output as a tab
 separated list (TSV):
 
 ``` bash
-az group deployment show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out tsv --query *.outputs.siteURL
+az deployment group show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out tsv --query *.outputs.siteURL
 ```
 
 Now we can assign individual values to environment variables, for example:
 
 ``` bash
-MOODLE_SITE_URL="$(az group deployment show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out tsv --query *.outputs.siteURL.value)"
+MOODLE_SITE_URL="$(az deployment group show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out tsv --query *.outputs.siteURL.value)"
 ```
 
 ### Retrieving Moodle Site URL
@@ -73,7 +73,7 @@ default "www.example.org" you will need to retrieve this value from
 Azure using the following command:
 
 ```bash
-MOODLE_SITE_URL="$(az group deployment show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out tsv --query *.outputs.siteURL.value)"
+MOODLE_SITE_URL="$(az deployment group show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out tsv --query *.outputs.siteURL.value)"
 ```
 
 #### Retrieving Moodle Site Load Balancer URL
@@ -84,7 +84,7 @@ ensure that you configure your DNS entry for site URL to point at the
 load balancer.
 
 ```bash
-MOODLE_LOAD_BALANCER_DNS="$(az group deployment show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out tsv --query *.outputs.loadBalancerDNS.value)"
+MOODLE_LOAD_BALANCER_DNS="$(az deployment group show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out tsv --query *.outputs.loadBalancerDNS.value)"
 ```
 
 ### Retrieving Moodle Administrator Password
@@ -92,7 +92,7 @@ MOODLE_LOAD_BALANCER_DNS="$(az group deployment show --resource-group $MOODLE_RG
 Moodle admin password (username is "admin"):
 
 ```bash
-MOODLE_ADMIN_PASSWORD="$(az group deployment show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out tsv --query *.outputs.moodleAdminPassword.value)"
+MOODLE_ADMIN_PASSWORD="$(az deployment group show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out tsv --query *.outputs.moodleAdminPassword.value)"
 ```
 
 ### Retriving Controller Virtual Machine Details
@@ -100,7 +100,7 @@ MOODLE_ADMIN_PASSWORD="$(az group deployment show --resource-group $MOODLE_RG_NA
 The controller VM runs management tasks for the cluster, such as cron jobs and syslog.
 
 ```bash
-MOODLE_CONTROLLER_INSTANCE_IP="$(az group deployment show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out tsv --query *.outputs.controllerInstanceIP.value)"
+MOODLE_CONTROLLER_INSTANCE_IP="$(az deployment group show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out tsv --query *.outputs.controllerInstanceIP.value)"
 ```
 
 There is no username and password for this VM since a username and SSH
@@ -111,18 +111,18 @@ key are provided as input parameters to the template.
 #### Database URL
 
 ``` bash
-MOODLE_DATABASE_DNS="$(az group deployment show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out tsv --query *.outputs.databaseDNS.value)"
+MOODLE_DATABASE_DNS="$(az deployment group show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out tsv --query *.outputs.databaseDNS.value)"
 ```
 #### Database admin username
 
 ``` bash
-MOODLE_DATABASE_ADMIN_USERNAME="$(az group deployment show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out tsv --query *.outputs.databaseAdminUsername.value)"
+MOODLE_DATABASE_ADMIN_USERNAME="$(az deployment group show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out tsv --query *.outputs.databaseAdminUsername.value)"
 ```
 
 #### Database admin password
 
 ``` bash
-MOODLE_DATABASE_ADMIN_PASSWORD="$(az group deployment show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out tsv --query *.outputs.databaseAdminPassword.value)"
+MOODLE_DATABASE_ADMIN_PASSWORD="$(az deployment group show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out tsv --query *.outputs.databaseAdminPassword.value)"
 ```
 
 ### Retrieving Moodle Application VNET Information
@@ -130,7 +130,7 @@ MOODLE_DATABASE_ADMIN_PASSWORD="$(az group deployment show --resource-group $MOO
 First frontend VM IP:
 
 ``` bash
-MOODLE_FIRST_FRONTEND_VM_IP="$(az group deployment show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out tsv --query *.outputs.firstFrontendVmIP.value)"
+MOODLE_FIRST_FRONTEND_VM_IP="$(az deployment group show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out tsv --query *.outputs.firstFrontendVmIP.value)"
 ```
 
 # Validation
