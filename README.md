@@ -66,7 +66,7 @@ There below is a listing of useful plugins allow Moodle to be integrated with se
 - [Object File System Plugin*](https://github.com/catalyst/moodle-tool_objectfs) for [Azure Blob Storage](https://azure.microsoft.com/en-us/services/storage/blobs/)
 - [Azure Search Plugin*](https://github.com/catalyst/moodle-search_azure) for [Azure Search](https://azure.microsoft.com/en-us/services/logic-apps/)
 - [Trigger Plugin](https://github.com/catalyst/moodle-tool_trigger) and [Restful Webservice Plugin](https://github.com/catalyst/moodle-webservice_restful) for [Azure Logic Apps](https://azure.microsoft.com/en-us/services/logic-apps/) (requires use of [Moodle Connector](https://github.com/catalyst/azure-connector_moodle) now in development)
-- [Office 365 and Azure Active Directory Plugins for Moodle*](https://github.com/Microsoft/o365-moodle) for [Azure Active Directory](https://azure.microsoft.com/en-us/services/active-directory/)
+- [Office 365 and Microsoft Entra ID (formely Azure Active Directory) Plugins for Moodle*](https://github.com/Microsoft/o365-moodle) for [Microsoft Entra ID](https://www.microsoft.com/en-us/security/business/identity-access/microsoft-entra-id/)
 - [Elasticsearch Plugin*](https://github.com/catalyst/moodle-search_elastic)
 
 At the current time this template allows the optional installation of the plugins above with a * next to them. Please note these plugins can be installed at any time post deployment via Moodle's own [plugin directory](https://moodle.org/plugins/). You can find a list of all Azure relevant plugins in the Moodle plugin directory [here](https://moodle.org/plugins/browse.php?list=set&id=91). You might also choose to follow this list via RSS.
