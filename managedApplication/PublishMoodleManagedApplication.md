@@ -40,18 +40,17 @@ Applications.
 See [Create UI Definition
 documentation](https://docs.microsoft.com/en-us/azure/managed-applications/create-uidefinition-overview) for more information.
 
-## Create an Azure Active Directory User Group or Application
+## Create an Microsoft Entra ID User Group or Application
 
-You will need to create one ore more user group or appliction in Azure
-Active Directory to allow you to manage the applications resources on
+You will need to create one ore more user group or appliction in
+Microsoft Entra ID to allow you to manage the applications resources on
 behalf of your customer. These groups or application can be given any
 built-in Role-Based Access Control (RBAC) role, such as 'Owner' or
 'Contributor'. By creating more than one such group or application you
 can configure access to your customers resources based on the specific
 needs of each role in your organization.
 
-Azure has full documentation on [creating a group in Azure Active
-Directory](https://docs.microsoft.com/en-us/azure/active-directory/active-directory-groups-create-azure-portal). The commands below will create a single 'owner' role for
+Azure has full documentation on [creating a group in Microsoft Entra ID](https://learn.microsoft.com/en-us/entra/fundamentals/how-to-manage-groups). The commands below will create a single 'owner' role for
 use in the examples below.
 
 If the Group already exists we don't want to create a new one, so we
@@ -80,7 +79,7 @@ the built-in 'Owner' role:
 MOODLE_MANAGED_APP_ROLE_ID=$(az role definition list --name Owner --query [].name --output tsv)
 ```
 
-The Azure documentation has more information on how to work with [Azure Active Directory](https://docs.microsoft.com/en-us/azure/active-directory/manage-access-to-azure-resources).
+The Azure documentation has more information on how to work with [Microsoft Entra ID](https://learn.microsoft.com/en-us/azure/role-based-access-control/).
 
 ## Create a Resource Group for the Managed Application Service Catalog Entry
 
