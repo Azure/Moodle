@@ -8,7 +8,7 @@ Catalog. This document will explain how to remove them all.
 
 We need to ensure the [variables](Environment.md) are set up correctly.
 
-## Azure Active Directory
+## Microsoft Entra ID
 
 ``` bash
 MOODLE_MANAGED_APP_AD_ID=$(az ad group list --filter="displayName eq '$MOODLE_MANAGED_APP_OWNER_GROUP_NAME'" --query [0].objectId --output tsv)
