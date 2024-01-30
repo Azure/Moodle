@@ -110,7 +110,7 @@ function deploy_moodle_with_some_parameters
     eval $cmd || return 1
 
     local deployment_name="${resource_group}-deployment"
-    local cmd="az group deployment create --resource-group $resource_group --name $deployment_name $no_wait_flag --template-uri $template_url --parameters @$parameters_template_file webServerType=$web_server_type autoscaleVmSku=$web_vm_sku dbServerType=$db_server_type mysqlPgresVcores=$db_vcores mysqlPgresStgSizeGB=$db_size_gb fileServerType=$file_server_type fileServerDiskCount=$file_server_disk_count fileServerDiskSize=$file_server_disk_size redisDeploySwitch=$redis_cache sshPublicKey='$ssh_pub_key'"
+    local cmd="az deployment group create --resource-group $resource_group --name $deployment_name $no_wait_flag --template-uri $template_url --parameters @$parameters_template_file webServerType=$web_server_type autoscaleVmSku=$web_vm_sku dbServerType=$db_server_type mysqlPgresVcores=$db_vcores mysqlPgresStgSizeGB=$db_size_gb fileServerType=$file_server_type fileServerDiskCount=$file_server_disk_count fileServerDiskSize=$file_server_disk_size redisDeploySwitch=$redis_cache sshPublicKey='$ssh_pub_key'"
     show_command_to_run $cmd
     eval $cmd
 }
@@ -238,7 +238,7 @@ function run_simple_test_1_on_resource_group
 
     sudo apt update; sudo apt install -y jq
     local deployment="${resource_group}-deployment"
-    local output=$(az group deployment show -g $resource_group -n $deployment)
+    local output=$(az deployment group show -g $resource_group -n $deployment)
     local moodle_host=$(echo $output | jq -r .properties.outputs.siteURL.value)
     local db_host=$(echo $output | jq -r .properties.outputs.databaseDNS.value)
     local moodle_db_user=$(echo $output | jq -r .properties.outputs.moodleDbUsername.value)
