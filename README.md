@@ -111,7 +111,7 @@ If you have an immediate need for guidance for a larger sized deployment, you mi
 
 5. **How does this template relate to other Moodle offerings available on the Azure Marketplace?** It is generally not a good idea to run Moodle as a single VM in a production setting. This template is highly configurable and allows for high availability and redundancy.
 
-6. **How does this template relate to this [Azure Quickstart Template for Moodle](https://github.com/Azure/azure-quickstart-templates/tree/master/moodle-scalable-cluster-ubuntu)?** This repo is the working repo for the quickstart template. We will be pushing changes from this template to the quickstart template on a regular cadence.
+6. **How does this template relate to this [Azure Quickstart Template for Moodle](https://github.com/Azure/azure-quickstart-templates/tree/master/application-workloads/moodle/moodle-scalable-cluster-ubuntu)?** This repo is the working repo for the quickstart template. We will be pushing changes from this template to the quickstart template on a regular cadence.
 
 7. **I am already running Moodle on Azure. How does this work benefit me?** We are looking for painpoints from you and the broader Moodle on Azure community that we can help solve. We are also looking to understand where our implementation of Moodle on Azure outperforms or underperforms other implementations such as yours that are out in the wild. If you have observations, performance benchmarks or just general feedback about your experience running Moodle on Azure that you'd like to share we're extremely interested! Load testing is a very big area of focus, so if you have scripts you wouldn't mind contributing please let us know.
 
