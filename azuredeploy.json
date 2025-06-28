@@ -1203,10 +1203,10 @@
             "type": "string",
             "value": "[variables('moodleCommon').dbLoginPassword]"
         },
-        "firstFrontendVmIP": {
-            "type": "string",
-            "value": "[reference('scaleSetTemplate').outputs.webvm1IP.value]"
-        },
+        // "firstFrontendVmIP": {
+        //     "type": "string",
+        //     "value": "[reference('scaleSetTemplate').outputs.webvm1IP.value]"
+        // },
         "moodleAdminPassword": {
             "type": "string",
             "value": "[variables('moodleCommon').moodleAdminPass]"

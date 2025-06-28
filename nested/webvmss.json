@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "moodleCommon": {
@@ -54,6 +54,36 @@
                             "sourceAddressPrefix": "*",
                             "sourcePortRange": "*"
                         }
+                    },
+                    {
+                        "name": "Allow_SMB_In",
+                        "properties": {
+                            "access": "Allow",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "445",
+                            "direction": "Inbound",
+                            "priority": 1010,
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*"
+                        }
+                    },
+                    {
+                        "name": "Allow_Outbound_445",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "445",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1000,
+                            "direction": "Outbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
                     }
                 ]
             },
@@ -73,7 +103,7 @@
         },
         {
             "type": "Microsoft.Compute/virtualMachineScaleSets",
-            "apiVersion": "2019-07-01",
+            "apiVersion": "2021-04-01",
             "dependsOn": [
                 "[concat('Microsoft.Storage/storageAccounts/', parameters('moodleCommon').vmssdStorageAccounttName)]",
                 "[concat('Microsoft.Network/networkSecurityGroups/', parameters('moodleCommon').vmssNsgName)]"
@@ -81,10 +111,9 @@
             "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').vmssName]",
             "properties": {
-                "overprovision": true,
-                "upgradePolicy": {
-                    "mode": "Manual"
-                },
+                "orchestrationMode": "flexible",
+                "singlePlacementGroup": false,
+                "platformFaultDomainCount": 1,
                 "virtualMachineProfile": {
                     "extensionProfile": {
                         "extensions": [
@@ -109,6 +138,7 @@
                         ]
                     },
                     "networkProfile": {
+                        "networkApiVersion": "2020-11-01",
                         "networkInterfaceConfigurations": [
                             {
                                 "name": "vmssnic",
@@ -117,6 +147,7 @@
                                         {
                                             "name": "ipcfg_lb",
                                             "properties": {
+                                                "primary": true,
                                                 "loadBalancerBackendAddressPools": "[take(variables('lbBePoolArray'), variables('lbBePoolArrayTakeCount'))]",
                                                 "applicationGatewayBackendAddressPools": "[take(variables('appGwBePoolArray'), variables('appGwBePoolArrayTakeCount'))]",
                                                 "subnet": {
@@ -149,6 +180,12 @@
                                 ]
                             }
                         }
+                    },
+                    "diagnosticsProfile": {
+                        "bootDiagnostics": {
+                        "enabled": true
+                        //"storageUri":  "[reference(resourceId('Microsoft.Storage/storageAccounts', parameters('moodleCommon').vmssdStorageAccounttName)).primaryEndpoints.blob]"
+                        }         
                     },
                     "storageProfile": {
                         "imageReference": "[parameters('moodleCommon').osType]",
@@ -246,7 +283,7 @@
         "pipID": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('moodleCommon').lbPipName)]",
         "scriptUri": "[concat(parameters('moodleCommon').scriptLocation,parameters('moodleCommon').webServerSetupScriptFilename,parameters('moodleCommon').artifactsSasToken)]",
         "vmssID": "[resourceId('Microsoft.Compute/virtualMachineScaleSets',parameters('moodleCommon').vmssName)]",
-        "webvmss1NIC": "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('moodleCommon').vmssName, '/virtualMachines/0/networkInterfaces/vmssnic')]",
+        //"webvmss1NIC": "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('moodleCommon').vmssName, '/virtualMachines/0/networkInterfaces/vmssnic')]",
         "appGwID": "[resourceId('Microsoft.Network/applicationGateways', parameters('moodleCommon').appGwName)]",
         "appGwBePoolId": "[concat(variables('appGwID'), '/backendAddressPools/', parameters('moodleCommon').appGwBePoolName)]",
         "vmssNsgNameId": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('moodleCommon').vmssNsgName)]",
@@ -264,9 +301,9 @@
         "appGwBePoolArrayTakeCount": "[if(equals(parameters('moodleCommon').httpsTermination, 'AppGw'), 1, 0)]"
     },
     "outputs": {
-        "webvm1IP": {
-            "value": "[reference(variables('webvmss1NIC'), '2017-03-30').ipConfigurations[0].properties.privateIPAddress]",
-            "type": "string"
-        }
+        // "webvm1IP": {
+        //     "value": "[reference(variables('webvmss1NIC'), '2017-03-30').ipConfigurations[0].properties.privateIPAddress]",
+        //     "type": "string"
+        // }
     }
 }

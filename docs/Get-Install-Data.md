@@ -125,13 +125,16 @@ MOODLE_DATABASE_ADMIN_USERNAME="$(az group deployment show --resource-group $MOO
 MOODLE_DATABASE_ADMIN_PASSWORD="$(az group deployment show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out tsv --query *.outputs.databaseAdminPassword.value)"
 ```
 
+
+<!-- 
+// Need to figure out how to do this for VMSS Flex
 ### Retrieving Moodle Application VNET Information
 
-First frontend VM IP:
+##First frontend VM IP:
 
 ``` bash
 MOODLE_FIRST_FRONTEND_VM_IP="$(az group deployment show --resource-group $MOODLE_RG_NAME --name $MOODLE_DEPLOYMENT_NAME --out tsv --query *.outputs.firstFrontendVmIP.value)"
-```
+``` -->
 
 # Validation
 
