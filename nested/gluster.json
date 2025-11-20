@@ -29,7 +29,12 @@
                 "name": "Aligned"
             },
             "tags": {
-                "displayName": "Gluster Availability Set"
+                "displayName": "Gluster Availability Set",
+                "purpose": "training",
+                "owner_email": "ramvaradarajan@kubrickgroup.com",
+                "expiry_date": "N/A",
+                "project": "N/A",
+                "cohort_id": "N/A"
             }
         },
         {

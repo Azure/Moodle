@@ -39,6 +39,14 @@
                     "virtualNetworkRules": []
                 },
                 "supportsHttpsTrafficOnly": true
+            },
+            "tags": {
+                "displayName": "Storage Account",
+                "purpose": "training",
+                "owner_email": "ramvaradarajan@kubrickgroup.com",
+                "expiry_date": "N/A",
+                "project": "N/A",
+                "cohort_id": "N/A"
             }
         },
         {
@@ -73,6 +81,14 @@
                     },
                     "keySource": "Microsoft.Storage"
                 }
+            },
+            "tags": {
+                "displayName": "Storage Account (Azure Files)",
+                "purpose": "training",
+                "owner_email": "ramvaradarajan@kubrickgroup.com",
+                "expiry_date": "N/A",
+                "project": "N/A",
+                "cohort_id": "N/A"
             }
         }
     ],

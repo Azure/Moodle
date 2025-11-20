@@ -58,7 +58,12 @@
                 ]
             },
             "tags": {
-                "displayName": "VMSS NSG"
+                "displayName": "VMSS NSG",
+                "purpose": "training",
+                "owner_email": "ramvaradarajan@kubrickgroup.com",
+                "expiry_date": "N/A",
+                "project": "N/A",
+                "cohort_id": "N/A"
             }
         },
         {
@@ -69,6 +74,14 @@
             "kind": "Storage",
             "sku": {
                 "name": "Standard_LRS"
+            },
+            "tags": {
+                "displayName": "VMSS Diagnostics Storage Account",
+                "purpose": "training",
+                "owner_email": "ramvaradarajan@kubrickgroup.com",
+                "expiry_date": "N/A",
+                "project": "N/A",
+                "cohort_id": "N/A"
             }
         },
         {
@@ -169,7 +182,12 @@
                 "tier": "Standard"
             },
             "tags": {
-                "displayName": "webfarm"
+                "displayName": "webfarm",
+                "purpose": "training",
+                "owner_email": "ramvaradarajan@kubrickgroup.com",
+                "expiry_date": "N/A",
+                "project": "N/A",
+                "cohort_id": "N/A"
             }
         },
         {

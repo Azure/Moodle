@@ -21,6 +21,14 @@
                         "[concat(parameters('moodleCommon').vNetAddressSpace,'/16')]"
                     ]
                 }
+            },
+            "tags": {
+                "displayName": "Virtual Network",
+                "purpose": "training",
+                "owner_email": "ramvaradarajan@kubrickgroup.com",
+                "expiry_date": "N/A",
+                "project": "N/A",
+                "cohort_id": "N/A"
             }
         }
     ],

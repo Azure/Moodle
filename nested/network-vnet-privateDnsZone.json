@@ -22,7 +22,14 @@
             "apiVersion": "2018-09-01",
             "name": "[parameters('moodleCommon').mysqlflexPrivateDnsZoneName]",
             "location": "global",
-            "tags": {},
+            "tags": {
+                "displayName": "Private DNS Zone for MySQL Flexible Server",
+                "purpose": "training",
+                "owner_email": "ramvaradarajan@kubrickgroup.com",
+                "expiry_date": "N/A",
+                "project": "N/A",
+                "cohort_id": "N/A"
+            },
             "properties": {}
         },
         {

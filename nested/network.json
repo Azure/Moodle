@@ -114,7 +114,12 @@
                 "publicIPAllocationMethod": "Dynamic"
             },
             "tags": {
-                "displayName": "Virtual network gateway Public IP"
+                "displayName": "Virtual network gateway Public IP",
+                "purpose": "training",
+                "owner_email": "ramvaradarajan@kubrickgroup.com",
+                "expiry_date": "N/A",
+                "project": "N/A",
+                "cohort_id": "N/A"
             }
         },
         {
@@ -151,6 +156,14 @@
                     "capacity": 2
                 },
                 "vpnType": "[parameters('moodleCommon').vpnType]"
+            },
+            "tags": {
+                "displayName": "Virtual network gateway",
+                "purpose": "training",
+                "owner_email": "ramvaradarajan@kubrickgroup.com",
+                "expiry_date": "N/A",
+                "project": "N/A",
+                "cohort_id": "N/A"
             }
         },
         {
@@ -170,7 +183,12 @@
                 "publicIPAllocationMethod": "Static"
             },
             "tags": {
-                "displayName": "Load Balancer Public IP"
+                "displayName": "Load Balancer Public IP",
+                "purpose": "training",
+                "owner_email": "ramvaradarajan@kubrickgroup.com",
+                "expiry_date": "N/A",
+                "project": "N/A",
+                "cohort_id": "N/A"
             }
         },
         {
@@ -190,7 +208,12 @@
                 "publicIPAllocationMethod": "Static"
             },
             "tags": {
-                "displayName": "Load Balancer Outbound Public IP 001"
+                "displayName": "Load Balancer Outbound Public IP 001",
+                "purpose": "training",
+                "owner_email": "ramvaradarajan@kubrickgroup.com",
+                "expiry_date": "N/A",
+                "project": "N/A",
+                "cohort_id": "N/A"
             }
         },
         {
@@ -210,7 +233,12 @@
                 "publicIPAllocationMethod": "Static"
             },
             "tags": {
-                "displayName": "Load Balancer Outbound Public IP 002"
+                "displayName": "Load Balancer Outbound Public IP 002",
+                "purpose": "training",
+                "owner_email": "ramvaradarajan@kubrickgroup.com",
+                "expiry_date": "N/A",
+                "project": "N/A",
+                "cohort_id": "N/A"
             }
         },
         {
@@ -222,11 +250,19 @@
             "sku" : {
                 "name" : "[if(endswith(parameters('moodleCommon').appGwSkuName,'v2'),'Standard','Basic')]"
             },
-            "properties": {                
+            "properties": {
                 "dnsSettings": {
                     "domainNameLabel": "[parameters('moodleCommon').appGwName]"
                 },
                 "publicIPAllocationMethod": "[if(endswith(parameters('moodleCommon').appGwSkuName,'v2'),'Static','Dynamic')]"
+            },
+            "tags": {
+                "displayName": "Application Gateway Public IP",
+                "purpose": "training",
+                "owner_email": "ramvaradarajan@kubrickgroup.com",
+                "expiry_date": "N/A",
+                "project": "N/A",
+                "cohort_id": "N/A"
             }
         },
         {
@@ -241,7 +277,12 @@
                 "publicIPAllocationMethod": "Static"
             },
             "tags": {
-                "displayName": "Controller VM Public IP"
+                "displayName": "Controller VM Public IP",
+                "purpose": "training",
+                "owner_email": "ramvaradarajan@kubrickgroup.com",
+                "expiry_date": "N/A",
+                "project": "N/A",
+                "cohort_id": "N/A"
             }
         },
         {
@@ -385,6 +426,14 @@
                     }
                 ],
                 "inboundNatPools": []
+            },
+            "tags": {
+                "displayName": "Load Balancer",
+                "purpose": "training",
+                "owner_email": "ramvaradarajan@kubrickgroup.com",
+                "expiry_date": "N/A",
+                "project": "N/A",
+                "cohort_id": "N/A"
             }
         },
         {

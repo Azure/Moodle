@@ -116,7 +116,15 @@
                     },
                     "type": "firewallRules"
                 }
-            ]
+            ],
+            "tags": {
+                "displayName": "MySQL Server",
+                "purpose": "training",
+                "owner_email": "ramvaradarajan@kubrickgroup.com",
+                "expiry_date": "N/A",
+                "project": "N/A",
+                "cohort_id": "N/A"
+            }
         }
     ],
     "outputs": {

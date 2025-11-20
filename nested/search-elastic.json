@@ -37,7 +37,12 @@
                 "enableAcceleratedNetworking": "[parameters('moodleCommon').enableAccelNwForOtherVmsSwitch]"
             },
             "tags": {
-                "displayName": "Elastic NIC 1"
+                "displayName": "Elastic NIC 1",
+                "purpose": "training",
+                "owner_email": "ramvaradarajan@kubrickgroup.com",
+                "expiry_date": "N/A",
+                "project": "N/A",
+                "cohort_id": "N/A"
             }
         },
         {
@@ -87,7 +92,12 @@
                 }
             },
             "tags": {
-                "displayName": "Elastic Search Virtual Machine"
+                "displayName": "Elastic Search Virtual Machine",
+                "purpose": "training",
+                "owner_email": "ramvaradarajan@kubrickgroup.com",
+                "expiry_date": "N/A",
+                "project": "N/A",
+                "cohort_id": "N/A"
             }
         },
         {
@@ -155,7 +165,12 @@
                 "enableAcceleratedNetworking": "[parameters('moodleCommon').enableAccelNwForOtherVmsSwitch]"
             },
             "tags": {
-                "displayName": "Elastic NIC 2"
+                "displayName": "Elastic NIC 2",
+                "purpose": "training",
+                "owner_email": "ramvaradarajan@kubrickgroup.com",
+                "expiry_date": "N/A",
+                "project": "N/A",
+                "cohort_id": "N/A"
             }
         },
         {
@@ -205,7 +220,12 @@
                 }
             },
             "tags": {
-                "displayName": "Elastic Search Virtual Machine"
+                "displayName": "Elastic Search Virtual Machine",
+                "purpose": "training",
+                "owner_email": "ramvaradarajan@kubrickgroup.com",
+                "expiry_date": "N/A",
+                "project": "N/A",
+                "cohort_id": "N/A"
             }
         },
         {
@@ -273,7 +293,12 @@
                 "enableAcceleratedNetworking": "[parameters('moodleCommon').enableAccelNwForOtherVmsSwitch]"
             },
             "tags": {
-                "displayName": "Elastic NIC 2"
+                "displayName": "Elastic NIC 2",
+                "purpose": "training",
+                "owner_email": "ramvaradarajan@kubrickgroup.com",
+                "expiry_date": "N/A",
+                "project": "N/A",
+                "cohort_id": "N/A"
             }
         },
         {
@@ -323,7 +348,12 @@
                 }
             },
             "tags": {
-                "displayName": "Elastic Search Virtual Machine"
+                "displayName": "Elastic Search Virtual Machine",
+                "purpose": "training",
+                "owner_email": "ramvaradarajan@kubrickgroup.com",
+                "expiry_date": "N/A",
+                "project": "N/A",
+                "cohort_id": "N/A"
             }
         },
         {

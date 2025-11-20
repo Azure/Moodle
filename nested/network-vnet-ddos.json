@@ -27,7 +27,15 @@
             "apiVersion": "2018-02-01",
             "condition": "[parameters('moodleCommon').ddosSwitch]",
             "location": "[parameters('moodleCommon').location]",
-            "name": "[parameters('moodleCommon').ddosPlanName]"
+            "name": "[parameters('moodleCommon').ddosPlanName]",
+            "tags": {
+                "displayName": "DDoS Protection Plan",
+                "purpose": "training",
+                "owner_email": "ramvaradarajan@kubrickgroup.com",
+                "expiry_date": "N/A",
+                "project": "N/A",
+                "cohort_id": "N/A"
+            }
         },
         {
             "type": "Microsoft.Network/virtualNetworks",
@@ -47,6 +55,14 @@
                     "id": "[resourceId('Microsoft.Network/ddosProtectionPlans', parameters('moodleCommon').ddosPlanName)]"
                 },
                 "enableDdosProtection": "[parameters('moodleCommon').ddosSwitch]"
+            },
+            "tags": {
+                "displayName": "Virtual Network with DDoS Protection",
+                "purpose": "training",
+                "owner_email": "ramvaradarajan@kubrickgroup.com",
+                "expiry_date": "N/A",
+                "project": "N/A",
+                "cohort_id": "N/A"
             }
         }
     ],
