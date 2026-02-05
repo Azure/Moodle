@@ -7,7 +7,7 @@
             "metadata": {
                 "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
             },
-            "defaultValue": "https://raw.githubusercontent.com/Azure/Moodle/master/"
+            "defaultValue": "https://raw.githubusercontent.com/prabowoekky/Moodle/master/"
         },
         "_artifactsLocationSasToken": {
             "type": "securestring",
@@ -143,7 +143,7 @@
             "type": "string"
         },
         "controllerVmSku": {
-            "defaultValue": "Standard_DS1_v2",
+            "defaultValue": "Standard_F1s",
             "metadata": {
                 "description": "VM size for the controller VM"
             },
@@ -161,7 +161,7 @@
             "type": "string"
         },
         "autoscaleVmSku": {
-            "defaultValue": "Standard_DS2_v2",
+            "defaultValue": "Standard_B2s_v2",
             "metadata": {
                 "description": "VM size for autoscaled web VMs"
             },
