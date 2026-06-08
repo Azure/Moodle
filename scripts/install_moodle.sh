@@ -818,6 +818,20 @@ local1.*   /var/log/sitelogs/moodle/access.log
 local1.err   /var/log/sitelogs/moodle/error.log
 local2.*   /var/log/sitelogs/moodle/cron.log
 EOF
+
+    # Rotate the site logs so they don't grow unbounded and fill the OS disk
+    cat <<EOF > /etc/logrotate.d/moodle-sitelogs
+/var/log/sitelogs/moodle/*.log {
+    daily
+    rotate 14
+    missingok
+    notifempty
+    compress
+    delaycompress
+    copytruncate
+}
+EOF
+
     service rsyslog restart
 
     # Fire off moodle setup
