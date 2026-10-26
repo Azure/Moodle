@@ -35,7 +35,7 @@
                     "_artifactsLocationSasToken":   { "value": "[parameters('_artifactsLocationSasToken')]" },
                     "redisDeploySwitch":            { "value": false },
                     "sshPublicKey":                 { "value": "[parameters('sshPublicKey')]" },
-                    "autoscaleVmSku":               { "value": "Standard_DS1_v2" },
+                    "autoscaleVmSku":               { "value": "Standard_B1ms" },
                     "enableAccelNwForOtherVmsSwitch":   { "value": false },
                     "dbServerType":                 { "value": "mysqlflex" },
                     "vnetDbDeploySwitch":           {"value": true },
@@ -58,7 +58,7 @@
         "documentation01": "This wrapper template calls the main-template with bare minimum configs and the only required parameter (sshPublicKey).",
         "documentation02": "To speed up deployment and consume least resources, other parameters are fixed in this tempalte and overriden as follows:",
         "documentation03": "   - fileServerType: nfs",
-        "documentation04": "   - autoscaleVmSku: Standard_DS1_vs",
+        "documentation04": "   - autoscaleVmSku: Standard_B1ms",
         "documentation05": "   - fileServerDiskCount: 2",
         "documentation06": "   - dbServerType: mysqlflex",
         "documentation07": "   - redisDeploySwitch: false"

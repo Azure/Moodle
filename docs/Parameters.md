@@ -229,7 +229,7 @@ Type: string
 
 Possible Values: null
 
-Default: Standard_DS1_v2
+Default: Standard_B1ms
 
 
 ### webServerType
