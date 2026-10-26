@@ -221,7 +221,7 @@
                     "siteURL":                      { "value": ""},
                     "moodleVersion":                { "value": "[parameters('moodleVersion')]"},
                     "sshPublicKey":                 { "value": "[parameters('sshPublicKey')]" },
-                    "controllerVmSku":              { "value": "Standard_B1ms"},
+                    "controllerVmSku":              { "value": "Standard_B2as_v2"},
                     "webServerType":                { "value": "[parameters('webServerType')]"},
                     "autoscaleVmSku":               { "value": "[parameters('autoscaleVmSku')]" },
                     "autoscaleVmCountMax":          { "value": "[int(parameters('autoscaleVmCountMax'))]" },
