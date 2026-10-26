@@ -16,7 +16,7 @@
             "apiVersion": "2019-06-01",
             "location": "[parameters('moodleCommon').location]",
             "name": "[concat(parameters('moodleCommon').storageAccountName,'naf')]",
-            "kind": "Storage",
+            "kind": "StorageV2",
             "sku": {
                 "name": "[parameters('moodleCommon').storageAccountType]"
             },
@@ -47,7 +47,7 @@
             "apiVersion": "2019-06-01",
             "location": "[parameters('moodleCommon').location]",
             "name": "[concat(parameters('moodleCommon').storageAccountName,'af')]",
-            "kind": "[if(equals(parameters('moodleCommon').storageAccountType, 'Premium_LRS'), 'FileStorage', 'Storage')]",
+            "kind": "[if(equals(parameters('moodleCommon').storageAccountType, 'Premium_LRS'), 'FileStorage', 'StorageV2')]",
             "sku": {
                 "name": "[parameters('moodleCommon').storageAccountType]"
             },
