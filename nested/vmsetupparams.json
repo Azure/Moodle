@@ -77,7 +77,7 @@
                 "type": "[if(equals(parameters('moodleCommon').dbServerType, 'mysqlflex'), 'mysql', parameters('moodleCommon').dbServerType)]",
                 "fqdn": "[parameters('dbFQDN')]",
                 "adminLogin": "[parameters('moodleCommon').dbLogin]",
-                "adminLoginAzure": "[if(equals(parameters('moodleCommon').dbServerType, 'mssql'), concat(parameters('moodleCommon').dbLogin, '@', parameters('moodleCommon').dbServerType, '-', parameters('moodleCommon').resourcesPrefix), parameters('moodleCommon').dbLogin)]",
+                "adminLoginAzure": "[if(equals(parameters('moodleCommon').dbServerType, 'mssql'), concat(parameters('moodleCommon').dbLogin, '@', parameters('moodleCommon').dbServerType, '-', parameters('moodleCommon').resourcesPrefix), parameters('moodleCommon').dbLogin))]",
                 "adminPassword": "[parameters('moodleCommon').dbLoginPassword]",
                 "mssqlDbServiceObjectiveName": "[parameters('moodleCommon').mssqlDbServiceObjectiveName]",
                 "mssqlDbEdition": "[parameters('moodleCommon').mssqlDbEdition]",
