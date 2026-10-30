@@ -1,5 +1,5 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "moodleCommon": {
@@ -41,33 +41,37 @@
     },
     "resources": [
         {
-            "type": "Microsoft.DBforPostgreSQL/servers",
-            "apiVersion": "2017-12-01",
-            "kind": "",
+            "type": "Microsoft.DBforPostgreSQL/flexibleServers",
+            "apiVersion": "2025-08-01",
             "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').serverName]",
             "properties": {
                 "administratorLogin": "[parameters('moodleCommon').dbLogin]",
                 "administratorLoginPassword": "[parameters('moodleCommon').dbLoginPassword]",
-                "sslEnforcement": "[parameters('moodleCommon').sslEnforcement]",
-                "storageProfile": {
-                    "storageMB": "[mul(parameters('moodleCommon').mysqlPgresStgSizeGB, 1024)]",
-                    "backupRetentionDays": "35",
+                "createMode": "Default",
+                "network": {
+                    "publicNetworkAccess": "Enabled"
+                },
+                "storage": {
+                    "storageSizeGB": "[parameters('moodleCommon').postgresStorageSizeGiB]",
+                    "autoGrow": "Enabled",
+                    "type": "Premium_LRS"
+                },
+                "backup": {
+                    "backupRetentionDays": 35,
                     "geoRedundantBackup": "Enabled"
                 },
                 "version": "[parameters('moodleCommon').postgresVersion]"
             },
             "sku": {
-                "capacity": "[parameters('moodleCommon').mysqlPgresVcores]",
-                "name": "[parameters('moodleCommon').mysqlPgresSkuName]",
-                "tier": "[parameters('moodleCommon').mysqlPgresSkuTier]",
-                "family": "[parameters('moodleCommon').mysqlPgresSkuHwFamily]"
+                "name": "[parameters('moodleCommon').postgresSkuName]",
+                "tier": "[parameters('moodleCommon').postgresSkuTier]"
             },
             "resources": [
                 {
-                    "apiVersion": "2017-12-01",
+                    "apiVersion": "2025-08-01",
                     "dependsOn": [
-                        "[concat('Microsoft.DBforPostgreSQL/servers/', parameters('moodleCommon').serverName)]"
+                        "[concat('Microsoft.DBforPostgreSQL/flexibleServers/', parameters('moodleCommon').serverName)]"
                     ],
                     "location": "[parameters('moodleCommon').location]",
                     "name": "postgres-firewall-allow-lb",
@@ -78,9 +82,9 @@
                     "type": "firewallRules"
                 },
                 {
-                    "apiVersion": "2017-12-01",
+                    "apiVersion": "2025-08-01",
                     "dependsOn": [
-                        "[concat('Microsoft.DBforPostgreSQL/servers/', parameters('moodleCommon').serverName)]"
+                        "[concat('Microsoft.DBforPostgreSQL/flexibleServers/', parameters('moodleCommon').serverName)]"
                     ],
                     "location": "[parameters('moodleCommon').location]",
                     "name": "postgres-firewall-allow-lb-out001",
@@ -91,9 +95,9 @@
                     "type": "firewallRules"
                 },
                 {
-                    "apiVersion": "2017-12-01",
+                    "apiVersion": "2025-08-01",
                     "dependsOn": [
-                        "[concat('Microsoft.DBforPostgreSQL/servers/', parameters('moodleCommon').serverName)]"
+                        "[concat('Microsoft.DBforPostgreSQL/flexibleServers/', parameters('moodleCommon').serverName)]"
                     ],
                     "location": "[parameters('moodleCommon').location]",
                     "name": "postgres-firewall-allow-lb-out002",
@@ -104,9 +108,9 @@
                     "type": "firewallRules"
                 },
                 {
-                    "apiVersion": "2017-12-01",
+                    "apiVersion": "2025-08-01",
                     "dependsOn": [
-                        "[concat('Microsoft.DBforPostgreSQL/servers/', parameters('moodleCommon').serverName)]"
+                        "[concat('Microsoft.DBforPostgreSQL/flexibleServers/', parameters('moodleCommon').serverName)]"
                     ],
                     "location": "[parameters('moodleCommon').location]",
                     "name": "postgres-firewall-allow-ctlr",

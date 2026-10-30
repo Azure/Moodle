@@ -80,16 +80,16 @@
             "type": "bool"
         },
         "enableAccelNwForCtlrVmSwitch": {
-            "defaultValue": false,
+            "defaultValue": true,
             "metadata": {
-                "description": "Switch to enable Azure Accelerated Networking on the controller VM. Default to false because currently the default controller VM SKU (D1) doesn't support AN. Change this to true if you set the controller VM SKU to eligibible ones (e.g., D2) for better performance."
+                "description": "Switch to enable Azure Accelerated Networking on the controller VM. Required by the default Ddsv5 VM size; keep enabled unless selecting a different compatible VM family."
             },
             "type": "bool"
         },
         "enableAccelNwForOtherVmsSwitch": {
             "defaultValue": true,
             "metadata": {
-                "description": "Switch to enable Azure Accelerated Networking on all other VMs. Default to true because currently the default controller VM SKU for all other VMS (D2) does support AN. Change this to false if you set the SKU of any other VMs to an ineligibible one (e.g., D1) to avoid deployment failure."
+                "description": "Switch to enable Azure Accelerated Networking on all other VMs. Required by the default Ddsv5 VM sizes; keep enabled unless selecting a different compatible VM family."
             },
             "type": "bool"
         },
@@ -121,9 +121,9 @@
         },
         "moodleVersion": {
             "allowedValues": [
-                "MOODLE_405_STABLE"
+                "MOODLE_503_STABLE"
             ],
-            "defaultValue": "MOODLE_405_STABLE",
+            "defaultValue": "MOODLE_503_STABLE",
             "metadata": {
                 "description": "The Moodle version you want to install."
             },
@@ -143,7 +143,7 @@
             "type": "string"
         },
         "controllerVmSku": {
-            "defaultValue": "Standard_DS1_v2",
+            "defaultValue": "Standard_D4ds_v5",
             "metadata": {
                 "description": "VM size for the controller VM"
             },
@@ -161,7 +161,7 @@
             "type": "string"
         },
         "autoscaleVmSku": {
-            "defaultValue": "Standard_DS2_v2",
+            "defaultValue": "Standard_D2ds_v5",
             "metadata": {
                 "description": "VM size for autoscaled web VMs"
             },
@@ -194,9 +194,9 @@
         },
         "phpVersion": {
             "allowedValues": [
-                "8.1"
+                "8.3"
             ],
-            "defaultValue": "8.1",
+            "defaultValue": "8.3",
             "metadata": {
                 "description": "php version"
             },
@@ -206,7 +206,6 @@
             "defaultValue": "mysqlflex",
             "allowedValues": [
                 "postgres",
-                "mysql",
                 "mssql",
                 "mysqlflex"
             ],
@@ -236,60 +235,13 @@
             },
             "type": "string"
         },
-        "mysqlPgresVcores": {
+        "mysqlflexVersion": {
             "allowedValues": [
-                1,
-                2,
-                4,
-                8,
-                16,
-                32
+                "8.4"
             ],
-            "defaultValue": 2,
+            "defaultValue": "8.4",
             "metadata": {
-                "description": "MySql/Postgresql vCores. For Basic tier, only 1 & 2 are allowed. For GeneralPurpose tier, 2, 4, 8, 16, 32 are allowed. For MemoryOptimized, 2, 4, 8, 16 are allowed."
-            },
-            "type": "int"
-        },
-        "mysqlPgresStgSizeGB": {
-            "defaultValue": 125,
-            "minValue": 5,
-            "maxValue": 1024,
-            "metadata": {
-                "description": "MySql/Postgresql storage size in GB. Minimum 5GB, increase by 1GB, up to 1TB (1024 GB)"
-            },
-            "type": "int"
-        },
-        "mysqlPgresSkuTier": {
-            "allowedValues": [
-                "Basic",
-                "GeneralPurpose",
-                "MemoryOptimized"
-            ],
-            "defaultValue": "GeneralPurpose",
-            "metadata": {
-                "description": "MySql/Postgresql sku tier"
-            },
-            "type": "string"
-        },
-        "mysqlPgresSkuHwFamily": {
-            "allowedValues": [
-                "Gen4",
-                "Gen5"
-            ],
-            "defaultValue": "Gen5",
-            "metadata": {
-                "description": "MySql/Postgresql sku hardware family. Central US is Gen4 only, so make sure to change this parameter to Gen4 if your deployment is on Central US."
-            },
-            "type": "string"
-        },
-        "mysqlVersion": {
-            "allowedValues": [
-                "8.0.21"
-            ],
-            "defaultValue": "8.0.21",
-            "metadata": {
-                "description": "Mysql version"
+                "description": "MySQL Flexible Server version for new Moodle 5.3 deployments. Uses API 2025-06-01-preview for MySQL 8.4; existing databases require a separate backed-up upgrade and cutover plan."
             },
             "type": "string"
         },
@@ -381,7 +333,7 @@
             ],
             "defaultValue": "Disabled",
             "metadata": {
-              "description": "High availability mode for azure database for mysql flexible server."
+                "description": "High availability mode for azure database for mysql flexible server."
             },
             "type": "string"
         },
@@ -407,19 +359,46 @@
             ],
             "defaultValue": "",
             "metadata": {
-            "description": "Availability zone of the High availability standby server. (Leave blank for No Preference). Add this value if HA is enabled."
+                "description": "Availability zone of the High availability standby server. (Leave blank for No Preference). Add this value if HA is enabled."
             },
             "type": "string"
         },
         "postgresVersion": {
             "allowedValues": [
-                "9.6"
+                "18"
             ],
-            "defaultValue": "9.6",
+            "defaultValue": "18",
             "metadata": {
-                "description": "Postgresql version"
+                "description": "PostgreSQL Flexible Server major version for new deployments. Existing databases require a separately rehearsed migration and rollback plan."
             },
             "type": "string"
+        },
+        "postgresSkuName": {
+            "type": "string",
+            "defaultValue": "Standard_D2ds_v5",
+            "metadata": {
+                "description": "PostgreSQL Flexible Server compute size; verify regional availability and tier compatibility."
+            }
+        },
+        "postgresSkuTier": {
+            "type": "string",
+            "defaultValue": "GeneralPurpose",
+            "allowedValues": [
+                "Burstable",
+                "GeneralPurpose",
+                "MemoryOptimized"
+            ],
+            "metadata": {
+                "description": "PostgreSQL Flexible Server compute tier matching postgresSkuName."
+            }
+        },
+        "postgresStorageSizeGiB": {
+            "type": "int",
+            "defaultValue": 128,
+            "minValue": 32,
+            "metadata": {
+                "description": "PostgreSQL Flexible Server Premium SSD storage size in GiB."
+            }
         },
         "sslEnforcement": {
             "allowedValues": [
@@ -500,14 +479,13 @@
         "fileServerType": {
             "defaultValue": "nfs",
             "allowedValues": [
-                "gluster",
                 "nfs",
                 "nfs-ha",
                 "nfs-byo",
                 "azurefiles"
             ],
             "metadata": {
-                "description": "File server type: GlusterFS, NFS, and NFS-HA (2-VM highly available NFS cluster)"
+                "description": "Shared file service: NFS, NFS-HA, BYO NFS or Azure Files. Gluster is no longer supported."
             },
             "type": "string"
         },
@@ -528,7 +506,7 @@
         "fileServerDiskSize": {
             "defaultValue": 127,
             "metadata": {
-                "description": "Size per disk for gluster nodes or nfs server"
+                "description": "Size in GiB per NFS data disk"
             },
             "type": "int"
         },
@@ -537,14 +515,14 @@
             "minValue": 2,
             "maxValue": 8,
             "metadata": {
-                "description": "Number of disks in raid0 per gluster node or nfs server"
+                "description": "Number of data disks for the NFS server"
             },
             "type": "int"
         },
         "fileServerVmSku": {
-            "defaultValue": "Standard_DS2_v2",
+            "defaultValue": "Standard_D4ds_v5",
             "metadata": {
-                "description": "VM size for the gluster or NFS-HA nodes"
+                "description": "VM size for the NFS-HA nodes"
             },
             "type": "string"
         },
@@ -597,15 +575,17 @@
             },
             "type": "string"
         },
+        "appGwWebSubnetEgressPublicIp": {
+            "defaultValue": "",
+            "metadata": {
+                "description": "(App Gateway with a custom VNet only) Static public egress IP used by the web subnet. Required when the custom web subnet uses public database access; ignored for repository-created VNets, which deploy a NAT Gateway."
+            },
+            "type": "string"
+        },
         "appGwSkuName": {
             "defaultValue": "Standard_v2",
             "allowedValues": [
-                "Standard_Small",
-                "Standard_Medium",
-                "Standard_Large",
                 "Standard_v2",
-                "WAF_Medium",
-                "WAF_Large",
                 "WAF_v2"
             ],
             "metadata": {
@@ -616,9 +596,7 @@
         "appGwSkuTier": {
             "defaultValue": "Standard_v2",
             "allowedValues": [
-                "Standard",
                 "Standard_v2",
-                "WAF",
                 "WAF_v2"
             ],
             "metadata": {
@@ -644,7 +622,7 @@
                 "Premium_LRS"
             ],
             "metadata": {
-                "description": "Storage Account type. This storage account is only for the Moodle ObjectFS plugin and/or the (currently disabled) Azure Files file share option"
+                "description": "Storage account replication and performance. Premium_LRS creates BlockBlobStorage for ObjectFS or FileStorage for Azure Files; standard SKUs create StorageV2."
             },
             "type": "string"
         },
@@ -657,17 +635,6 @@
             ],
             "metadata": {
                 "description": "options of moodle global search"
-            },
-            "type": "string"
-        },
-        "tikaService": {
-            "defaultValue": "none",
-            "allowedValues": [
-                "none",
-                "tika"
-            ],
-            "metadata": {
-                "description": "options of enabling tika service for file searching in moodle"
             },
             "type": "string"
         },
@@ -721,16 +688,9 @@
             "type": "string"
         },
         "elasticVmSku": {
-            "defaultValue": "Standard_DS2_v2",
+            "defaultValue": "Standard_D2ds_v5",
             "metadata": {
                 "description": "VM size for the elastic search nodes"
-            },
-            "type": "string"
-        },
-        "tikaVmSku": {
-            "defaultValue": "Standard_DS2_v2",
-            "metadata": {
-                "description": "VM size for the tika search nodes"
             },
             "type": "string"
         },
@@ -773,7 +733,6 @@
         "loadBalancerSku": {
             "defaultValue": "Standard",
             "allowedValues": [
-                "Basic",
                 "Standard"
             ],
             "metadata": {
@@ -795,9 +754,9 @@
         "ubuntuVersion": {
             "type": "string",
             "allowedValues": [
-                "22_04-lts-gen2"
+                "24_04-lts-gen2"
             ],
-            "defaultValue": "22_04-lts-gen2"
+            "defaultValue": "24_04-lts-gen2"
         },
         "location": {
             "type": "string",
@@ -959,54 +918,6 @@
             }
         },
         {
-            "condition": "[and(equals(parameters('tikaService'), 'tika'), not(equals(parameters('searchType'), 'none')))]",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2017-05-10",
-            "dependsOn": [
-                "Microsoft.Resources/deployments/networkTemplate",
-                "Microsoft.Resources/deployments/recoveryTemplate"
-            ],
-            "name": "tikaTemplate",
-            "properties": {
-                "mode": "Incremental",
-                "parameters": {
-                    "moodleCommon": {
-                        "value": "[variables('moodleCommon')]"
-                    },
-                    "subnetIdTika": {
-                        "value": "[reference('networkTemplate').outputs.subnetIdTika.value]"
-                    }
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl, 'tika.json', parameters('_artifactsLocationSasToken'))]"
-                }
-            }
-        },
-        {
-            "condition": "[equals(parameters('fileServerType'),'gluster')]",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2017-05-10",
-            "dependsOn": [
-                "Microsoft.Resources/deployments/networkTemplate",
-                "Microsoft.Resources/deployments/recoveryTemplate"
-            ],
-            "name": "glusterTemplate",
-            "properties": {
-                "mode": "Incremental",
-                "parameters": {
-                    "moodleCommon": {
-                        "value": "[variables('moodleCommon')]"
-                    },
-                    "subnetIdSan": {
-                        "value": "[reference('networkTemplate').outputs.subnetIdSan.value]"
-                    }
-                },
-                "templateLink": {
-                    "uri": "[concat(variables('moodleCommon').baseTemplateUrl,'gluster.json',parameters('_artifactsLocationSasToken'))]"
-                }
-            }
-        },
-        {
             "condition": "[equals(parameters('fileServerType'),'nfs-ha')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
@@ -1066,9 +977,6 @@
                     "dataDiskSizeInGB": {
                         "value": "[parameters('fileServerDiskSize')]"
                     },
-                    "OSDiskSizeInGB": {
-                        "value": "[parameters('OSDiskSizeInGB')]"
-                    },
                     "resourcesUniqueString": {
                         "value": "[variables('resourceprefix')]"
                     }
@@ -1121,7 +1029,6 @@
             "apiVersion": "2017-05-10",
             "dependsOn": [
                 "Microsoft.Resources/deployments/vmSetupParamsTemplate",
-                "Microsoft.Resources/deployments/glusterTemplate",
                 "Microsoft.Resources/deployments/nfsHaTemplate",
                 "Microsoft.Resources/deployments/recoveryTemplate",
                 "Microsoft.Resources/deployments/networkTemplate",
@@ -1240,7 +1147,6 @@
         "documentation05": "    postgres / mysql  - creates a postgresql / mysql server",
         "documentation06": "    vnet                - creates a virtual network with three subnets",
         "documentation07": "    elastic             - creates a elastic search cluster on a vm farm",
-        "documentation08": "    gluster             - creates a gluster file system on a vm farm",
         "documentation09": "    webvmss             - creates a vm scale set",
         "documentation10": "    controller          - creates a controller VM and deploys code",
         "documentation11": "GlusterFS Sizing guidance",
@@ -1279,7 +1185,7 @@
             "dbLogin": "[parameters('dbLogin')]",
             "dbLoginPassword": "[concat(substring(uniqueString(resourceGroup().id, deployment().name), 2, 11), '*7', toUpper('pfiwb'))]",
             "dbServerType": "[parameters('dbServerType')]",
-            "dbUsername": "[if(equals(parameters('dbServerType'), 'mysqlflex'), parameters('dbLogin'), concat(parameters('dbLogin'), '@', parameters('dbServerType'), '-', variables('resourceprefix')))]",
+            "dbUsername": "[if(equals(parameters('dbServerType'), 'mssql'), concat(parameters('dbLogin'), '@', parameters('dbServerType'), '-', variables('resourceprefix')), parameters('dbLogin'))]",
             "ddosPlanName": "[concat('ddos-plan-',variables('resourceprefix'))]",
             "ddosSwitch": "[parameters('ddosSwitch')]",
             "elasticVmSku": "[parameters('elasticVmSku')]",
@@ -1314,11 +1220,9 @@
             "gatewayName": "[concat('vnet-gateway-',variables('resourceprefix'))]",
             "gatewayPublicIPName": "[concat('vnet-gw-ip-',variables('resourceprefix'))]",
             "gatewayType": "[parameters('gatewayType')]",
-            "gfsNameRoot": "[concat('gluster-vm-',variables('resourceprefix'))]",
-            "gfxAvailabilitySetName": "[concat('gluster-avset-',variables('resourceprefix'))]",
-            "glusterScriptFilename": "install_gluster.sh",
             "htmlLocalCopySwitch": "[parameters('htmlLocalCopySwitch')]",
             "httpsTermination": "[parameters('httpsTermination')]",
+            "appGwWebSubnetEgressPublicIp": "[parameters('appGwWebSubnetEgressPublicIp')]",
             "installGdprPluginsSwitch": "[parameters('installGdprPluginsSwitch')]",
             "installO365pluginsSwitch": "[parameters('installO365pluginsSwitch')]",
             "installObjectFsSwitch": "[parameters('installObjectFsSwitch')]",
@@ -1336,7 +1240,7 @@
             "moodleDbName": "[parameters('moodleDbName')]",
             "moodleDbPass": "[concat('9#36^', substring(uniqueString(resourceGroup().id, deployment().name), 5, 8), toUpper('ercq'))]",
             "moodleDbUser": "[parameters('moodleDbUser')]",
-            "moodleDbUserAzure": "[if(equals(parameters('dbServerType'), 'mysqlflex'), parameters('moodleDbUser'), concat(parameters('moodleDbUser'), '@', parameters('dbServerType'), '-', variables('resourceprefix')))]",
+            "moodleDbUserAzure": "[if(equals(parameters('dbServerType'), 'mssql'), concat(parameters('moodleDbUser'), '@', parameters('dbServerType'), '-', variables('resourceprefix')), parameters('moodleDbUser'))]",
             "moodleInstallScriptFilename": "install_moodle.sh",
             "moodleOnAzureConfigsJsonPath": "/var/lib/cloud/instance/moodle_on_azure_configs.json",
             "moodleVersion": "[parameters('moodleVersion')]",
@@ -1344,12 +1248,7 @@
             "mssqlDbSize": "[parameters('mssqlDbSize')]",
             "mssqlDbEdition": "[parameters('mssqlDbEdition')]",
             "mssqlVersion": "[parameters('mssqlVersion')]",
-            "mysqlPgresSkuHwFamily": "[parameters('mysqlPgresSkuHwFamily')]",
-            "mysqlPgresSkuName": "[concat(if(equals(parameters('mysqlPgresSkuTier'),'Basic'),'B', if(equals(parameters('mysqlPgresSkuTier'),'GeneralPurpose'),'GP', 'MO')), '_', parameters('mysqlPgresSkuHwFamily'), '_', string(parameters('mysqlPgresVcores')))]",
-            "mysqlPgresSkuTier": "[parameters('mysqlPgresSkuTier')]",
-            "mysqlPgresStgSizeGB": "[parameters('mysqlPgresStgSizeGB')]",
-            "mysqlPgresVcores": "[parameters('mysqlPgresVcores')]",
-            "mysqlVersion": "[parameters('mysqlVersion')]",
+            "mysqlflexVersion": "[parameters('mysqlflexVersion')]",
             "mysqlflexSkuName": "[parameters('mysqlflexSkuName')]",
             "mysqlflexSkuTier": "[if(startsWith(parameters('mysqlflexSkuName'), 'Standard_B'), 'Burstable', if(startsWith(parameters('mysqlflexSkuName'), 'Standard_D'), 'GeneralPurpose', 'MemoryOptimized'))]",
             "mysqlflexStgSizeGiB": "[parameters('mysqlflexStgSizeGiB')]",
@@ -1358,7 +1257,7 @@
             "mysqlflexHaEnabled": "[parameters('mysqlflexHaEnabled')]",
             "mysqlflexAvailabilityZone": "[parameters('mysqlflexAvailabilityZone')]",
             "mysqlflexStandbyAvailabilityZone": "[parameters('mysqlflexStandbyAvailabilityZone')]",
-            "mysqlflexRequireSecureTransport":  "[if(equals(parameters('sslEnforcement'),'Enabled'),'ON','OFF')]",
+            "mysqlflexRequireSecureTransport": "[if(equals(parameters('sslEnforcement'),'Enabled'),'ON','OFF')]",
             "mysqlflexPrivateDnsZoneName": "[concat(parameters('dbServerType'), '-',variables('resourceprefix'),'.private.mysql.database.azure.com')]",
             "nfsByoIpExportPath": "[parameters('nfsByoIpExportPath')]",
             "nfsHaClientsIPRange": "[variables('subnetWebRange')]",
@@ -1368,7 +1267,7 @@
             "nfsHaNode1IP": "[concat(variables('subnetSanPrefix'), '.120')]",
             "osDiskStorageType": "[parameters('osDiskStorageType')]",
             "osType": {
-                "offer": "0001-com-ubuntu-server-jammy",
+                "offer": "0001-com-ubuntu-server-noble",
                 "publisher": "Canonical",
                 "sku": "[parameters('ubuntuVersion')]",
                 "version": "latest"
@@ -1376,6 +1275,9 @@
             "phpVersion": "[parameters('phpVersion')]",
             "policyName": "[concat('policy-',variables('resourceprefix'))]",
             "postgresVersion": "[parameters('postgresVersion')]",
+            "postgresSkuName": "[parameters('postgresSkuName')]",
+            "postgresSkuTier": "[parameters('postgresSkuTier')]",
+            "postgresStorageSizeGiB": "[parameters('postgresStorageSizeGiB')]",
             "redisCacheName": "[concat('redis-',variables('resourceprefix'))]",
             "redisDeploySwitch": "[parameters('redisDeploySwitch')]",
             "redisDns": "[concat('redis-',variables('resourceprefix'),'.redis.cache.windows.net')]",
@@ -1385,7 +1287,6 @@
             "siteURL": "[if(or(empty(parameters('siteURL')), equals(parameters('siteURL'), 'www.example.org')), concat(if(equals(parameters('httpsTermination'), 'AppGw'),'appgw-','lb-'),variables('resourceprefix'),'.',parameters('location'),'.cloudapp.azure.com'), parameters('siteURL'))]",
             "sshPublicKey": "[parameters('sshPublicKey')]",
             "sshUsername": "[parameters('sshUsername')]",
-            "sslEnforcement": "[parameters('sslEnforcement')]",
             "storageAccountName": "[tolower(concat('abs',variables('resourceprefix')))]",
             "storageAccountType": "[parameters('storageAccountType')]",
             "subnetDb": "[concat('db-subnet-',variables('resourceprefix'))]",
@@ -1406,20 +1307,11 @@
             "subnetSan": "[concat('san-subnet-',variables('resourceprefix'))]",
             "subnetSanPrefix": "[variables('subnetSanPrefix')]",
             "subnetSanRange": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),2)), '.0/24')]",
-            "subnetTika": "[concat('tika-subnet-',variables('resourceprefix'))]",
-            "subnetTikaPrefix": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),1)))]",
-            "subnetTikaRange": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),1)), '.0/24')]",
             "subnetWeb": "[concat('web-subnet-',variables('resourceprefix'))]",
             "subnetWebPrefix": "[concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),0)))]",
             "subnetWebRange": "[variables('subnetWebRange')]",
             "thumbprintSslCert": "[if(or(empty(parameters('keyVaultResourceId')), empty(parameters('sslCertThumbprint'))), 'None', parameters('sslCertThumbprint'))]",
             "thumbprintCaCert": "[if(or(empty(parameters('keyVaultResourceId')), empty(parameters('caCertThumbprint'))), 'None', parameters('caCertThumbprint'))]",
-            "tikaNicName": "[concat('tika-vm-nic-',variables('resourceprefix'))]",
-            "tikaScriptFilename": "install_tika.sh",
-            "tikaService": "[parameters('tikaService')]",
-            "tikaVmIP": "[if(equals(parameters('tikaService'), 'tika'), concat( variables('octets')[0], '.', variables('octets')[1], '.', string(add(int(variables('octets')[2]),1)), '.20'), 'none')]",
-            "tikaVmName": "[concat('tika-vm-',variables('resourceprefix'))]",
-            "tikaVmSku": "[parameters('tikaVmSku')]",
             "vNetAddressSpace": "[parameters('vNetAddressSpace')]",
             "vaultName": "[concat('vault-',variables('resourceprefix'))]",
             "vmssName": "[concat('vmss-',variables('resourceprefix'))]",

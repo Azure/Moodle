@@ -1,8 +1,8 @@
 {
     "sshPublicKey":         { "value": "GEN-SSH-PUB-KEY" },
     "redisDeploySwitch":    { "value": false },
-    "dbServerType":         { "value": "mysql" },
+    "dbServerType":         { "value": "mysqlflex" },
     "fileServerType":       { "value": "nfs" },
-    "autoscaleVmSku":       { "value": "Standard_DS1_v2" },
+    "autoscaleVmSku":       { "value": "Standard_D2ds_v5" },
     "fileServerDiskCount":  { "value": 2 }
 }
