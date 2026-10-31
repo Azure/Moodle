@@ -51,7 +51,7 @@
                 "description": "Switch to enable Azure Accelerated Networking (Note: this feature is NOT available for D1-level VM SKU)"
             },
             "type": "bool",
-            "defaultValue": false
+            "defaultValue": true
         },
         "availSetId": {
             "metadata": {
@@ -64,7 +64,7 @@
                 "description": "Azure VM SKU for the NFS HA VMs"
             },
             "type": "string",
-            "defaultValue": "Standard_DS2_v2"
+            "defaultValue": "Standard_D4ds_v5"
         },
         "adminUserName": {
             "metadata": {
@@ -150,11 +150,17 @@
                         }
                     }
                 ],
-                "enableAcceleratedNetworking": "[parameters('enableAccelNwSwitch')]"
+                "enableAcceleratedNetworking": "[parameters('enableAccelNwSwitch')]",
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('nicName'), '-nsg'))]"
+                }
             },
             "tags": {
                 "displayName": "[concat('NIC for NFS-HA node', parameters('vmIndex'), ' VM')]"
-            }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('nicName'), '-nsg'))]"
+            ]
         },
         {
             "type": "Microsoft.Compute/virtualMachines",
@@ -235,7 +241,7 @@
                                 "[variables('commonFunctionsScriptUri')]"
                             ]
                         },
-                        "protectedSettings":{
+                        "protectedSettings": {
                             "commandToExecute": "[variables('cmdExec')]"
                         },
                         "type": "CustomScript",
@@ -245,9 +251,18 @@
                         "displayName": "NFS-HA VM setup CustomScript extension"
                     }
                 }
-                    ],
+            ],
             "tags": {
                 "displayName": "[concat('NFS-HA Virtual Machine ', variables('vmName'))]"
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2024-05-01",
+            "name": "[concat(variables('nicName'), '-nsg')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "securityRules": []
             }
         }
     ],

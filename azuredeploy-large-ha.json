@@ -48,7 +48,7 @@
                     "redisDeploySwitch":            { "value": true },
                     "sshPublicKey":                 { "value": "[parameters('sshPublicKey')]" },
                     "autoscaleVmCountMax":          { "value": 20 },
-                    "autoscaleVmSku":		        { "value": "Standard_DS3_v2" },
+                    "autoscaleVmSku":		        { "value": "Standard_D4ds_v5" },
                     "searchType":                   { "value": "elastic" },
                     "dbServerType":                 { "value": "mysqlflex" },
                     "vnetDbDeploySwitch":           { "value": true },

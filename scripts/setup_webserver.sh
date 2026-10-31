@@ -29,8 +29,6 @@ moodle_on_azure_configs_json_path=${1}
 
 get_setup_params_from_configs_json "$moodle_on_azure_configs_json_path" || exit 99
 
-echo "$glusterNode"           >> /tmp/vars.txt
-echo "$glusterVolume"         >> /tmp/vars.txt
 echo "$siteFQDN"              >> /tmp/vars.txt
 echo "$httpsTermination"      >> /tmp/vars.txt
 echo "$syslogServer"          >> /tmp/vars.txt
@@ -95,7 +93,6 @@ check_fileServerType_param "$fileServerType"
     php-gd \
     php-pgsql \
     php-mysql \
-    php-xmlrpc \
     php-intl \
     php-xml \
     php-bz2
@@ -130,12 +127,7 @@ EOF
   systemctl enable tuned
   tuned-adm profile throughput-performance
 
-  if [ "$fileServerType" = "gluster" ]; then
-    #configure gluster repository & install gluster client
-    add-apt-repository ppa:gluster/glusterfs-9 --yes
-    apt_update_noninteractive
-    apt_install_noninteractive glusterfs-client
-  elif [ "$fileServerType" = "azurefiles" ]; then
+  if [ "$fileServerType" = "azurefiles" ]; then
     apt_install_noninteractive \
       linux-modules-extra-azure \
       cifs-utils >> /tmp/apt.log
@@ -164,14 +156,7 @@ EOF
   # PHP Version
   PhpVer=$(get_php_version)
 
-  if [ "$fileServerType" = "gluster" ]; then
-    # Mount gluster fs for /moodle
-    sudo mkdir -p /moodle
-    sudo chown www-data /moodle
-    sudo chmod 770 /moodle
-    sudo echo -e 'Adding Gluster FS to /etc/fstab and mounting it'
-    setup_and_mount_gluster_moodle_share "$glusterNode" "$glusterVolume"
-  elif [ $fileServerType = "nfs" ]; then
+  if [ "$fileServerType" = "nfs" ]; then
     # mount NFS export (set up on controller VM--No HA)
     echo -e '\n\rMounting NFS export from '$nfsVmName':/moodle on /moodle and adding it to /etc/fstab\n\r'
     configure_nfs_client_and_mount $nfsVmName /moodle /moodle
@@ -279,13 +264,12 @@ EOF
   # Set up html dir local copy if specified
   htmlRootDir="/moodle/html/moodle"
   if [ "$htmlLocalCopySwitch" = "true" ]; then
+    htmlRootDir="/var/www/html/moodle"
     if [ "$fileServerType" = "azurefiles" ]; then
       mkdir -p /var/www/html
       ACCOUNT_KEY="$storageAccountKey"
       NAME="$storageAccountName"
       END=$(date -u -d "60 minutes" '+%Y-%m-%dT%H:%M:00Z')
-      htmlRootDir="/var/www/html/moodle"
-
       sas=$(az storage share generate-sas \
         -n moodle \
         --account-key $ACCOUNT_KEY \
@@ -301,13 +285,14 @@ EOF
       chown www-data:www-data -R $htmlRootDir && sync
       setup_html_local_copy_cron_job
     fi
-    if [ "$fileServerType" = "nfs" -o "$fileServerType" = "nfs-ha" -o "$fileServerType" = "nfs-byo" -o "$fileServerType" = "gluster" ]; then
+    if [[ "$fileServerType" == "nfs" || "$fileServerType" == "nfs-ha" || "$fileServerType" == "nfs-byo" ]]; then
       mkdir -p /var/www/html/moodle
       rsync -a /moodle/html/moodle/ $htmlRootDir/
       chown www-data:www-data -R $htmlRootDir && sync
       setup_html_local_copy_cron_job
     fi
   fi
+  htmlRootDir="${htmlRootDir}/public"
 
   if [ "$httpsTermination" = "VMSS" ]; then
     # Configure nginx/https
@@ -381,7 +366,6 @@ EOF
         if (\$http_x_forwarded_proto != https) {
                 return 301 https://\$server_name\$request_uri;
         }
-        rewrite ^/(.*\.php)(/)(.*)$ /\$1?file=/\$3 last;
 EOF
     fi
     cat <<EOF >> /etc/nginx/sites-enabled/${siteFQDN}.conf
@@ -391,13 +375,13 @@ EOF
         }
 
   location / {
-    try_files \$uri \$uri/index.php?\$query_string;
+    try_files \$uri \$uri/ /r.php\$is_args\$args;
   }
  
         location ~ [^/]\.php(/|$) {
           fastcgi_split_path_info ^(.+?\.php)(/.*)$;
           if (!-f \$document_root\$fastcgi_script_name) {
-                  return 404;
+              rewrite ^ /r.php last;
           }
  
           fastcgi_buffers 16 16k;
@@ -432,9 +416,11 @@ EOF
   DocumentRoot ${htmlRootDir}
 
   <Directory ${htmlRootDir}>
-    Options FollowSymLinks
+    Options -Indexes +FollowSymLinks
     AllowOverride All
     Require all granted
+    AcceptPathInfo On
+    FallbackResource /r.php
   </Directory>
 EOF
     if [ "$httpsTermination" != "None" ]; then

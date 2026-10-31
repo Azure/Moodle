@@ -42,7 +42,7 @@
     "resources": [
       {
         "type": "Microsoft.DBforMySQL/flexibleServers",
-        "apiVersion": "2021-05-01",
+        "apiVersion": "2025-06-01-preview",
         "location": "[parameters('moodleCommon').location]",
         "name": "[parameters('moodleCommon').serverName]",
         "sku": {
@@ -50,7 +50,8 @@
           "tier": "[parameters('moodleCommon').mysqlflexSkuTier]"
         },
         "properties": {
-          "version": "[parameters('moodleCommon').mysqlVersion]",
+          "createMode": "Default",
+          "version": "[parameters('moodleCommon').mysqlflexVersion]",
           "administratorLogin": "[parameters('moodleCommon').dbLogin]",
           "administratorLoginPassword": "[parameters('moodleCommon').dbLoginPassword]",
           "availabilityZone": "[parameters('moodleCommon').mysqlflexAvailabilityZone]",
@@ -58,13 +59,13 @@
             "mode": "[parameters('moodleCommon').mysqlflexHaEnabled]",
             "standbyAvailabilityZone": "[parameters('moodleCommon').mysqlflexStandbyAvailabilityZone]"
           },
-          "Storage": {
+          "storage": {
             "storageSizeGB": "[parameters('moodleCommon').mysqlflexStgSizeGiB]",
             "iops": "[parameters('moodleCommon').mysqlflexStgIops]",
-            "autogrow": "[parameters('moodleCommon').mysqlflexStgAutogrow]"
+            "autoGrow": "[parameters('moodleCommon').mysqlflexStgAutogrow]"
           },
-          "network": "[if(parameters('moodleCommon').vnetDbDeploySwitch, variables('vnetNetworkData'), createObject())]",
-          "Backup": {
+          "network": "[if(parameters('moodleCommon').vnetDbDeploySwitch, variables('vnetNetworkData'), variables('publicNetworkData'))]",
+          "backup": {
             "backupRetentionDays": 35,
             "geoRedundantBackup": "Enabled"
           }
@@ -142,7 +143,11 @@
     "variables": {
       "vnetNetworkData": {
         "delegatedSubnetResourceId": "[parameters('subnetIdDb')]",
-        "privateDnsZoneResourceId": "[resourceId('Microsoft.Network/privateDnsZones', parameters('moodleCommon').mysqlflexPrivateDnsZoneName)]"
+        "privateDnsZoneResourceId": "[resourceId('Microsoft.Network/privateDnsZones', parameters('moodleCommon').mysqlflexPrivateDnsZoneName)]",
+        "publicNetworkAccess": "Disabled"
+      },
+      "publicNetworkData": {
+        "publicNetworkAccess": "Enabled"
       }
     },
     "outputs": {

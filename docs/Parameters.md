@@ -146,24 +146,35 @@ Default: false
 
 ### enableAccelNwForCtlrVmSwitch
 
-Switch to enable Azure Accelerated Networking on the controller VM. Default to false because currently the default controller VM SKU (D1) doesn't support AN. Change this to true if you set the controller VM SKU to eligibible ones (e.g., D2) for better performance.
-
-Type: bool
-
-Possible Values: null
-
-Default: false
-
-
-### enableAccelNwForOtherVmsSwitch
-
-Switch to enable Azure Accelerated Networking on all other VMs. Default to true because currently the default controller VM SKU for all other VMS (D2) does support AN. Change this to false if you set the SKU of any other VMs to an ineligibible one (e.g., D1) to avoid deployment failure.
+Switch to enable Azure Accelerated Networking on the controller VM. Required by the default Ddsv5 VM size; keep enabled unless selecting a different compatible VM family.
 
 Type: bool
 
 Possible Values: null
 
 Default: true
+
+
+### enableAccelNwForOtherVmsSwitch
+
+Switch to enable Azure Accelerated Networking on all other VMs. Required by the default Ddsv5 VM sizes; keep enabled unless selecting a different compatible VM family.
+
+Type: bool
+
+Possible Values: null
+
+Default: true
+
+
+### vnetDbDeploySwitch
+
+Switch to deploying the db in VNet. Note: currently the Vnet DB Deployment is available for mysqlflex only. For other db server types, the database will not be deployed in VNet.
+
+Type: bool
+
+Possible Values: null
+
+Default: false
 
 
 ### httpsTermination
@@ -194,9 +205,9 @@ The Moodle version you want to install.
 
 Type: string
 
-Possible Values: ["MOODLE_35_STABLE","MOODLE_34_STABLE","v3.4.3","v3.4.2","v3.4.1","MOODLE_33_STABLE","MOODLE_32_STABLE","MOODLE_31_STABLE","MOODLE_30_STABLE","MOODLE_29_STABLE"]
+Possible Values: ["MOODLE_503_STABLE"]
 
-Default: MOODLE_35_STABLE
+Default: MOODLE_503_STABLE
 
 
 ### sshPublicKey
@@ -229,7 +240,7 @@ Type: string
 
 Possible Values: null
 
-Default: Standard_DS1_v2
+Default: Standard_D4ds_v5
 
 
 ### webServerType
@@ -240,7 +251,7 @@ Type: string
 
 Possible Values: ["apache","nginx"]
 
-Default: apache
+Default: nginx
 
 
 ### autoscaleVmSku
@@ -251,7 +262,7 @@ Type: string
 
 Possible Values: null
 
-Default: Standard_DS2_v2
+Default: Standard_D2ds_v5
 
 
 ### autoscaleVmCountMax
@@ -287,15 +298,26 @@ Possible Values: ["Premium_LRS","Standard_LRS"]
 Default: Premium_LRS
 
 
+### phpVersion
+
+php version
+
+Type: string
+
+Possible Values: ["8.3"]
+
+Default: 8.3
+
+
 ### dbServerType
 
 Database type
 
 Type: string
 
-Possible Values: ["postgres","mysql","mssql"]
+Possible Values: ["postgres","mssql","mysqlflex"]
 
-Default: mysql
+Default: mysqlflex
 
 
 ### dbLogin
@@ -309,70 +331,158 @@ Possible Values: null
 Default: dbadmin
 
 
-### mysqlPgresVcores
+### moodleDbName
 
-MySql/Postgresql vCores. For Basic tier, only 1 & 2 are allowed. For GeneralPurpose tier, 2, 4, 8, 16, 32 are allowed. For MemoryOptimized, 2, 4, 8, 16 are allowed.
+Moodle Database name
 
-Type: int
+Type: string
 
-Possible Values: [1,2,4,8,16,32]
+Possible Values: null
 
-Default: 2
+Default: moodle
 
 
-### mysqlPgresStgSizeGB
+### moodleDbUser
 
-MySql/Postgresql storage size in GB. Minimum 5GB, increase by 1GB, up to 1TB (1024 GB)
+Moodle Database username. This user is different from Database admin user.
+
+Type: string
+
+Possible Values: null
+
+Default: moodle
+
+
+### mysqlflexVersion
+
+MySQL Flexible Server version for new Moodle 5.3 deployments. Uses API 2025-06-01-preview for MySQL 8.4; existing databases require a separate backed-up upgrade and cutover plan.
+
+Type: string
+
+Possible Values: ["8.4"]
+
+Default: 8.4
+
+
+### mysqlflexSkuName
+
+The name of the sku for Azure Database for MySQL Flexible Servers, e.g. Standard_D32ds_v4. Complete list is available here : https://learn.microsoft.com/en-us/azure/mysql/flexible-server/concepts-service-tiers-storage
+
+Type: string
+
+Possible Values: ["Standard_B1s","Standard_B1ms","Standard_B2s","Standard_B2ms","Standard_B4ms","Standard_B8ms","Standard_B12ms","Standard_B16ms","Standard_B20ms","Standard_D2ads_v5","Standard_D2ds_v4","Standard_D4ads_v5","Standard_D4ds_v4","Standard_D8ads_v5","Standard_D8ds_v4","Standard_D16ads_v5","Standard_D16ds_v4","Standard_D32ads_v5","Standard_D32ds_v4","Standard_D48ads_v5","Standard_D48ds_v4","Standard_D64ads_v5","Standard_D64ds_v4","Standard_E2ds_v4","Standard_E2ads_v5","Standard_E4ds_v4","Standard_E4ads_v5","Standard_E8ds_v4","Standard_E8ads_v5","Standard_E16ds_v4","Standard_E16ads_v5","Standard_E32ds_v4","Standard_E32ads_v5","Standard_E48ds_v4","Standard_E48ads_v5","Standard_E64ds_v4","Standard_E64ads_v5","Standard_E80ids_v4","Standard_E2ds_v5","Standard_E4ds_v5","Standard_E8ds_v5","Standard_E16ds_v5","Standard_E32ds_v5","Standard_E48ds_v5","Standard_E64ds_v5","Standard_E96ds_v5"]
+
+Default: Standard_B2s
+
+
+### mysqlflexStgSizeGiB
+
+Azure Database for MySQL Flexible server storage size in GiB. Minimum 20GiB, increase by 1GiB, up to 16TiB (1024 GiB)
 
 Type: int
 
 Possible Values: null
 
-Default: 125
+Default: 20
 
 
-### mysqlPgresSkuTier
+### mysqlflexStgIops
 
-MySql/Postgresql sku tier
+Azure Database for MySQL Flexible server storage iops. Minimum 360, Maxium is determined by selected mysqlflexSkuName.
 
-Type: string
+Type: int
 
-Possible Values: ["Basic","GeneralPurpose","MemoryOptimized"]
+Possible Values: null
 
-Default: GeneralPurpose
-
-
-### mysqlPgresSkuHwFamily
-
-MySql/Postgresql sku hardware family. Central US is Gen4 only, so make sure to change this parameter to Gen4 if your deployment is on Central US.
-
-Type: string
-
-Possible Values: ["Gen4","Gen5"]
-
-Default: Gen5
+Default: 360
 
 
-### mysqlVersion
+### mysqlflexStgAutogrow
 
-Mysql version
+
 
 Type: string
 
-Possible Values: ["5.6","5.7"]
+Possible Values: ["Enabled","Disabled"]
 
-Default: 5.7
+Default: Enabled
+
+
+### mysqlflexHaEnabled
+
+High availability mode for azure database for mysql flexible server.
+
+Type: string
+
+Possible Values: ["Disabled","SameZone","ZoneRedundant"]
+
+Default: Disabled
+
+
+### mysqlflexAvailabilityZone
+
+Availability Zone information of the server. (Leave blank for No Preference).
+
+Type: string
+
+Possible Values: ["1","2","3",""]
+
+Default:
+
+
+### mysqlflexStandbyAvailabilityZone
+
+Availability zone of the High availability standby server. (Leave blank for No Preference). Add this value if HA is enabled.
+
+Type: string
+
+Possible Values: ["1","2","3",""]
+
+Default:
 
 
 ### postgresVersion
 
-Postgresql version
+PostgreSQL Flexible Server major version for new deployments. Existing databases require a separately rehearsed migration and rollback plan.
 
 Type: string
 
-Possible Values: ["9.5","9.6"]
+Possible Values: ["18"]
 
-Default: 9.6
+Default: 18
+
+
+### postgresSkuName
+
+PostgreSQL Flexible Server compute size; verify regional availability and tier compatibility.
+
+Type: string
+
+Possible Values: null
+
+Default: Standard_D2ds_v5
+
+
+### postgresSkuTier
+
+PostgreSQL Flexible Server compute tier matching postgresSkuName.
+
+Type: string
+
+Possible Values: ["Burstable","GeneralPurpose","MemoryOptimized"]
+
+Default: GeneralPurpose
+
+
+### postgresStorageSizeGiB
+
+PostgreSQL Flexible Server Premium SSD storage size in GiB.
+
+Type: int
+
+Possible Values: null
+
+Default: 128
 
 
 ### sslEnforcement
@@ -432,11 +542,11 @@ Default: 12.0
 
 ### fileServerType
 
-File server type: GlusterFS, NFS, and NFS-HA (2-VM highly available NFS cluster)
+Shared file service: NFS, NFS-HA, BYO NFS or Azure Files. Gluster is no longer supported.
 
 Type: string
 
-Possible Values: ["gluster","nfs","nfs-ha","nfs-byo"]
+Possible Values: ["nfs","nfs-ha","nfs-byo","azurefiles"]
 
 Default: nfs
 
@@ -449,12 +559,23 @@ Type: string
 
 Possible Values: null
 
-Default: 
+Default:
+
+
+### OSDiskSizeInGB
+
+OS disk size per Webserver in VMSS
+
+Type: int
+
+Possible Values: null
+
+Default: 256
 
 
 ### fileServerDiskSize
 
-Size per disk for gluster nodes or nfs server
+Size in GiB per NFS data disk
 
 Type: int
 
@@ -465,7 +586,7 @@ Default: 127
 
 ### fileServerDiskCount
 
-Number of disks in raid0 per gluster node or nfs server
+Number of data disks for the NFS server
 
 Type: int
 
@@ -476,13 +597,13 @@ Default: 4
 
 ### fileServerVmSku
 
-VM size for the gluster or NFS-HA nodes
+VM size for the NFS-HA nodes
 
 Type: string
 
 Possible Values: null
 
-Default: Standard_DS2_v2
+Default: Standard_D4ds_v5
 
 
 ### keyVaultResourceId
@@ -562,15 +683,26 @@ Possible Values: null
 Default: 
 
 
+### appGwWebSubnetEgressPublicIp
+
+(App Gateway with a custom VNet only) Static public egress IP used by the web subnet. Required when the custom web subnet uses public database access; ignored for repository-created VNets, which deploy a NAT Gateway.
+
+Type: string
+
+Possible Values: null
+
+Default:
+
+
 ### appGwSkuName
 
 (App Gateway https termination only) Name of the Applicate Gateway SKU
 
 Type: string
 
-Possible Values: ["Standard_Small","Standard_Medium","Standard_Large","WAF_Medium","WAF_Large"]
+Possible Values: ["Standard_v2","WAF_v2"]
 
-Default: Standard_Medium
+Default: Standard_v2
 
 
 ### appGwSkuTier
@@ -579,9 +711,9 @@ Default: Standard_Medium
 
 Type: string
 
-Possible Values: ["Standard","WAF"]
+Possible Values: ["Standard_v2","WAF_v2"]
 
-Default: Standard
+Default: Standard_v2
 
 
 ### appGwSkuCapacity
@@ -597,11 +729,11 @@ Default: 2
 
 ### storageAccountType
 
-Storage Account type. This storage account is only for the Moodle ObjectFS plugin and/or the (currently disabled) Azure Files file share option
+Storage account replication and performance. Premium_LRS creates BlockBlobStorage for ObjectFS or FileStorage for Azure Files; standard SKUs create StorageV2.
 
 Type: string
 
-Possible Values: ["Standard_LRS","Standard_GRS","Standard_ZRS"]
+Possible Values: ["Standard_LRS","Standard_GRS","Standard_ZRS","Premium_LRS"]
 
 Default: Standard_LRS
 
@@ -613,17 +745,6 @@ options of moodle global search
 Type: string
 
 Possible Values: ["none","azure","elastic"]
-
-Default: none
-
-
-### tikaService
-
-options of enabling tika service for file searching in moodle
-
-Type: string
-
-Possible Values: ["none","tika"]
 
 Default: none
 
@@ -680,18 +801,7 @@ Type: string
 
 Possible Values: null
 
-Default: Standard_DS2_v2
-
-
-### tikaVmSku
-
-VM size for the tika search nodes
-
-Type: string
-
-Possible Values: null
-
-Default: Standard_DS2_v2
+Default: Standard_D2ds_v5
 
 
 ### customVnetId
@@ -744,9 +854,31 @@ Loadbalancer SKU
 
 Type: string
 
-Possible Values: ["Basic","Standard"]
+Possible Values: ["Standard"]
 
-Default: Basic
+Default: Standard
+
+
+### loadBalancerTier
+
+Loadbalancer Tier
+
+Type: string
+
+Possible Values: ["Regional","Global"]
+
+Default: Regional
+
+
+### ubuntuVersion
+
+
+
+Type: string
+
+Possible Values: ["24_04-lts-gen2"]
+
+Default: 24_04-lts-gen2
 
 
 ### location
@@ -760,3 +892,12 @@ Possible Values: null
 Default: [resourceGroup().location]
 
 
+### isMigration
+
+Indicates whether the this template is using for migration scenario.
+
+Type: bool
+
+Possible Values: null
+
+Default: false

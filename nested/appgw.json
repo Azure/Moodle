@@ -26,7 +26,7 @@
             "type": "Microsoft.Network/applicationGateways",
             "name": "[parameters('moodleCommon').appGwName]",
             "location": "[parameters('moodleCommon').location]",
-            "apiVersion": "2019-11-01",
+            "apiVersion": "2024-05-01",
             "properties": {
                 "sku": {
                     "name": "[parameters('moodleCommon').appGwSkuName]",
@@ -65,7 +65,7 @@
                         "properties": {
                             "port": 80
                         }
-                    }                    
+                    }
                 ],
                 "backendAddressPools": [
                     {
@@ -123,15 +123,15 @@
                     {
                         "name": "httpToHttps",
                         "properties": {
-                            "redirectType":"Permanent",
-                            "includePath" : true,
-                            "includeQueryString" : true,
+                            "redirectType": "Permanent",
+                            "includePath": true,
+                            "includeQueryString": true,
                             "targetListener": {
                                 "id": "[concat(variables('appGwID'), '/httpListeners/appGwHttpsListener')]"
                             }
                         }
                     }
-                ],                
+                ],
                 "requestRoutingRules": [
                     {
                         "Name": "httpsRule",
@@ -145,7 +145,8 @@
                             },
                             "backendHttpSettings": {
                                 "id": "[concat(variables('appGwID'), '/backendHttpSettingsCollection/appGwBackendHttpSettings')]"
-                            }
+                            },
+                            "priority": 100
                         }
                     },
                     {
@@ -157,7 +158,8 @@
                             },
                             "redirectConfiguration": {
                                 "id": "[concat(variables('appGwID'), '/redirectConfigurations/httpToHttps')]"
-                            }
+                            },
+                            "priority": 101
                         }
                     }
                 ]

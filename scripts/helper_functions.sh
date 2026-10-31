@@ -49,8 +49,6 @@ function get_setup_params_from_configs_json
 
     local json=$(cat $configs_json_path)
     export moodleVersion=$(echo $json | jq -r .moodleProfile.version)
-    export glusterNode=$(echo $json | jq -r .fileServerProfile.glusterVmName)
-    export glusterVolume=$(echo $json | jq -r .fileServerProfile.glusterVolName)
     export siteFQDN=$(echo $json | jq -r .siteProfile.siteURL)
     export httpsTermination=$(echo $json | jq -r .siteProfile.httpsTermination)
     export dbIP=$(echo $json | jq -r .dbServerProfile.fqdn)
@@ -80,7 +78,6 @@ function get_setup_params_from_configs_json
     export searchType=$(echo $json | jq -r .moodleProfile.searchType)
     export azureSearchKey=$(echo $json | jq -r .moodleProfile.azureSearchKey)
     export azureSearchNameHost=$(echo $json | jq -r .moodleProfile.azureSearchNameHost)
-    export tikaVmIP=$(echo $json | jq -r .moodleProfile.tikaVmIP)
     export syslogServer=$(echo $json | jq -r .moodleProfile.syslogServer)
     export webServerType=$(echo $json | jq -r .moodleProfile.webServerType)
     export htmlLocalCopySwitch=$(echo $json | jq -r .moodleProfile.htmlLocalCopySwitch)
@@ -100,6 +97,17 @@ function get_php_version {
         _PHPVER=`/usr/bin/php -r "echo PHP_VERSION;" | /usr/bin/cut -c 1,2,3`
     fi
     echo $_PHPVER
+}
+
+function install_postgresql_client
+{
+  apt_install_noninteractive ca-certificates curl
+  mkdir -p /etc/apt/keyrings
+  curl --fail --silent --show-error --location https://www.postgresql.org/media/keys/ACCC4CF8.asc -o /etc/apt/keyrings/postgresql.asc
+  chmod 644 /etc/apt/keyrings/postgresql.asc
+  printf 'deb [signed-by=/etc/apt/keyrings/postgresql.asc] https://apt.postgresql.org/pub/repos/apt %s-pgdg main\n' "$(lsb_release -cs)" > /etc/apt/sources.list.d/pgdg.list
+  apt_update_noninteractive
+  apt_install_noninteractive postgresql-client-18
 }
 
 function install_php_mssql_driver
@@ -139,8 +147,8 @@ function install_php_mssql_driver
 function check_fileServerType_param
 {
     local fileServerType=$1
-    if [ "$fileServerType" != "gluster" -a "$fileServerType" != "azurefiles" -a "$fileServerType" != "nfs" -a "$fileServerType" != "nfs-ha" -a "$fileServerType" != "nfs-byo" ]; then
-        echo "Invalid fileServerType ($fileServerType) given. Only 'gluster', 'azurefiles', 'nfs', 'nfs-ha' or 'nfs-byo' are allowed. Exiting"
+    if [[ "$fileServerType" != "azurefiles" && "$fileServerType" != "nfs" && "$fileServerType" != "nfs-ha" && "$fileServerType" != "nfs-byo" ]]; then
+      echo "Invalid fileServerType ($fileServerType) given. Only 'azurefiles', 'nfs', 'nfs-ha' or 'nfs-byo' are allowed. Exiting"
         exit 1
     fi
 }
@@ -208,15 +216,6 @@ function check_azure_files_moodle_share_exists
       echo "File share 'moodle' does not exists in the storage account ($storageAccountName)"
       exit 1
     fi
-}
-
-function setup_and_mount_gluster_moodle_share
-{
-    local glusterNode=$1
-    local glusterVolume=$2
-
-    grep -q "/moodle.*glusterfs" /etc/fstab || echo -e $glusterNode':/'$glusterVolume'   /moodle         glusterfs       defaults,_netdev,log-level=WARNING,log-file=/var/log/gluster.log 0 0' >> /etc/fstab
-    mount /moodle
 }
 
 function setup_and_mount_azure_files_moodle_share
