@@ -5,10 +5,13 @@ var templates = ['nested/*.json', 'managedApplication/*.json', 'loadtest/*.json'
 
 grunt.initConfig({
   jshint: {
-      files: templates,
+      files: templates.concat(['tests/*.js']),
       options: {
           jshintrc: '.jshintrc'
       }
   }
 });
-grunt.registerTask('test', ['jshint']);
+grunt.registerTask('deployment-regressions', function () {
+    require('./tests/deployment-regressions')();
+});
+grunt.registerTask('test', ['jshint', 'deployment-regressions']);

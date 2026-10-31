@@ -144,6 +144,18 @@ big your Moodle cron runs are this may not be sufficient. If cron jobs
 are very delayed and cron processes are building up on the controller
 then an upgrade in tier is needed.
 
+The controller's dynamic PHP-FPM pool allows at most 40 children, starts 8,
+and keeps between 4 and 12 spare workers. Size the VM for the observed
+worker memory usage rather than assuming every child can reach PHP's
+memory limit simultaneously.
+
+Moodle cron is scheduled once per minute. Each run receives SIGTERM after
+1800 seconds (30 minutes), followed by SIGKILL after another 30 seconds if
+it does not exit. When Redis sessions are enabled, their connection timeout
+is 10 seconds. These safeguards limit stalled connections and cron runs;
+legitimate jobs that need more than 30 minutes require adjusting the cron
+timeout on the controller.
+
 ### Frontend instances
 
 In general the frontend instances will not be the source of any
