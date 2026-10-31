@@ -907,11 +907,13 @@ EOF
         create_redis_configuration_in_moodledata_muc_config_php
 
         # redis configuration in /moodle/html/moodle/config.php
+        sed -i "23 a \$CFG->session_redis_connection_timeout = 10;  // Fail fast instead of hanging forever on dead Redis sockets." /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->session_redis_lock_expire = 7200;" /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->session_redis_acquire_lock_timeout = 120;" /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->session_redis_prefix = 'moodle_prod'; // Optional, default is don't set one." /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->session_redis_database = 0;  // Optional, default is db 0." /moodle/html/moodle/config.php
-        sed -i "23 a \$CFG->session_redis_port = 6379;  // Optional." /moodle/html/moodle/config.php
+        sed -i "23 a \$CFG->session_redis_port = 10000;  // Azure Managed Redis TLS port." /moodle/html/moodle/config.php
+        sed -i "23 a \$CFG->session_redis_encrypt = array('verify_peer' => false, 'verify_peer_name' => false);  // Azure Managed Redis requires TLS." /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->session_redis_host = '$redisDns';" /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->session_redis_auth = '$redisAuth';" /moodle/html/moodle/config.php
         sed -i "23 a \$CFG->session_handler_class = '\\\core\\\session\\\redis';" /moodle/html/moodle/config.php
@@ -965,7 +967,8 @@ EOF
 
    # create cron entry
    # It is scheduled for once per minute. It can be changed as needed.
-   echo '* * * * * www-data /usr/bin/php /moodle/html/moodle/admin/cli/cron.php 2>&1 | /usr/bin/logger -p local2.notice -t moodle' > /etc/cron.d/moodle-cron
+   # timeout guard prevents zombie cron processes piling up on dead Redis/DB sockets.
+   echo '* * * * * www-data /usr/bin/timeout -k 30 1800 /usr/bin/php /moodle/html/moodle/admin/cli/cron.php 2>&1 | /usr/bin/logger -p local2.notice -t moodle' > /etc/cron.d/moodle-cron
 
    # Set up cronned sql dump
    if [ "$dbServerType" = "mysql" ]; then
