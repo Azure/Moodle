@@ -754,9 +754,12 @@
         "ubuntuVersion": {
             "type": "string",
             "allowedValues": [
-                "24_04-lts-gen2"
+                "server"
             ],
-            "defaultValue": "24_04-lts-gen2"
+            "defaultValue": "server",
+            "metadata": {
+                "description": "Azure Marketplace SKU for the Canonical ubuntu-24_04-lts offer. The server SKU is Ubuntu 24.04 LTS AMD64 Gen2."
+            }
         },
         "location": {
             "type": "string",
@@ -1267,7 +1270,7 @@
             "nfsHaNode1IP": "[concat(variables('subnetSanPrefix'), '.120')]",
             "osDiskStorageType": "[parameters('osDiskStorageType')]",
             "osType": {
-                "offer": "0001-com-ubuntu-server-noble",
+                "offer": "ubuntu-24_04-lts",
                 "publisher": "Canonical",
                 "sku": "[parameters('ubuntuVersion')]",
                 "version": "latest"

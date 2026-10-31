@@ -872,13 +872,18 @@ Default: Regional
 
 ### ubuntuVersion
 
-
+Azure Marketplace SKU for Ubuntu 24.04 LTS AMD64 Gen2. The image is
+`Canonical:ubuntu-24_04-lts:server:latest`, as listed in
+[Canonical's image reference](https://github.com/canonical/ubuntu-cloud-docs/blob/main/docs/azure/azure-how-to/instances/find-ubuntu-images.rst).
 
 Type: string
 
-Possible Values: ["24_04-lts-gen2"]
+Possible Values: ["server"]
 
-Default: 24_04-lts-gen2
+Default: server
+
+Existing deployment and migration parameter files that explicitly set
+`ubuntuVersion` to `24_04-lts-gen2` must change that value to `server`.
 
 
 ### location
