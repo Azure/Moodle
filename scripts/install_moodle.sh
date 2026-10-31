@@ -521,10 +521,10 @@ listen = /run/php/php${PhpVer}-fpm.sock
 listen.owner = www-data
 listen.group = www-data
 pm = dynamic
-pm.max_children = 3000
-pm.start_servers = 20 
-pm.min_spare_servers = 22 
-pm.max_spare_servers = 30 
+pm.max_children = 40
+pm.start_servers = 8
+pm.min_spare_servers = 4
+pm.max_spare_servers = 12
 EOF
 
    # Remove the default site. Moodle is the only site we want
