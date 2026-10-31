@@ -21,6 +21,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+set -exo pipefail
+
 esClusterName=$1
 elasticvm1ip=$2
 elasticvm2ip=$3
@@ -62,7 +64,15 @@ function apt_install_noninteractive {
 
   # make sure the system does automatic update
   apt_update_noninteractive
-  apt_install_noninteractive unattended-upgrades apt-transport-https
+  apt_install_noninteractive unattended-upgrades apt-transport-https curl
+
+  # Elasticsearch 5.6 cannot run with Ubuntu's default Java 21.
+  apt_install_noninteractive openjdk-8-jre-headless
+  elasticJavaHome="/usr/lib/jvm/java-8-openjdk-$(dpkg --print-architecture)"
+  if [ ! -x "$elasticJavaHome/bin/java" ]; then
+    echo "Required Elasticsearch Java 8 runtime is missing: $elasticJavaHome/bin/java" >&2
+    exit 1
+  fi
 
   # configure elastic search repository & install elastic search
   wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | gpg --dearmor -o /usr/share/keyrings/elasticsearch-keyring.gpg
@@ -71,8 +81,8 @@ function apt_install_noninteractive {
   apt_update_noninteractive
   apt_install_noninteractive elasticsearch=5.6.16
 
-  # install the required packages
-  apt_install_noninteractive openjdk-8-jre openjdk-8-jdk default-jre default-jdk
+  sed -i '/^[[:space:]]*JAVA_HOME=/d' /etc/default/elasticsearch
+  printf 'JAVA_HOME="%s"\n' "$elasticJavaHome" >> /etc/default/elasticsearch
 
   # Configure elasticsearch
   cat <<EOF > /etc/elasticsearch/elasticsearch.yml
@@ -168,4 +178,22 @@ EOF
 
   service elasticsearch restart
 
-}  > /tmp/setup.log
+  elasticReady=false
+  for attempt in $(seq 1 60); do
+    if curl --fail --silent --show-error --connect-timeout 2 --max-time 3 \
+        http://127.0.0.1:9200/ > /dev/null; then
+      elasticReady=true
+      break
+    fi
+    if ! systemctl is-active --quiet elasticsearch; then
+      break
+    fi
+    sleep 2
+  done
+  if [ "$elasticReady" != "true" ]; then
+    echo "Elasticsearch failed to become responsive on port 9200 using Java 8." >&2
+    journalctl -u elasticsearch --no-pager -n 50 >&2
+    exit 1
+  fi
+
+} 2>&1 | tee /tmp/setup.log
