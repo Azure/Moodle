@@ -96,6 +96,12 @@ The template is highly configurable. Full details of the configuration options c
 
 **Search.** Azure supports running an Elasticsearch cluster, however it does not offer a fully-managed Elasticsearch service, so for those looking for a fully-managed Search service [Azure Search](https://azure.microsoft.com/en-us/services/logic-apps/) is recommended.
 
+The optional legacy Elasticsearch 5.6 service uses an explicitly configured
+Java 8 runtime, not Ubuntu's default Java. Its setup fails if the local HTTP
+endpoint on port 9200 does not become responsive; inspect `/tmp/setup.log`
+and `journalctl -u elasticsearch` on the Elasticsearch VM. This runtime fix
+does not upgrade the legacy Elasticsearch version.
+
 **Caching.** While enabling Redis cache can improve performance for a large Moodle site we have not seen it be very effective for small-to-medium size sites. We can likely improve upon this, patches welcome ;-)
 
 **Regions.** Note that not all resources types (such as databases) may be available in your region. You should check the list of [Azure Products by Region](https://azure.microsoft.com/en-us/global-infrastructure/services/) to for local availability.
