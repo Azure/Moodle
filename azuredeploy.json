@@ -1378,7 +1378,7 @@
             "postgresVersion": "[parameters('postgresVersion')]",
             "redisCacheName": "[concat('redis-',variables('resourceprefix'))]",
             "redisDeploySwitch": "[parameters('redisDeploySwitch')]",
-            "redisDns": "[concat('redis-',variables('resourceprefix'),'.redis.cache.windows.net')]",
+            "redisDns": "[concat('redis-',variables('resourceprefix'),'.',parameters('location'),'.redis.azure.net')]",
             "resourcesPrefix": "[variables('resourceprefix')]",
             "searchType": "[parameters('searchType')]",
             "serverName": "[concat(parameters('dbServerType'), '-',variables('resourceprefix'))]",

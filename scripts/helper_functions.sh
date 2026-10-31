@@ -584,10 +584,11 @@ function create_redis_configuration_in_moodledata_muc_config_php
       'plugin' => 'redis',
       'configuration' => 
       array (
-        'server' => '$redisDns',
+        'server' => '${redisDns}:10000',
         'prefix' => 'moodle_prod',
         'password' => '$redisAuth',
         'serializer' => '1',
+        'encryption' => '1',
       ),
       'features' => 26,
       'modes' => 3,

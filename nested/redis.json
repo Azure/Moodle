@@ -10,36 +10,120 @@
         },
         "subnetIdRedis": {
             "metadata": {
-                "description": "Azure resource ID of the subnet where this Redis instance is to be deployed"
+                "description": "Azure resource ID of the subnet where the Azure Managed Redis private endpoint is to be deployed"
             },
             "type": "string"
         }
     },
     "resources": [
         {
-            "type": "Microsoft.Cache/Redis",
-            "apiVersion": "2016-04-01",
+            "type": "Microsoft.Cache/redisEnterprise",
+            "apiVersion": "2025-07-01",
             "location": "[parameters('moodleCommon').location]",
             "name": "[parameters('moodleCommon').redisCacheName]",
+            "sku": {
+                "name": "Balanced_B20"
+            },
             "properties": {
-                "enableNonSslPort": true,
-                "sku": {
-                    "capacity": 1,
-                    "family": "P",
-                    "name": "Premium"
+                "highAvailability": "Enabled",
+                "minimumTlsVersion": "1.2",
+                "publicNetworkAccess": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Cache/redisEnterprise/databases",
+            "apiVersion": "2025-04-01",
+            "name": "[concat(parameters('moodleCommon').redisCacheName, '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Cache/redisEnterprise', parameters('moodleCommon').redisCacheName)]"
+            ],
+            "properties": {
+                "clientProtocol": "Encrypted",
+                "port": 10000,
+                "clusteringPolicy": "EnterpriseCluster",
+                "evictionPolicy": "VolatileLRU",
+                "accessKeysAuthentication": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones",
+            "apiVersion": "2020-06-01",
+            "location": "global",
+            "name": "[variables('privateDnsZoneName')]",
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+            "apiVersion": "2020-06-01",
+            "location": "global",
+            "name": "[concat(variables('privateDnsZoneName'), '/', uniqueString(variables('vnetId')))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDnsZoneName'))]"
+            ],
+            "properties": {
+                "registrationEnabled": false,
+                "virtualNetwork": {
+                    "id": "[variables('vnetId')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateEndpoints",
+            "apiVersion": "2021-05-01",
+            "location": "[parameters('moodleCommon').location]",
+            "name": "[variables('privateEndpointName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Cache/redisEnterprise/databases', parameters('moodleCommon').redisCacheName, 'default')]"
+            ],
+            "properties": {
+                "subnet": {
+                    "id": "[parameters('subnetIdRedis')]"
                 },
-                "subnetId": "[parameters('subnetIdRedis')]"
+                "privateLinkServiceConnections": [
+                    {
+                        "name": "[variables('privateEndpointName')]",
+                        "properties": {
+                            "privateLinkServiceId": "[variables('redisResourceId')]",
+                            "groupIds": [
+                                "redisEnterprise"
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+            "apiVersion": "2021-05-01",
+            "name": "[concat(variables('privateEndpointName'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateEndpoints', variables('privateEndpointName'))]",
+                "[resourceId('Microsoft.Network/privateDnsZones/virtualNetworkLinks', variables('privateDnsZoneName'), uniqueString(variables('vnetId')))]"
+            ],
+            "properties": {
+                "privateDnsZoneConfigs": [
+                    {
+                        "name": "privatelink-redis-azure-net",
+                        "properties": {
+                            "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDnsZoneName'))]"
+                        }
+                    }
+                ]
             }
         }
     ],
     "variables": {
-        "documentation1": "This sub-template creates a redis cache.  It expects certain values in the 'common' datastructure.",
-        "documentation2": " redisCacheName - name of cache",
-        "redisResourceId": "[resourceId('Microsoft.Cache/Redis', parameters('moodleCommon').redisCacheName)]"
+        "documentation1": "This sub-template creates an Azure Managed Redis (Microsoft.Cache/redisEnterprise) cluster reachable through a private endpoint.  It expects certain values in the 'common' datastructure.",
+        "documentation2": " redisCacheName - name of the Azure Managed Redis cluster",
+        "privateDnsZoneName": "privatelink.redis.azure.net",
+        "privateEndpointName": "[concat(parameters('moodleCommon').redisCacheName, '-pe')]",
+        "vnetId": "[if(equals(parameters('moodleCommon').customVnetId, ''), resourceId('Microsoft.Network/virtualNetworks', parameters('moodleCommon').vnetName), parameters('moodleCommon').customVnetId)]",
+        "redisResourceId": "[resourceId('Microsoft.Cache/redisEnterprise', parameters('moodleCommon').redisCacheName)]",
+        "redisDbResourceId": "[resourceId('Microsoft.Cache/redisEnterprise/databases', parameters('moodleCommon').redisCacheName, 'default')]"
     },
     "outputs": {
         "redisKey": {
-            "value": "[listKeys(variables('redisResourceId'), '2016-04-01').primaryKey]",
+            "value": "[listKeys(variables('redisDbResourceId'), '2025-04-01').primaryKey]",
             "type": "string"
         }
     }
